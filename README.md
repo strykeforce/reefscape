@@ -1,5 +1,7 @@
 # 2025 FIRST REEFSCAPE
 
+[![CI](https://github.com/strykeforce/reefscape/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/reefscape/actions/workflows/main.yml)
+
 ## Controls
 
 ### Driver Controller
