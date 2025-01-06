@@ -187,4 +187,4 @@ compile_commands.json
 .factorypath
 
 #Build constants for Gversion (advantage kit)
-#src/main/java/frc/robot/constants/BuildConstants.java
+src/main/java/frc/robot/constants/BuildConstants.java
