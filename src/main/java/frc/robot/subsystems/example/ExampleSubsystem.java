@@ -1,0 +1,95 @@
+package frc.robot.subsystems.example;
+
+import static edu.wpi.first.units.Units.Rotations;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.ExampleConstants;
+import frc.robot.standards.ClosedLoopPosSubsystem;
+import org.littletonrobotics.junction.Logger;
+// import org.strykeforce.telemetry.TelemetryService;
+// import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+// import org.strykeforce.telemetry.measurable.Measure;
+
+public class ExampleSubsystem extends SubsystemBase implements ClosedLoopPosSubsystem {
+  // Private Variables
+  private final ExampleIO io;
+  private final ExampleIOInputsAutoLogged inputs = new ExampleIOInputsAutoLogged();
+  private Angle setpoint = Rotations.of(0.0);
+  private ExampleState curState = ExampleState.INIT;
+
+  // Constructor
+  public ExampleSubsystem(ExampleIO io) {
+    this.io = io;
+    zero();
+  }
+
+  // Getter/Setter Methods
+  public ExampleState getState() {
+    return curState;
+  }
+
+  @Override
+  public Angle getPosition() {
+    return inputs.position;
+  }
+
+  @Override
+  public void setPosition(Angle position) {
+    io.setPosition(position);
+    setpoint = position;
+  }
+
+  // Helper Methods
+  @Override
+  public void zero() {
+    io.zero();
+    curState = ExampleState.ZEROED;
+  }
+
+  @Override
+  public boolean isFinished() {
+    return setpoint.minus(inputs.position).abs(Rotations)
+        <= ExampleConstants.kCloseEnough.in(Rotations);
+  }
+
+  // Periodic Function
+  @Override
+  public void periodic() {
+    // Read Inputs
+    io.updateInputs(inputs);
+
+    // State Machine
+    switch (curState) {
+      case INIT:
+        break;
+      case ZEROED:
+        break;
+      default:
+        break;
+    }
+
+    // Log Outputs
+    Logger.recordOutput("Example/curState", curState.ordinal());
+    Logger.recordOutput("Example/setpoint", setpoint.in(Rotations));
+  }
+
+  // Grapher
+  // @Override
+  // public void registerWith(TelemetryService telemetryService) {
+
+  //   super.registerWith(telemetryService);
+  //   io.registerWith(telemetryService);
+  // }
+
+  // @Override
+  // public Set<Measure> getMeasures() {
+  //   return Set.of(new Measure("State", () -> curState.ordinal()));
+  // }
+
+  // State Enum
+  public enum ExampleState {
+    INIT,
+    ZEROED
+  }
+}
