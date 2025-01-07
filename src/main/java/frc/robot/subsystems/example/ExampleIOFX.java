@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.ExampleConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.TelemetryService;
 
 public class ExampleIOFX implements ExampleIO {
   // private objects
@@ -67,8 +67,8 @@ public class ExampleIOFX implements ExampleIO {
     inputs.position = currPosition.refresh().getValue().minus(relSetpointOffset);
   }
 
-  //   @Override
-  //   public void registerWith(TelemetryService telemetryService) {
-  //     telemetryService.register(talonFx, true);
-  //   }
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    telemetryService.register(talonFx, true);
+  }
 }
