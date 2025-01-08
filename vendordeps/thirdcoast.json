@@ -7,7 +7,7 @@
     "mavenUrls": [
         "https://s3.us-east-2.amazonaws.com/packages.strykeforce.org/repo/"
     ],
-    "jsonUrl": "http://maven.strykeforce.org/thirdcoast.json",
+    "jsonUrl": "https://s3.us-east-2.amazonaws.com/packages.strykeforce.org/thirdcoast.json",
     "javaDependencies": [
         {
             "groupId": "org.strykeforce",
