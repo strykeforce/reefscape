@@ -1,11 +1,10 @@
 package frc.robot.subsystems.algae;
+
+import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
-import edu.wpi.first.units.measure.AngularVelocity;
-
-
-public interface algaeIO{
+public interface algaeIO {
   @AutoLog
   public static class IOInputs {
     public AngularVelocity velocity;
