@@ -16,9 +16,12 @@ public class DriveConstants {
   public static final double kDriveGearRatio = 6.5;
   public static final double kWheelDiameterInches = 4.0;
   public static final double kMaxSpeedMetersPerSecond = 12.0;
+  public static final double kSpeedStillThreshold = 0.1; // meters per second
+  public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
 
   public static final double kRobotLength = 22.0;
   public static final double kRobotWidth = 22.0;
+  public static final double kFieldMaxX = 690.0;
 
   public static final double kPOmega = 4.5;
   public static final double kIOmega = 0.0;
@@ -41,6 +44,12 @@ public class DriveConstants {
     locs[3] = new Translation2d(-x, -y); // right rear
     return locs;
   }
+
+  // temp stuff
+  public static final int kTempAvgCount = 25;
+  public static final double kTripTemp = 1300;
+  public static final double kRecoverTemp = 1290;
+  public static final double kNotifyTemp = 1295;
 
   public static TalonSRXConfiguration
       getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
