@@ -17,6 +17,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
 
   public void setPosition(Angle position) {
     io.setPosition(position);
+    setPoint = position;
   }
 
   public Angle getPosition(Angle position) {
@@ -45,5 +46,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(new Measure("Is Biscuit Finished", () -> isFinished() ? 1.0 : 0.0));
+  }
+
+  public void zero() {
+    io.zero();
   }
 }

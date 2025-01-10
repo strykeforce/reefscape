@@ -14,6 +14,7 @@ public interface BiscuitIO {
   public class BiscuitIOInputs {
     public Angle position = Rotations.of(0);
     public AngularVelocity velocity = RotationsPerSecond.of(0);
+    public boolean fwdLimitSwitchOpen = false;
   }
 
   public default void setPosition(Angle position) {}
@@ -21,4 +22,6 @@ public interface BiscuitIO {
   public default void updateInputs(BiscuitIOInputs inputs) {}
 
   public default void registerWith(TelemetryService telemetry) {}
+
+  public default void zero() {}
 }

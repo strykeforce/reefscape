@@ -1,18 +1,21 @@
 package frc.robot.subsystems.biscuit;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.subsystems.biscuit.BiscuitIO.BiscuitIOInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
-// import com.ctre.phoenix6.BaseStatusSignal.refreshAll;
 
 public class BiscuitIOFX implements BiscuitIO {
 
@@ -23,6 +26,11 @@ public class BiscuitIOFX implements BiscuitIO {
   private Angle setPoint;
   private StatusSignal<Angle> position;
   private StatusSignal<AngularVelocity> velocity;
+  private StatusSignal<ForwardLimitTypeValue> fwdLimitSwitch;
+  private boolean didZero;
+  private boolean fwdLimitSwitchOpen;
+  private Angle offset;
+  private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
 
   TalonFXConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
@@ -40,7 +48,7 @@ public class BiscuitIOFX implements BiscuitIO {
     configurator = talon.getConfigurator();
     configurator.apply(new TalonFXConfiguration());
     configurator.apply(BiscuitConstants.talonConfiguration());
-
+    // Set our variables
     velocity = talon.getVelocity();
     position = talon.getPosition();
   }
@@ -51,11 +59,26 @@ public class BiscuitIOFX implements BiscuitIO {
   }
 
   public void updateInputs(BiscuitIOInputs inputs) {
-    // inputs.velocity = velocity.refresh().getValue();
-    inputs.position = position.refresh().getValue().minus(BiscuitConstants.kZero);
+    BaseStatusSignal.refreshAll(velocity, position, fwdLimitSwitch);
+    inputs.velocity = velocity.getValue();
+    inputs.position = position.getValue().minus(BiscuitConstants.kZero);
+    inputs.fwdLimitSwitchOpen = fwdLimitSwitch.getValueAsDouble() == 1;
   }
 
   public void registerWith(TelemetryService telemetry) {
     telemetry.register(talon, true);
+  }
+
+  public void zero() {
+    didZero = false;
+    if (fwdLimitSwitchOpen == true) {
+      Angle pos = position.getValue();
+      offset = BiscuitConstants.kZero.minus(pos);
+      didZero = true;
+    } else {
+      rangeAlert.set(true);
+      logger.error("Biscuit overextended! Shutting down movement!");
+      configurator.apply(BiscuitConstants.disableTalon());
+    }
   }
 }
