@@ -1,5 +1,6 @@
 package frc.robot.subsystems.example;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -10,7 +11,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.ExampleConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.TelemetryService;
 
 public class ExampleIOFX implements ExampleIO {
   // private objects
@@ -63,12 +64,13 @@ public class ExampleIOFX implements ExampleIO {
 
   @Override
   public void updateInputs(ExampleIOInputs inputs) {
-    inputs.velocity = currVelocity.refresh().getValue();
-    inputs.position = currPosition.refresh().getValue().minus(relSetpointOffset);
+    BaseStatusSignal.refreshAll(currVelocity, currPosition);
+    inputs.velocity = currVelocity.getValue();
+    inputs.position = currPosition.getValue().minus(relSetpointOffset);
   }
 
-  //   @Override
-  //   public void registerWith(TelemetryService telemetryService) {
-  //     telemetryService.register(talonFx, true);
-  //   }
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    telemetryService.register(talonFx, true);
+  }
 }

@@ -7,6 +7,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 // import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.TelemetryService;
 
 public interface ExampleIO {
 
@@ -22,5 +23,5 @@ public interface ExampleIO {
 
   public default void zero() {}
 
-  //   public default void registerWith(TelemetryService telemetryService) {}
+  public default void registerWith(TelemetryService telemetryService) {}
 }

@@ -3,15 +3,15 @@ package frc.robot.subsystems.example;
 import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ExampleConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
+import java.util.Set;
 import org.littletonrobotics.junction.Logger;
-// import org.strykeforce.telemetry.TelemetryService;
-// import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-// import org.strykeforce.telemetry.measurable.Measure;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class ExampleSubsystem extends SubsystemBase implements ClosedLoopPosSubsystem {
+public class ExampleSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
   // Private Variables
   private final ExampleIO io;
   private final ExampleIOInputsAutoLogged inputs = new ExampleIOInputsAutoLogged();
@@ -58,6 +58,7 @@ public class ExampleSubsystem extends SubsystemBase implements ClosedLoopPosSubs
   public void periodic() {
     // Read Inputs
     io.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
 
     // State Machine
     switch (curState) {
@@ -75,17 +76,17 @@ public class ExampleSubsystem extends SubsystemBase implements ClosedLoopPosSubs
   }
 
   // Grapher
-  // @Override
-  // public void registerWith(TelemetryService telemetryService) {
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
 
-  //   super.registerWith(telemetryService);
-  //   io.registerWith(telemetryService);
-  // }
+    super.registerWith(telemetryService);
+    io.registerWith(telemetryService);
+  }
 
-  // @Override
-  // public Set<Measure> getMeasures() {
-  //   return Set.of(new Measure("State", () -> curState.ordinal()));
-  // }
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(new Measure("State", () -> curState.ordinal()));
+  }
 
   // State Enum
   public enum ExampleState {
