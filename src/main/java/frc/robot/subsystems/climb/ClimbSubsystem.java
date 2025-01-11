@@ -2,39 +2,88 @@ package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.constants.ClimbConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
-import frc.robot.subsystems.climb.ClimbArmIO.ClimbArmIOInputs;
-import frc.robot.subsystems.example.ExampleIOInputsAutoLogged;
-import frc.robot.subsystems.example.ExampleSubsystem.ExampleState;
+import java.util.Set;
+import org.littletonrobotics.junction.Logger;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
-    private final ClimbWheelIO wheelIo;
-    private final ClimbArmIO armIo;
+  private final ClimbArmIO io;
+  private final ClimbWheelIO wheelIo;
 
-    private final ClimbWheelIOInputsAutoLogged wheelInputs = new ExampleIOInputsAutoLogged();
-    private final ClimbArmIOInputsAutoLogged armInputs = new ExampleIOInputsAutoLogged();
+  private final ClimbArmIOInputsAutoLogged inputs = new ClimbArmIOInputsAutoLogged();
 
-    private Angle setpoint = Rotations.of(0.0);
-    private ClimbState curState = ClimbState.INIT;
+  private Angle setpoint = Rotations.of(0.0);
+  private ClimbState curState = ClimbState.INIT;
 
-    public ClimbSubsystem(ClimbWheelIO wheelIo, ClimbArmIO armIo) {
-        this.wheelIo = wheelIo;
-        this.armIo=armIo;
+  public ClimbSubsystem(ClimbArmIO io, ClimbWheelIO wheelIo) {
+    this.io = io;
+    this.wheelIo = wheelIo;
 
-        zero();
+    zero();
+  }
+
+  @Override
+  public Angle getPosition() {
+    return inputs.position;
+  }
+
+  @Override
+  public void setPosition(Angle position) {
+    io.setPosition(position);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return setpoint.minus(inputs.position).abs(Rotations)
+        <= ClimbConstants.kArmCloseEnough.in(Rotations);
+  }
+
+  @Override
+  public void zero() {
+    io.zero();
+
+    curState = ClimbState.ZEROED;
+  }
+
+  @Override
+  public void periodic() {
+    // Read Inputs
+    io.updateInputs(inputs);
+
+    // State Machine
+    switch (curState) {
+      case INIT:
+        break;
+      case ZEROED:
+        break;
+      default:
+        break;
     }
 
-    @Override
-    public void zero() {
-        armIo.zero();
-        curState = ClimbState.ZEROED;
-    }
+    // Log Outputs
+    Logger.recordOutput("Coral/curState", curState.ordinal());
+    Logger.recordOutput("Coral/setpoint", setpoint.in(Rotations));
+  }
 
-    public enum ClimbState {
-        INIT,
-        ZEROED
-    }
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+    wheelIo.registerWith(telemetryService);
+    io.registerWith(telemetryService);
+  }
+
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of();
+  }
+
+  public enum ClimbState {
+    INIT,
+    ZEROED
+  }
 }
