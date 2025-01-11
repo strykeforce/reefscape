@@ -24,7 +24,7 @@ public class CoralIOFX implements CoralIO {
   TalonFXConfigurator configurator;
   private MotionMagicVelocityDutyCycle velocityRequest =
       new MotionMagicVelocityDutyCycle(0).withEnableFOC(false).withSlot(0);
-  StatusSignal<AngularVelocity> currVelocity;
+  StatusSignal<AngularVelocity> curVelocity;
   StatusSignal<ForwardLimitValue> fwdLimitSwitch;
   StatusSignal<ReverseLimitValue> revLimitSwitch;
 
@@ -38,7 +38,7 @@ public class CoralIOFX implements CoralIO {
     configurator.apply(CoralConstants.getFXConfig());
 
     // Attach status signals
-    currVelocity = talonFx.getVelocity();
+    curVelocity = talonFx.getVelocity();
     fwdLimitSwitch = talonFx.getForwardLimit();
     revLimitSwitch = talonFx.getReverseLimit();
   }
@@ -66,7 +66,7 @@ public class CoralIOFX implements CoralIO {
 
   @Override
   public void updateInputs(CoralIOInputs inputs) {
-    inputs.velocity = currVelocity.refresh().getValue();
+    inputs.velocity = curVelocity.refresh().getValue();
     inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
     inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 0;
   }
