@@ -10,11 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.util.CircularBuffer;
-import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.RobotConstants;
-import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
@@ -29,10 +25,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private final SwerveIO io;
   private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
   private final HolonomicDriveController holonomicController;
-  private RobotStateSubsystem robotStateSubsystem;
-  private double avgTemp = 0.0;
-  private CircularBuffer<Integer> temps = new CircularBuffer<Integer>(DriveConstants.kTempAvgCount);
-  private AnalogInput breakerTemp;
 
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
@@ -50,8 +42,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", "Nothing");
-
-    this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
 
     this.io = io;
     // Setup Holonomic Controller
@@ -209,10 +199,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("Holonomic Controller Enabled: {}", enabled);
   }
 
-  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
-    this.robotStateSubsystem = robotStateSubsystem;
-  }
-
   public void teleResetGyro() {
     logger.info("Driver Joystick: Reset Gyro");
     // double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
@@ -287,10 +273,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.configDriveCurrents(DriveConstants.getNormDriveLimits());
   }
 
-  public double getTemp() {
-    return avgTemp;
-  }
-
   public PIDController getxController() {
     return xController;
   }
@@ -310,28 +292,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void periodic() {
     io.updateInputs(inputs);
-    int temp = breakerTemp.getValue();
-    temps.addFirst(temp);
-    double avg = 0;
-    if (temps.size() == DriveConstants.kTempAvgCount)
-      for (int i = 0; i < DriveConstants.kTempAvgCount; ++i) avg += temps.get(i);
-
-    avg /= DriveConstants.kTempAvgCount;
-
-    avgTemp = avg;
 
     switch (currDriveState) {
       case IDLE:
-        if (avg > DriveConstants.kTripTemp) {
-          io.configDriveCurrents(DriveConstants.getSafeDriveLimits());
-          setDriveState(DriveStates.SAFE);
-        }
         break;
       case SAFE:
-        if (avg < DriveConstants.kRecoverTemp) {
-          io.configDriveCurrents(DriveConstants.getNormDriveLimits());
-          setDriveState(DriveStates.IDLE);
-        }
         break;
       case SAFE_HOLD:
         break;
