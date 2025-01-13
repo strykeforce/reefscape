@@ -14,7 +14,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class PathHandler extends MeasurableSubsystem {
   DriveSubsystem driveSubsystem;
 
-  private PathStates currstate = PathStates.DONE;
+  private PathStates currState = PathStates.DONE;
   private boolean isHandling = false;
   private List<Character> NodeNames;
   private Timer timer = new Timer();
@@ -24,19 +24,50 @@ public class PathHandler extends MeasurableSubsystem {
   private Trajectory<SwerveSample> currPath;
   private boolean runningPath = false;
   private boolean mirrorTrajectory = false;
-  private boolean firstpath = true;
   private Character startNode = 'a';
 
-  PathHandler(DriveSubsystem driveSubsystem, String[][] pathNames, List<Character> NodeNames,) {
+  PathHandler(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
-    this.pathNames = pathNames;
-    this.NodeNames = NodeNames;
+    NodeNames.add('a');
 
     reassignAlliance();
   }
 
+  PathHandler(
+      DriveSubsystem driveSubsystem,
+      String[][] pathNames,
+      List<Character> NodeNames,
+      Character startNode) {
+    this.driveSubsystem = driveSubsystem;
+    this.pathNames = pathNames;
+    this.NodeNames = NodeNames;
+    this.startNode = startNode;
+
+    reassignAlliance();
+  }
+
+  public void setPathNames(String[][] pathNames) {
+    if (!isHandling) {
+      this.pathNames = pathNames;
+    }
+  }
+
+  public void setNodeNames(List<Character> NodeNames) {
+    if (!isHandling) {
+      this.NodeNames = NodeNames;
+    }
+  }
+
+  public void setStartNode(Character startNode) {
+    if (!isHandling) {
+      this.startNode = startNode;
+    }
+  }
+
   public void startPathHandler() {
-    firstpath = true;
+    NodeNames.add(0, startNode);
+    isHandling = true;
+    currState = PathStates.DRIVE_FETCH;
   }
 
   public void reassignAlliance() {
@@ -55,12 +86,14 @@ public class PathHandler extends MeasurableSubsystem {
     if (isHandling && path != null) {
       currPath = path;
       runningPath = true;
+      timer.stop();
+      timer.reset();
       timer.start();
       driveSubsystem.calculateController(currPath.getInitialSample(mirrorTrajectory).get());
-      if (currstate == PathStates.FETCH) {
-        currstate = PathStates.DRIVE_FETCH;
-      } else if (currstate == PathStates.PLACE) {
-        currstate = PathStates.DRIVE_PLACE;
+      if (currState == PathStates.PLACE) {
+        currState = PathStates.DRIVE_FETCH;
+      } else if (currState == PathStates.FETCH) {
+        currState = PathStates.DRIVE_PLACE;
       }
     }
   }
@@ -73,10 +106,10 @@ public class PathHandler extends MeasurableSubsystem {
         timer.stop();
         timer.reset();
         driveSubsystem.calculateController(currPath.getFinalSample(mirrorTrajectory).get());
-        if (currstate == PathStates.DRIVE_FETCH) {
-          currstate = PathStates.FETCH;
-        } else if (currstate == PathStates.DRIVE_PLACE) {
-          currstate = PathStates.PLACE;
+        if (currState == PathStates.DRIVE_FETCH) {
+          currState = PathStates.FETCH;
+        } else if (currState == PathStates.DRIVE_PLACE) {
+          currState = PathStates.PLACE;
         }
       }
     }
@@ -84,9 +117,9 @@ public class PathHandler extends MeasurableSubsystem {
 
   private Trajectory<SwerveSample> nextPath() {
     if (NodeNames.size() > 0) {
-      if (currstate == PathStates.DRIVE_FETCH) {
+      if (currState == PathStates.DRIVE_FETCH) {
         return fetchPaths.get(NodeNames.get(0) - 'a');
-      } else if (currstate == PathStates.DRIVE_PLACE) {
+      } else if (currState == PathStates.DRIVE_PLACE) {
         return placePaths.get(NodeNames.get(0) - 'a');
       }
     } else {
@@ -95,25 +128,43 @@ public class PathHandler extends MeasurableSubsystem {
     return null;
   }
 
+  private void advanceNodes() {
+    if (NodeNames.size() > 0) {
+      NodeNames.remove(0);
+    }
+  }
+
   public void killPathHandler() {
     isHandling = false;
-    currstate = PathStates.DONE;
+    currState = PathStates.DONE;
     runningPath = false;
     timer.stop();
     timer.reset();
   }
 
+  public void killPathHandlerAfterPath() {
+    NodeNames.clear();
+  }
+
   public void periodic() {
-    switch (currstate) {
+    switch (currState) {
       case DRIVE_FETCH:
-        startPath(nextPath());
+        if (!runningPath) {
+          startPath(nextPath());
+        }
+        drivePath();
         break;
       case FETCH:
         // align the robot
         // make the robot grab a piece
+        advanceNodes();
+        currState = PathStates.DRIVE_PLACE;
         break;
       case DRIVE_PLACE:
-        startPath(nextPath());
+        if (!runningPath) {
+          startPath(nextPath());
+        }
+        drivePath();
         break;
       case PLACE:
         // align the robot
