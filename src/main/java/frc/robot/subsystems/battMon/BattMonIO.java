@@ -6,10 +6,10 @@ public interface BattMonIO {
 
   @AutoLog
   public class BattMonIOInputs {
-    public double batt1Output = 0;
-    public double batt2Output = 0;
-    public double pdpOutput = 0;
-    public double tempOutput = 0;
+    public double batt1Output;
+    public double batt2Output;
+    public double pdpOutput ;
+    public double tempOutput ;
   }
 
   public default void updateInputs(BattMonIOInputs inputs) {}

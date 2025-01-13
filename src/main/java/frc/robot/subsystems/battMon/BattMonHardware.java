@@ -4,8 +4,6 @@ import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import frc.robot.constants.BattMonConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BattMonHardware implements BattMonIO {
 
@@ -17,16 +15,10 @@ public class BattMonHardware implements BattMonIO {
   private DutyCycle batt2Cycle = new DutyCycle(batt2);
   private DutyCycle PDPCycle = new DutyCycle(PDP);
   private DutyCycle tempCycle = new DutyCycle(temp);
-  private Logger logger;
 
-  private double batt1Output;
-  private double batt2Output;
-  private double pdpOutput;
-  private double tempOutput;
   private Counter tempCounter = new Counter(temp);
 
   public BattMonHardware() {
-    logger = LoggerFactory.getLogger(this.getClass());
     tempCounter.setUpSourceEdge(true, false);
   }
 
