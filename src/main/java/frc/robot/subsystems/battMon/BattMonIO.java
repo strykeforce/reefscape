@@ -8,8 +8,8 @@ public interface BattMonIO {
   public class BattMonIOInputs {
     public double batt1Output;
     public double batt2Output;
-    public double pdpOutput ;
-    public double tempOutput ;
+    public double pdpOutput;
+    public double tempOutput;
   }
 
   public default void updateInputs(BattMonIOInputs inputs) {}
