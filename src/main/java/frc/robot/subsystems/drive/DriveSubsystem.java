@@ -14,14 +14,15 @@ import frc.robot.constants.DriveConstants;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
-import org.slf4j.Logger;
+
+import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class DriveSubsystem extends MeasurableSubsystem {
-  private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
   private final SwerveIO io;
   private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
   private final HolonomicDriveController holonomicController;
@@ -37,6 +38,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
           0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, new double[4], new double[4]);
   private Trajectory<SwerveSample> autoTrajectory;
   private double trajectoryActive = 0.0;
+
+  private int gyroDifferentCount = 0;
 
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
@@ -123,6 +126,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     autoTrajectory = traj;
   }
 
+  public Trajectory<SwerveSample> getAutoTrajectory() {
+    if (autoTrajectory != null) {
+      return autoTrajectory;
+    } else {
+      return null;
+    }
+  }
+
   public void resetHolonomicController(double yaw) {
     xController.reset();
     yController.reset();
@@ -153,7 +164,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public ChassisSpeeds getFieldRelSpeed() {
-    return io.getFieldRelSpeed();
+    return inputs.fieldRelSpeed;
   }
 
   public ChassisSpeeds getRobotRelSpeed() {
@@ -182,16 +193,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // Take fieldRel Speed and get the magnitude of the vector
     double wheelSpeed = FastMath.hypot(vX, vY);
 
-    double gyroRate = inputs.gyroRate;
-
     boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillThreshold;
-    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+    boolean gyroStill = isGyroStill();
 
     return velStill && gyroStill;
   }
 
+  public boolean isGyroStill() {
+    return Math.abs(inputs.gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+  }
+
   public void setGyroOffset(Rotation2d rotation) {
-    io.setGyroOffset(apply(rotation));
+    io.setBothGyroOffset(apply(rotation));
   }
 
   public void setEnableHolo(boolean enabled) {
@@ -203,7 +216,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("Driver Joystick: Reset Gyro");
     // double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     double gyroResetDegs = 0.0; // TODO change this to the above once we have RobotStateSubsystem
-    io.setGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
+    io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     io.resetGyro();
     io.resetOdometry(
         new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
@@ -292,6 +305,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
+    if (Math.abs(inputs.gyroRotation2d.getDegrees() - inputs.navxRotation2d.getDegrees())
+        > DriveConstants.kGyroDifferentThreshold) {
+      gyroDifferentCount++;
+    } else {
+      gyroDifferentCount = 0;
+    }
+    if (gyroDifferentCount > DriveConstants.kGyroDifferentCount && isDriveStill()) {
+      io.setPigeonGyroOffset(inputs.navxRotation2d);
+      gyroDifferentCount = 0;
+    }
 
     switch (currDriveState) {
       case IDLE:

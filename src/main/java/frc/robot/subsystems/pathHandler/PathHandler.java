@@ -17,6 +17,7 @@ public class PathHandler extends MeasurableSubsystem {
   private PathStates currState = PathStates.DONE;
   private boolean isHandling = false;
   private List<Character> NodeNames;
+  private List<Integer> NodeLevels;
   private Timer timer = new Timer();
   private List<Trajectory<SwerveSample>> fetchPaths;
   private List<Trajectory<SwerveSample>> placePaths;
@@ -28,22 +29,19 @@ public class PathHandler extends MeasurableSubsystem {
 
   PathHandler(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
-    NodeNames.add('a');
-
-    reassignAlliance();
   }
 
   PathHandler(
       DriveSubsystem driveSubsystem,
       String[][] pathNames,
       List<Character> NodeNames,
+      List<Integer> NodeLevels,
       Character startNode) {
     this.driveSubsystem = driveSubsystem;
     this.pathNames = pathNames;
     this.NodeNames = NodeNames;
+    this.NodeLevels = NodeLevels;
     this.startNode = startNode;
-
-    reassignAlliance();
   }
 
   public void setPathNames(String[][] pathNames) {
@@ -55,6 +53,12 @@ public class PathHandler extends MeasurableSubsystem {
   public void setNodeNames(List<Character> NodeNames) {
     if (!isHandling) {
       this.NodeNames = NodeNames;
+    }
+  }
+
+  public void setNodeLevels(List<Integer> NodeLevels) {
+    if (!isHandling) {
+      this.NodeLevels = NodeLevels;
     }
   }
 
@@ -75,9 +79,7 @@ public class PathHandler extends MeasurableSubsystem {
     for (int i = 0; i < 12; i++) {
       Optional<Trajectory<SwerveSample>> temp = Choreo.loadTrajectory(pathNames[i][0]);
       fetchPaths.add(temp.get());
-    }
-    for (int i = 0; i < 12; i++) {
-      Optional<Trajectory<SwerveSample>> temp = Choreo.loadTrajectory(pathNames[i][1]);
+      temp = Choreo.loadTrajectory(pathNames[i][1]);
       placePaths.add(temp.get());
     }
   }
@@ -155,8 +157,7 @@ public class PathHandler extends MeasurableSubsystem {
         drivePath();
         break;
       case FETCH:
-        // align the robot
-        // make the robot grab a piece
+        // wait for the the robot to grab a piece
         advanceNodes();
         currState = PathStates.DRIVE_PLACE;
         break;
