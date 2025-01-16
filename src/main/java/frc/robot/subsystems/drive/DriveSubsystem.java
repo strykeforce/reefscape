@@ -14,7 +14,6 @@ import frc.robot.constants.DriveConstants;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
-
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.swerve.SwerveModule;
@@ -126,6 +125,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     autoTrajectory = traj;
   }
 
+  public void setAutoDebugMsg(String msg) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", msg);
+  }
+
   public Trajectory<SwerveSample> getAutoTrajectory() {
     if (autoTrajectory != null) {
       return autoTrajectory;
@@ -167,10 +170,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return inputs.fieldRelSpeed;
   }
 
-  public ChassisSpeeds getRobotRelSpeed() {
-    return io.getRobotRelSpeed();
-  }
-
   public void setDriveState(DriveStates state) {
     currDriveState = state;
   }
@@ -183,7 +182,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // logger.info(
     //     "Timestamp Before FieldRel: {}",
     //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-    ChassisSpeeds cs = getFieldRelSpeed();
+    ChassisSpeeds cs = inputs.fieldRelSpeed;
     double vX = cs.vxMetersPerSecond;
     double vY = cs.vyMetersPerSecond;
     // logger.info(
@@ -270,10 +269,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Control Methods
   public void lockZero() {
-    SwerveModule[] swerveModules = io.getSwerveModules();
-    for (int i = 0; i < 4; i++) {
-      swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(0.0));
-    }
+    Rotation2d rot = Rotation2d.fromDegrees(0.0);
+    io.setSwerveModuleAngles(rot, rot, rot, rot);
   }
 
   public void toSafeHold() {
@@ -361,14 +358,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure(
             "Holo Controller Omega Setpoint",
             () -> holonomicController.getThetaController().getSetpoint().position),
-        new Measure("Trajectory Active", () -> trajectoryActive),
-        new Measure("Wheel 0 Angle", () -> io.getSwerveModuleStates()[0].angle.getDegrees()),
-        new Measure("Wheel 0 Speed", () -> io.getSwerveModuleStates()[0].speedMetersPerSecond),
-        new Measure("Wheel 1 Angle", () -> io.getSwerveModuleStates()[1].angle.getDegrees()),
-        new Measure("Wheel 1 Speed", () -> io.getSwerveModuleStates()[1].speedMetersPerSecond),
-        new Measure("Wheel 2 Angle", () -> io.getSwerveModuleStates()[2].angle.getDegrees()),
-        new Measure("Wheel 2 Speed", () -> io.getSwerveModuleStates()[2].speedMetersPerSecond),
-        new Measure("Wheel 3 Angle", () -> io.getSwerveModuleStates()[3].angle.getDegrees()),
-        new Measure("Wheel 3 Speed", () -> io.getSwerveModuleStates()[3].speedMetersPerSecond));
+        new Measure("Trajectory Active", () -> trajectoryActive));
   }
 }

@@ -39,19 +39,21 @@ public interface SwerveIO {
     public double[] azimuthCurrent = {0, 0, 0, 0};
   }
 
-  public default SwerveModule[] getSwerveModules() {
+  private SwerveModule[] getSwerveModules() {
+    return null;
+  }
+  
+  public default void setSwerveModuleAngles(Rotation2d FL, Rotation2d FR, Rotation2d BL, Rotation2d BR) {}
+
+  private SwerveModulePosition[] getSwerveModulePositions() {
     return null;
   }
 
-  public default SwerveModulePosition[] getSwerveModulePositions() {
+  private SwerveModuleState[] getSwerveModuleStates() {
     return null;
   }
 
-  public default SwerveModuleState[] getSwerveModuleStates() {
-    return null;
-  }
-
-  public default ChassisSpeeds getRobotRelSpeed() {
+  private ChassisSpeeds getRobotRelSpeed() {
     return null;
   }
 

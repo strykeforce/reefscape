@@ -23,12 +23,14 @@ public class PathHandler extends MeasurableSubsystem {
   private List<Trajectory<SwerveSample>> placePaths;
   private String[][] pathNames = new String[12][2];
   private Trajectory<SwerveSample> currPath;
+  private String currPathString;
   private boolean runningPath = false;
   private boolean mirrorTrajectory = false;
   private Character startNode = 'a';
 
   PathHandler(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
+    reassignAlliance();
   }
 
   PathHandler(
@@ -86,6 +88,7 @@ public class PathHandler extends MeasurableSubsystem {
 
   private void startPath(Trajectory<SwerveSample> path) {
     if (isHandling && path != null) {
+      driveSubsystem.setAutoDebugMsg("Start " + currPathString);
       currPath = path;
       runningPath = true;
       timer.stop();
@@ -104,6 +107,7 @@ public class PathHandler extends MeasurableSubsystem {
     if (isHandling && runningPath && currPath != null) {
       driveSubsystem.calculateController(currPath.sampleAt(timer.get(), mirrorTrajectory).get());
       if (timer.hasElapsed(currPath.getTotalTime())) {
+        driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
         timer.stop();
         timer.reset();
@@ -111,7 +115,7 @@ public class PathHandler extends MeasurableSubsystem {
         if (currState == PathStates.DRIVE_FETCH) {
           currState = PathStates.FETCH;
         } else if (currState == PathStates.DRIVE_PLACE) {
-          currState = PathStates.PLACE;
+          currState = PathStates.DRIVE_PLACE_ALIGN;
         }
       }
     }
@@ -120,8 +124,10 @@ public class PathHandler extends MeasurableSubsystem {
   private Trajectory<SwerveSample> nextPath() {
     if (NodeNames.size() > 0) {
       if (currState == PathStates.DRIVE_FETCH) {
+        currPathString = pathNames[NodeNames.get(0) - 'a'][0];
         return fetchPaths.get(NodeNames.get(0) - 'a');
       } else if (currState == PathStates.DRIVE_PLACE) {
+        currPathString = pathNames[NodeNames.get(0) - 'a'][1];
         return placePaths.get(NodeNames.get(0) - 'a');
       }
     } else {
@@ -167,9 +173,13 @@ public class PathHandler extends MeasurableSubsystem {
         }
         drivePath();
         break;
+      case DRIVE_PLACE_ALIGN:
+        
+        break;
       case PLACE:
         // align the robot
         // make the robot place a piece
+        currState = PathStates.DRIVE_FETCH;
         break;
       case DONE:
         isHandling = false;
@@ -190,6 +200,7 @@ public class PathHandler extends MeasurableSubsystem {
     DRIVE_FETCH,
     PLACE,
     DRIVE_PLACE,
+    DRIVE_PLACE_ALIGN,
     DONE
   }
 }

@@ -54,6 +54,7 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   @Override
   public void initialize() {
     if (isTherePath) {
+      driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
       Pose2d initialPose = new Pose2d();
       initialPose = trajectory.getInitialPose(mirrorTrajectory).get();
       if (resetOdometry) {
@@ -100,5 +101,6 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
 
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
+    driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
   }
 }

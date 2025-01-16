@@ -78,10 +78,6 @@ public class Swerve implements SwerveIO, Checkable {
       azimuthTalon.enableVoltageCompensation(true);
       azimuthTalon.setNeutralMode(NeutralMode.Coast);
 
-      if (i == 1)
-        azimuth1FwdLimitSupplier =
-            () -> azimuthTalon.getSensorCollection().isFwdLimitSwitchClosed();
-
       var driveTalon = new TalonFX(i + 10);
       drives[i] = driveTalon;
       configurator = driveTalon.getConfigurator();
@@ -129,11 +125,18 @@ public class Swerve implements SwerveIO, Checkable {
     return "Swerve";
   }
 
-  public SwerveModule[] getSwerveModules() {
+  private SwerveModule[] getSwerveModules() {
     return swerveDrive.getSwerveModules();
   }
 
-  public SwerveModulePosition[] getSwerveModulePositions() {
+  public void setSwerveModuleAngles(Rotation2d FL, Rotation2d FR, Rotation2d BL, Rotation2d BR) {
+    swerveModules[0].setAzimuthRotation2d(FL);
+    swerveModules[1].setAzimuthRotation2d(FR);
+    swerveModules[2].setAzimuthRotation2d(BL);
+    swerveModules[3].setAzimuthRotation2d(BR);
+  }
+
+  private SwerveModulePosition[] getSwerveModulePositions() {
     SwerveModule[] swerveModules = getSwerveModules();
     SwerveModulePosition[] temp = {null, null, null, null};
     for (int i = 0; i < 4; ++i) {
@@ -151,7 +154,7 @@ public class Swerve implements SwerveIO, Checkable {
     return swerveModuleStates;
   }
 
-  public ChassisSpeeds getRobotRelSpeed() {
+  private ChassisSpeeds getRobotRelSpeed() {
     SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
     SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
@@ -181,10 +184,6 @@ public class Swerve implements SwerveIO, Checkable {
     return new ChassisSpeeds(fieldX, fieldY, roboRelSpeed.omegaRadiansPerSecond);
   }
 
-  public SwerveDriveKinematics getKinematics() {
-    return swerveDrive.getKinematics();
-  }
-
   public void setOdometry(OdometryStrategy Odom) {
     swerveDrive.setOdometry(Odom);
   }
@@ -196,10 +195,6 @@ public class Swerve implements SwerveIO, Checkable {
   public void setBothGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
     navxOffset = rotation;
-  }
-
-  public BooleanSupplier getAzimuth1FwdLimitSwitch() {
-    return azimuth1FwdLimitSupplier;
   }
 
   public void resetGyro() {
