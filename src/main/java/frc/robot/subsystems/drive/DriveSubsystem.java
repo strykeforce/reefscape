@@ -16,7 +16,6 @@ import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 

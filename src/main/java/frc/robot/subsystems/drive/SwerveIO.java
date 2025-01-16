@@ -42,8 +42,9 @@ public interface SwerveIO {
   private SwerveModule[] getSwerveModules() {
     return null;
   }
-  
-  public default void setSwerveModuleAngles(Rotation2d FL, Rotation2d FR, Rotation2d BL, Rotation2d BR) {}
+
+  public default void setSwerveModuleAngles(
+      Rotation2d FL, Rotation2d FR, Rotation2d BL, Rotation2d BR) {}
 
   private SwerveModulePosition[] getSwerveModulePositions() {
     return null;

@@ -174,7 +174,6 @@ public class PathHandler extends MeasurableSubsystem {
         drivePath();
         break;
       case DRIVE_PLACE_ALIGN:
-        
         break;
       case PLACE:
         // align the robot
