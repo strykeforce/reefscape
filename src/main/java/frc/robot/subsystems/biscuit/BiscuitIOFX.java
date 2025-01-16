@@ -23,7 +23,6 @@ public class BiscuitIOFX implements BiscuitIO {
   private TalonFX talon;
 
   private final Angle sensorInitial;
-  private Angle setPoint;
   private StatusSignal<Angle> position;
   private StatusSignal<AngularVelocity> velocity;
   private StatusSignal<ForwardLimitTypeValue> fwdLimitSwitch;
@@ -47,22 +46,22 @@ public class BiscuitIOFX implements BiscuitIO {
     // Reset and configure moter settings
     configurator = talon.getConfigurator();
     configurator.apply(new TalonFXConfiguration());
-    configurator.apply(BiscuitConstants.talonConfiguration());
+    configurator.apply(BiscuitConstants.getFXConfig());
     // Set our variables
     velocity = talon.getVelocity();
     position = talon.getPosition();
   }
 
   public void setPosition(Angle position) {
-    setPoint = position.plus(BiscuitConstants.kZero);
-    talon.setControl(positionRequest.withPosition(setPoint));
+    talon.setControl(positionRequest.withPosition(position));
   }
 
   public void updateInputs(BiscuitIOInputs inputs) {
     BaseStatusSignal.refreshAll(velocity, position, fwdLimitSwitch);
     inputs.velocity = velocity.getValue();
-    inputs.position = position.getValue().minus(BiscuitConstants.kZero);
+    inputs.position = position.getValue();
     inputs.fwdLimitSwitchOpen = fwdLimitSwitch.getValueAsDouble() == 1;
+    inputs.didZero = didZero;
   }
 
   public void registerWith(TelemetryService telemetry) {

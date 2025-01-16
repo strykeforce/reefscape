@@ -19,14 +19,8 @@ import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.Angle;
 
 public class BiscuitConstants {
-
-  public static TalonFXConfiguration talonConfiguration() {
-    TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
-
-    return talonFXConfiguration;
-  }
-
   // These are all wrong right now because we don't have any actual info
+
   public static Angle kZero = Rotations.of(42); // Will need to be experimentally determined
   public static int talonID = 3;
   public static double kCloseEnough = 2137473647; // This is a little out of wack.
@@ -36,17 +30,10 @@ public class BiscuitConstants {
 
   // Disables the TalonFX by setting it's voltage to zero. Not very shocking.
   public static TalonFXConfiguration disableTalon() {
-    TalonFXConfiguration disableConfig = new TalonFXConfiguration();
-
     VoltageConfigs voltage =
-        new VoltageConfigs().withPeakForwardVoltage(0).withPeakReverseVoltage(0);
-    disableConfig.Voltage = voltage;
-
-    HardwareLimitSwitchConfigs limitSwitch =
-        new HardwareLimitSwitchConfigs().withForwardLimitEnable(false);
-    disableConfig.HardwareLimitSwitch = limitSwitch;
-
-    return disableConfig;
+        new VoltageConfigs().withPeakForwardVoltage(0.0).withPeakReverseVoltage(0.0);
+    getFXConfig().Voltage = voltage;
+    return getFXConfig();
   }
 
   // I copied and pasted this because I'm lazy
