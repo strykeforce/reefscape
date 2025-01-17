@@ -1,15 +1,58 @@
 package frc.robot.subsystems.algae;
-package frc.robot.standards;
-import edu.wpi.first.units.measure.AngularVelocity;
 
+import static edu.wpi.first.units.Units.Rotations;
 
-public class AlgaeSubsystem {
+import edu.wpi.first.units.measure.Angle;
+import frc.robot.constants.AlgaeConstants;
+import frc.robot.constants.ExampleConstants;
+import frc.robot.standards.ClosedLoopPosSubsystem;
+import frc.robot.subsystems.algae.algaeIO.IOInputs;
 
+import java.util.Set;
+import org.littletonrobotics.junction.Logger;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
+public class AlgaeSubsystem implements ClosedLoopPosSubsystem {
+    private final algaeIO io;
+  private final IOInputsAutoLogged inputs = new IOInputsAutoLogged();
+  private Angle setpoint = Rotations.of(0.0);
 
-  public void setSpeed(AngularVelocity speed){};
+  public AlgaeSubsystem(algaeIO io) {
+    this.io = io;
+  }
 
-  public AngularVelocity getSpeed(){};
+  public Angle getPosition() {
+    return getPosition();
+  }
 
-  public boolean atSpeed(){};
+  public void setPosition(Angle position) {
+    setPosition(position);
+    setpoint = position;
+  }
+
+  public boolean isFinished() {
+    return setpoint.minus(getPosition()).abs(Rotations) <= AlgaeConstants.kCloseEnough.in(Rotations);
+  }
+
+  // Periodic Function
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
+    Logger.recordOutput("Algae/setpoint", setpoint.in(Rotations));
+  }
+
+  // Grapher
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+
+    super.registerWith(telemetryService);
+    io.registerWith(telemetryService);
+  }
+
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(new Measure("State", () -> curState.ordinal()));
+  }
 }
