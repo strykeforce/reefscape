@@ -6,10 +6,10 @@ public interface BattMonIO {
 
   @AutoLog
   public class BattMonIOInputs {
-    public double batt1Output;
-    public double batt2Output;
-    public double pdpOutput;
-    public double tempOutput;
+    public double batteryVoltage;
+    public double batteryCurrent;
+    public double pdpVoltage;
+    public double breakerTemp;
   }
 
   public default void updateInputs(BattMonIOInputs inputs) {}

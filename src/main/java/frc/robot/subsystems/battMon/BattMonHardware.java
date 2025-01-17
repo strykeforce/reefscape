@@ -7,13 +7,13 @@ import frc.robot.constants.BattMonConstants;
 
 public class BattMonHardware implements BattMonIO {
 
-  private DigitalInput batt1 = new DigitalInput(0);
-  private DigitalInput batt2 = new DigitalInput(1);
-  private DigitalInput PDP = new DigitalInput(3);
+  private DigitalInput battVoltage = new DigitalInput(0);
+  private DigitalInput battCurrent = new DigitalInput(1);
+  private DigitalInput pdpVoltage = new DigitalInput(3);
   private DigitalInput temp = new DigitalInput(4);
-  private DutyCycle batt1Cycle = new DutyCycle(batt1);
-  private DutyCycle batt2Cycle = new DutyCycle(batt2);
-  private DutyCycle PDPCycle = new DutyCycle(PDP);
+  private DutyCycle battVoltageCycle = new DutyCycle(battVoltage);
+  private DutyCycle battCurrentCycle = new DutyCycle(battCurrent);
+  private DutyCycle pdpCycle = new DutyCycle(pdpVoltage);
   private DutyCycle tempCycle = new DutyCycle(temp);
 
   private Counter tempCounter = new Counter(temp);
@@ -24,11 +24,14 @@ public class BattMonHardware implements BattMonIO {
 
   @Override
   public void updateInputs(BattMonIOInputs inputs) {
-    inputs.batt1Output = batt1Cycle.getOutput() * BattMonConstants.kBatt1;
-    inputs.batt2Output = batt2Cycle.getOutput() * BattMonConstants.kBatt2;
-    inputs.pdpOutput = PDPCycle.getOutput() * BattMonConstants.kPDP;
-    inputs.tempOutput =
-        (tempCycle.getHighTimeNanoseconds() / (tempCounter.getPeriod() / 1000000000))
-            * BattMonConstants.kTemp;
+    inputs.batteryVoltage = battVoltageCycle.getOutput() 
+    * BattMonConstants.kBattVolt1 * BattMonConstants.kBattVolt2;
+    inputs.batteryCurrent = battCurrentCycle.getOutput() 
+    * BattMonConstants.kBattCurrent1 * BattMonConstants.kBattCurrent2;
+    inputs.pdpVoltage = pdpCycle.getOutput() 
+    * BattMonConstants.kPdpVoltage1 * BattMonConstants.kPdpVoltage2;
+    inputs.breakerTemp =
+        ((tempCycle.getHighTimeNanoseconds() / (tempCounter.getPeriod() / 1000000000))
+            - BattMonConstants.kBreakerTemp1) / BattMonConstants.kBreakerTemp2;
   }
 }
