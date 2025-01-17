@@ -43,8 +43,5 @@ public class algaeIOFX implements algaeIO {
         talonFX.setPosition(position);
   }
 
-  public void zero() {
-  }
-
   public void registerWith(TelemetryService telemetryService) {}
 }
