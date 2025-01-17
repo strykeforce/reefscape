@@ -1,5 +1,6 @@
 package frc.robot.subsystems.algae;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
@@ -10,6 +11,7 @@ public interface algaeIO {
   @AutoLog
   public static class IOInputs {
     public AngularVelocity velocity;
+    public Angle location;
     public ReverseLimitValue reverseLimitSwitch;
   }
 

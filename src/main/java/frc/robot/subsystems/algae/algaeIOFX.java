@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.AlgaeConstants;
 
@@ -20,6 +21,7 @@ public class algaeIOFX implements algaeIO {
     private final TalonFX talonFX;
     private StatusSignal<AngularVelocity> currVelocity;
     private StatusSignal<ReverseLimitValue> reverseLimitSwitch;
+    private StatusSignal<Angle> currAngle;
     
     // FX Access objects
     TalonFXConfigurator configurator;
@@ -32,24 +34,27 @@ public class algaeIOFX implements algaeIO {
         talonFX = new TalonFX(AlgaeConstants.kFxId);
         reverseLimitSwitch = talonFX.getReverseLimit();
         currVelocity = talonFX.getVelocity();
+        currAngle = talonFX.getPosition();
     }
 
     @Override
     public void updateInputs(IOInputs inputs) {
-        // Update the velocity input in the IOInputs structure
+      // inputs.reverseLimitSwitch = reverseLimitSwitch.refresh().getValue().value == 1;
         inputs.velocity = currVelocity.refresh().getValue();
+        inputs.location = currAngle.refresh().getValue();
     }
 
     @Override
     public void setPosition(double position) {
-        // In case you want to use the position control in your system
         talonFX.setPosition(position);
+    }
+    public Angle getPosition() {
+        return currAngle.getValue();
     }
 
     @Override
     public void zero() {
-        // This can reset the encoder or clear other state as needed
-        talonFX.clearStickyFaults();
+        // not doing one for now
     }
 
     @Override
