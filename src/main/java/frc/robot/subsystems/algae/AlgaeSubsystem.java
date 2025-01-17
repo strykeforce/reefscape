@@ -32,6 +32,10 @@ public class AlgaeSubsystem implements ClosedLoopPosSubsystem {
     setpoint = position;
   }
 
+  public void zero(){
+    setPosition(Rotations.of(0));
+  }
+
   public boolean isFinished() {
     return setpoint.minus(getPosition()).abs(Rotations) <= AlgaeConstants.kCloseEnough.in(Rotations);
   }
@@ -44,14 +48,12 @@ public class AlgaeSubsystem implements ClosedLoopPosSubsystem {
   }
 
   // Grapher
-  @Override
   public void registerWith(TelemetryService telemetryService) {
 
     super.registerWith(telemetryService);
     io.registerWith(telemetryService);
   }
 
-  @Override
   public Set<Measure> getMeasures() {
     return Set.of(new Measure("State", () -> curState.ordinal()));
   }
