@@ -2,53 +2,75 @@ package frc.robot.subsystems.funnel;
 
 import java.util.Set;
 
+import org.littletonrobotics.junction.Logger;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
+import frc.robot.constants.FunnelConstants;
 import frc.robot.standards.OpenLoopSubsystem;
 
 public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubsystem{
 
     // Private Variables
     private final FunnelIo io;
+    private float totalBreaks = 0;
 
-    public FunnelState curState = FunnelState.Idle;
+    public FunnelState curState = FunnelState.HasNotSeenCoral;
 
     // Constructor
-    public FunnelSubsystem(FunnelIo io){
+    public FunnelSubsystem(FunnelIo io) {
         this.io = io;
     }
 
-    public FunnelState getState(){
+    // Getter/Setter Methods
+    public FunnelState getState() {
         return curState;
     }
 
     @Override
-    public void periodic(){
+    public void periodic() {
         switch (curState){
-            case Idle:
+            case HasSeenCoral:
                 break;
-            case PickingUp:
-                break;
-            case Held:
+            case HasNotSeenCoral:
                 break;
         }
+
+        // Log Outputs
+        Logger.recordOutput("Funnel/curState", curState);
+        Logger.recordOutput("Funnel/totalBreaks", totalBreaks);
+    }
+
+    // Grapher
+    @Override
+    public void registerWith(TelemetryService telemetryService) {
+        io.registerWith(telemetryService);
+        super.registerWith(telemetryService);
     }
 
     @Override
     public Set<Measure> getMeasures() {
-            return null;
+        return Set.of(new Measure("State", () -> curState.ordinal()));
     }
 
-    public enum FunnelState{
-        Idle,
-        PickingUp,
-        Held
+    // State Enum
+    public enum FunnelState {
+        HasSeenCoral,
+        HasNotSeenCoral
     }
 
     @Override
     public void setPercent(double pct) {
+        io.setPct(pct);
+    }
 
+    public void StartMotor() {
+        setPercent(FunnelConstants.kFunnelPercentOutput);
+    }
+
+    public void StopMotor() {
+        setPercent(0.0);
     }
     
 }
