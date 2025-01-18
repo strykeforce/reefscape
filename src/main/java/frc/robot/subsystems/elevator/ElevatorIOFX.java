@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
 import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -16,16 +18,28 @@ public class ElevatorIOFX implements ElevatorIO {
      private TalonFX talonFxLeft;
      private TalonFX talonFxRight;
 
+     private double setpoints;
+
      // FX Access objects
     TalonFXConfigurator configuratorLeft;
     TalonFXConfigurator configuratorRight;
+    StatusSignal<Double> currVelocites;
+    // private MotionMagicVelocityVoltage velocityRequests =
+    //     new MotionMagicVelocityVoltage;
 
     public ExiterIOFX() {
         logger = LoggerFactory.getLogger(this.getClass());
         talonFxLeft = new TalonFX(ElevatorConstants.kFxIDMain);
         talonFxRight = new TalonFX(ElevatorConstants.kFxIDFollow);
-    
 
+        //controller config
+        configuratorLeft = talonFxLeft.getConfigurator();
+        configuratorRight = talonFxRight.getConfigurator();
+        configuratorLeft.apply(ElevatorConstants.getLeftFXConfig());
+        configuratorRight.apply(ElevatorConstants.getRightFXConfig());;
+    
+        // Attach status signals
+        currVelocites = talonFxLeft.getVelocity();
     }
 
     /* 
@@ -67,8 +81,7 @@ public class ElevatorIOFX implements ElevatorIO {
 
     @Override
     public void updateInputs(ExiterIOInputs inputs) {
-        inputs.velocityLeft = currLeftVelocity.refresh().getValue();
-        inputs.velocityRight = currRightVelocity.refresh().getValue();
+        inputs.velocites = currVelocites.refresh().getValue();
     }
 
     @Override
@@ -79,5 +92,4 @@ public class ElevatorIOFX implements ElevatorIO {
 
 }
 
-  //how to make subsystem extend closed-pos?
 

@@ -28,8 +28,6 @@ public class ElevatorConstants {
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
 
-  //Make constants for Level 1 and have all the others be offsets of those constants
-
   public static TalonFXConfiguration getBothFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();
 
