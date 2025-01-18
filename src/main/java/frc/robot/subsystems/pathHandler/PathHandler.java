@@ -1,10 +1,16 @@
 package frc.robot.subsystems.pathHandler;
 
 import choreo.Choreo;
+
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Robot;
+import frc.robot.constants.RobotStateConstants;
+import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import net.jafama.FastMath;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,6 +31,7 @@ public class PathHandler extends MeasurableSubsystem {
   private Trajectory<SwerveSample> currPath;
   private String currPathString;
   private boolean runningPath = false;
+  private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
   private Character startNode = 'a';
 
@@ -115,7 +122,30 @@ public class PathHandler extends MeasurableSubsystem {
         if (currState == PathStates.DRIVE_FETCH) {
           currState = PathStates.FETCH;
         } else if (currState == PathStates.DRIVE_PLACE) {
-          currState = PathStates.DRIVE_PLACE_ALIGN;
+          currState = PathStates.PLACE;
+        }
+      } else if (shouldTransitionToServoing()) {
+        currState = PathStates.DRIVE_PLACE_SERVO;
+        isServoing = true;
+      }
+    }
+  }
+
+  private void drivePathServo() {
+    if (isHandling && runningPath && currPath != null && isServoing) {
+      driveSubsystem.calculateControllerServo(currPath.sampleAt(timer.get(), mirrorTrajectory).get(), 0.0); // TODO: use tag servoing here when ready
+      if (timer.hasElapsed(currPath.getTotalTime())) {
+        driveSubsystem.setAutoDebugMsg("End " + currPathString);
+        runningPath = false;
+        timer.stop();
+        timer.reset();
+        driveSubsystem.calculateControllerServo(currPath.getFinalSample(mirrorTrajectory).get(), 0.0);
+        if (currState == PathStates.DRIVE_FETCH) {
+          currState = PathStates.FETCH;
+        } else if (currState == PathStates.DRIVE_PLACE_SERVO) {
+          isServoing = false;
+          // RobotStateSubsystem.PlacePiece();
+          currState = PathStates.PLACE;
         }
       }
     }
@@ -154,6 +184,21 @@ public class PathHandler extends MeasurableSubsystem {
     NodeNames.clear();
   }
 
+  private boolean shouldTransitionToServoing() {
+    boolean isCloseEnough = false;
+    double preNormalizedAngle = FastMath.toRadians(RobotStateConstants.kNodeAngles[FastMath.floorToInt((NodeNames.get(0) - 'a') / 2)]);
+    double goal = mirrorTrajectory ? FastMath.normalizeMinusPiPi(preNormalizedAngle + Math.PI) : preNormalizedAngle;
+    double pos = driveSubsystem.getGyroRotation2d().getRadians();
+    if (goal < -Math.PI/2 || goal > Math.PI/2) {
+      isCloseEnough = FastMath.abs(FastMath.normalizeZeroTwoPi(pos) - FastMath.normalizeZeroTwoPi(goal)) < FastMath.toRadians(TagServoingConstants.kAngleCloseEnough);
+    } else {
+      isCloseEnough = FastMath.abs(pos - goal) < FastMath.toRadians(TagServoingConstants.kAngleCloseEnough);
+    }
+    return currState == PathStates.DRIVE_PLACE
+     && timer.hasElapsed(currPath.getTotalTime() - 1.0)
+     && isCloseEnough;
+  }
+
   public void periodic() {
     switch (currState) {
       case DRIVE_FETCH:
@@ -163,9 +208,10 @@ public class PathHandler extends MeasurableSubsystem {
         drivePath();
         break;
       case FETCH:
-        // wait for the the robot to grab a piece
-        advanceNodes();
-        currState = PathStates.DRIVE_PLACE;
+        // if (robotStateSubsystem.hasPiece) {
+          advanceNodes();
+          currState = PathStates.DRIVE_PLACE;
+        // }
         break;
       case DRIVE_PLACE:
         if (!runningPath) {
@@ -173,12 +219,15 @@ public class PathHandler extends MeasurableSubsystem {
         }
         drivePath();
         break;
-      case DRIVE_PLACE_ALIGN:
+      case DRIVE_PLACE_SERVO:
+        if (runningPath && isServoing) {
+          drivePathServo();
+        }
         break;
       case PLACE:
-        // align the robot
-        // make the robot place a piece
-        currState = PathStates.DRIVE_FETCH;
+        // if (RobotStateSubsystem.State != RobotStateSubsystem.hasPiece) {
+          currState = PathStates.DRIVE_FETCH;
+        // }
         break;
       case DONE:
         isHandling = false;
@@ -199,7 +248,7 @@ public class PathHandler extends MeasurableSubsystem {
     DRIVE_FETCH,
     PLACE,
     DRIVE_PLACE,
-    DRIVE_PLACE_ALIGN,
+    DRIVE_PLACE_SERVO,
     DONE
   }
 }

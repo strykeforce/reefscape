@@ -115,6 +115,28 @@ public class DriveSubsystem extends MeasurableSubsystem {
         false);
   }
 
+  // Choreo Holonomic Controller
+  public void calculateControllerServo(SwerveSample desiredState, double desiredRobotRelvY) {
+    holoContInput = desiredState;
+    double xFF = desiredState.vx;
+    double rotationFF = desiredState.heading;
+
+    Pose2d pose = inputs.poseMeters;
+    double xFeedback = xController.calculate(pose.getX(), desiredState.x);
+    double rotationFeedback =
+        omegaController.calculate(pose.getRotation().getRadians(), desiredState.heading);
+
+    holoContOutput.vxMetersPerSecond = xFF + xFeedback;
+    holoContOutput.vyMetersPerSecond = desiredRobotRelvY;
+    holoContOutput.omegaRadiansPerSecond = rotationFF + rotationFeedback;
+
+    io.move(
+        holoContOutput.vxMetersPerSecond,
+        holoContOutput.vyMetersPerSecond,
+        holoContOutput.omegaRadiansPerSecond,
+        false);
+  }
+
   public void resetOdometry(Pose2d pose) {
     io.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
