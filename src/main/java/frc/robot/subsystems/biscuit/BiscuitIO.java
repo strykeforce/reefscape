@@ -15,6 +15,7 @@ public interface BiscuitIO {
     public Angle position = Rotations.of(0);
     public AngularVelocity velocity = RotationsPerSecond.of(0);
     public boolean fwdLimitSwitchOpen = false;
+    public boolean didZero;
   }
 
   public default void setPosition(Angle position) {}

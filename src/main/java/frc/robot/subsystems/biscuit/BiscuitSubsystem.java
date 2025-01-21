@@ -1,3 +1,5 @@
+// Blessed by the great tech-priests of the Adeptus Mechanicus
+
 package frc.robot.subsystems.biscuit;
 
 import static edu.wpi.first.units.Units.Rotations;
@@ -5,6 +7,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.*;
 import frc.robot.constants.BiscuitConstants;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
@@ -31,6 +34,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
+    Logger.recordOutput("Biscuit setPoint", setPoint);
+    Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
   }
 
   @Override
@@ -45,7 +51,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
 
   @Override
   public Set<Measure> getMeasures() {
-    return Set.of(new Measure("Is Biscuit Finished", () -> isFinished() ? 1.0 : 0.0));
+    return Set.of(
+        new Measure("Is Biscuit Finished", () -> isFinished() ? 1.0 : 0.0),
+        new Measure("Biscuit Set Point", () -> setPoint.in(Rotations)));
   }
 
   public void zero() {
