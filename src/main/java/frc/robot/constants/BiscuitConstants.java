@@ -29,11 +29,11 @@ public class BiscuitConstants {
   // public static Angle Level1 = ;
 
   // Disables the TalonFX by setting it's voltage to zero. Not very shocking.
-  public static TalonFXConfiguration disableTalon() {
+  public static VoltageConfigs disableTalon() {
     VoltageConfigs voltage =
         new VoltageConfigs().withPeakForwardVoltage(0.0).withPeakReverseVoltage(0.0);
     getFXConfig().Voltage = voltage;
-    return getFXConfig();
+    return voltage;
   }
 
   // I copied and pasted this because I'm lazy
