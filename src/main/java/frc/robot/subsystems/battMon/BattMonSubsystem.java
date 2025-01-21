@@ -4,43 +4,51 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.BattMonConstants;
-import frc.robot.subsystems.battMon.BattMonIO.BattMonIOInputs;
+import org.littletonrobotics.junction.Logger;
 
 public class BattMonSubsystem extends SubsystemBase {
   // Private objects
   private BattMonIO io;
-  private BattMonIOInputs inputs = new BattMonIOInputs();
+  private BattMonIOInputsAutoLogged inputs = new BattMonIOInputsAutoLogged();
   private battMonState curState;
   // Alerts
   private Alert highTempAlert = new Alert("WARNING reaching maximum temp!", AlertType.kWarning);
   private Alert dangerTempAlert = new Alert("DANGER MAXIMUM TEMP REACHED", AlertType.kError);
   private Alert safeAlert = new Alert("SAFE Temp low. Limits removed", AlertType.kInfo);
 
-  private double tempThreshold;
+  private double recoveryTempThreshold;
+  private double curDangerThreshold;
+  private double curWarnThreshold;
 
   @Override
   public void periodic() {
     // Refresh data and graph it
     io.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
+
+    curDangerThreshold =
+        BattMonConstants.kTempLimitSlope * inputs.batteryCurrent
+            + BattMonConstants.kTempLimitOffset;
+    curWarnThreshold = curDangerThreshold - BattMonConstants.kWarningOffset;
 
     // Check for dangerous outputs NOTE all of these values are temporary
     switch (curState) {
       case NORMAL:
-        if (inputs.breakerTemp >= (BattMonConstants.kTempHighSlope * inputs.pdpVoltage + 100)) {
+        if (inputs.breakerTemp >= curWarnThreshold) {
           highTempAlert.set(true);
           safeAlert.set(false);
-          tempThreshold = inputs.breakerTemp - BattMonConstants.kHysteresis * inputs.pdpVoltage;
+          recoveryTempThreshold = curWarnThreshold - BattMonConstants.kHysteresis;
           curState = battMonState.WARNING;
         } else {
           break;
         }
 
       case WARNING:
-        if (inputs.breakerTemp > (BattMonConstants.kTempDangerSlope * inputs.pdpVoltage)) {
+        if (inputs.breakerTemp > curDangerThreshold) {
           highTempAlert.set(false);
           dangerTempAlert.set(true);
           curState = battMonState.DANGER;
-        } else if (inputs.breakerTemp < tempThreshold) {
+        } else if (inputs.breakerTemp < recoveryTempThreshold) {
           highTempAlert.set(false);
           safeAlert.set(true);
           curState = battMonState.NORMAL;
@@ -49,9 +57,7 @@ public class BattMonSubsystem extends SubsystemBase {
         }
 
       case DANGER:
-        if (inputs.breakerTemp >= (BattMonConstants.kTempDangerSlope * inputs.pdpVoltage)) {
-          break;
-        } else {
+        if (inputs.breakerTemp <= recoveryTempThreshold) {
           dangerTempAlert.set(false);
           highTempAlert.set(true);
           curState = battMonState.WARNING;

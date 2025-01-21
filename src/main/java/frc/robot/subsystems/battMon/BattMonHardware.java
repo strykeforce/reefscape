@@ -24,14 +24,17 @@ public class BattMonHardware implements BattMonIO {
 
   @Override
   public void updateInputs(BattMonIOInputs inputs) {
-    inputs.batteryVoltage = battVoltageCycle.getOutput() 
-    * BattMonConstants.kBattVolt1 * BattMonConstants.kBattVolt2;
-    inputs.batteryCurrent = battCurrentCycle.getOutput() 
-    * BattMonConstants.kBattCurrent1 * BattMonConstants.kBattCurrent2;
-    inputs.pdpVoltage = pdpCycle.getOutput() 
-    * BattMonConstants.kPdpVoltage1 * BattMonConstants.kPdpVoltage2;
+    inputs.batteryVoltage =
+        battVoltageCycle.getOutput() * BattMonConstants.kBattVoltSlope
+            + BattMonConstants.kBattVoltOffset;
+    inputs.batteryCurrent =
+        battCurrentCycle.getOutput() * BattMonConstants.kBattCurrentSlope
+            + BattMonConstants.kBattCurrentOffset;
+    inputs.pdpVoltage =
+        pdpCycle.getOutput() * BattMonConstants.kPdpVoltSlope + BattMonConstants.kPdpVoltOffset;
     inputs.breakerTemp =
         ((tempCycle.getHighTimeNanoseconds() / (tempCounter.getPeriod() / 1000000000))
-            - BattMonConstants.kBreakerTemp1) / BattMonConstants.kBreakerTemp2;
+                - BattMonConstants.kBreakerTemp1)
+            / BattMonConstants.kBreakerTemp2;
   }
 }
