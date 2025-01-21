@@ -12,6 +12,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLog;
+import org.strykeforce.swerve.OdometryStrategy;
 import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -23,36 +24,37 @@ public interface SwerveIO {
     public double odometryY = 0.0;
     public double odometryRotation2D = 0.0;
     public Rotation2d gyroRotation2d = new Rotation2d();
+    public Rotation2d navxRotation2d = new Rotation2d();
     public double normalizedGyroRotation = 0.0;
     public double gyroPitch = 0.0;
     public double gyroRoll = 0.0;
     public double gyroRate = 0.0;
     public boolean isConnected = false;
     public Pose2d poseMeters = new Pose2d();
-    public double updateCount = 0;
+    public double pigeonTemp = 0;
     public double fieldX = 0;
     public double fieldY = 0;
+    public ChassisSpeeds fieldRelSpeed = new ChassisSpeeds();
     public double[] azimuthVels = {0, 0, 0, 0};
     public double[] azimuthCurrent = {0, 0, 0, 0};
   }
 
-  public default SwerveModule[] getSwerveModules() {
+  private SwerveModule[] getSwerveModules() {
     return null;
   }
 
-  public default SwerveModulePosition[] getSwerveModulePositions() {
+  public default void setSwerveModuleAngles(
+      Rotation2d FL, Rotation2d FR, Rotation2d BL, Rotation2d BR) {}
+
+  private SwerveModulePosition[] getSwerveModulePositions() {
     return null;
   }
 
-  public default SwerveModuleState[] getSwerveModuleStates() {
+  private SwerveModuleState[] getSwerveModuleStates() {
     return null;
   }
 
-  public default ChassisSpeeds getFieldRelSpeed() {
-    return null;
-  }
-
-  public default ChassisSpeeds getRobotRelSpeed() {
+  private ChassisSpeeds getRobotRelSpeed() {
     return null;
   }
 
@@ -60,9 +62,11 @@ public interface SwerveIO {
     return null;
   }
 
-  public default void setOdometry(Rotation2d Odom) {}
+  public default void setOdometry(OdometryStrategy Odom) {}
 
-  public default void setGyroOffset(Rotation2d rotation) {}
+  public default void setPigeonGyroOffset(Rotation2d rotation) {}
+
+  public default void setBothGyroOffset(Rotation2d rotation) {}
 
   public default void resetGyro() {}
 

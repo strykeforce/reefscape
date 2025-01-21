@@ -18,6 +18,8 @@ public class DriveConstants {
   public static final double kMaxSpeedMetersPerSecond = 12.0;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
+  public static final double kGyroDifferentThreshold = 5.0; // 5 degrees
+  public static final int kGyroDifferentCount = 3;
 
   public static final double kRobotLength = 22.0;
   public static final double kRobotWidth = 22.0;

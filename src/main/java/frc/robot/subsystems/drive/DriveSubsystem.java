@@ -10,29 +10,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.util.CircularBuffer;
-import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.RobotConstants;
-import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
-import org.slf4j.Logger;
+import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.swerve.SwerveModule;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class DriveSubsystem extends MeasurableSubsystem {
-  private static final Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
   private final SwerveIO io;
   private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
   private final HolonomicDriveController holonomicController;
-  private RobotStateSubsystem robotStateSubsystem;
-  private double avgTemp = 0.0;
-  private CircularBuffer<Integer> temps = new CircularBuffer<Integer>(DriveConstants.kTempAvgCount);
-  private AnalogInput breakerTemp;
 
   private final ProfiledPIDController omegaController;
   private final PIDController xController;
@@ -46,12 +37,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Trajectory<SwerveSample> autoTrajectory;
   private double trajectoryActive = 0.0;
 
+  private int gyroDifferentCount = 0;
+
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", "Nothing");
-
-    this.breakerTemp = new AnalogInput(RobotConstants.kBreakerTempChannel);
 
     this.io = io;
     // Setup Holonomic Controller
@@ -124,6 +115,28 @@ public class DriveSubsystem extends MeasurableSubsystem {
         false);
   }
 
+  // Choreo Holonomic Controller
+  public void calculateControllerServo(SwerveSample desiredState, double desiredRobotRelvY) {
+    holoContInput = desiredState;
+    double xFF = desiredState.vx;
+    double rotationFF = desiredState.heading;
+
+    Pose2d pose = inputs.poseMeters;
+    double xFeedback = xController.calculate(pose.getX(), desiredState.x);
+    double rotationFeedback =
+        omegaController.calculate(pose.getRotation().getRadians(), desiredState.heading);
+
+    holoContOutput.vxMetersPerSecond = xFF + xFeedback;
+    holoContOutput.vyMetersPerSecond = desiredRobotRelvY;
+    holoContOutput.omegaRadiansPerSecond = rotationFF + rotationFeedback;
+
+    io.move(
+        holoContOutput.vxMetersPerSecond,
+        holoContOutput.vyMetersPerSecond,
+        holoContOutput.omegaRadiansPerSecond,
+        false);
+  }
+
   public void resetOdometry(Pose2d pose) {
     io.resetOdometry(pose);
     logger.info("reset odometry with: {}", pose);
@@ -131,6 +144,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void recordAutoTrajectory(Trajectory<SwerveSample> traj) {
     autoTrajectory = traj;
+  }
+
+  public void setAutoDebugMsg(String msg) {
+    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", msg);
+  }
+
+  public Trajectory<SwerveSample> getAutoTrajectory() {
+    if (autoTrajectory != null) {
+      return autoTrajectory;
+    } else {
+      return null;
+    }
   }
 
   public void resetHolonomicController(double yaw) {
@@ -163,11 +188,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public ChassisSpeeds getFieldRelSpeed() {
-    return io.getFieldRelSpeed();
-  }
-
-  public ChassisSpeeds getRobotRelSpeed() {
-    return io.getRobotRelSpeed();
+    return inputs.fieldRelSpeed;
   }
 
   public void setDriveState(DriveStates state) {
@@ -182,7 +203,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // logger.info(
     //     "Timestamp Before FieldRel: {}",
     //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
-    ChassisSpeeds cs = getFieldRelSpeed();
+    ChassisSpeeds cs = inputs.fieldRelSpeed;
     double vX = cs.vxMetersPerSecond;
     double vY = cs.vyMetersPerSecond;
     // logger.info(
@@ -192,16 +213,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // Take fieldRel Speed and get the magnitude of the vector
     double wheelSpeed = FastMath.hypot(vX, vY);
 
-    double gyroRate = inputs.gyroRate;
-
     boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillThreshold;
-    boolean gyroStill = Math.abs(gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+    boolean gyroStill = isGyroStill();
 
     return velStill && gyroStill;
   }
 
+  public boolean isGyroStill() {
+    return Math.abs(inputs.gyroRate) <= DriveConstants.kGyroRateStillThreshold;
+  }
+
   public void setGyroOffset(Rotation2d rotation) {
-    io.setGyroOffset(apply(rotation));
+    io.setBothGyroOffset(apply(rotation));
   }
 
   public void setEnableHolo(boolean enabled) {
@@ -209,15 +232,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("Holonomic Controller Enabled: {}", enabled);
   }
 
-  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
-    this.robotStateSubsystem = robotStateSubsystem;
-  }
-
   public void teleResetGyro() {
     logger.info("Driver Joystick: Reset Gyro");
     // double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     double gyroResetDegs = 0.0; // TODO change this to the above once we have RobotStateSubsystem
-    io.setGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
+    io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     io.resetGyro();
     io.resetOdometry(
         new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
@@ -271,10 +290,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Control Methods
   public void lockZero() {
-    SwerveModule[] swerveModules = io.getSwerveModules();
-    for (int i = 0; i < 4; i++) {
-      swerveModules[i].setAzimuthRotation2d(Rotation2d.fromDegrees(0.0));
-    }
+    Rotation2d rot = Rotation2d.fromDegrees(0.0);
+    io.setSwerveModuleAngles(rot, rot, rot, rot);
   }
 
   public void toSafeHold() {
@@ -285,10 +302,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void toIdle() {
     setDriveState(DriveStates.IDLE);
     io.configDriveCurrents(DriveConstants.getNormDriveLimits());
-  }
-
-  public double getTemp() {
-    return avgTemp;
   }
 
   public PIDController getxController() {
@@ -310,28 +323,22 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void periodic() {
     io.updateInputs(inputs);
-    int temp = breakerTemp.getValue();
-    temps.addFirst(temp);
-    double avg = 0;
-    if (temps.size() == DriveConstants.kTempAvgCount)
-      for (int i = 0; i < DriveConstants.kTempAvgCount; ++i) avg += temps.get(i);
-
-    avg /= DriveConstants.kTempAvgCount;
-
-    avgTemp = avg;
+    Logger.processInputs(getName(), inputs);
+    if (Math.abs(inputs.gyroRotation2d.getDegrees() - inputs.navxRotation2d.getDegrees())
+        > DriveConstants.kGyroDifferentThreshold) {
+      gyroDifferentCount++;
+    } else {
+      gyroDifferentCount = 0;
+    }
+    if (gyroDifferentCount > DriveConstants.kGyroDifferentCount && isDriveStill()) {
+      io.setPigeonGyroOffset(inputs.navxRotation2d);
+      gyroDifferentCount = 0;
+    }
 
     switch (currDriveState) {
       case IDLE:
-        if (avg > DriveConstants.kTripTemp) {
-          io.configDriveCurrents(DriveConstants.getSafeDriveLimits());
-          setDriveState(DriveStates.SAFE);
-        }
         break;
       case SAFE:
-        if (avg < DriveConstants.kRecoverTemp) {
-          io.configDriveCurrents(DriveConstants.getNormDriveLimits());
-          setDriveState(DriveStates.IDLE);
-        }
         break;
       case SAFE_HOLD:
         break;
@@ -372,14 +379,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
         new Measure(
             "Holo Controller Omega Setpoint",
             () -> holonomicController.getThetaController().getSetpoint().position),
-        new Measure("Trajectory Active", () -> trajectoryActive),
-        new Measure("Wheel 0 Angle", () -> io.getSwerveModuleStates()[0].angle.getDegrees()),
-        new Measure("Wheel 0 Speed", () -> io.getSwerveModuleStates()[0].speedMetersPerSecond),
-        new Measure("Wheel 1 Angle", () -> io.getSwerveModuleStates()[1].angle.getDegrees()),
-        new Measure("Wheel 1 Speed", () -> io.getSwerveModuleStates()[1].speedMetersPerSecond),
-        new Measure("Wheel 2 Angle", () -> io.getSwerveModuleStates()[2].angle.getDegrees()),
-        new Measure("Wheel 2 Speed", () -> io.getSwerveModuleStates()[2].speedMetersPerSecond),
-        new Measure("Wheel 3 Angle", () -> io.getSwerveModuleStates()[3].angle.getDegrees()),
-        new Measure("Wheel 3 Speed", () -> io.getSwerveModuleStates()[3].speedMetersPerSecond));
+        new Measure("Trajectory Active", () -> trajectoryActive));
   }
 }

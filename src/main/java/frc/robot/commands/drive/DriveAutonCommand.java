@@ -53,32 +53,35 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
 
   @Override
   public void initialize() {
-    Pose2d initialPose = new Pose2d();
-    if (trajectory.getInitialPose(mirrorTrajectory) != null) {
+    if (isTherePath) {
+      driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
+      Pose2d initialPose = new Pose2d();
       initialPose = trajectory.getInitialPose(mirrorTrajectory).get();
+      if (resetOdometry) {
+        driveSubsystem.resetOdometry(initialPose);
+      }
+      driveSubsystem.setEnableHolo(true);
+      // driveSubsystem.recordAutoTrajectory(trajectory);
+      driveSubsystem.resetHolonomicController();
+      driveSubsystem.grapherTrajectoryActive(true);
+      timer.reset();
+      logger.info("Begin Trajectory: {}", trajectoryName);
+      SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
+      driveSubsystem.calculateController(desiredState);
     }
-    if (resetOdometry && trajectory.getInitialPose(mirrorTrajectory) != null) {
-      driveSubsystem.resetOdometry(initialPose);
-    }
-    driveSubsystem.setEnableHolo(true);
-    // driveSubsystem.recordAutoTrajectory(trajectory);
-    driveSubsystem.resetHolonomicController();
-    driveSubsystem.grapherTrajectoryActive(true);
-    timer.reset();
-    logger.info("Begin Trajectory: {}", trajectoryName);
-    SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
-    driveSubsystem.calculateController(desiredState);
   }
 
   @Override
   public void execute() {
-    SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
-    driveSubsystem.calculateController(desiredState);
+    if (isTherePath) {
+      SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
+      driveSubsystem.calculateController(desiredState);
+    }
   }
 
   @Override
   public boolean isFinished() {
-    if (isTherePath) {
+    if (!isTherePath) {
       return false;
     }
     return timer.hasElapsed(trajectory.getTotalTime());
@@ -98,5 +101,6 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
 
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
+    driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
   }
 }
