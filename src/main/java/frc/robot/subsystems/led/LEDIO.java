@@ -53,7 +53,7 @@ public class LEDIO {
     }
   }
 
-  public void setPattern(LEDPattern pattern) {
+  public void setStrip(LEDPattern pattern) {
     pattern.applyTo(led);
   }
 }
