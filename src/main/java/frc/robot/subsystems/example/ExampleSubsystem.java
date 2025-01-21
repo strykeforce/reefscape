@@ -58,6 +58,7 @@ public class ExampleSubsystem extends MeasurableSubsystem implements ClosedLoopP
   public void periodic() {
     // Read Inputs
     io.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
 
     // State Machine
     switch (curState) {
