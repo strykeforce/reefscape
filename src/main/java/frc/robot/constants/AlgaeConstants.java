@@ -20,7 +20,7 @@ import edu.wpi.first.units.measure.*;
 public class AlgaeConstants {
 
   
-  public static int kFxId = 4; //CHANGE TO MOTOR NUMBER
+  public static int kFxId = 30;
 
   public static final Angle kCloseEnough = Degrees.of(5);
   public static final Angle kMaxFwd = Rotations.of(100);

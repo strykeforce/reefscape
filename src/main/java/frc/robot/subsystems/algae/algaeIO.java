@@ -9,15 +9,15 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 public interface algaeIO {
   @AutoLog
-  public static class IOInputs {
+  public static class AlgaeIOInputs {
     public AngularVelocity velocity;
-    public Angle location;
+    public static Angle position;
     public ReverseLimitValue reverseLimitSwitch;
   }
 
-  public default void updateInputs(IOInputs inputs) {}
+  public default void updateInputs(AlgaeIOInputs inputs) {}
 
-  public default void setPosition(double position) {}
+  public default void setSpeed(double speed) {}
 
   public default void zero() {}
 
