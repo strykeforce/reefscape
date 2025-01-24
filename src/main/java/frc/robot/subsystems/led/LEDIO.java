@@ -51,9 +51,17 @@ public class LEDIO {
     for (int i = 0; i < led.getLength(); i++) {
       setLED(i, Color.kBlack);
     }
+    ledBase.setData(led);
   }
 
   public void setStrip(LEDPattern pattern) {
     pattern.applyTo(led);
+  }
+
+  public void setStrip(Color color) {
+    for (int i = 0; i < led.getLength(); i++) {
+      setLED(i, color);
+    }
+    ledBase.setData(led);
   }
 }
