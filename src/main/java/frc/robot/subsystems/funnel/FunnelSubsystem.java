@@ -9,12 +9,13 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 import frc.robot.constants.FunnelConstants;
 import frc.robot.standards.OpenLoopSubsystem;
+import frc.robot.subsystems.example.ExampleIOInputsAutoLogged;
 
 public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubsystem{
 
     // Private Variables
     private final FunnelIo io;
-    private float totalBreaks = 0;
+    private final FunnelIOInputsAutoLogged inputs = new FunnelIOInputsAutoLogged();
 
     public FunnelState curState = FunnelState.HasNotSeenCoral;
 
@@ -30,6 +31,9 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
     @Override
     public void periodic() {
+        // Update Inputs
+        io.updateInputs(inputs);
+
         switch (curState){
             case HasSeenCoral:
                 break;
@@ -39,7 +43,6 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
         // Log Outputs
         Logger.recordOutput("Funnel/curState", curState);
-        Logger.recordOutput("Funnel/totalBreaks", totalBreaks);
     }
 
     // Grapher

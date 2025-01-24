@@ -1,5 +1,6 @@
 package frc.robot.subsystems.example;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -63,6 +64,7 @@ public class ExampleIOFX implements ExampleIO {
 
   @Override
   public void updateInputs(ExampleIOInputs inputs) {
+    BaseStatusSignal.refreshAll(currVelocity, currPosition);
     inputs.velocity = currVelocity.refresh().getValue();
     inputs.position = currPosition.refresh().getValue().minus(relSetpointOffset);
   }
