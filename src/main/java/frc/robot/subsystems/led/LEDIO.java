@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class LEDIO {
-  public AddressableLED ledBase;
-  public AddressableLEDBuffer led;
+  private AddressableLED ledBase;
+  private AddressableLEDBuffer led;
 
   public LEDIO(int port, int length) {
     ledBase = new AddressableLED(port);

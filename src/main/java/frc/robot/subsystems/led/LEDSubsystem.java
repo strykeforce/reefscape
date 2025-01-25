@@ -13,27 +13,130 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class LEDSubsystem extends MeasurableSubsystem {
   private LEDIO io;
   private LEDPattern base = LEDPattern.solid(Color.kBlack);
-  private LEDPattern coral = LEDPattern.solid(LEDConstants.kCoralInRobot);
+  public LEDStates currState = LEDStates.OFF;
+
+  // section patterns
   private LEDPattern algea =
       LEDPattern.steps(
-          Map.of(0, LEDConstants.kHasAlgea, LEDConstants.stripLength / 3, Color.kBlack));
-
+          Map.of(0, LEDConstants.kHasAlgea, LEDConstants.kStripLength / 3, Color.kBlack));
+  private LEDPattern coral = LEDPattern.solid(LEDConstants.kCoralInRobot);
+  private LEDPattern level = LEDPattern.steps(Map.of(LEDConstants.kLevelStart, LEDConstants.kL1));
+  private LEDPattern place =
+      LEDPattern.steps(Map.of(LEDConstants.kPlaceStart, LEDConstants.kManual));
+  private LEDPattern getAlgea =
+      LEDPattern.steps(Map.of(LEDConstants.kGetAlgeaStart, LEDConstants.kNotGetAlgea));
+  private LEDPattern autoplace =
+      LEDPattern.steps(Map.of(LEDConstants.kStripLength / 3 * 2, LEDConstants.kAutoPlacing))
+          .blink(Seconds.of(0.25));
   private LEDPattern currentLimiting =
       LEDPattern.solid(LEDConstants.kCurrentLimiting).blink(Seconds.of(1), Seconds.of(2));
-  private LEDPattern autoplace =
-      LEDPattern.steps(Map.of(LEDConstants.stripLength / 3 * 2, LEDConstants.kAutoPlacing))
-          .blink(Seconds.of(0.25));
-  public LEDStates currState = LEDStates.OFF;
-  public CoralStates coralState = CoralStates.NO_PIECE;
-  public boolean autoPlacing = false;
-  public boolean hasAlgae = false;
-  public boolean isLimiting = false;
+
+  // section booleans and states
+  private boolean hasAlgae = false;
+  private CoralStates coralState = CoralStates.NO_PIECE;
+  private LevelStates levelState = LevelStates.L1;
+  private PlaceStates placeState = PlaceStates.MANUAL;
+  private boolean shouldGetAlgea = false;
+  private boolean autoPlacing = false;
+  private boolean isLimiting = false;
 
   public LEDSubsystem(LEDIO io) {
     this.io = io;
   }
 
+  public void setState(LEDStates state) {
+    currState = state;
+    switch (currState) {
+      case OFF:
+        io.setOff();
+        break;
+      case NORMAL:
+        buildBase();
+        break;
+      case CLIMB:
+        break;
+      default:
+        break;
+    }
+  }
+
+  public LEDStates getState() {
+    return currState;
+  }
+
+  // setters
+  public void setAlgeaLights(boolean on) {
+    hasAlgae = on;
+    buildBase();
+  }
+
+  public void setCoralLights(CoralStates state) {
+    coralState = state;
+    buildBase();
+  }
+
+  public void setLevelLights(LevelStates state) {
+    levelState = state;
+    buildBase();
+  }
+
+  public void setPlaceLights(PlaceStates state) {
+    placeState = state;
+    buildBase();
+  }
+
+  public void setGetAlgeaLights(boolean on) {
+    shouldGetAlgea = on;
+    buildBase();
+  }
+
+  public void setAutoPlacing(boolean isAutoPlacing) {
+    autoPlacing = isAutoPlacing;
+    buildBase();
+  }
+
+  public void setCurrentLimiting(boolean isCurrentLimiting) {
+    this.isLimiting = isCurrentLimiting;
+    buildBase();
+  }
+
+  // getters
+  public boolean getAlgeaLights() {
+    return hasAlgae;
+  }
+
+  public CoralStates getCoralLights() {
+    return coralState;
+  }
+
+  public LevelStates getLevelLights() {
+    return levelState;
+  }
+
+  public PlaceStates getPlaceLights() {
+    return placeState;
+  }
+
+  public boolean getGetAlgeaLights() {
+    return shouldGetAlgea;
+  }
+
+  public boolean getAutoPlacing() {
+    return autoPlacing;
+  }
+
+  public boolean getCurrentLimiting() {
+    return isLimiting;
+  }
+
   private void buildBase() {
+    algea =
+        LEDPattern.steps(
+            Map.of(
+                0,
+                hasAlgae ? LEDConstants.kHasAlgea : LEDConstants.kNotHasAlgea,
+                LEDConstants.kStripLength / 3,
+                Color.kBlack));
     switch (coralState) {
       case IN_FUNNEL:
         coral = LEDPattern.solid(LEDConstants.kCoralInFunnel);
@@ -45,9 +148,34 @@ public class LEDSubsystem extends MeasurableSubsystem {
         coral = LEDPattern.solid(LEDConstants.kCoralNotInRobot);
         break;
     }
-    algea =
+    switch (levelState) {
+      case L1:
+        level = LEDPattern.steps(Map.of(LEDConstants.kLevelStart, LEDConstants.kL1));
+        break;
+      case L2:
+        level = LEDPattern.steps(Map.of(LEDConstants.kLevelStart, LEDConstants.kL2));
+        break;
+      case L3:
+        level = LEDPattern.steps(Map.of(LEDConstants.kLevelStart, LEDConstants.kL3));
+        break;
+      case L4:
+        level = LEDPattern.steps(Map.of(LEDConstants.kLevelStart, LEDConstants.kL4));
+        break;
+    }
+    switch (placeState) {
+      case MANUAL:
+        place = LEDPattern.steps(Map.of(LEDConstants.kPlaceStart, LEDConstants.kManual));
+      case LEFT:
+        place = LEDPattern.steps(Map.of(LEDConstants.kPlaceStart, LEDConstants.kLeft));
+      case RIGHT:
+        place = LEDPattern.steps(Map.of(LEDConstants.kPlaceStart, LEDConstants.kRight));
+    }
+    getAlgea =
         LEDPattern.steps(
-            Map.of(0, LEDConstants.kHasAlgea, LEDConstants.stripLength / 3, Color.kBlack));
+            Map.of(
+                LEDConstants.kGetAlgeaStart,
+                shouldGetAlgea ? LEDConstants.kGetAlgea : LEDConstants.kNotGetAlgea));
+    base = getAlgea.overlayOn(place.overlayOn(level.overlayOn(algea.overlayOn(coral))));
   }
 
   public void periodic() {
@@ -55,11 +183,12 @@ public class LEDSubsystem extends MeasurableSubsystem {
       case OFF:
         break;
       case NORMAL:
+        LEDPattern output = base;
         if (autoPlacing) {
-          base = autoplace.overlayOn(base);
+          output = autoplace.overlayOn(output);
         }
         if (isLimiting) {
-          base = currentLimiting.overlayOn(base);
+          output = currentLimiting.overlayOn(output);
         }
         io.setStrip(base);
         break;
@@ -89,6 +218,19 @@ public class LEDSubsystem extends MeasurableSubsystem {
   public enum CoralStates {
     IN_FUNNEL,
     IN_ROBOT,
-    NO_PIECE,
+    NO_PIECE
+  }
+
+  public enum LevelStates {
+    L1,
+    L2,
+    L3,
+    L4
+  }
+
+  public enum PlaceStates {
+    MANUAL,
+    LEFT,
+    RIGHT
   }
 }
