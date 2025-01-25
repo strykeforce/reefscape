@@ -9,6 +9,11 @@
 
 ### Operator Controller
 
+## State Diagrams
+
+### Robot State
+![robotState](docs/reefscape-RobotState-Light.png)
+
 
 ## CAN Bus
 
