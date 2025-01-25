@@ -24,7 +24,6 @@ public final class VisionConstants {
   //   public static final double kThetaStdDevRejected = Units.degreesToRadians(360);
   //   public static final double kThetaStdThres = 0.2;
 
-
   // Velocity Filter
   public static final double kLinearCoeffOnVelFilter = 0.1;
   public static final double kOffsetOnVelFilter = 0.10;
@@ -50,7 +49,12 @@ public final class VisionConstants {
   public static final double FOV58YUYVSingleTagCoeff = 22.0 / 100.0;
 
   // Constants for cameras
-  public static final int kNumCams = 4;
+  public static final int kNumCams = 5;
+  public static final int kNumPis = 3;
+  public static final int[] kUdpIndex = {0, 1, 2};
+
+  // Camera Ports
+  public static final int[] kCamPorts = {5802, 5802, 5803, 5803, 5804};
 
   // Names
   public static final String kCam1Name = "Shooter";
