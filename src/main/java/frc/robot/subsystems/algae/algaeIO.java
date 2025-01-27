@@ -17,7 +17,7 @@ public interface algaeIO {
 
   public default void updateInputs(AlgaeIOInputs inputs) {}
 
-  public default void setSpeed(double speed) {}
+  public default void setSpeed(AngularVelocity speed) {}
 
   public default void zero() {}
 

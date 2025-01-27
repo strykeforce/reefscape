@@ -2,13 +2,11 @@ package frc.robot.subsystems.algae;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.strykeforce.IOInputsAutoLogged;
 import org.strykeforce.telemetry.TelemetryService;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
@@ -23,28 +21,25 @@ public class algaeIOFX implements algaeIO {
 
   // FX Access objects
   TalonFXConfigurator configurator;
-  private MotionMagicDutyCycle positionRequest =
-      new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
   StatusSignal<AngularVelocity> currVelocity;
   StatusSignal<ForwardLimitValue> forwardLimitSwitch;
   StatusSignal<ReverseLimitValue> reverseLimitSwitch;
 
   public algaeIOFX() {
-    final AlgaeIOInputsAutoLogged inputs = new IOInputsAutoLogged();
     logger = LoggerFactory.getLogger(this.getClass());
     talonFX = new TalonFX(AlgaeConstants.kFxId);
     reverseLimitSwitch = talonFX.getReverseLimit();
     currVelocity = talonFX.getVelocity();
-    reverseLimitSwitch = talonFX.getReverseLimit();
     forwardLimitSwitch = talonFX.getForwardLimit();
   }
 
   public void updateInputs(AlgaeIOInputs inputs) {
+    BaseStatusSignal.refreshAll();
     inputs.velocity = currVelocity.refresh().getValue();
   }
 
   public void setSpeed(AngularVelocity speed) {
-    talonFX.set(speed);
+    talonFX.set(speed.baseUnitMagnitude());
   }
 
   public AngularVelocity AngularVelocity() {

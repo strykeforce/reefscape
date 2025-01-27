@@ -13,9 +13,9 @@ import frc.robot.subsystems.algae.algaeIO.AlgaeIOInputs;
 
 public class AlgaeSubsystem implements ClosedLoopSpeedSubsystem {
     private final algaeIO io;
-    private final IOInputsAutoLogged inputs = new IOInputsAutoLogged();
+    private final AlgaeIOInputs inputs = new AlgaeIOInputs();
     private Angle setpoint = Rotations.of(0.0);  // Initial setpoint for position
-    private AngularVelocity desiredSpeed = AngularVelocity.ZERO;  // Initial desired speed
+    private AngularVelocity desiredSpeed;
 
     public AlgaeSubsystem(algaeIO io) {
         this.io = io;
@@ -30,21 +30,21 @@ public class AlgaeSubsystem implements ClosedLoopSpeedSubsystem {
     // Set the speed (velocity) of the motor
     
     public void setSpeed(AngularVelocity speed) {
-        io.set(speed);
-        this.desiredSpeed = speed;  // Keep track of the desired speed
+        io.setSpeed(speed);
+        desiredSpeed = speed;  // Keep track of the desired speed
     }
 
     // Get the current speed (velocity) of the motor
     
     public AngularVelocity getSpeed() {
-        return io.getSpeed();  // Assuming algaeIO provides the speed
+        return inputs.velocity;
     }
 
     // Check if the subsystem is at the desired speed
     
     public boolean atSpeed() {
         // Check if the current speed is within a tolerance of the desired speed
-        return getSpeed().minus(desiredSpeed).abs() <= AlgaeConstants.kSpeedTolerance.in(AngularVelocity.class);
+        return Math.abs(getSpeed().minus(desiredSpeed)) <= AlgaeConstants.kSpeedTolerance.in(AngularVelocity.class);
     }
 
     // Zero the subsystem (reset position to zero)
