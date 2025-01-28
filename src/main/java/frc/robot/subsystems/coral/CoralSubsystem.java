@@ -1,3 +1,3 @@
 package frc.robot.subsystems.coral;
 
-public class CoralSubsystem {}
+public class CoralSubsystem implements ClosedLoopSpeedSubsystem {}

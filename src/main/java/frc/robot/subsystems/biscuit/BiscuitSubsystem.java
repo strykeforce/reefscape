@@ -6,13 +6,14 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.*;
 import frc.robot.constants.BiscuitConstants;
+import frc.robot.standards.ClosedLoopPosSubsystem;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
-public class BiscuitSubsystem extends MeasurableSubsystem {
+public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
 
   private BiscuitIO io;
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();

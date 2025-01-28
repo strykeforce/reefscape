@@ -27,6 +27,7 @@ public class BiscuitConstants {
   public static final Angle kMaxFwd = Rotations.of(100);
   public static final Angle kMaxRev = Rotations.of(-100);
   // public static Angle Level1 = ;
+  public static final Angle kStowSetpoint = null;
 
   // Disables the TalonFX by setting it's voltage to zero. Not very shocking.
   public static VoltageConfigs disableTalon() {

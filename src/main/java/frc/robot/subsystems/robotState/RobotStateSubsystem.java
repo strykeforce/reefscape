@@ -1,5 +1,11 @@
 package frc.robot.subsystems.robotState;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.constants.BiscuitConstants;
+import frc.robot.constants.DriveConstants;
+import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.RobotStateConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
@@ -19,6 +25,8 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class RobotStateSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  private Alliance allianceColor = Alliance.Blue;
+
   private AlgaeSubsystem algaeSubsystem;
   private BattMonSubsystem battMonSubsystem;
   private BiscuitSubsystem biscuitSubsystem;
@@ -31,6 +39,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private VisionSubsystem visionSubsystem;
 
   private RobotStates curState;
+  private RobotStates nextState;
   private ScoringLevel scoringLevel;
   private ScoreSide scoreSide;
   private AlgaeHeight algaeHeight;
@@ -42,6 +51,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean hasCoral = true;
   private boolean hasAlgae = false;
   private boolean isAuto = true;
+
+  private Pose2d algaeRemovalPose;
+  private ScoringLevel algaeLevel;
 
   public RobotStateSubsystem(
       AlgaeSubsystem algaeSubsystem,
@@ -70,11 +82,33 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return curState;
   }
 
-  private void setState(RobotStates robotState) {
-    if (this.curState != robotState) {
-      logger.info("{} -> {}", this.curState, robotState);
-      this.curState = robotState;
+  public void setAllianceColor(Alliance alliance) {
+    allianceColor = alliance;
+    logger.info("Change color to: {}", allianceColor);
+  }
+
+  public Alliance getAllianceColor() {
+    return allianceColor;
+  }
+
+  public ScoringLevel getAlgaeLevel() {
+    return tagAlignSubsystem.getHexant() % 2 == 0 ? ScoringLevel.L3 : ScoringLevel.L2;
+  }
+
+  private void setState(RobotStates robotState, boolean transfer) {
+    if (curState != robotState) {
+      if (transfer) {
+        nextState = robotState;
+        logger.info("TRANSFER ({} -> {})", curState, nextState);
+      } else {
+        logger.info("{} -> {}", this.curState, robotState);
+      }
+      curState = robotState;
     }
+  }
+
+  private void setState(RobotStates robotState) {
+    setState(robotState, false);
   }
 
   public void setScoringLevel(ScoringLevel scoringLevel) {
@@ -117,17 +151,178 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.isAuto = isAuto;
   }
 
+  public void toStow() {
+    algaeSubsystem.hold();
+    biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
+    coralSubsystem.hold();
+    elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
+
+    setState(RobotStates.TO_STOW);
+  }
+
+  public void toPrepCoral() {
+    if (isAuto) {
+      toReefAlign(false, false);
+    } else {
+      toReefAlign(getAlgaeOnCycle, false);
+    }
+  }
+
+  public void toFunnelLoad() {
+    biscuitSubsystem.setPosition(BiscuitConstants.kFunnelSetpoint);
+    coralSubsystem.intake();
+    elevatorSubsystem.setPosition(ElevatorConstants.kFunnelSetpoint);
+
+    setState(RobotStates.FUNNEL_LOAD, true);
+  }
+
+  public void toReefAlign() {
+    toReefAlign(getAlgaeOnCycle, true);
+  }
+
+  private void toReefAlign(boolean getAlgae, boolean drive) {
+    if (getAlgae) {
+      algaeSubsystem.intake();
+
+      switch (getAlgaeLevel()) {
+        case L1 -> {}
+        case L2 -> {
+          biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeSetpoint);
+          elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeSetpoint);
+        }
+        case L3 -> {
+          biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeSetpoint);
+          elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeSetpoint);
+        }
+        case L4 -> {}
+      }
+    } else {
+      if (!coralSubsystem.hasCoral()) {
+        toStow();
+        return;
+      } else {
+        switch (scoringLevel) {
+          case L1 -> {
+            biscuitSubsystem.setPosition(BiscuitConstants.kL1CoralSetpoint);
+            elevatorSubsystem.setPosition(ElevatorConstants.kL1CoralSetpoint);
+          }
+          case L2 -> {
+            biscuitSubsystem.setPosition(BiscuitConstants.kL2CoralSetpoint);
+            elevatorSubsystem.setPosition(ElevatorConstants.kL2CoralSetpoint);
+          }
+          case L3 -> {
+            biscuitSubsystem.setPosition(BiscuitConstants.kL3CoralSetpoint);
+            elevatorSubsystem.setPosition(ElevatorConstants.kL3CoralSetpoint);
+          }
+          case L4 -> {
+            biscuitSubsystem.setPosition(BiscuitConstants.kL4CoralSetpoint);
+            elevatorSubsystem.setPosition(ElevatorConstants.kL4CoralSetpoint);
+          }
+        }
+      }
+    }
+
+    if (drive) {
+      tagAlignSubsystem.setup();
+      tagAlignSubsystem.start();
+    }
+
+    setState(RobotStates.REEF_ALIGN);
+  }
+
+  public void toRemoveAlgae() {
+    algaeRemovalPose = driveSubsystem.getPoseMeters();
+
+    switch (getAlgaeLevel()) {
+      case L2 -> {
+        biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeRemovalSetpoint);
+        elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
+
+        switch (scoringLevel) {
+          case L1, L2 -> {
+            driveSubsystem.move(DriveConstants.kAlgaeRemovalSpeed, 0, 0, false);
+          }
+        }
+      }
+      case L3 -> {
+        biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeRemovalSetpoint);
+        elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
+      }
+    }
+
+    setState(RobotStates.REMOVE_ALGAE);
+  }
+
+  public void toPlaceCoral() {
+    coralSubsystem.place();
+
+    setState(RobotStates.PLACE_CORAL);
+  }
+
   @Override
   public void periodic() {
     switch (curState) {
-      case TO_STOW -> {}
-      case STOW -> {}
+      case TRANSFER -> {
+        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+          setState(nextState);
+        }
+      }
+
+      case TO_STOW -> {
+        if (algaeSubsystem.isFinished()
+            && biscuitSubsystem.isFinished()
+            && coralSubsystem.isFinished()
+            && elevatorSubsystem.isFinished()) {
+          setState(RobotStates.STOW);
+        }
+      }
+      case STOW -> {
+        if (!coralSubsystem.hasCoral()) {
+          toFunnelLoad();
+        }
+      }
       case PREP_CORAL -> {}
-      case REEF_ALIGN -> {}
-      case REMOVE_ALGAE -> {}
-      case CORAL_REALIGN -> {}
-      case PLACE_CORAL -> {}
-      case FUNNEL_LOAD -> {}
+      case REEF_ALIGN -> {
+        if (tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE) {
+          if (getAlgaeOnCycle && algaeSubsystem.hasAlgae()) {
+            toRemoveAlgae();
+          } else if (!getAlgaeOnCycle) {
+            toPlaceCoral();
+          }
+        }
+      }
+      case REMOVE_ALGAE -> {
+        if (getAlgaeLevel() == ScoringLevel.L2) {
+          switch (scoringLevel) {
+            case L1, L2 -> {
+              if (driveSubsystem.getPoseMeters().minus(algaeRemovalPose).getTranslation().getNorm()
+                  > RobotStateConstants.kAlgaeRetreatDistance) {
+                driveSubsystem.move(0, 0, 0, false);
+                toReefAlign(false, true);
+              }
+            }
+            case L3, L4 -> {
+              if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+                toReefAlign(false, false);
+              }
+            }
+          }
+        } else if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+          toReefAlign(false, false);
+        }
+      }
+
+      case PLACE_CORAL -> {
+        if (!coralSubsystem.hasCoral()) {
+          toFunnelLoad();
+        }
+      }
+
+      case FUNNEL_LOAD -> {
+        if (coralSubsystem.hasCoral()) {
+          setState(RobotStates.LOADING_CORAL);
+        }
+      }
       case LOADING_CORAL -> {}
       case PRESTAGE -> {}
       case HP_ALGAE -> {}
@@ -170,6 +365,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PRE_CLIMB,
     CLIMB,
     INTERRUPTED,
+    TRANSFER
   }
 
   public enum ScoringLevel {
