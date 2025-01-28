@@ -2,72 +2,98 @@ package frc.robot.subsystems.algae;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import org.littletonrobotics.junction.Logger;
-import org.strykeforce.telemetry.TelemetryService;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.AlgaeConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
-import frc.robot.subsystems.algae.algaeIO.AlgaeIOInputs;
+import java.util.Set;
+import org.littletonrobotics.junction.Logger;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
-public class AlgaeSubsystem implements ClosedLoopSpeedSubsystem {
+public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
     private final algaeIO io;
     private final AlgaeIOInputs inputs = new AlgaeIOInputs();
-    private Angle setpoint = Rotations.of(0.0);  // Initial setpoint for position
+    private Angle setpoint = Rotations.of(0.0);
     private AngularVelocity desiredSpeed;
+
+    private enum AlgaeState {
+        INIT,
+        DETECTING,
+        ALGAE_PRESENT,
+        NO_ALGAE,
+        ERROR
+    }
+
+    private AlgaeState currentAlgaeState = AlgaeState.INIT;
 
     public AlgaeSubsystem(algaeIO io) {
         this.io = io;
+        zero();
     }
 
-    // Get the current position from the io object
-    
+    public AlgaeState getState() {
+        return currentAlgaeState;
+    }
+
     public Angle getPosition() {
-        return AlgaeIOInputs.position;
+        return inputs.position;
     }
 
-    // Set the speed (velocity) of the motor
-    
     public void setSpeed(AngularVelocity speed) {
         io.setSpeed(speed);
-        desiredSpeed = speed;  // Keep track of the desired speed
+        desiredSpeed = speed;
     }
 
-    // Get the current speed (velocity) of the motor
-    
     public AngularVelocity getSpeed() {
         return inputs.velocity;
     }
 
-    // Check if the subsystem is at the desired speed
-    
     public boolean atSpeed() {
-        // Check if the current speed is within a tolerance of the desired speed
-        return Math.abs(getSpeed().minus(desiredSpeed)) <= AlgaeConstants.kSpeedTolerance.in(AngularVelocity.class);
+        if (getSpeed().baseUnit().minus(desiredSpeed.baseUnit()) <= AlgaeConstants.kCloseEnough){
+            
+        }
     }
 
-    // Zero the subsystem (reset position to zero)
-    
     public void zero() {
-        setpoint = Rotations.of(0);  // Reset the setpoint to zero
-        io.zero();  // Call the zero method in algaeIO (to reset hardware)
+        setpoint = Rotations.of(0);
+        io.zero();
+        currentAlgaeState = AlgaeState.DETECTING;
     }
 
-    // Check if the subsystem has reached the setpoint position
     public boolean isFinished() {
-        return setpoint.minus(getPosition()).abs(Rotations) <= AlgaeConstants.kCloseEnough.in(Rotations);
+        return setpoint.minus(inputs.position).abs(Rotations) <= AlgaeConstants.kCloseEnough.in(Rotations);
     }
 
-    // Periodic function that runs repeatedly during the robot's operation
+    private void updateAlgaeState() {
+        if (inputs.algaeDetected) {
+            currentAlgaeState = AlgaeState.ALGAE_PRESENT;
+        } else if (!inputs.algaeDetected) {
+            currentAlgaeState = AlgaeState.NO_ALGAE;
+        }
+    }
+
     public void periodic() {
-        io.updateInputs(inputs);  // Update the inputs from the hardware
-        Logger.processInputs(getName(), inputs);  // Log inputs
-        Logger.recordOutput("Algae/setpoint", setpoint.in(Rotations));  // Log setpoint position
+        io.updateInputs(inputs);
+        updateAlgaeState();
+        Logger.recordOutput("Algae/state", currentAlgaeState.ordinal());
+        Logger.recordOutput("Algae/setpoint", setpoint.in(Rotations));
+
+        switch (currentAlgaeState) {
+            case ALGAE_PRESENT:
+                break;
+            case NO_ALGAE:
+                break;
+        }
     }
 
-    // Register the subsystem with a telemetry service for monitoring
     public void registerWith(TelemetryService telemetryService) {
-        io.registerWith(telemetryService);  // Register io with the telemetry service
+        super.registerWith(telemetryService);
+        io.registerWith(telemetryService);
+    }
+
+    public Set<Measure> getMeasures() {
+        return Set.of(new Measure("State", () -> currentAlgaeState.ordinal()));
     }
 }
