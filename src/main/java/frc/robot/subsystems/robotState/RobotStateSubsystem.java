@@ -319,11 +319,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case FUNNEL_LOAD -> {
-        if (coralSubsystem.hasCoral()) {
+        /*if ( FIXME: funnel beam break? )*/ {
           setState(RobotStates.LOADING_CORAL);
         }
       }
-      case LOADING_CORAL -> {}
+      case LOADING_CORAL -> {
+        if (coralSubsystem.hasCoral()) {
+          biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
+          elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
+
+          setState(RobotStates.PRESTAGE, true);
+        }
+      }
       case PRESTAGE -> {}
       case HP_ALGAE -> {}
       case PROCESSOR_ALGAE -> {}
