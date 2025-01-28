@@ -24,7 +24,9 @@ public class ElevatorConstants {
   public static final double kMaxFwd;
   public static final double kMaxRev;
   public static final double kZeroTicks;
+  public static final int zeroMultiple; //some constant to multiply, add by to turn the analog input into a position
   
+  public static final int heightAnalogID = 0;
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
 
@@ -33,9 +35,9 @@ public class ElevatorConstants {
 
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit()
-            .withStatorCurrentLimitEnable()
-            .withSupplyCurrentLimit()
+            .withStatorCurrentLimit(10)
+            .withStatorCurrentLimitEnable(false)
+            .withSupplyCurrentLimit() //one new line change needed
             .withSupplyCurrentThreshold()
             .withSupplyCurrentLimitEnable()
             .withSupplyTimeThreshold();

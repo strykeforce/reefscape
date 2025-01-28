@@ -12,12 +12,12 @@ import org.strykeforce.telemetry.measurable.Measure;
 import edu.wpi.first.units.measure.Angle;
 
 
-public class ElevatorSubsystem implements ClosedLoopPosSubsystem extends MeasurableSubsystem {
+public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
     // Private Variables
     private final ElevatorIO io;
     private final ElevatorIOInputsAutoLogged inputs = new ExiterIOInputsAutoLogged();
 
-    private double setpoints;
+    private Angle setpoints;
 
     // Constructor
     public void ExiterSubsystem(ElevatorIO io) {
@@ -32,7 +32,6 @@ public class ElevatorSubsystem implements ClosedLoopPosSubsystem extends Measura
 
     //Log outputs
     Logger.recordOutput("Elevator/setpoints", setpoints);
-    Logger.recordOutput("Exiter/atSpeed", atSpeed());
   }
 
    // Grapher
@@ -47,22 +46,19 @@ public class ElevatorSubsystem implements ClosedLoopPosSubsystem extends Measura
     return Set.of();
   }
 
-  public double getSpeeds() {
+  public void setPosition(Angle position) {
+    setpoints = position;
+    io.setPosition(position); //why not working?
+  }
+
+  public Angle getPosition() {
     return setpoints;
   }
-  
-  public boolean atSpeed() {
-    return Math.abs(setpoints - inputs.velocityLeft) <= ElevatorConstants.kCloseEnough);
-  }
-
-  public void setPosition(Angle position) {}
-
-  public Angle getPosition() {}
 
   public boolean isFinished() {}
+  
+  public void zero() {} 
 
-  public default void zero() {
-    
-  }
-
+  //public void atPosition() {}
+  
 }
