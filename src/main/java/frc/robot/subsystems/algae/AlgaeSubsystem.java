@@ -2,10 +2,14 @@ package frc.robot.subsystems.algae;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Velocity;
 import frc.robot.constants.AlgaeConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
+import frc.robot.subsystems.algae.algaeIO.AlgaeIOInputs;
+
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.TelemetryService;
@@ -19,14 +23,11 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     private AngularVelocity desiredSpeed;
 
     private enum AlgaeState {
-        INIT,
-        DETECTING,
         ALGAE_PRESENT,
-        NO_ALGAE,
-        ERROR
+        NO_ALGAE
     }
 
-    private AlgaeState currentAlgaeState = AlgaeState.INIT;
+    private AlgaeState currentAlgaeState = AlgaeState.NO_ALGAE;
 
     public AlgaeSubsystem(algaeIO io) {
         this.io = io;
@@ -51,25 +52,18 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     }
 
     public boolean atSpeed() {
-        if (getSpeed().baseUnit().minus(desiredSpeed.baseUnit()) <= AlgaeConstants.kCloseEnough){
-            
-        }
+        return inputs.velocity.equals(desiredSpeed);
     }
 
     public void zero() {
         setpoint = Rotations.of(0);
         io.zero();
-        currentAlgaeState = AlgaeState.DETECTING;
-    }
-
-    public boolean isFinished() {
-        return setpoint.minus(inputs.position).abs(Rotations) <= AlgaeConstants.kCloseEnough.in(Rotations);
     }
 
     private void updateAlgaeState() {
-        if (inputs.algaeDetected) {
+        if (inputs.reverseLimitSwitch.equals(1)) {
             currentAlgaeState = AlgaeState.ALGAE_PRESENT;
-        } else if (!inputs.algaeDetected) {
+        } else if (!inputs.reverseLimitSwitch.equals(1)) {
             currentAlgaeState = AlgaeState.NO_ALGAE;
         }
     }

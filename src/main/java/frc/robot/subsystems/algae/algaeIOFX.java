@@ -7,6 +7,7 @@ import org.strykeforce.telemetry.TelemetryService;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
@@ -24,6 +25,7 @@ public class algaeIOFX implements algaeIO {
   StatusSignal<AngularVelocity> currVelocity;
   StatusSignal<ForwardLimitValue> forwardLimitSwitch;
   StatusSignal<ReverseLimitValue> reverseLimitSwitch;
+  VelocityVoltage speedRequest = new VelocityVoltage(0).withEnableFOC(false).withSlot(0);
 
   public algaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -39,7 +41,7 @@ public class algaeIOFX implements algaeIO {
   }
 
   public void setSpeed(AngularVelocity speed) {
-    talonFX.set(speed.baseUnitMagnitude());
+    talonFX.setControl(speedRequest.withVelocity(speed));
   }
 
   public AngularVelocity AngularVelocity() {
