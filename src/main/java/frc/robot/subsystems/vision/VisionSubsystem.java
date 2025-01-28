@@ -8,16 +8,22 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Distance;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.Swerve;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.io.IOException;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+import java.lang.Math;
 
 public class VisionSubsystem extends MeasurableSubsystem {
 
@@ -99,14 +105,37 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return cams[index].isCameraConnected();
   }
 
-  private boolean poseValidWithWheels(Translation2d pose, WallEyeResult result) {
-    if (poseValidWithWheels(pose, result)) {
+  //Filters
+  private boolean camsAgreeWithWheels(Translation3d pose, WallEyeResult result) {
 
-      ChassisSpeeds speed = driveSubsystem.getFieldRelSpeed();
+      ChassisSpeeds vel = driveSubsystem.getFieldRelSpeed();
       Pose2d curPose = driveSubsystem.getPoseMeters();
-    }
-    return false;
+
+      Translation2d disp = (curPose.getTranslation().minus(pose.toTranslation2d()));
+
+      double velMagnitude = Math.sqrt(Math.pow(vel.vxMetersPerSecond,2)
+      + Math.pow(vel.vyMetersPerSecond, 2));
+
+      double dispMagnitude = Math.sqrt(Math.pow(disp.getX(),2)+
+      Math.pow(disp.getY(),2));
+
+      return result.getNumTags() >= minTags &&
+      dispMagnitude <= (velMagnitude * VisionConstants.kLinearCoeffOnVelFilter 
+      + VisionConstants.kOffsetOnVelFilter
+      + Math.pow(velMagnitude * VisionConstants.kSquaredCoeffOnVelFilter, 2)
+      );
   }
+
+  private boolean camsWithinField(Translation3d pose, WallEyePoseResult result) {
+
+    return (result.getNumTags() >= 2 
+    || result.getAmbiguity() < VisionConstants.kMaxAmbig) 
+    && pose.getMeasureX().in(Meters) < field.getFieldLength() 
+    && pose.getMeasureY().in(Meters) < field.getFieldWidth();
+  }
+
+  
+
 
   @Override
   public Set<Measure> getMeasures() {
