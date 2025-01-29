@@ -8,6 +8,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -17,6 +18,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.Swerve;
 import java.io.IOException;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -30,18 +32,24 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
     VisionConstants.kCam2Pose.getTranslation().toTranslation2d(),
     VisionConstants.kCam3Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam4Pose.getTranslation().toTranslation2d()
+    VisionConstants.kCam4Pose.getTranslation().toTranslation2d(),
+    VisionConstants.kCam5Pose.getTranslation().toTranslation2d()
   };
 
   Rotation2d[] camRotations = {
     VisionConstants.kCam1Pose.getRotation().toRotation2d(),
     VisionConstants.kCam2Pose.getRotation().toRotation2d(),
     VisionConstants.kCam3Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam4Pose.getRotation().toRotation2d()
+    VisionConstants.kCam4Pose.getRotation().toRotation2d(),
+    VisionConstants.kCam5Pose.getRotation().toRotation2d()
   };
 
   String[] camNames = {
-    VisionConstants.kCam1Name, VisionConstants.kCam2Name, VisionConstants.kCam3Name
+    VisionConstants.kCam1Name,
+    VisionConstants.kCam2Name,
+    VisionConstants.kCam3Name,
+    VisionConstants.kCam4Name,
+    VisionConstants.kCam5Name
   };
 
   String[] piNames = {
@@ -52,7 +60,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam1Idx,
     VisionConstants.kCam2Idx,
     VisionConstants.kCam3Idx,
-    VisionConstants.kCam4Idx
+    VisionConstants.kCam4Idx,
+    VisionConstants.kCam5Idx
   };
 
   private Swerve swerve = new Swerve();
@@ -157,6 +166,88 @@ public class VisionSubsystem extends MeasurableSubsystem {
     return (result.getNumTags() >= 2 || result.getAmbiguity() < VisionConstants.kMaxAmbig)
         && pose.getMeasureX().in(Meters) < field.getFieldLength()
         && pose.getMeasureY().in(Meters) < field.getFieldWidth();
+  }
+
+  private double getStdDevFactor(double distance, int numTags, String camName) {
+    switch (camName) {
+      case "Upper Right":
+      case "Upper Left":
+        if (numTags == 1)
+          return 1.0
+              / VisionConstants.FOV58YUYVBaseTrust
+              * FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.FOV58YUYVSingleTagCoeff * distance,
+                      VisionConstants.FOV58YUYVPowerNumber));
+
+        return 1
+            / VisionConstants.FOV58YUYVBaseTrust
+            * FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV58YUYVMultiTagCoeff * distance,
+                    VisionConstants.FOV58YUYVPowerNumber));
+
+      case "Rear":
+        if (numTags == 1)
+          return 1
+              / VisionConstants.FOV58YUYVBaseTrust
+              * FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.FOV58MJPGSingleTagCoeff * distance,
+                      VisionConstants.FOV58YUYVPowerNumber));
+
+        return 1
+            / VisionConstants.FOV58YUYVBaseTrust
+            * FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV58MJPGSingleTagCoeff * distance,
+                    VisionConstants.FOV58YUYVPowerNumber));
+
+      case "Servo Left":
+      case "Servo Right":
+        if (numTags == 1)
+          return 1
+              / VisionConstants.FOV75YUYVBaseTrust
+              * FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.FOV75YUYVSingleTagCoeff * distance,
+                      VisionConstants.FOV75YUYVPowerNumber));
+        return 1
+            / VisionConstants.FOV75YUYVBaseTrust
+            * FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.FOV75YUYVMultiTagCoeff * distance,
+                    VisionConstants.FOV75YUYVPowerNumber));
+
+      default:
+        if (numTags == 1)
+          return 1
+              / VisionConstants.baseTrust
+              * FastMath.pow(
+                  VisionConstants.baseNumber,
+                  FastMath.pow(
+                      VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
+        return 1
+            / VisionConstants.baseTrust
+            * FastMath.pow(
+                VisionConstants.baseNumber,
+                FastMath.pow(
+                    VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
+    }
+  }
+
+  private Pose3d getCloserPose(Pose3d pose1, Pose3d pose2, double rotation) {
+    if (Math.abs(new Rotation2d(rotation).minus(pose1.getRotation().toRotation2d()).getRadians())
+        <= Math.abs(
+            new Rotation2d(rotation).minus(pose2.getRotation().toRotation2d()).getRadians()))
+      return pose1;
+    else return pose2;
   }
 
   @Override

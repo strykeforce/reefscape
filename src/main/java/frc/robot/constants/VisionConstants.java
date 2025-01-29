@@ -38,15 +38,27 @@ public final class VisionConstants {
   public static final double multiTagCoeff = 18.0 / 100.0;
   public static final double baseNumber = Math.E;
   public static final double powerNumber = 4.0;
+  public static final double baseTrust = 3.0;
+
   public static final double FOV45MultiTagCoeff = 16.0 / 100.0;
   public static final double FOV45powerNumber = 4.5;
-  public static final double FOV45SinlgeTagCoeff = 21.0 / 100.0;
+  public static final double FOV45SingleTagCoeff = 21.0 / 100.0;
+  public static final double FOV45BaseTrust = 3.0;
+
   public static final double FOV58MJPGMultiTagCoeff = 16.0 / 100.0;
   public static final double FOV58MJPGPowerNumber = 3.5;
   public static final double FOV58MJPGSingleTagCoeff = 21.0 / 100.0;
+  public static final double FOV58MJPGBaseTrust = 3.0;
+
   public static final double FOV58YUYVMultiTagCoeff = 17.0 / 100.0;
   public static final double FOV58YUYVPowerNumber = 4.0;
   public static final double FOV58YUYVSingleTagCoeff = 22.0 / 100.0;
+  public static final double FOV58YUYVBaseTrust = 3.0;
+
+  public static final double FOV75YUYVMultiTagCoeff = 17.0 / 100.0;
+  public static final double FOV75YUYVPowerNumber = 4.0;
+  public static final double FOV75YUYVSingleTagCoeff = 22.0 / 100.0;
+  public static final double FOV75YUYVBaseTrust = 3.0;
 
   // Constants for cameras
   public static final int kNumCams = 5;
@@ -57,20 +69,22 @@ public final class VisionConstants {
   public static final int[] kCamPorts = {5802, 5802, 5803, 5803, 5804};
 
   // Names
-  public static final String kCam1Name = "Shooter";
-  public static final String kCam2Name = "Intake";
-  public static final String kCam3Name = "AngledShooterLeft";
-  public static final String kCam4Name = "AngledShooterRight";
+  public static final String kCam1Name = "Upper 1";
+  public static final String kCam2Name = "Upper 2";
+  public static final String kCam3Name = "Rear";
+  public static final String kCam4Name = "Servo Left";
+  public static final String kCam5Name = "Servo Right";
 
-  public static final String kPi1Name = "Shooter";
-  public static final String kPi2Name = "Intake";
-  public static final String kPi3Name = "AngledShooters";
+  public static final String kPi1Name = "Upper 1/Servo 1";
+  public static final String kPi2Name = "Cam 2/Servo 2";
+  public static final String kPi3Name = "Cam 3";
 
   // Indexs
   public static final int kCam1Idx = 0;
-  public static final int kCam2Idx = 0;
-  public static final int kCam3Idx = 0;
-  public static final int kCam4Idx = 1;
+  public static final int kCam2Idx = 1;
+  public static final int kCam3Idx = 2;
+  public static final int kCam4Idx = 0;
+  public static final int kCam5Idx = 1;
 
   public static final double kLoopTime = 0.02;
   public static final int kCircularBufferSize = 1000;
@@ -91,7 +105,10 @@ public final class VisionConstants {
       new Pose3d(
           new Translation3d(-0.22, -0.335, 0.50),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
-
+  public static final Pose3d kCam5Pose =
+      new Pose3d(
+          new Translation3d(-0.22, -0.335, 0.50),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
   public static Matrix<N1, N1> kLocalMeasurementStdDevs =
