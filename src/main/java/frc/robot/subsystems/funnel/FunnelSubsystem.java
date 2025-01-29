@@ -16,6 +16,7 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     // Private Variables
     private final FunnelIo io;
     private final FunnelIOInputsAutoLogged inputs = new FunnelIOInputsAutoLogged();
+    private float totalBreaks = 0;
 
     public FunnelState curState = FunnelState.HasNotSeenCoral;
 
@@ -33,16 +34,27 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     public void periodic() {
         // Update Inputs
         io.updateInputs(inputs);
+        Logger.processInputs("funnelInputs", inputs);
 
         switch (curState){
             case HasSeenCoral:
                 break;
             case HasNotSeenCoral:
+            if(inputs.revBeamOpen == false){
+                totalBreaks += 1;
+            }else{
+                totalBreaks = 0;
+            }
+
+            if(totalBreaks >= 3){
+                curState = FunnelState.HasNotSeenCoral;
+            }
                 break;
         }
 
         // Log Outputs
         Logger.recordOutput("Funnel/curState", curState);
+        Logger.recordOutput("Funnel/totalBreaks", totalBreaks);
     }
 
     // Grapher
@@ -74,6 +86,10 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
     public void StopMotor() {
         setPercent(0.0);
+    }
+
+    public void ClearCoral() {
+        curState = FunnelState.HasNotSeenCoral;
     }
     
 }
