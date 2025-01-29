@@ -88,6 +88,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return nextState;
   }
 
+  public CoralLoc getCoralLoc() {
+    return coralLoc;
+  }
+
   public void setAllianceColor(Alliance alliance) {
     allianceColor = alliance;
     logger.info("Change color to: {}", allianceColor);
@@ -136,10 +140,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setAlgaeHeight(AlgaeHeight algaeHeight) {
     this.algaeHeight = algaeHeight;
-  }
-
-  public void setCoralLoc(CoralLoc coralLoc) {
-    this.coralLoc = coralLoc;
   }
 
   public void setAutoPlacing(boolean isAutoPlacing) {
@@ -424,6 +424,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    if (funnelSubsystem.hasCoral()) {
+      coralLoc = CoralLoc.FUNNEL;
+    }
+    
     switch (curState) {
       case TRANSFER -> {
         if (biscuitSubsystem.isFinished()
@@ -554,17 +558,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case PLACE_CORAL -> {
         if (!coralSubsystem.hasCoral()) {
+          coralLoc = CoralLoc.NONE;
           toFunnelLoad();
         }
       }
 
       case FUNNEL_LOAD -> {
         if (funnelSubsystem.hasCoral()) {
+          coralLoc = CoralLoc.TRANSFER;
           setState(RobotStates.LOADING_CORAL);
         }
       }
       case LOADING_CORAL -> {
         if (coralSubsystem.hasCoral()) {
+          coralLoc = CoralLoc.CORAL;
           biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
           elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
 
