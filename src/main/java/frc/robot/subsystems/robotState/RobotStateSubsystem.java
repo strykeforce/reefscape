@@ -427,7 +427,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     if (funnelSubsystem.hasCoral()) {
       coralLoc = CoralLoc.FUNNEL;
     }
-    
+
     switch (curState) {
       case TRANSFER -> {
         if (biscuitSubsystem.isFinished()
@@ -499,7 +499,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           }
         }
         futureState = null;
-        
+
         if (!coralSubsystem.hasCoral()) {
           toFunnelLoad();
         }
