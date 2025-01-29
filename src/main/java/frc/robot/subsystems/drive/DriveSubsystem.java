@@ -96,7 +96,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holoContInput = desiredState;
     double xFF = desiredState.vx;
     double yFF = desiredState.vy;
-    double rotationFF = desiredState.heading;
+    double rotationFF = desiredState.omega;
 
     Pose2d pose = inputs.poseMeters;
     double xFeedback = xController.calculate(pose.getX(), desiredState.x);

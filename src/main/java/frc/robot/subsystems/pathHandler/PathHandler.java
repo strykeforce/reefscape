@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +32,7 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean runningPath = false;
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
+  private boolean mirrorToProcessor = false;
   private Character startNode = 'a';
 
   PathHandler(DriveSubsystem driveSubsystem) {
@@ -42,12 +45,14 @@ public class PathHandler extends MeasurableSubsystem {
       String[][] pathNames,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
-      Character startNode) {
+      Character startNode,
+      boolean mirrorToProcessor) {
     this.driveSubsystem = driveSubsystem;
     this.pathNames = pathNames;
     this.NodeNames = NodeNames;
     this.NodeLevels = NodeLevels;
     this.startNode = startNode;
+    this.mirrorToProcessor = mirrorToProcessor;
   }
 
   public void setPathNames(String[][] pathNames) {
@@ -71,6 +76,12 @@ public class PathHandler extends MeasurableSubsystem {
   public void setStartNode(Character startNode) {
     if (!isHandling) {
       this.startNode = startNode;
+    }
+  }
+
+  public void setMirrorToProcessor(boolean mirrorToProcessor) {
+    if (!isHandling) {
+      this.mirrorToProcessor = mirrorToProcessor;
     }
   }
 
@@ -204,7 +215,15 @@ public class PathHandler extends MeasurableSubsystem {
     }
     return currState == PathStates.DRIVE_PLACE
         && timer.hasElapsed(currPath.getTotalTime() - 1.0)
+        // && TagAlignSubsystem.canSeeTag(desiredTag)
         && isCloseEnough;
+  }
+
+  private SwerveSample mirrorToProcessor(SwerveSample sample) {
+    if (mirrorToProcessor) {
+      sample = new SwerveSample(sample.t, sample.x, sample.y, sample.heading * -1, sample.vx, sample.vy, sample.omega * -1, sample.ax, , getDeviceId(), null, null)
+    }
+    return sample;
   }
 
   public void periodic() {

@@ -24,6 +24,7 @@ public class DriveConstants {
   public static final double kRobotLength = 22.0;
   public static final double kRobotWidth = 22.0;
   public static final double kFieldMaxX = 690.0;
+  public static final double kFieldMaxY
 
   public static final double kPOmega = 4.5;
   public static final double kIOmega = 0.0;
