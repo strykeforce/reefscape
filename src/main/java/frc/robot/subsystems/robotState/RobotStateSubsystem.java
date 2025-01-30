@@ -171,8 +171,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
               toStow();
               return true;
             }
+            default -> {}
           }
         }
+        default -> {}
       }
 
       switch (curState) {
@@ -192,8 +194,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
               toStow();
               return true;
             }
+            default -> {}
           }
         }
+        default -> {}
       }
     }
 
@@ -247,6 +251,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeSetpoint);
           elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeSetpoint);
         }
+        default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
       }
     } else {
       if (!coralSubsystem.hasCoral()) {
@@ -474,6 +479,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                 biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeRemovalSetpoint);
                 elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
               }
+              default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
             }
 
             setState(RobotStates.REMOVE_ALGAE);
@@ -569,9 +575,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toStow();
         }
       }
-      case PRE_CLIMB -> {}
+      case PREP_CLIMB -> {}
       case CLIMB -> {}
       case INTERRUPTED -> {}
+      default -> logger.error("Unhandled state: {}", curState);
     }
   }
 
