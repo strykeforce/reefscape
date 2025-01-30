@@ -270,7 +270,7 @@ public class Swerve implements SwerveIO, Checkable {
     }
     inputs.fieldRelSpeed = getFieldRelSpeed();
     inputs.fieldY = fieldY;
-    inputs.fieldX = fieldX;
+    inputs.fieldX = fieldX; 
   }
 
   @Override
