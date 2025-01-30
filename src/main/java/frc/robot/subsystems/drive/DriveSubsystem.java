@@ -84,11 +84,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move X", vXmps);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move Y", vYmps);
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move Omega", vOmegaRadps);
-    io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
-  }
 
-  public void recordYVel(double val) {
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", val);
+    io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
   // Choreo Holonomic Controller
@@ -200,15 +197,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isDriveStill() {
-    // logger.info(
-    //     "Timestamp Before FieldRel: {}",
-    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
     ChassisSpeeds cs = inputs.fieldRelSpeed;
     double vX = cs.vxMetersPerSecond;
     double vY = cs.vyMetersPerSecond;
-    // logger.info(
-    //     "Timestamp After FieldRel: {}",
-    //     org.littletonrobotics.junction.Logger.getRealTimestamp() / 1000);
 
     // Take fieldRel Speed and get the magnitude of the vector
     double wheelSpeed = FastMath.hypot(vX, vY);
@@ -243,7 +234,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   // Make whether a trajectory is currently active obvious on grapher
-  public void grapherTrajectoryActive(Boolean active) {
+  public void grapherTrajectoryActive(boolean active) {
     if (active) trajectoryActive = 1.0;
     else trajectoryActive = 0.0;
   }
@@ -324,7 +315,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
-    if (Math.abs(inputs.gyroRotation2d.getDegrees() - inputs.navxRotation2d.getDegrees())
+    if (Math.abs(inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees())
         > DriveConstants.kGyroDifferentThreshold) {
       gyroDifferentCount++;
     } else {
@@ -336,14 +327,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
 
     switch (currDriveState) {
-      case IDLE:
-        break;
-      case SAFE:
-        break;
-      case SAFE_HOLD:
-        break;
-      default:
-        break;
+      case IDLE -> {}
+      case SAFE -> {}
+      case SAFE_HOLD -> {}
+      default -> {}
     }
   }
 

@@ -184,55 +184,62 @@ public class Swerve implements SwerveIO, Checkable {
     return new ChassisSpeeds(fieldX, fieldY, roboRelSpeed.omegaRadiansPerSecond);
   }
 
-  public void setOdometry(OdometryStrategy Odom) {
-    swerveDrive.setOdometry(Odom);
+  @Override
+  public void setOdometry(OdometryStrategy odom) {
+    swerveDrive.setOdometry(odom);
   }
 
+  @Override
   public void setPigeonGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
   }
 
+  @Override
   public void setBothGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
     navxOffset = rotation;
   }
 
+  @Override
   public void resetGyro() {
     swerveDrive.resetGyro();
     navx.reset();
   }
 
-  public void updateSwerve() {
-    swerveDrive.periodic();
-  }
-
+  @Override
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
     navx.reset();
   }
 
+  @Override
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
     odometryStrategy.addVisionMeasurement(pose, timestamp);
   }
 
+  @Override
   public void addVisionMeasurement(Pose2d pose2d, double timestamp, Matrix<N3, N1> stdDevs) {
     odometryStrategy.addVisionMeasurement(pose2d, timestamp, stdDevs);
   }
 
+  @Override
   public void drive(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
     swerveDrive.drive(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
+  @Override
   public void move(double vXmps, double vYmps, double vOmegaRadps, boolean isFieldOriented) {
     swerveDrive.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
+  @Override
   public void setAzimuthVel(double vel) {
     for (int i = 0; i < 4; i++) {
       azimuths[i].set(TalonSRXControlMode.PercentOutput, vel);
     }
   }
 
+  @Override
   public void configDriveCurrents(CurrentLimitsConfigs config) {
     for (int i = 0; i < 4; i++) {
       drives[i].getConfigurator().apply(config);
@@ -241,6 +248,9 @@ public class Swerve implements SwerveIO, Checkable {
 
   @Override
   public void updateInputs(SwerveIOInputs inputs) {
+    swerveDrive.updateInputs(); // Call before swerveDrive.periodic()
+    swerveDrive.periodic();
+
     inputs.odometryX = swerveDrive.getPoseMeters().getX();
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
