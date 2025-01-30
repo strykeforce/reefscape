@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveConstants {
+  public static final double kAlgaeRemovalSpeed = 0;
+
   public static final double kDriveGearRatio = 6.5;
   public static final double kWheelDiameterInches = 4.0;
   public static final double kMaxSpeedMetersPerSecond = 12.0;

@@ -16,9 +16,41 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
 
 public class BiscuitConstants {
+  // Setpoints
+  // Idle
+  public static final Angle kStowSetpoint = Rotations.of(0.0);
+  public static final Angle kFunnelSetpoint = Rotations.of(0.0);
+  public static final Angle kPrestageSetpoint = Rotations.of(0.0);
+
+  // Algae removal
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(0.0);
+
+  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(0.0);
+  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(0.0);
+
+  public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
+  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
+
+  // Coral score
+  public static final Angle kL1CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL2CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL3CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL4CoralSetpoint = Rotations.of(0.0);
+
+  // Algae obtaining
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kHpAlgaeSetpoint = Rotations.of(0.0);
+
+  // Algae scoring
+  public static final Angle kProcessorSetpoint = Rotations.of(0.0);
+  public static final Angle kBargeSetpoint = Rotations.of(0.0);
+
   // These are all wrong right now because we don't have any actual info
 
   public static Angle kZero = Rotations.of(42); // Will need to be experimentally determined
@@ -26,8 +58,6 @@ public class BiscuitConstants {
   public static double kCloseEnough = 2137473647; // This is a little out of wack.
   public static final Angle kMaxFwd = Rotations.of(100);
   public static final Angle kMaxRev = Rotations.of(-100);
-  // public static Angle Level1 = ;
-  public static final Angle kStowSetpoint = null;
 
   // Disables the TalonFX by setting it's voltage to zero. Not very shocking.
   public static VoltageConfigs disableTalon() {

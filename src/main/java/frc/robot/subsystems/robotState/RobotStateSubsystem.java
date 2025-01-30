@@ -163,6 +163,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       switch (curState) {
         case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE, INTERRUPTED -> {
           switch (nextState) {
+              // These are all the states that could possibly be entered that are also possibly
+              // dangerous
+              // Each futureState must be handled in STOW
             case REEF_ALIGN_ALGAE, REEF_ALIGN_CORAL, PREP_CLIMB -> {
               futureState = nextState;
               toStow();
@@ -177,11 +180,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             REEF_ALIGN_CORAL,
             REMOVE_ALGAE,
             SAFE_REMOVE_ALGAE_ABOVE,
-            SAFE_REMOVE_ALGAE_RETRACT,
+            SAFE_REMOVE_ALGAE_ROTATE,
             PLACE_CORAL,
             INTERRUPTED -> {
           switch (nextState) {
-            case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE -> {
+              // These are all the states that could possibly be entered that are also
+              // dangerous
+              // Each futureState must be handled in STOW
+            case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE, PREP_CLIMB -> {
               futureState = nextState;
               toStow();
               return true;
@@ -279,30 +285,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
-  public void toRemoveAlgae() {
-    algaeRemovalPose = driveSubsystem.getPoseMeters();
-
-    switch (getAlgaeLevel()) {
-      case L2 -> {
-        biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeRemovalSetpoint);
-        elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
-
-        // FIXME: if driving to remove algae
-        switch (scoringLevel) {
-          case L1, L2 -> {
-            driveSubsystem.move(DriveConstants.kAlgaeRemovalSpeed, 0, 0, false);
-          }
-        }
-      }
-      case L3 -> {
-        biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeRemovalSetpoint);
-        elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
-      }
-    }
-
-    setState(RobotStates.REMOVE_ALGAE);
-  }
-
   public void toPlaceCoral() {
     coralSubsystem.place();
 
@@ -350,8 +332,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
         if (poseX > RobotStateConstants.kRedBargeSafeX
             || poseX < RobotStateConstants.kBlueBargeSafeX) {
-          biscuitSubsystem.setPosition(BiscuitConstants.kProcessorSetpoint);
-          elevatorSubsystem.setPosition(ElevatorConstants.kProcessorSetpoint);
+          biscuitSubsystem.setPosition(BiscuitConstants.kBargeSetpoint);
+          elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
 
           setState(RobotStates.BARGE_ALGAE, true);
         }
@@ -448,54 +430,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case STOW -> {
         if (futureState != null) {
           switch (futureState) {
-            case REEF_ALIGN_ALGAE -> {
-              toReefAlign(true, isAutoPlacing);
-            }
-            case REEF_ALIGN_CORAL -> {
-              toReefAlign(false, isAutoPlacing);
-            }
-            case REMOVE_ALGAE -> {
-              toRemoveAlgae();
-            }
-            case SAFE_REMOVE_ALGAE_ABOVE -> {
-              toSafeRemoveAlgaeAbove();
-            }
-            case SAFE_REMOVE_ALGAE_RETRACT -> {
-              toSafeRemoveAlgaeRetract();
-            }
-            case PLACE_CORAL -> {
-              toPlaceCoral();
-            }
-            case FUNNEL_LOAD -> {
-              toFunnelLoad();
-            }
-            case LOADING_CORAL -> {
-              toLoadingCoral();
-            }
-            case HP_ALGAE -> {
-              toHpAlgae();
-            }
-            case PROCESSOR_ALGAE -> {
-              toProcessor();
-            }
-            case BARGE_ALGAE -> {
-              toScoreAlgae();
-            }
-            case MIC_ALGAE -> {
-              toAlgaeFloorPickup();
-            }
-            case FLOOR_ALGAE -> {
-              toAlgaeFloorPickup();
-            }
-            case PREP_CLIMB -> {
-              toPrepClimb();
-            }
-            case CLIMB -> {
-              toClimb();
-            }
-            case INTERRUPTED -> {
-              toInterrupted();
-            }
+            case REEF_ALIGN_ALGAE -> toReefAlign(true, isAutoPlacing);
+            case REEF_ALIGN_CORAL -> toReefAlign(false, isAutoPlacing);
+            case HP_ALGAE -> toHpAlgae();
+            case PROCESSOR_ALGAE, BARGE_ALGAE -> toScoreAlgae();
+            case MIC_ALGAE, FLOOR_ALGAE -> toAlgaeFloorPickup();
+            case PREP_CLIMB -> toPrepClimb();
+            default -> logger.error("Unhandled future state: {}", futureState);
           }
         }
         futureState = null;
@@ -512,9 +453,30 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         //   }
         // }
       case REEF_ALIGN_ALGAE -> {
-        if (tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE) {
+        if (!isAutoPlacing
+            || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE) {
           if (algaeSubsystem.hasAlgae()) {
-            toRemoveAlgae();
+            algaeRemovalPose = driveSubsystem.getPoseMeters();
+
+            switch (getAlgaeLevel()) {
+              case L2 -> {
+                biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeRemovalSetpoint);
+                elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
+
+                // FIXME: if driving to remove algae
+                switch (scoringLevel) {
+                  case L1, L2 -> {
+                    driveSubsystem.move(DriveConstants.kAlgaeRemovalSpeed, 0, 0, false);
+                  }
+                }
+              }
+              case L3 -> {
+                biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeRemovalSetpoint);
+                elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
+              }
+            }
+
+            setState(RobotStates.REMOVE_ALGAE);
           }
         }
       }
@@ -533,6 +495,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                 driveSubsystem.move(0, 0, 0, false);
                 toReefAlign(false, true);
               }
+              // FIXME: if not driving to remove algae
+              biscuitSubsystem.setPosition(BiscuitConstants.kSafeAlgaeRemovalSetpoint);
+              elevatorSubsystem.setPosition(ElevatorConstants.kSafeAlgaeRemovalSetpoint);
+              setState(RobotStates.SAFE_REMOVE_ALGAE_ABOVE, true);
             }
             case L3, L4 -> {
               if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
@@ -546,13 +512,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case SAFE_REMOVE_ALGAE_ABOVE -> {
-        biscuitSubsystem.setPosition(BiscuitConstants.kSafeAlgaeRemovalSetpoint);
-        elevatorSubsystem.setPosition(ElevatorConstants.kSafeAlgaeRemovalSetpoint);
-
-        setState(RobotStates.SAFE_REMOVE_ALGAE_RETRACT, true);
+        biscuitSubsystem.setPosition(BiscuitConstants.kSafeAlgaeRemovalRotateSetpoint);
+        elevatorSubsystem.setPosition(ElevatorConstants.kSafeAlgaeRemovalRotateSetpoint);
+        setState(RobotStates.SAFE_REMOVE_ALGAE_ROTATE, true);
       }
 
-      case SAFE_REMOVE_ALGAE_RETRACT -> {
+      case SAFE_REMOVE_ALGAE_ROTATE -> {
         toReefAlign(false, false);
       }
 
@@ -628,7 +593,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     REEF_ALIGN_CORAL,
     REMOVE_ALGAE,
     SAFE_REMOVE_ALGAE_ABOVE,
-    SAFE_REMOVE_ALGAE_RETRACT,
+    SAFE_REMOVE_ALGAE_ROTATE,
     // CORAL_REALIGN,
     PLACE_CORAL,
     FUNNEL_LOAD,
