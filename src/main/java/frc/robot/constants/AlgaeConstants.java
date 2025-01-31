@@ -1,7 +1,7 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
@@ -17,15 +17,14 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.*;
+
 public class AlgaeConstants {
 
-  
   public static int kFxId = 30;
 
-  public static final Angle kCloseEnough = Degrees.of(5);
-  public static final Angle kMaxFwd = Rotations.of(100);
-  public static final Angle kMaxRev = Rotations.of(-100);
-  public static final Angle kZeroTicks = Rotations.of(1530);
+  public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
+  public static final AngularVelocity kMaxFwd = RotationsPerSecond.of(100);
+  public static final AngularVelocity kMaxRev = RotationsPerSecond.of(-100);
 
   // Example Talon FX Config
   public static TalonFXConfiguration getFXConfig() {
