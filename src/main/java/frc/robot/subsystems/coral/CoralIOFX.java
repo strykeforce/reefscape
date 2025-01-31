@@ -1,7 +1,8 @@
 package frc.robot.subsystems.coral;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfigurator;
@@ -66,11 +67,10 @@ public class CoralIOFX implements CoralIO {
 
   @Override
   public void updateInputs(CoralIOInputs inputs) {
-    inputs.velocity = curVelocity.refresh().getValue();
-    inputs.isFwdLimitSwitchClosed =
-        fwdLimitSwitch.refresh().getValue().value == 1; // FIXME check right value
-    inputs.isRevLimitSwitchClosed =
-        revLimitSwitch.refresh().getValue().value == 0; // FIXME check right value
+    BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
+    inputs.velocity = curVelocity.getValue();
+    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.getValue().value == 1; // FIXME check right value
+    inputs.isRevLimitSwitchClosed = revLimitSwitch.getValue().value == 0; // FIXME check right value
   }
 
   @Override
