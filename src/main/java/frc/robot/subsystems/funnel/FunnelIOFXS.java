@@ -5,44 +5,44 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.FunnelConstants;
 
-public class FunnelIOFX implements FunnelIo{
+public class FunnelIOFXS implements FunnelIo{
     // Private Objects
     private Logger logger;
-    private TalonFX talonfx;
+    private TalonFXS talonfxs;
 
     // FX Acces Objects
-    TalonFXConfigurator configurator;
+    TalonFXSConfigurator configurator;
     StatusSignal<AngularVelocity> curVelocity;
     StatusSignal<ReverseLimitValue> curRevLimit;
 
     private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0.0).withEnableFOC(false);
 
-    public FunnelIOFX() {
+    public FunnelIOFXS() {
         logger = LoggerFactory.getLogger(this.getClass());
-        talonfx = new TalonFX(FunnelConstants.FunnelFxId);
+        talonfxs = new TalonFXS(FunnelConstants.FunnelFxsId);
 
         // Config controller
-        configurator = talonfx.getConfigurator();
-        configurator.apply(new TalonFXConfiguration());
-        configurator.apply(FunnelConstants.getFXConfig());
+        configurator = talonfxs.getConfigurator();
+        configurator.apply(new TalonFXSConfiguration());
+        configurator.apply(FunnelConstants.getFXSConfig());
 
         // Attach status signals
-        curVelocity = talonfx.getVelocity();
-        curRevLimit = talonfx.getReverseLimit();
+        curVelocity = talonfxs.getVelocity();
+        curRevLimit = talonfxs.getReverseLimit();
     }
 
     @Override
     public void setPct(double percentOutput){
-        talonfx.setControl(dutyCycleRequest.withOutput(percentOutput));
+        talonfxs.setControl(dutyCycleRequest.withOutput(percentOutput));
     }
 
     @Override
@@ -53,6 +53,6 @@ public class FunnelIOFX implements FunnelIo{
 
     @Override
     public void registerWith(TelemetryService telemetryService) {
-        telemetryService.register(talonfx, true);
+        telemetryService.register(talonfxs, true);
     }
 }

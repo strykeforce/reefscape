@@ -4,7 +4,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -14,10 +14,10 @@ import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 public class FunnelConstants {
     public static final double kFunnelPercentOutput = 0;
 
-    public static int FunnelFxId = 0;
+    public static int FunnelFxsId = 0;
 
-    public static TalonFXConfiguration getFXConfig() {
-        TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+    public static TalonFXSConfiguration getFXSConfig() {
+        TalonFXSConfiguration fxsConfig = new TalonFXSConfiguration();
 
         CurrentLimitsConfigs current =
             new CurrentLimitsConfigs()
@@ -28,7 +28,7 @@ public class FunnelConstants {
                 .withSupplyCurrentLowerLimit(8)
                 .withSupplyCurrentLowerTime(0.02)
                 .withSupplyCurrentLimitEnable(true);
-        fxConfig.CurrentLimits = current;
+        fxsConfig.CurrentLimits = current;
 
         HardwareLimitSwitchConfigs hwLimit =
             new HardwareLimitSwitchConfigs()
@@ -40,20 +40,20 @@ public class FunnelConstants {
                 .withReverseLimitEnable(false)
                 .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
                 .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
-        fxConfig.HardwareLimitSwitch = hwLimit;
+        fxsConfig.HardwareLimitSwitch = hwLimit;
 
         SoftwareLimitSwitchConfigs swLimit =
             new SoftwareLimitSwitchConfigs()
                 .withForwardSoftLimitEnable(false)
                 .withReverseSoftLimitEnable(false);
-        fxConfig.SoftwareLimitSwitch = swLimit;
+        fxsConfig.SoftwareLimitSwitch = swLimit;
         
         MotorOutputConfigs motorOut =
             new MotorOutputConfigs()
                 .withDutyCycleNeutralDeadband(0.01)
                 .withNeutralMode(NeutralModeValue.Coast);
-        fxConfig.MotorOutput = motorOut;
+        fxsConfig.MotorOutput = motorOut;
 
-        return fxConfig;
+        return fxsConfig;
     }
 }
