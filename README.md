@@ -27,8 +27,8 @@
 | Drive     | FX       | drive                     | 11  | FD      |          |           | kraken |         |
 | Drive     | FX       | drive                     | 12  | FD      |          |           | kraken |         |
 | Drive     | FX       | drive                     | 13  | FD      |          |           | kraken |         |
-| Elevator  | FX       | elevatorMain              | 20  | rio     |          | 20        | kraken |         |
-| Elevator  | FX       | elevatorFollow            | 21  | rio     |          | 21        | kraken |         |
+| Elevator  | FX       | elevatorMain              | 20  | rio     |          | 21        | kraken |         |
+| Elevator  | FX       | elevatorFollow            | 21  | rio     |          | 20        | kraken |         |
 | Biscuit   | FXS      | biscuit                   | 25  | rio     |          |           | Minion |         |
 | Algae     | FXS      | rollers                   | 30  | rio     |          |           | Minion |         |
 | Coral     | FXS      | wheels                    | 35  | rio     |          |           | Minion |         |
