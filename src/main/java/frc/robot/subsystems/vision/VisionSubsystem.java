@@ -7,16 +7,20 @@ import WallEye.UdpSubscriber;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.Swerve;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
 import net.jafama.FastMath;
 import org.slf4j.Logger;
@@ -42,6 +46,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam3Pose.getRotation().toRotation2d(),
     VisionConstants.kCam4Pose.getRotation().toRotation2d(),
     VisionConstants.kCam5Pose.getRotation().toRotation2d()
+  };
+
+  private double[] camHeights = {
+    VisionConstants.kCam1Pose.getMeasureZ().in(Meters),
+    VisionConstants.kCam2Pose.getMeasureZ().in(Meters),
+    VisionConstants.kCam3Pose.getMeasureZ().in(Meters),
+    VisionConstants.kCam4Pose.getMeasureZ().in(Meters),
+    VisionConstants.kCam5Pose.getMeasureZ().in(Meters)
   };
 
   String[] camNames = {
@@ -72,6 +84,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private AprilTagFieldLayout field;
   private boolean updating = true;
   private int minTags;
+  private CircularBuffer<Double> gyroBuffer =
+      new CircularBuffer<Double>(VisionConstants.kCircularBufferSize);
+  private double timeSinceLastUpdate;
+  private int updatesToWheels;
+  private ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>();
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -109,6 +126,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   public boolean cameraConnected(int index) {
     return cams[index].isCameraConnected();
+  }
+
+  private double getSeconds() {
+    return RobotController.getFPGATime();
   }
 
   private double minTagDistance(WallEyePoseResult result) {
@@ -248,6 +269,43 @@ public class VisionSubsystem extends MeasurableSubsystem {
             new Rotation2d(rotation).minus(pose2.getRotation().toRotation2d()).getRadians()))
       return pose1;
     else return pose2;
+  }
+
+  private Pose3d getCorrectPose(Pose3d pose1, Pose3d pose2, double time, int camIndex) {
+    double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
+    double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
+
+    if (dist1 < dist2 && dist1 < 0.5 && dist1 > 0) {
+      return pose1;
+    }
+    if (dist2 < dist1 && dist2 < 0.5 && dist2 > 0) {
+      return pose2;
+    }
+
+    if (gyroBuffer.size() < VisionConstants.kCircularBufferSize) return pose1;
+
+    double rotation =
+        gyroBuffer.get(FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
+    return getCloserPose(pose1, pose2, rotation);
+  }
+
+  @Override
+  public void periodic() {
+    gyroBuffer.addFirst(
+        FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
+
+    if (getSeconds() - timeSinceLastUpdate > VisionConstants.kMaxTimeNoVision) {
+      updatesToWheels = 0;
+    }
+
+    validResults.clear();
+
+    for (int i = 0; i < VisionConstants.kNumCams; i++) {
+      if (cams[i].hasNewUpdate()) {
+        timeSinceLastUpdate = getSeconds();
+        validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
+      }
+    }
   }
 
   @Override
