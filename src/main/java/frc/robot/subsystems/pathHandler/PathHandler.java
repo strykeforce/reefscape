@@ -4,11 +4,10 @@ import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.drive.Swerve;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -109,7 +108,8 @@ public class PathHandler extends MeasurableSubsystem {
       timer.stop();
       timer.reset();
       timer.start();
-      driveSubsystem.calculateController(currPath.getInitialSample(mirrorTrajectory).get());
+      driveSubsystem.calculateController(
+          mirrorToProcessor(currPath.getInitialSample(mirrorTrajectory).get()));
       if (currState == PathStates.PLACE) {
         currState = PathStates.DRIVE_FETCH;
       } else if (currState == PathStates.FETCH) {
@@ -120,13 +120,15 @@ public class PathHandler extends MeasurableSubsystem {
 
   private void drivePath() {
     if (isHandling && runningPath && currPath != null) {
-      driveSubsystem.calculateController(currPath.sampleAt(timer.get(), mirrorTrajectory).get());
+      driveSubsystem.calculateController(
+          mirrorToProcessor(currPath.sampleAt(timer.get(), mirrorTrajectory).get()));
       if (timer.hasElapsed(currPath.getTotalTime())) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
         timer.stop();
         timer.reset();
-        driveSubsystem.calculateController(currPath.getFinalSample(mirrorTrajectory).get());
+        driveSubsystem.calculateController(
+            mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()));
         if (currState == PathStates.DRIVE_FETCH) {
           currState = PathStates.FETCH;
         } else if (currState == PathStates.DRIVE_PLACE) {
@@ -142,7 +144,7 @@ public class PathHandler extends MeasurableSubsystem {
   private void drivePathServo() {
     if (isHandling && runningPath && currPath != null && isServoing) {
       driveSubsystem.calculateControllerServo(
-          currPath.sampleAt(timer.get(), mirrorTrajectory).get(),
+          mirrorToProcessor(currPath.sampleAt(timer.get(), mirrorTrajectory).get()),
           0.0); // TODO: use tag servoing here when ready
       if (timer.hasElapsed(currPath.getTotalTime())) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
@@ -150,7 +152,7 @@ public class PathHandler extends MeasurableSubsystem {
         timer.stop();
         timer.reset();
         driveSubsystem.calculateControllerServo(
-            currPath.getFinalSample(mirrorTrajectory).get(), 0.0);
+            mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()), 0.0);
         if (currState == PathStates.DRIVE_FETCH) {
           currState = PathStates.FETCH;
         } else if (currState == PathStates.DRIVE_PLACE_SERVO) {
@@ -221,9 +223,31 @@ public class PathHandler extends MeasurableSubsystem {
 
   private SwerveSample mirrorToProcessor(SwerveSample sample) {
     if (mirrorToProcessor) {
-      sample = new SwerveSample(sample.t, sample.x, sample.y, sample.heading * -1, sample.vx, sample.vy, sample.omega * -1, sample.ax, , getDeviceId(), null, null)
+      sample =
+          new SwerveSample(
+              sample.t,
+              sample.x,
+              DriveConstants.kFieldMaxY - sample.y,
+              sample.heading * -1,
+              sample.vx,
+              DriveConstants.kFieldMaxY - sample.vy,
+              sample.omega * -1,
+              sample.ax,
+              DriveConstants.kFieldMaxY - sample.ay,
+              sample.alpha * -1,
+              sample.moduleForcesX(),
+              new double[] {
+                sample.moduleForcesY()[0] * -1,
+                sample.moduleForcesY()[1] * -1,
+                sample.moduleForcesY()[2] * -1,
+                sample.moduleForcesY()[3] * -1
+              });
     }
     return sample;
+  }
+
+  public boolean isFinished() {
+    return !isHandling;
   }
 
   public void periodic() {
