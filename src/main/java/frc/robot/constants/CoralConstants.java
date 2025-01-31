@@ -1,13 +1,15 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -19,11 +21,11 @@ import edu.wpi.first.units.measure.AngularVelocity;
 public class CoralConstants {
   public static int kCoralFxId = 0;
 
-  public static final AngularVelocity kCloseEnough = DegreesPerSecond.of(5);
+  public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
 
   // Coral Talon FX Config
-  public static TalonFXConfiguration getFXConfig() {
-    TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+  public static TalonFXSConfiguration getFXConfig() {
+    TalonFXSConfiguration fxsConfig = new TalonFXSConfiguration();
 
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
@@ -34,7 +36,7 @@ public class CoralConstants {
             .withSupplyCurrentLowerLimit(8)
             .withSupplyCurrentLowerTime(0.02)
             .withSupplyCurrentLimitEnable(true);
-    fxConfig.CurrentLimits = current;
+    fxsConfig.CurrentLimits = current;
 
     HardwareLimitSwitchConfigs hwLimit =
         new HardwareLimitSwitchConfigs()
@@ -46,7 +48,7 @@ public class CoralConstants {
             .withReverseLimitEnable(false)
             .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
             .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
-    fxConfig.HardwareLimitSwitch = hwLimit;
+    fxsConfig.HardwareLimitSwitch = hwLimit;
 
     Slot0Configs slot0 =
         new Slot0Configs()
@@ -58,7 +60,7 @@ public class CoralConstants {
             .withKS(0)
             .withKV(0)
             .withKA(0);
-    fxConfig.Slot0 = slot0;
+    fxsConfig.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs()
@@ -67,14 +69,14 @@ public class CoralConstants {
             .withMotionMagicExpo_kA(0)
             .withMotionMagicExpo_kV(0)
             .withMotionMagicJerk(0);
-    fxConfig.MotionMagic = motionMagic;
+    fxsConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
             .withDutyCycleNeutralDeadband(0.01)
             .withNeutralMode(NeutralModeValue.Coast);
-    fxConfig.MotorOutput = motorOut;
+    fxsConfig.MotorOutput = motorOut;
 
-    return fxConfig;
+    return fxsConfig;
   }
 }

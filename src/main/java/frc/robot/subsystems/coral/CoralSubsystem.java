@@ -51,7 +51,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   public void periodic() {
     // Read Inputs
     io.updateInputs(inputs);
-
+    
     // State Machine
     switch (curState) {
       case INIT:
