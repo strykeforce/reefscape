@@ -1,7 +1,5 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -22,6 +20,10 @@ public class CoralConstants {
   public static int kCoralFxId = 0;
 
   public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
+
+  public static final AngularVelocity kIntakingSpeed = null;
+
+  public static final AngularVelocity kEjectingSpeed = null;
 
   // Coral Talon FX Config
   public static TalonFXSConfiguration getFXConfig() {

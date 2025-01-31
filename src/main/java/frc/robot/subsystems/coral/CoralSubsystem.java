@@ -7,6 +7,7 @@ import frc.robot.constants.CoralConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
@@ -15,7 +16,9 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   private final CoralIO io;
   private final CoralIOInputsAutoLogged inputs = new CoralIOInputsAutoLogged();
   private AngularVelocity setpoint = RotationsPerSecond.of(0.0);
-  private CoralState curState = CoralState.INIT;
+  private CoralState curState;
+  ;
+  private org.slf4j.Logger logger = LoggerFactory.getLogger(CoralSubsystem.class);
 
   public CoralSubsystem(CoralIO io) {
     this.io = io;
@@ -30,6 +33,11 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     return inputs.velocity;
   }
 
+  public void setState(CoralState state) {
+    logger.info("{} -> {}", curState, state);
+    this.curState = state;
+  }
+
   @Override
   public void setSpeed(AngularVelocity speed) {
     setpoint = speed;
@@ -42,8 +50,24 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
         <= CoralConstants.kCloseEnough.in(RotationsPerSecond);
   }
 
-  public boolean isBeamBroken() {
-    return false; // FIXME when we get the robot
+  public boolean isEnterBeamBroken() {
+    return inputs.isFwdLimitSwitchClosed; // FIXME correct one?
+  }
+
+  public boolean isExitBeamBroken() {
+    return inputs.isRevLimitSwitchClosed; // FIXME correct one?
+  }
+
+  public void intake() {
+    io.enableRevLimitSwitch(true);
+    setSpeed(CoralConstants.kIntakingSpeed);
+    setState(CoralState.INTAKING);
+  }
+
+  public void eject() {
+    io.enableRevLimitSwitch(false);
+    setSpeed(CoralConstants.kEjectingSpeed);
+    setState(CoralState.EJECTING);
   }
 
   // Periodic Function
@@ -51,15 +75,29 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   public void periodic() {
     // Read Inputs
     io.updateInputs(inputs);
-    
+    Logger.processInputs(getName(), inputs);
+
     // State Machine
     switch (curState) {
-      case INIT:
-        break;
-      case ZEROED:
-        break;
-      default:
-        break;
+      case IDLE -> {}
+      case INTAKING -> {
+        if (isEnterBeamBroken()) {
+          setState(CoralState.CORAL_LOADING);
+        }
+      }
+      case CORAL_LOADING -> {
+        if (isExitBeamBroken()) {
+          setState(CoralState.HAS_CORAL);
+        }
+      }
+      case HAS_CORAL -> {}
+      case EJECTING -> {
+        if (!isExitBeamBroken()) {
+          setState(CoralState.EMPTY);
+        }
+      }
+      case EMPTY -> {}
+      default -> {}
     }
 
     // Log Outputs
@@ -79,7 +117,11 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public enum CoralState {
-    INIT,
-    ZEROED
+    IDLE,
+    HAS_CORAL,
+    CORAL_LOADING,
+    INTAKING,
+    EJECTING,
+    EMPTY
   }
 }

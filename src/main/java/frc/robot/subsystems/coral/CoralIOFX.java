@@ -1,8 +1,7 @@
 package frc.robot.subsystems.coral;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfigurator;
@@ -17,8 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class CoralIOFX implements CoralIO {
+  // private objects
   private Logger logger;
-  private TalonFXS talonFxs;
+  private TalonFXS talonFx;
 
   // FX Access objects
   TalonFXSConfigurator configurator;
@@ -30,50 +30,51 @@ public class CoralIOFX implements CoralIO {
 
   public CoralIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    talonFxs = new TalonFXS(CoralConstants.kCoralFxId);
+    talonFx = new TalonFXS(CoralConstants.kCoralFxId);
 
     // Config controller
-    configurator = talonFxs.getConfigurator();
+    configurator = talonFx.getConfigurator();
     configurator.apply(new TalonFXSConfiguration()); // Factory default motor controller
     configurator.apply(CoralConstants.getFXConfig());
 
     // Attach status signals
-    curVelocity = talonFxs.getVelocity();
-    fwdLimitSwitch = talonFxs.getForwardLimit();
-    revLimitSwitch = talonFxs.getReverseLimit();
+    curVelocity = talonFx.getVelocity();
+    fwdLimitSwitch = talonFx.getForwardLimit();
+    revLimitSwitch = talonFx.getReverseLimit();
   }
 
   @Override
   public void setVelocity(AngularVelocity velocity) {
-    logger.info("Setting velocity to {} degrees per second", velocity.in(DegreesPerSecond));
+    logger.info("Setting velocity to {} rots per second", velocity.in(RotationsPerSecond));
 
-    talonFxs.setControl(velocityRequest.withVelocity(velocity));
+    talonFx.setControl(velocityRequest.withVelocity(velocity));
   }
 
   @Override
   public void enableFwdLimitSwitch(boolean enabled) {
-    talonFxs
+    talonFx
         .getConfigurator()
         .apply(CoralConstants.getFXConfig().HardwareLimitSwitch.withForwardLimitEnable(enabled));
   }
 
   @Override
   public void enableRevLimitSwitch(boolean enabled) {
-    talonFxs
+    talonFx
         .getConfigurator()
         .apply(CoralConstants.getFXConfig().HardwareLimitSwitch.withReverseLimitEnable(enabled));
   }
 
   @Override
   public void updateInputs(CoralIOInputs inputs) {
-    BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
-    inputs.velocity = curVelocity.getValue();
-    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.refresh().getValue().value == 1;
-    inputs.isRevLimitSwitchClosed = revLimitSwitch.refresh().getValue().value == 0;
+    inputs.velocity = curVelocity.refresh().getValue();
+    inputs.isFwdLimitSwitchClosed =
+        fwdLimitSwitch.refresh().getValue().value == 1; // FIXME check right value
+    inputs.isRevLimitSwitchClosed =
+        revLimitSwitch.refresh().getValue().value == 0; // FIXME check right value
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    telemetryService.register(talonFxs, true);
+    telemetryService.register(talonFx, true);
   }
 }
