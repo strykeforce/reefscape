@@ -1,14 +1,18 @@
 package frc.robot.constants;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -53,36 +57,57 @@ public class DriveConstants {
   public static final double kRecoverTemp = 1290;
   public static final double kNotifyTemp = 1295;
 
-  public static TalonSRXConfiguration
+  public static TalonFXSConfiguration
       getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
     // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
-    TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
+    TalonFXSConfiguration azimuthConfig = new TalonFXSConfiguration();
 
-    azimuthConfig.primaryPID.selectedFeedbackCoefficient = 1.0;
-    azimuthConfig.auxiliaryPID.selectedFeedbackSensor = FeedbackDevice.None;
+    HardwareLimitSwitchConfigs hardwareLimitSwitchConfigs = new HardwareLimitSwitchConfigs();
+    hardwareLimitSwitchConfigs.ForwardLimitEnable = false;
+    hardwareLimitSwitchConfigs.ReverseLimitEnable = false;
+    azimuthConfig.HardwareLimitSwitch = hardwareLimitSwitchConfigs;
 
-    azimuthConfig.forwardLimitSwitchSource = LimitSwitchSource.Deactivated;
-    azimuthConfig.reverseLimitSwitchSource = LimitSwitchSource.Deactivated;
+    CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
+    currentConfig.SupplyCurrentLowerTime = 0;
+    currentConfig.SupplyCurrentLowerLimit = 0;
 
-    azimuthConfig.continuousCurrentLimit = 10;
-    azimuthConfig.peakCurrentDuration = 0;
-    azimuthConfig.peakCurrentLimit = 0;
+    currentConfig.SupplyCurrentLimit = 10;
+    currentConfig.SupplyCurrentLimitEnable = true;
 
-    azimuthConfig.slot0.kP = 15.0;
-    azimuthConfig.slot0.kI = 0.0;
-    azimuthConfig.slot0.kD = 150.0;
-    azimuthConfig.slot0.kF = 1.0;
-    azimuthConfig.slot0.integralZone = 0;
-    azimuthConfig.slot0.allowableClosedloopError = 0;
-    azimuthConfig.slot0.maxIntegralAccumulator = 0;
+    azimuthConfig.CurrentLimits = currentConfig;
 
-    azimuthConfig.motionCruiseVelocity = 800;
-    azimuthConfig.motionAcceleration = 10_000;
-    azimuthConfig.velocityMeasurementWindow = 64;
-    azimuthConfig.velocityMeasurementPeriod = SensorVelocityMeasPeriod.Period_100Ms;
-    azimuthConfig.voltageCompSaturation = 12;
-    azimuthConfig.voltageMeasurementFilter = 32;
-    azimuthConfig.neutralDeadband = 0.04;
+    Slot0Configs slot0Config = new Slot0Configs();
+    slot0Config.kP = 360.35;
+    slot0Config.kI = 0.0;
+    slot0Config.kD = 3.604;
+
+    azimuthConfig.Slot0 = slot0Config;
+
+    ExternalFeedbackConfigs externalFeedbackConfigs = new ExternalFeedbackConfigs();
+    externalFeedbackConfigs.VelocityFilterTimeConstant = 0.1;
+    externalFeedbackConfigs.ExternalFeedbackSensorSource =
+        ExternalFeedbackSensorSourceValue.PulseWidth;
+    azimuthConfig.ExternalFeedback = externalFeedbackConfigs;
+
+    VoltageConfigs voltageConfig = new VoltageConfigs();
+    voltageConfig.SupplyVoltageTimeConstant = 3.2; // FIXME, seems very long
+    azimuthConfig.Voltage = voltageConfig;
+
+    MotionMagicConfigs motionConfig = new MotionMagicConfigs();
+    motionConfig.MotionMagicCruiseVelocity = 800;
+    motionConfig.MotionMagicAcceleration = 10_000;
+    azimuthConfig.MotionMagic = motionConfig;
+
+    MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
+    motorConfigs.DutyCycleNeutralDeadband = 0.04;
+    motorConfigs.NeutralMode = NeutralModeValue.Coast;
+    azimuthConfig.MotorOutput = motorConfigs;
+
+    CommutationConfigs commutationConfigs = new CommutationConfigs();
+    commutationConfigs.MotorArrangement = MotorArrangementValue.Minion_JST;
+
+    azimuthConfig.Commutation = commutationConfigs;
+
     return azimuthConfig;
   }
 

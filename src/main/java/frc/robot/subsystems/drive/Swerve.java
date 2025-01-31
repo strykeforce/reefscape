@@ -1,12 +1,12 @@
 package frc.robot.subsystems.drive;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,7 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
@@ -26,6 +25,7 @@ import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
 import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.swerve.FXSwerveModule;
 import org.strykeforce.swerve.OdometryStrategy;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
@@ -44,14 +44,15 @@ public class Swerve implements SwerveIO, Checkable {
   private SF_AHRS navx;
   private Rotation2d navxOffset = new Rotation2d();
 
+  private TalonFXSConfigurator configuratorFXS;
   private TalonFXConfigurator configurator;
 
   private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
 
-  private TalonSRX[] azimuths = new TalonSRX[4];
+  private TalonFXS[] azimuths = new TalonFXS[4];
   private TalonFX[] drives = new TalonFX[4];
 
-  private V6TalonSwerveModule[] swerveModules;
+  private FXSwerveModule[] swerveModules;
   private SwerveDriveKinematics kinematics;
   private double fieldY = 0.0;
   private double fieldX = 0.0;
@@ -59,24 +60,25 @@ public class Swerve implements SwerveIO, Checkable {
   public Swerve() {
 
     var moduleBuilder =
-        new V6TalonSwerveModule.V6Builder()
+        new FXSwerveModule.FXBuilder()
             .driveGearRatio(DriveConstants.kDriveGearRatio)
             .wheelDiameterInches(DriveConstants.kWheelDiameterInches)
             .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond)
             .latencyCompensation(true);
 
-    swerveModules = new V6TalonSwerveModule[4];
+    swerveModules = new FXSwerveModule[4];
     Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
 
     for (int i = 0; i < 4; i++) {
-      var azimuthTalon = new TalonSRX(i);
+      var azimuthTalon = new TalonFXS(i);
+      configuratorFXS = azimuthTalon.getConfigurator();
+      configuratorFXS.apply(new TalonFXSConfiguration()); // factory default
+      configuratorFXS.apply(DriveConstants.getAzimuthTalonConfig());
+      azimuthTalon.getSupplyVoltage().setUpdateFrequency(100);
+      azimuthTalon.getSupplyCurrent().setUpdateFrequency(100);
+      azimuthTalon.getClosedLoopReference().setUpdateFrequency(200);
+
       azimuths[i] = azimuthTalon;
-      azimuthTalon.configFactoryDefault(RobotConstants.kTalonConfigTimeout);
-      azimuthTalon.configAllSettings(
-          DriveConstants.getAzimuthTalonConfig(), RobotConstants.kTalonConfigTimeout);
-      azimuthTalon.enableCurrentLimit(true);
-      azimuthTalon.enableVoltageCompensation(true);
-      azimuthTalon.setNeutralMode(NeutralMode.Coast);
 
       var driveTalon = new TalonFX(i + 10);
       drives[i] = driveTalon;
@@ -235,7 +237,7 @@ public class Swerve implements SwerveIO, Checkable {
   @Override
   public void setAzimuthVel(double vel) {
     for (int i = 0; i < 4; i++) {
-      azimuths[i].set(TalonSRXControlMode.PercentOutput, vel);
+      azimuths[i].set(vel);
     }
   }
 
@@ -265,12 +267,12 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.poseMeters = swerveDrive.getPoseMeters();
     inputs.pigeonTemp = pigeon.getPigeon2().getTemperature().getValueAsDouble();
     for (int i = 0; i < 4; ++i) {
-      inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
-      inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
+      inputs.azimuthVels[i] = azimuths[i].getVelocity().getValueAsDouble();
+      inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent().getValueAsDouble();
     }
     inputs.fieldRelSpeed = getFieldRelSpeed();
     inputs.fieldY = fieldY;
-    inputs.fieldX = fieldX; 
+    inputs.fieldX = fieldX;
   }
 
   @Override
