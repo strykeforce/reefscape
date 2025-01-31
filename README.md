@@ -19,26 +19,26 @@
 
 | Subsystem | Type     | Talon                     | ID  | CAN BUS | Comp PDP | Proto PDP | Motor | Breaker |
 | --------- | -------- | ------------------------- | --- | ------- | -------- | --------- | ----- | ------- |
-| Drive     | FXS      | azimuth                   | 0   | FD      |          | Minion    |       |         |
-| Drive     | FXS      | azimuth                   | 1   | FD      |          | Minion    |       |         |
-| Drive     | FXS      | azimuth                   | 2   | FD      |          | Minion    |       |         |
-| Drive     | FXS      | azimuth                   | 3   | FD      |          | Minion    |       |         |
-| Drive     | FX       | drive                     | 10  | FD      |          | kraken    |       |         |
-| Drive     | FX       | drive                     | 11  | FD      |          | kraken    |       |         |
-| Drive     | FX       | drive                     | 12  | FD      |          | kraken    |       |         |
-| Drive     | FX       | drive                     | 13  | FD      |          | kraken    |       |         |
-| Elevator  | FX       | elevatorMain              | 20  | rio     |          | kraken    |       |         |
-| Elevator  | FX       | elevatorFollow            | 21  | rio     |          | kraken    |       |         |
-| Biscuit   | FXS      | biscuit                   | 25  | rio     |          | minion    |       |         |
-| Algae     | FXS      | rollers                   | 30  | rio     |          | minion    |       |         |
-| Coral     | FXS      | wheels                    | 35  | rio     |          | minion    |       |         |
-| Funnel    | FXS      | rollers                   | 40  | rio     |          | minion    |       |         |
-| Climb     | FX       | rollers                   | 45  | rio     |          |           |       |         |
-| Climb     | FX       | pivot                     | 46  | rio     |          | kraken    |       |         |
-| Climb     | CANcoder | CANCoder                  | 47  | ri0     |          |           |       |         |
-| -         | -        | rio                       | -   | both    |          |           |       |         |
-| -         | -        | radio                     | -   | -       |          |           |       |         |
-| -         | -        | custom circuit (pi power) | -   | -       |          |           |       |         |
+| Drive     | FXS      | azimuth                   | 0   | FD      |          |           | Minion |         |
+| Drive     | FXS      | azimuth                   | 1   | FD      |          |           | Minion |         |
+| Drive     | FXS      | azimuth                   | 2   | FD      |          |           | Minion |         |
+| Drive     | FXS      | azimuth                   | 3   | FD      |          |           | Minion |         |
+| Drive     | FX       | drive                     | 10  | FD      |          |           | kraken |         |
+| Drive     | FX       | drive                     | 11  | FD      |          |           | kraken |         |
+| Drive     | FX       | drive                     | 12  | FD      |          |           | kraken |         |
+| Drive     | FX       | drive                     | 13  | FD      |          |           | kraken |         |
+| Elevator  | FX       | elevatorMain              | 20  | rio     |          | 20        | kraken |         |
+| Elevator  | FX       | elevatorFollow            | 21  | rio     |          | 21        | kraken |         |
+| Biscuit   | FXS      | biscuit                   | 25  | rio     |          |           | Minion |         |
+| Algae     | FXS      | rollers                   | 30  | rio     |          |           | Minion |         |
+| Coral     | FXS      | wheels                    | 35  | rio     |          |           | Minion |         |
+| Funnel    | FXS      | rollers                   | 40  | rio     |          |           | Minion |         |
+| Climb     | FX       | rollers                   | 45  | rio     |          |           | Minion |         |
+| Climb     | FX       | pivot                     | 46  | rio     |          |           | kraken |         |
+| Climb     | CANcoder | CANCoder                  | 47  | ri0     |          |           | n/a    |         |
+| -         | -        | rio                       | -   | both    |          | 12        |        |         |
+| -         | -        | radio                     | -   | -       |          |           |        |         |
+| -         | -        | custom circuit (pi power) | -   | -       |          |           |        |         |
 
 ## VRM
 | Device          | Voltage | Current |
