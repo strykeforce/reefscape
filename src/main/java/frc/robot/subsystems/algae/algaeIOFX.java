@@ -2,9 +2,9 @@ package frc.robot.subsystems.algae;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXSConfigurator;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -15,11 +15,11 @@ import org.strykeforce.telemetry.TelemetryService;
 
 public class algaeIOFX implements algaeIO {
   private Logger logger;
-  private TalonFXS talonFX;
+  private TalonFX talonFX;
   private AlgaeIOInputs inputs;
 
   // FX Access objects
-  private TalonFXSConfigurator configurator;
+  private TalonFXConfigurator configurator;
   private StatusSignal<AngularVelocity> curVelocity;
   private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
   private StatusSignal<ReverseLimitValue> revLimitSwitch;
@@ -27,7 +27,7 @@ public class algaeIOFX implements algaeIO {
 
   public algaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    talonFX = new TalonFXS(AlgaeConstants.kFxId);
+    talonFX = new TalonFX(AlgaeConstants.kFxId);
     revLimitSwitch = talonFX.getReverseLimit();
     curVelocity = talonFX.getVelocity();
     fwdLimitSwitch = talonFX.getForwardLimit();

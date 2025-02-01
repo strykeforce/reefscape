@@ -17,7 +17,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   private final AlgaeIOInputs inputs = new AlgaeIOInputs();
   private AngularVelocity desiredSpeed;
 
-  private AlgaeState curState = AlgaeState.EMPTY;
+  private AlgaeState curState = AlgaeState.IDLE;
 
   public AlgaeSubsystem(algaeIO io) {
     this.io = io;
