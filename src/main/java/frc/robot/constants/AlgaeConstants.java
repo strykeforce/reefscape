@@ -1,6 +1,5 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -16,23 +15,19 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 public class AlgaeConstants {
-
   public static int kFxId = 30;
 
   public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
   public static final AngularVelocity kMaxFwd = RotationsPerSecond.of(100);
   public static final AngularVelocity kMaxRev = RotationsPerSecond.of(-100);
 
-  public static final AngularVelocity kHoldSpeed = null;
-
-  public static final AngularVelocity kBargeScoreSpeed = null;
-
-  public static final AngularVelocity kProcessorScoreSpeed = null;
-
-  public static final AngularVelocity kIntakingSpeed = null;
+  public static final AngularVelocity kHoldSpeed = RotationsPerSecond.of(-0.1);
+  public static final AngularVelocity kBargeScoreSpeed = RotationsPerSecond.of(1);
+  public static final AngularVelocity kProcessorScoreSpeed = RotationsPerSecond.of(1);
+  public static final AngularVelocity kIntakingSpeed = RotationsPerSecond.of(-1);
 
   // Example Talon FX Config
   public static TalonFXConfiguration getFXConfig() {

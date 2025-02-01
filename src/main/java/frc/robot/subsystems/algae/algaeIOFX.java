@@ -2,7 +2,6 @@ package frc.robot.subsystems.algae;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
@@ -19,7 +18,6 @@ public class algaeIOFX implements algaeIO {
   private AlgaeIOInputs inputs;
 
   // FX Access objects
-  private TalonFXConfigurator configurator;
   private StatusSignal<AngularVelocity> curVelocity;
   private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
   private StatusSignal<ReverseLimitValue> revLimitSwitch;
