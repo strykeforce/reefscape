@@ -8,23 +8,47 @@ import frc.robot.standards.ClosedLoopSpeedSubsystem;
 import frc.robot.subsystems.algae.algaeIO.AlgaeIOInputs;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
+  private org.slf4j.Logger logger = LoggerFactory.getLogger(AlgaeSubsystem.class);
+
   private final algaeIO io;
   private final AlgaeIOInputs inputs = new AlgaeIOInputs();
   private AngularVelocity desiredSpeed;
 
-  private AlgaeState curState = AlgaeState.IDLE;
+  private AlgaeStates curState = AlgaeStates.IDLE;
 
   public AlgaeSubsystem(algaeIO io) {
     this.io = io;
   }
 
-  public AlgaeState getState() {
+  public AlgaeStates getState() {
     return curState;
+  }
+
+  public void setState(AlgaeStates newState) {
+    logger.info("{} -> {}", curState, newState);
+    curState = newState;
+  }
+
+  public void intake() {
+    setSpeed(AlgaeConstants.kIntakingSpeed);
+  }
+
+  public void scoreProcessor() {
+    setSpeed(AlgaeConstants.kProcessorScoreSpeed);
+  }
+
+  public void scoreBarge() {
+    setSpeed(AlgaeConstants.kBargeScoreSpeed);
+  }
+
+  public void hold() {
+    setSpeed(AlgaeConstants.kHoldSpeed);
   }
 
   @Override
@@ -53,12 +77,14 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     switch (curState) {
       case HAS_ALGAE -> {
         if (!inputs.isFwdLimitSwitchClosed) {
-          curState = AlgaeState.EMPTY;
+          setState(AlgaeStates.EMPTY);
+          setSpeed(RotationsPerSecond.of(0));
         }
       }
       case EMPTY -> {
-        if (inputs.isRevLimitSwitchClosed) {
-          curState = AlgaeState.HAS_ALGAE;
+        if (inputs.isRevLimitSwitchClosed) { // FIXME: correct?
+          hold();
+          setState(AlgaeStates.HAS_ALGAE);
         }
       }
       case IDLE -> {}
@@ -76,7 +102,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     return Set.of(new Measure("State", () -> curState.ordinal()));
   }
 
-  public enum AlgaeState {
+  public enum AlgaeStates {
     HAS_ALGAE,
     EMPTY,
     IDLE

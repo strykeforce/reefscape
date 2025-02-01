@@ -26,6 +26,14 @@ public class AlgaeConstants {
   public static final AngularVelocity kMaxFwd = RotationsPerSecond.of(100);
   public static final AngularVelocity kMaxRev = RotationsPerSecond.of(-100);
 
+  public static final AngularVelocity kHoldSpeed = null;
+
+  public static final AngularVelocity kBargeScoreSpeed = null;
+
+  public static final AngularVelocity kProcessorScoreSpeed = null;
+
+  public static final AngularVelocity kIntakingSpeed = null;
+
   // Example Talon FX Config
   public static TalonFXConfiguration getFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();
@@ -56,9 +64,9 @@ public class AlgaeConstants {
     SoftwareLimitSwitchConfigs swLimit =
         new SoftwareLimitSwitchConfigs()
             .withForwardSoftLimitEnable(true)
-            .withForwardSoftLimitThreshold(kMaxFwd)
+            .withForwardSoftLimitThreshold(kMaxFwd.in(RotationsPerSecond))
             .withReverseSoftLimitEnable(true)
-            .withReverseSoftLimitThreshold(kMaxRev);
+            .withReverseSoftLimitThreshold(kMaxRev.in(RotationsPerSecond));
     fxConfig.SoftwareLimitSwitch = swLimit;
 
     Slot0Configs slot0 =
