@@ -3,6 +3,7 @@ package frc.robot.constants;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
+import edu.wpi.first.units.measure.Angle;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -19,13 +20,12 @@ import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public class ElevatorConstants {
- 
-  public static final double kCloseEnough;
-  public static final double kMaxFwd;
-  public static final double kMaxRev;
-  public static final double kZeroTicks;
-  public static final int zeroMultiple; //some constant to multiply, add by to turn the analog input into a position
-  
+  public static final double kCloseEnough = 5;
+  public static final double kMaxFwd = 5;
+  public static final double kMaxRev = 5;
+  //public static final Angle kZeroTicks=; //this is the offset
+  public static final double stowElevator = 2;
+  public static final int zeroMultiple = 2; //some constant to multiply/add to the analog input to turn it into a position
   public static final int heightAnalogID = 0;
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
@@ -37,16 +37,17 @@ public class ElevatorConstants {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimit(10)
             .withStatorCurrentLimitEnable(false)
-            .withSupplyCurrentLimit() //one new line change needed
-            .withSupplyCurrentThreshold()
-            .withSupplyCurrentLimitEnable()
-            .withSupplyTimeThreshold();
+            //.withSupplyCurrentLimit(4) //one new line change needed
+            //.withSupplyCurrentThreshold(4)
+            .withSupplyCurrentLimitEnable(false);
+            //.withSupplyTimeThreshold()
     fxConfig.CurrentLimits = current;
 
+    /* 
     HardwareLimitSwitchConfigs hwLimit =
-        new HardwareLimitSwitchConfigs()
-            .withForwardLimitAutosetPositionEnable()
-            .withForwardLimitEnable()
+        new HardwareLimitSwitchConfigs(); 
+            //.withForwardLimitAutosetPositionEnable()
+            .withForwardLimitEnable(false)
             .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen)
             .withForwardLimitSource(ForwardLimitSourceValue.LimitSwitchPin)
             .withReverseLimitAutosetPositionEnable(false)
@@ -54,15 +55,15 @@ public class ElevatorConstants {
             .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
             .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
     fxConfig.HardwareLimitSwitch = hwLimit;
-
-    SoftwareLimitSwitchConfigs swLimit =
+    */
+    SoftwareLimitSwitchConfigs swLimit = 
         new SoftwareLimitSwitchConfigs()
             .withForwardSoftLimitEnable(false)
-            .withForwardSoftLimitThreshold(kMaxFwd)
-            .withReverseSoftLimitEnable(false)
-            .withReverseSoftLimitThreshold(kMaxRev);
+            .withForwardSoftLimitThreshold(2)
+            .withReverseSoftLimitEnable(false);
+            //.withReverseSoftLimitThreshold();
     fxConfig.SoftwareLimitSwitch = swLimit;
-
+ 
     Slot0Configs slot0 =
         new Slot0Configs()
             .withKP(0.4)
@@ -74,6 +75,7 @@ public class ElevatorConstants {
             .withKV(0.12)
             .withKA(0);
     fxConfig.Slot0 = slot0;
+   
 
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs()

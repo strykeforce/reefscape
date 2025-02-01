@@ -1,5 +1,4 @@
 package frc.robot.subsystems.elevator;
-
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
 
@@ -15,12 +14,12 @@ import edu.wpi.first.units.measure.Angle;
 public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
     // Private Variables
     private final ElevatorIO io;
-    private final ElevatorIOInputsAutoLogged inputs = new ExiterIOInputsAutoLogged();
+    private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged(); 
 
     private Angle setpoints;
 
     // Constructor
-    public void ExiterSubsystem(ElevatorIO io) {
+    public ElevatorSubsystem(ElevatorIO io) {
         this.io = io;
   }
 
@@ -48,17 +47,21 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   public void setPosition(Angle position) {
     setpoints = position;
-    io.setPosition(position); //why not working?
+    io.setPosition(position);
   }
 
   public Angle getPosition() {
     return setpoints;
   }
 
-  public boolean isFinished() {}
+  @Override
+  public boolean isFinished() {
+    return Math.abs(setpoints.minus(inputs.positions)) <= ElevatorConstants.kCloseEnough;
+  }
   
-  public void zero() {} 
+  public void zero() {
+    io.zero();
+  } 
 
-  //public void atPosition() {}
-  
+
 }
