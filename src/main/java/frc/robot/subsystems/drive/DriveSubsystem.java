@@ -312,6 +312,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         omegaController.getP(), omegaController.getI(), omegaController.getD());
   }
 
+  @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
