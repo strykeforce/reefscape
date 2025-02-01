@@ -18,4 +18,9 @@ public class SetElevatorPositionCommand extends Command {
   public void initialize() {
     elevatorSubsystem.setPosition(position);
   }
+
+  @Override
+  public boolean isFinished() {
+    return elevatorSubsystem.isFinished();
+  }
 }

@@ -18,4 +18,9 @@ public class JogElevatorCommand extends Command {
   public void initialize() {
     elevatorSubsystem.setPosition(elevatorSubsystem.getPosition().plus(positionChange));
   }
+
+  @Override
+  public boolean isFinished() {
+    return elevatorSubsystem.isFinished();
+  }
 }
