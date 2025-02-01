@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.controllers.FlyskyJoystick;
@@ -58,10 +59,19 @@ public class RobotContainer {
   }
 
   private void configureOperatorBindings() {
-    new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new OpenLoopCoralCommand(coralSubsystem, 0.5));
+    // Stop Coral
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new OpenLoopCoralCommand(coralSubsystem, -0.5));
+        .onTrue(new OpenLoopCoralCommand(coralSubsystem, 0));
+
+    // Intake Coral
+    new JoystickButton(xboxController, XboxController.Button.kY.value)
+        .onTrue(new OpenLoopCoralCommand(coralSubsystem, -0.5))
+        .onTrue(new EnableEjectBeamCommand(false, coralSubsystem));
+
+    // Eject Coral
+    new JoystickButton(xboxController, XboxController.Button.kA.value)
+        .onTrue(new OpenLoopCoralCommand(coralSubsystem, -0.5))
+        .onTrue(new EnableEjectBeamCommand(true, coralSubsystem));
   }
 
   public Command getAutonomousCommand() {
