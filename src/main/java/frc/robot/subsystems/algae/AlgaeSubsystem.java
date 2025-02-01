@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.AlgaeConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
-import frc.robot.subsystems.algae.algaeIO.AlgaeIOInputs;
+import frc.robot.subsystems.algae.AlgaeIO.AlgaeIOInputs;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +16,13 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(AlgaeSubsystem.class);
 
-  private final algaeIO io;
+  private final AlgaeIO io;
   private final AlgaeIOInputs inputs = new AlgaeIOInputs();
   private AngularVelocity desiredSpeed;
 
   private AlgaeStates curState = AlgaeStates.IDLE;
 
-  public AlgaeSubsystem(algaeIO io) {
+  public AlgaeSubsystem(AlgaeIO io) {
     this.io = io;
   }
 

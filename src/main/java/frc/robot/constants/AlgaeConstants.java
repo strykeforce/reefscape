@@ -17,7 +17,6 @@ import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-
 public class AlgaeConstants {
   public static int kFxId = 30;
 

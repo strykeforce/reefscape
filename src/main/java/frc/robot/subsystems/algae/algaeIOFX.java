@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class algaeIOFX implements algaeIO {
+public class AlgaeIOFX implements AlgaeIO {
   private Logger logger;
   private TalonFX talonFX;
   private AlgaeIOInputs inputs;
@@ -25,12 +25,12 @@ public class algaeIOFX implements algaeIO {
   private VelocityVoltage speedRequest = new VelocityVoltage(0).withEnableFOC(false).withSlot(0);
   private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
 
-  public algaeIOFX() {
+  public AlgaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     talonFX = new TalonFX(AlgaeConstants.kFxId);
+    fwdLimitSwitch = talonFX.getForwardLimit();
     revLimitSwitch = talonFX.getReverseLimit();
     curVelocity = talonFX.getVelocity();
-    fwdLimitSwitch = talonFX.getForwardLimit();
   }
 
   @Override

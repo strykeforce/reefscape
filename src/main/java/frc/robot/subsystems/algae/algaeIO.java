@@ -4,7 +4,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
-public interface algaeIO {
+public interface AlgaeIO {
   @AutoLog
   public static class AlgaeIOInputs {
     public AngularVelocity velocity;
