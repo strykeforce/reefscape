@@ -4,30 +4,58 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
+import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.subsystems.coral.CoralIO;
 import frc.robot.subsystems.coral.CoralIOFX;
 import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
+import org.strykeforce.telemetry.TelemetryController;
+import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
+  private Swerve swerve;
+  private DriveSubsystem driveSubsystem;
+
+  private final XboxController xboxController = new XboxController(1);
+  private final Joystick driveJoystick = new Joystick(0);
+
+  private final FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
+  private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
+
   private final CoralSubsystem coralSubsystem;
   private final CoralIO coralIO;
 
-  private final XboxController xboxController = new XboxController(1);
-
   public RobotContainer() {
+    swerve = new Swerve();
+    driveSubsystem = new DriveSubsystem(swerve);
+
     coralIO = new CoralIOFX();
     coralSubsystem = new CoralSubsystem(coralIO);
 
-    configureBindings();
+    configureTelemetry();
+    configureDriverBindings();
     configureOperatorBindings();
   }
 
-  private void configureBindings() {}
+  private void configureTelemetry() {
+    telemetryService.register(driveSubsystem);
+    telemetryService.register(coralSubsystem);
+    telemetryService.start();
+  }
+
+  private void configureDriverBindings() {
+    driveSubsystem.setDefaultCommand(
+        new DriveTeleopCommand(
+            () -> flysky.getFwd(), () -> flysky.getStr(), () -> flysky.getYaw(), driveSubsystem));
+  }
 
   private void configureOperatorBindings() {
     new JoystickButton(xboxController, XboxController.Button.kA.value)
