@@ -16,7 +16,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   private final CoralIO io;
   private final CoralIOInputsAutoLogged inputs = new CoralIOInputsAutoLogged();
   private AngularVelocity setpoint = RotationsPerSecond.of(0.0);
-  private CoralState curState;
+  private CoralState curState = CoralState.IDLE;
   private org.slf4j.Logger logger = LoggerFactory.getLogger(CoralSubsystem.class);
 
   public CoralSubsystem(CoralIO io) {
@@ -50,11 +50,11 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public boolean isEnterBeamBroken() {
-    return inputs.isFwdLimitSwitchClosed; // FIXME correct one?
+    return inputs.isFwdBeamBroken;
   }
 
   public boolean isExitBeamBroken() {
-    return inputs.isRevLimitSwitchClosed; // FIXME correct one?
+    return inputs.isRevBeamBroken;
   }
 
   public void intake() {

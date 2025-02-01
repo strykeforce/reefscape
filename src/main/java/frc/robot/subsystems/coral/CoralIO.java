@@ -11,8 +11,8 @@ public interface CoralIO {
   @AutoLog
   public static class CoralIOInputs {
     public AngularVelocity velocity = RotationsPerSecond.of(0.0);
-    public boolean isFwdLimitSwitchClosed = false;
-    public boolean isRevLimitSwitchClosed = false;
+    public boolean isFwdBeamBroken = false;
+    public boolean isRevBeamBroken = false;
   }
 
   public default void setVelocity(AngularVelocity velocity) {}

@@ -69,8 +69,8 @@ public class CoralIOFX implements CoralIO {
   public void updateInputs(CoralIOInputs inputs) {
     BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
     inputs.velocity = curVelocity.getValue();
-    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.getValue().value == 1; // FIXME check right value
-    inputs.isRevLimitSwitchClosed = revLimitSwitch.getValue().value == 0; // FIXME check right value
+    inputs.isFwdBeamBroken = fwdLimitSwitch.getValue().value == 0; // FIXME check right value
+    inputs.isRevBeamBroken = revLimitSwitch.getValue().value == 0; // FIXME check right value
   }
 
   @Override

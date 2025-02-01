@@ -21,9 +21,8 @@ public class CoralConstants {
 
   public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
 
-  public static final AngularVelocity kIntakingSpeed = null;
-
-  public static final AngularVelocity kEjectingSpeed = null;
+  public static final AngularVelocity kIntakingSpeed = RotationsPerSecond.of(-1);
+  public static final AngularVelocity kEjectingSpeed = RotationsPerSecond.of(1);
 
   // Coral Talon FX Config
   public static TalonFXSConfiguration getFXConfig() {
@@ -33,7 +32,6 @@ public class CoralConstants {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimit(10)
             .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20)
             .withSupplyCurrentLimit(10)
             .withSupplyCurrentLowerLimit(8)
             .withSupplyCurrentLowerTime(0.02)
@@ -47,7 +45,7 @@ public class CoralConstants {
             .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen)
             .withForwardLimitSource(ForwardLimitSourceValue.LimitSwitchPin)
             .withReverseLimitAutosetPositionEnable(false)
-            .withReverseLimitEnable(false)
+            .withReverseLimitEnable(true)
             .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
             .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
     fxsConfig.HardwareLimitSwitch = hwLimit;
