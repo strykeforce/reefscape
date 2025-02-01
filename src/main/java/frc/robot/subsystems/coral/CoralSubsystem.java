@@ -100,7 +100,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     }
 
     // Log Outputs
-    Logger.recordOutput("Coral/curState", curState.ordinal());
+    Logger.recordOutput("Coral/curState", curState);
     Logger.recordOutput("Coral/setpoint", setpoint.in(RotationsPerSecond));
   }
 
