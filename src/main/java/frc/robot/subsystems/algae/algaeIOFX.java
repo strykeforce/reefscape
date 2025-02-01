@@ -2,6 +2,7 @@ package frc.robot.subsystems.algae;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
@@ -22,6 +23,7 @@ public class algaeIOFX implements algaeIO {
   private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
   private StatusSignal<ReverseLimitValue> revLimitSwitch;
   private VelocityVoltage speedRequest = new VelocityVoltage(0).withEnableFOC(false).withSlot(0);
+  private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
 
   public algaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -42,6 +44,11 @@ public class algaeIOFX implements algaeIO {
   @Override
   public void setSpeed(AngularVelocity speed) {
     talonFX.setControl(speedRequest.withVelocity(speed));
+  }
+
+  @Override
+  public void setPct(double pct) {
+    talonFX.setControl(dutyCycleRequest.withOutput(pct));
   }
 
   public AngularVelocity AngularVelocity() {

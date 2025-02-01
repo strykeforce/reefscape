@@ -57,6 +57,10 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     desiredSpeed = speed;
   }
 
+  public void setPct(double pct) {
+    io.setPct(pct);
+  }
+
   @Override
   public AngularVelocity getSpeed() {
     return inputs.velocity;

@@ -16,6 +16,8 @@ public interface algaeIO {
 
   public default void setSpeed(AngularVelocity speed) {}
 
+  public default void setPct(double pct) {}
+
   public default void zero() {}
 
   public default void registerWith(TelemetryService telemetryService) {}
