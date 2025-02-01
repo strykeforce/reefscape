@@ -17,6 +17,8 @@ public interface CoralIO {
 
   public default void setVelocity(AngularVelocity velocity) {}
 
+  public default void setPct(double percentOutput) {}
+
   public default void enableFwdLimitSwitch(boolean enabled) {}
 
   public default void enableRevLimitSwitch(boolean enabled) {}

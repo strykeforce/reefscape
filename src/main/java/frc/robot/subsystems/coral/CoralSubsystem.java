@@ -43,6 +43,10 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     io.setVelocity(speed);
   }
 
+  public void setPct(double percentOutput) {
+    io.setPct(percentOutput);
+  }
+
   @Override
   public boolean atSpeed() {
     return setpoint.minus(inputs.velocity).abs(RotationsPerSecond)

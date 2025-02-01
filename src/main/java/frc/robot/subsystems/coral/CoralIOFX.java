@@ -6,6 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfigurator;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
@@ -22,12 +23,13 @@ public class CoralIOFX implements CoralIO {
   private TalonFXS talonFx;
 
   // FX Access objects
-  TalonFXSConfigurator configurator;
+  private TalonFXSConfigurator configurator;
   private MotionMagicVelocityDutyCycle velocityRequest =
       new MotionMagicVelocityDutyCycle(0).withEnableFOC(false).withSlot(0);
-  StatusSignal<AngularVelocity> curVelocity;
-  StatusSignal<ForwardLimitValue> fwdLimitSwitch;
-  StatusSignal<ReverseLimitValue> revLimitSwitch;
+  private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
+  private StatusSignal<AngularVelocity> curVelocity;
+  private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
+  private StatusSignal<ReverseLimitValue> revLimitSwitch;
 
   public CoralIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -49,6 +51,11 @@ public class CoralIOFX implements CoralIO {
     logger.info("Setting velocity to {} rots per second", velocity.in(RotationsPerSecond));
 
     talonFx.setControl(velocityRequest.withVelocity(velocity));
+  }
+
+  @Override
+  public void setPct(double percentOutput) {
+    talonFx.setControl(dutyCycleRequest.withOutput(percentOutput));
   }
 
   @Override
