@@ -13,6 +13,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveConstants {
+  public static final double kDeadbandAllStick = 0.075;
+  public static final double kExpoScaleYawFactor = 0.75;
+  public static final double kRateLimitFwdStr = 3.5;
+  public static final double kRateLimitYaw = 8.0;
+
   public static final double kDriveGearRatio = 6.5;
   public static final double kWheelDiameterInches = 4.0;
   public static final double kMaxSpeedMetersPerSecond = 12.0;
@@ -21,9 +26,9 @@ public class DriveConstants {
   public static final double kGyroDifferentThreshold = 5.0; // 5 degrees
   public static final int kGyroDifferentCount = 3;
 
-  public static final double kRobotLength = 22.0;
-  public static final double kRobotWidth = 22.0;
-  public static final double kFieldMaxX = 690.0;
+  public static final double kRobotLength = 0.6223;
+  public static final double kRobotWidth = 0.6223;
+  public static final double kFieldMaxX = 17.526;
 
   public static final double kPOmega = 4.5;
   public static final double kIOmega = 0.0;
