@@ -1,10 +1,9 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
-
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 
 public interface ElevatorIO {
 
@@ -27,16 +26,6 @@ public interface ElevatorIO {
 
   public default void zero() {}
 }
-
-
-
-
-
-
-
-
-
-
 
 /*
  * To-do: resolve all the comments, implement zero, find out if follower actually means every LOC for one motor does the same
