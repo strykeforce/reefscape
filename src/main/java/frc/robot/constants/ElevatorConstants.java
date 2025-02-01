@@ -1,8 +1,5 @@
 package frc.robot.constants;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.strykeforce.telemetry.TelemetryService;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -19,34 +16,39 @@ import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public class ElevatorConstants {
- 
-  public static final double kCloseEnough;
-  public static final double kMaxFwd;
-  public static final double kMaxRev;
-  public static final double kZeroTicks;
-  public static final int zeroMultiple; //some constant to multiply, add by to turn the analog input into a position
-  
+
+  public static final double kCloseEnoughRotations = 0.0083;
+  public static final double kMaxFwd = 0; // TODO all of these fields need to be filled out
+  public static final double kMaxRev = 0;
+  public static final int kZeroMultiple =
+      0; // some constant to multiply, add by to turn the analog input into a position
+  public static final double kZeroSpeed = -.05;
+  public static final int kZeroCounter = 3;
+  public static final double kZeroedThreshhold = .0001;
+
   public static final int heightAnalogID = 0;
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
+
+  public static final double kJogAmount = 0.1;
 
   public static TalonFXConfiguration getBothFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();
 
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(10)
             .withStatorCurrentLimitEnable(false)
-            .withSupplyCurrentLimit() //one new line change needed
-            .withSupplyCurrentThreshold()
-            .withSupplyCurrentLimitEnable()
-            .withSupplyTimeThreshold();
+            .withStatorCurrentLimit(20)
+            .withSupplyCurrentLimit(10)
+            .withSupplyCurrentLowerLimit(8)
+            .withSupplyCurrentLowerTime(0.02)
+            .withSupplyCurrentLimitEnable(true);
     fxConfig.CurrentLimits = current;
 
     HardwareLimitSwitchConfigs hwLimit =
         new HardwareLimitSwitchConfigs()
-            .withForwardLimitAutosetPositionEnable()
-            .withForwardLimitEnable()
+            .withForwardLimitAutosetPositionEnable(false)
+            .withForwardLimitEnable(false)
             .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen)
             .withForwardLimitSource(ForwardLimitSourceValue.LimitSwitchPin)
             .withReverseLimitAutosetPositionEnable(false)
@@ -92,5 +94,17 @@ public class ElevatorConstants {
     fxConfig.MotorOutput = motorOut;
 
     return fxConfig;
+  }
+
+  public static CurrentLimitsConfigs getZeroingCurrentLimitsConfigs() {
+    CurrentLimitsConfigs current =
+        new CurrentLimitsConfigs() // TODO actually have correct limits for zeroing
+            .withStatorCurrentLimitEnable(false)
+            .withStatorCurrentLimit(20)
+            .withSupplyCurrentLimit(10)
+            .withSupplyCurrentLowerLimit(8)
+            .withSupplyCurrentLowerTime(0.02)
+            .withSupplyCurrentLimitEnable(true);
+    return current;
   }
 }

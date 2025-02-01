@@ -34,7 +34,7 @@ public class ExampleConstants {
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20) 
+            .withStatorCurrentLimit(20)
             .withSupplyCurrentLimit(10)
             .withSupplyCurrentLowerLimit(8)
             .withSupplyCurrentLowerTime(0.02)
