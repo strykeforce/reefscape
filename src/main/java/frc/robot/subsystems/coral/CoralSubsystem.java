@@ -17,7 +17,6 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   private final CoralIOInputsAutoLogged inputs = new CoralIOInputsAutoLogged();
   private AngularVelocity setpoint = RotationsPerSecond.of(0.0);
   private CoralState curState;
-  ;
   private org.slf4j.Logger logger = LoggerFactory.getLogger(CoralSubsystem.class);
 
   public CoralSubsystem(CoralIO io) {
