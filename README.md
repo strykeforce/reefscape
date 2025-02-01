@@ -17,35 +17,35 @@
 
 ## CAN Bus
 
-| Subsystem | Type     | Talon                     | ID  | CAN BUS | Comp PDP | Proto PDP | Motor | Breaker |
-| --------- | -------- | ------------------------- | --- | ------- | -------- | --------- | ----- | ------- |
-| Drive     | FXS      | azimuth                   | 0   | FD      |          |           | Minion |         |
-| Drive     | FXS      | azimuth                   | 1   | FD      |          |           | Minion |         |
-| Drive     | FXS      | azimuth                   | 2   | FD      |          |           | Minion |         |
-| Drive     | FXS      | azimuth                   | 3   | FD      |          |           | Minion |         |
-| Drive     | FX       | drive                     | 10  | FD      |          |           | kraken |         |
-| Drive     | FX       | drive                     | 11  | FD      |          |           | kraken |         |
-| Drive     | FX       | drive                     | 12  | FD      |          |           | kraken |         |
-| Drive     | FX       | drive                     | 13  | FD      |          |           | kraken |         |
+| Subsystem | Type     | Talon                     | ID  | CAN BUS | Comp PDP | Proto PDP | Motor  | Breaker |
+| --------- | -------- | ------------------------- | --- | ------- | -------- | --------- | ------ | ------- |
+| Drive     | FXS      | azimuth                   | 0   | FD      |          | 16        | Minion |         |
+| Drive     | FXS      | azimuth                   | 1   | FD      |          | 17        | Minion |         |
+| Drive     | FXS      | azimuth                   | 2   | FD      |          | 6         | Minion |         |
+| Drive     | FXS      | azimuth                   | 3   | FD      |          | 7         | Minion |         |
+| Drive     | FX       | drive                     | 10  | FD      |          | 23        | kraken |         |
+| Drive     | FX       | drive                     | 11  | FD      |          | 22        | kraken |         |
+| Drive     | FX       | drive                     | 12  | FD      |          | 0         | kraken |         |
+| Drive     | FX       | drive                     | 13  | FD      |          | 1         | kraken |         |
 | Elevator  | FX       | elevatorMain              | 20  | rio     |          | 21        | kraken |         |
 | Elevator  | FX       | elevatorFollow            | 21  | rio     |          | 20        | kraken |         |
-| Biscuit   | FXS      | biscuit                   | 25  | rio     |          |           | Minion |         |
-| Algae     | FXS      | rollers                   | 30  | rio     |          |           | Minion |         |
-| Coral     | FXS      | wheels                    | 35  | rio     |          |           | Minion |         |
+| Biscuit   | FXS      | biscuit                   | 25  | rio     |          | 2         | Minion |         |
+| Algae     | FXS      | algae                     | 30  | rio     |          |           | Minion |         |
+| Coral     | FXS      | coral                     | 35  | rio     |          | 3         | Minion |         |
 | Funnel    | FXS      | rollers                   | 40  | rio     |          |           | Minion |         |
 | Climb     | FX       | rollers                   | 45  | rio     |          |           | Minion |         |
 | Climb     | FX       | pivot                     | 46  | rio     |          |           | kraken |         |
 | Climb     | CANcoder | CANCoder                  | 47  | ri0     |          |           | n/a    |         |
 | -         | -        | rio                       | -   | both    |          | 12        |        |         |
-| -         | -        | radio                     | -   | -       |          |           |        |         |
+| -         | -        | vrm (radio, pigeon)       | -   | -       |          | 13        |        |         |
 | -         | -        | custom circuit (pi power) | -   | -       |          |           |        |         |
 
 ## VRM
-| Device          | Voltage | Current |
-| --------------- | ------- | ------- |
-| Pigeon 2        | 12      | 2       |
-| Ethernet Switch | 12      | 2       |
-|                 |         |         |
+| Device          | Voltage | Current | ID  |
+| --------------- | ------- | ------- | --- |
+| Pigeon 2        | 12      | 0.5     | 4   |
+| Ethernet Switch | 12      | 2       |     |
+|                 |         |         |     |
 
 ## Beam Breaks
 | Subsystem | Talon   | ID  | Fwd/Rev | Purpose            |

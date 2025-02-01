@@ -173,18 +173,18 @@ public class DriveConstants {
     return driveConfig;
   }
 
-  public static final int kPigeonCanID = 1000; // fix later
+  public static final int kPigeonCanID = 4;
 
   public static Pigeon2Configuration getPigeon2Configuration() {
     Pigeon2Configuration config = new Pigeon2Configuration();
 
-    config.MountPose.MountPoseYaw = -90.0;
+    config.MountPose.MountPoseYaw = 0.0;
     config.MountPose.MountPoseRoll = 0.0;
     config.MountPose.MountPosePitch = 0.0;
 
     config.GyroTrim.GyroScalarX = 0.0;
     config.GyroTrim.GyroScalarY = 0.0;
-    config.GyroTrim.GyroScalarZ = -2.12;
+    config.GyroTrim.GyroScalarZ = -4.55;
 
     return config;
   }
