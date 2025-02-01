@@ -20,23 +20,25 @@ public class algaeIOFX implements algaeIO {
 
   // FX Access objects
   private TalonFXSConfigurator configurator;
-  private StatusSignal<AngularVelocity> currVelocity;
-  private StatusSignal<ForwardLimitValue> forwardLimitSwitch;
-  private StatusSignal<ReverseLimitValue> reverseLimitSwitch;
+  private StatusSignal<AngularVelocity> curVelocity;
+  private StatusSignal<ForwardLimitValue> fwdLimitSwitch;
+  private StatusSignal<ReverseLimitValue> revLimitSwitch;
   private VelocityVoltage speedRequest = new VelocityVoltage(0).withEnableFOC(false).withSlot(0);
 
   public algaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
     talonFX = new TalonFXS(AlgaeConstants.kFxId);
-    reverseLimitSwitch = talonFX.getReverseLimit();
-    currVelocity = talonFX.getVelocity();
-    forwardLimitSwitch = talonFX.getForwardLimit();
+    revLimitSwitch = talonFX.getReverseLimit();
+    curVelocity = talonFX.getVelocity();
+    fwdLimitSwitch = talonFX.getForwardLimit();
   }
 
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
-    BaseStatusSignal.refreshAll(currVelocity);
-    inputs.velocity = currVelocity.refresh().getValue();
+    BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
+    inputs.velocity = curVelocity.refresh().getValue();
+    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.getValue().value == 1; // FIXME check right value
+    inputs.isRevLimitSwitchClosed = revLimitSwitch.getValue().value == 0; // FIXME check right value
   }
 
   @Override

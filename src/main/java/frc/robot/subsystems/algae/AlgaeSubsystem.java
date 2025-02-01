@@ -1,9 +1,7 @@
 package frc.robot.subsystems.algae;
 
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.AlgaeConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
@@ -17,14 +15,12 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
   private final algaeIO io;
   private final AlgaeIOInputs inputs = new AlgaeIOInputs();
-  private Angle setpoint = Rotations.of(0.0);
   private AngularVelocity desiredSpeed;
 
   private AlgaeState curState = AlgaeState.EMPTY;
 
   public AlgaeSubsystem(algaeIO io) {
     this.io = io;
-    zero();
   }
 
   public AlgaeState getState() {
@@ -48,39 +44,41 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
         < AlgaeConstants.kCloseEnough.in(RotationsPerSecond);
   }
 
-  private void updateAlgaeState() {
-    if (inputs.reverseLimitSwitch.equals(1)) {
-      curState = AlgaeState.HAS_ALGAE;
-    } else if (!inputs.reverseLimitSwitch.equals(1)) {
-      curState = AlgaeState.EMPTY;
-    }
-  }
-
+  @Override
   public void periodic() {
     io.updateInputs(inputs);
-    updateAlgaeState();
-    Logger.recordOutput("Algae/state", curState.ordinal());
-    Logger.recordOutput("Algae/setpoint", setpoint.in(Rotations));
+    Logger.recordOutput("Algae/state", curState);
+    Logger.recordOutput("Algae/setpoint", desiredSpeed.in(RotationsPerSecond));
 
     switch (curState) {
-      case HAS_ALGAE:
-        break;
-      case EMPTY:
-        break;
+      case HAS_ALGAE -> {
+        if (!inputs.isFwdLimitSwitchClosed) {
+          curState = AlgaeState.EMPTY;
+        }
+      }
+      case EMPTY -> {
+        if (inputs.isRevLimitSwitchClosed) {
+          curState = AlgaeState.HAS_ALGAE;
+        }
+      }
+      case IDLE -> {}
     }
   }
 
+  @Override
   public void registerWith(TelemetryService telemetryService) {
     super.registerWith(telemetryService);
     io.registerWith(telemetryService);
   }
 
+  @Override
   public Set<Measure> getMeasures() {
     return Set.of(new Measure("State", () -> curState.ordinal()));
   }
 
   public enum AlgaeState {
     HAS_ALGAE,
-    EMPTY
+    EMPTY,
+    IDLE
   }
 }
