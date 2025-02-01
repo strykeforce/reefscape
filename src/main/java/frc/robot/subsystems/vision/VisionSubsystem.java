@@ -3,7 +3,6 @@ package frc.robot.subsystems.vision;
 import static edu.wpi.first.units.Units.*;
 
 import WallEye.*;
-import WallEye.UdpSubscriber;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -11,9 +10,11 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.VisionConstants;
@@ -27,25 +28,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+import edu.wpi.first.math.Matrix;
 
 public class VisionSubsystem extends MeasurableSubsystem {
 
   WallEyeCam[] cams;
 
-  Translation2d[] camPositions = {
-    VisionConstants.kCam1Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam2Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam3Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam4Pose.getTranslation().toTranslation2d(),
-    VisionConstants.kCam5Pose.getTranslation().toTranslation2d()
+  Translation3d[] camPositions = {
+    VisionConstants.kCam1Pose.getTranslation(),
+    VisionConstants.kCam2Pose.getTranslation(),
+    VisionConstants.kCam3Pose.getTranslation(),
+    VisionConstants.kCam4Pose.getTranslation(),
+    VisionConstants.kCam5Pose.getTranslation()
   };
 
-  Rotation2d[] camRotations = {
-    VisionConstants.kCam1Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam2Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam3Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam4Pose.getRotation().toRotation2d(),
-    VisionConstants.kCam5Pose.getRotation().toRotation2d()
+  Rotation3d[] camRotations = {
+    VisionConstants.kCam1Pose.getRotation(),
+    VisionConstants.kCam2Pose.getRotation(),
+    VisionConstants.kCam3Pose.getRotation(),
+    VisionConstants.kCam4Pose.getRotation(),
+    VisionConstants.kCam5Pose.getRotation()
   };
 
   private double[] camHeights = {
@@ -80,15 +82,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private DriveSubsystem driveSubsystem = new DriveSubsystem(swerve);
   private Logger logger;
   private UdpSubscriber[] udpSubscriber;
-  private Matrix adaptiveMatrix;
   private AprilTagFieldLayout field;
   private boolean updating = true;
   private int minTags;
   private CircularBuffer<Double> gyroBuffer =
       new CircularBuffer<Double>(VisionConstants.kCircularBufferSize);
   private double timeSinceLastUpdate;
-  private int updatesToWheels;
+  private int updatesToWheels;  private Matrix adaptiveMatrix;
   private ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>();
+  private WallEyeResult[] lastResult;
+  private Matrix<N3,N1> adativeMatrix;
+  private Matrix<N3,N1> stdMatrix;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -96,7 +100,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     cams = new WallEyeCam[VisionConstants.kNumCams];
     udpSubscriber = new UdpSubscriber[VisionConstants.kNumPis];
-    adaptiveMatrix = VisionConstants.kLocalMeasurementStdDevs.copy();
+    adaptiveMatrix = VisionConstants.kVisionMeasurementStdDevs.copy();
+    stdMatrix = adaptiveMatrix.copy();
     try {
       field = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile);
     } catch (IOException e) {
@@ -306,8 +311,56 @@ public class VisionSubsystem extends MeasurableSubsystem {
         validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
       }
     }
-  }
 
+    if (getSeconds() - timeSinceLastUpdate >= VisionConstants.kTimeToDecayDev) {
+      for (int i = 0; i < 2; i++){
+
+        double scaledWeight = VisionConstants.kVisionMeasurementStdDevs.get(i, 0)
+        + VisionConstants.kStdDevDecayCoeff
+        * ((getSeconds() - timeSinceLastUpdate) - VisionConstants.kTimeToDecayDev);
+
+        adaptiveMatrix.set(i, 0, 
+        scaledWeight >= VisionConstants.kMinStdDev 
+          ? scaledWeight : VisionConstants.kMinStdDev);
+      }
+    }
+
+    for(Pair<WallEyeResult, Integer>res : validResults){
+      if(res.getFirst() instanceof WallEyeResult){
+        //adaptiveMatrix.set(0, 0, .1);
+        //adaptiveMatrix.set(1, 0, .1);
+
+        WallEyePoseResult result = (WallEyePoseResult) res.getFirst();
+        int idx = res.getSecond();
+
+        for (int i = 0; i < 2; i++){
+        
+        stdMatrix.set(i, 0,
+        .1 / getStdDevFactor(minTagDistance(result), result.getNumTags(), camNames[idx]));
+        }
+
+        Pose3d cameraPose;
+        Translation3d centerPose;
+        Rotation3d cameraRotation;
+
+        if(result.getNumTags() > 1){
+          cameraPose = result.getCameraPose();
+
+          centerPose = cameraPose.getTranslation()
+          .minus(camPositions[idx]
+            .rotateBy(cameraPose.getRotation()))
+            .rotateBy(camRotations[idx]);
+        }
+        else{
+          //Work on this on Monday
+        }
+      }
+    }
+
+
+
+  }
+ 
   @Override
   public Set<Measure> getMeasures() {
     return Set.of();
