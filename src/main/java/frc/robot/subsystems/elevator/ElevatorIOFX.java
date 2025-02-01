@@ -1,5 +1,11 @@
 package frc.robot.subsystems.elevator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.Follow;
+import org.strykeforce.telemetry.TelemetryService;
+
+import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -9,7 +15,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
+//import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.constants.ElevatorConstants;
 import org.slf4j.Logger;

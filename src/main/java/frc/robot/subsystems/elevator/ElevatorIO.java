@@ -27,3 +27,18 @@ public interface ElevatorIO {
 
   public default void zero() {}
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * To-do: resolve all the comments, implement zero, find out if follower actually means every LOC for one motor does the same
+ * thing to the other?, positionrequest never used in IOFX
+ */
