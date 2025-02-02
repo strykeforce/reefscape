@@ -18,8 +18,8 @@ import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 public class ElevatorConstants {
 
   public static final double kCloseEnoughRotations = 0.0083;
-  public static final double kMaxFwd = 0; // TODO all of these fields need to be filled out
-  public static final double kMaxRev = 0;
+  public static final double kMaxFwd = 53; // TODO all of these fields need to be filled out
+  public static final double kMaxRev = 2;
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
   public static final double kZeroSpeed = -.05;
@@ -38,11 +38,11 @@ public class ElevatorConstants {
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20)
-            .withSupplyCurrentLimit(10)
-            .withSupplyCurrentLowerLimit(8)
-            .withSupplyCurrentLowerTime(0.02)
-            .withSupplyCurrentLimitEnable(true);
+            // .withStatorCurrentLimit(20)
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(40)
+            .withSupplyCurrentLowerLimit(10)
+            .withSupplyCurrentLowerTime(2);
     fxConfig.CurrentLimits = current;
 
     HardwareLimitSwitchConfigs hwLimit =
@@ -59,37 +59,32 @@ public class ElevatorConstants {
 
     SoftwareLimitSwitchConfigs swLimit =
         new SoftwareLimitSwitchConfigs()
-            .withForwardSoftLimitEnable(false)
+            .withForwardSoftLimitEnable(true)
             .withForwardSoftLimitThreshold(kMaxFwd)
-            .withReverseSoftLimitEnable(false)
+            .withReverseSoftLimitEnable(true)
             .withReverseSoftLimitThreshold(kMaxRev);
     fxConfig.SoftwareLimitSwitch = swLimit;
 
     Slot0Configs slot0 =
         new Slot0Configs()
-            .withKP(0.4)
-            .withKI(0.1)
+            .withKP(2)
+            .withKI(0)
             .withKD(0)
             .withGravityType(GravityTypeValue.Elevator_Static)
-            .withKG(0)
+            .withKG(0.36)
             .withKS(0)
-            .withKV(0.12)
+            .withKV(0.13)
             .withKA(0);
     fxConfig.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(130)
-            .withMotionMagicCruiseVelocity(0)
-            .withMotionMagicExpo_kA(0)
-            .withMotionMagicExpo_kV(0)
-            .withMotionMagicJerk(1000);
+        new MotionMagicConfigs().withMotionMagicCruiseVelocity(50).withMotionMagicAcceleration(100);
     fxConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
             .withDutyCycleNeutralDeadband(0.01)
-            .withNeutralMode(NeutralModeValue.Coast)
+            .withNeutralMode(NeutralModeValue.Brake)
             .withInverted(InvertedValue.CounterClockwise_Positive);
     fxConfig.MotorOutput = motorOut;
 
@@ -106,5 +101,15 @@ public class ElevatorConstants {
             .withSupplyCurrentLowerTime(0.02)
             .withSupplyCurrentLimitEnable(true);
     return current;
+  }
+
+  public static SoftwareLimitSwitchConfigs getZeroingSoftLimitConfigs() {
+    SoftwareLimitSwitchConfigs swLimit =
+        new SoftwareLimitSwitchConfigs()
+            .withForwardSoftLimitEnable(true)
+            .withForwardSoftLimitThreshold(kMaxFwd)
+            .withReverseSoftLimitEnable(false);
+
+    return swLimit;
   }
 }

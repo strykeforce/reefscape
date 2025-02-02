@@ -5,9 +5,9 @@ import frc.robot.subsystems.coral.CoralSubsystem;
 
 public class EnableEjectBeamCommand extends InstantCommand {
   private CoralSubsystem coralSubsystem;
-  private Boolean enable;
+  private boolean enable;
 
-  public EnableEjectBeamCommand(Boolean enable, CoralSubsystem coralSubsystem) {
+  public EnableEjectBeamCommand(boolean enable, CoralSubsystem coralSubsystem) {
     this.coralSubsystem = coralSubsystem;
     this.enable = enable;
   }
