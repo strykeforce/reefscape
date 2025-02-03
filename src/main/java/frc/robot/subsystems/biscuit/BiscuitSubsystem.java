@@ -4,7 +4,8 @@ package frc.robot.subsystems.biscuit;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
 import java.util.Set;
@@ -19,17 +20,29 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();
   private Angle setPoint;
 
+  @Override
   public void setPosition(Angle position) {
     io.setPosition(position);
     setPoint = position;
   }
 
-  public Angle getPosition(Angle position) {
+  @Override
+  public Angle getPosition() {
     return inputs.position;
   }
 
   public AngularVelocity getVelocity(AngularVelocity velocity) {
     return inputs.velocity;
+  }
+
+  @Override
+  public void zero() {
+    io.zero();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return setPoint.minus(inputs.position).abs(Rotations) < BiscuitConstants.kCloseEnough;
   }
 
   @Override
@@ -46,18 +59,10 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
     io.registerWith(telemetry);
   }
 
-  public boolean isFinished() {
-    return setPoint.minus(inputs.position).abs(Rotations) <= BiscuitConstants.kCloseEnough;
-  }
-
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(
         new Measure("Is Biscuit Finished", () -> isFinished() ? 1.0 : 0.0),
         new Measure("Biscuit Set Point", () -> setPoint.in(Rotations)));
-  }
-
-  public void zero() {
-    io.zero();
   }
 }

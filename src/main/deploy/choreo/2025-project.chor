@@ -4,7 +4,22 @@
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{}
+  "poses":{
+   "startpos":{
+    "x":{
+     "exp":"7.1008875 m",
+     "val":7.1008875
+    },
+    "y":{
+     "exp":"5.0756788 m",
+     "val":5.0756788
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
+    }
+   }
+  }
  },
  "config":{
   "frontLeft":{
@@ -57,16 +72,16 @@
   },
   "bumper":{
    "front":{
-    "exp":"35.875 in",
-    "val":0.911225
+    "exp":"17.9375 in",
+    "val":0.4556125
    },
    "side":{
-    "exp":"35.875 in",
-    "val":0.911225
+    "exp":"17.9375 in",
+    "val":0.4556125
    },
    "back":{
-    "exp":"35.875 in",
-    "val":0.911225
+    "exp":"17.9375 in",
+    "val":0.4556125
    }
   },
   "differentialTrackWidth":{

@@ -2,10 +2,10 @@ package frc.robot.subsystems.biscuit;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -20,7 +20,7 @@ import org.strykeforce.telemetry.TelemetryService;
 public class BiscuitIOFX implements BiscuitIO {
 
   private Logger logger;
-  private TalonFX talon;
+  private TalonFXS talon;
 
   private final Angle sensorInitial;
   private StatusSignal<Angle> position;
@@ -31,7 +31,7 @@ public class BiscuitIOFX implements BiscuitIO {
   private Angle offset;
   private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
 
-  TalonFXConfigurator configurator;
+  TalonFXSConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0);
 
@@ -39,23 +39,26 @@ public class BiscuitIOFX implements BiscuitIO {
     // Logger initialization with class name
     logger = LoggerFactory.getLogger(this.getClass());
     // Moter initialization with ID from constants
-    talon = new TalonFX(BiscuitConstants.talonID);
+    talon = new TalonFXS(BiscuitConstants.talonID);
     // Set the starting encoder position
     sensorInitial = talon.getPosition().getValue();
 
-    // Reset and configure moter settings
+    // Reset and configure motor settings
     configurator = talon.getConfigurator();
-    configurator.apply(new TalonFXConfiguration());
-    configurator.apply(BiscuitConstants.getFXConfig());
+    configurator.apply(new TalonFXSConfiguration());
+    configurator.apply(BiscuitConstants.getFXSConfig());
+
     // Set our variables
     velocity = talon.getVelocity();
     position = talon.getPosition();
   }
 
+  @Override
   public void setPosition(Angle position) {
     talon.setControl(positionRequest.withPosition(position));
   }
 
+  @Override
   public void updateInputs(BiscuitIOInputs inputs) {
     BaseStatusSignal.refreshAll(velocity, position, fwdLimitSwitch);
     inputs.velocity = velocity.getValue();
@@ -64,10 +67,12 @@ public class BiscuitIOFX implements BiscuitIO {
     inputs.didZero = didZero;
   }
 
+  @Override
   public void registerWith(TelemetryService telemetry) {
     telemetry.register(talon, true);
   }
 
+  @Override
   public void zero() {
     didZero = false;
     if (fwdLimitSwitchOpen == true) {

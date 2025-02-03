@@ -205,9 +205,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStow() {
-    algaeSubsystem.hold();
     biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
-    coralSubsystem.hold();
     elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
 
     setState(RobotStates.TO_STOW);
@@ -425,10 +423,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case TO_STOW -> {
-        if (algaeSubsystem.isFinished()
-            && biscuitSubsystem.isFinished()
-            && coralSubsystem.isFinished()
-            && elevatorSubsystem.isFinished()) {
+        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
           setState(RobotStates.STOW);
         }
       }
@@ -473,6 +468,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   case L1, L2 -> {
                     driveSubsystem.move(DriveConstants.kAlgaeRemovalSpeed, 0, 0, false);
                   }
+                  default -> {}
                 }
               }
               case L3 -> {
