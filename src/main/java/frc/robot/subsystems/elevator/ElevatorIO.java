@@ -11,7 +11,6 @@ public interface ElevatorIO {
   public static class ElevatorIOInputs {
     public double position = 0.0;
     public double velocity = 0.0;
-    // something about height and IO layer?
   }
 
   public default void updateInputs(ElevatorIOInputs inputs) {}
@@ -26,8 +25,3 @@ public interface ElevatorIO {
 
   public default void zero() {}
 }
-
-/*
- * To-do: resolve all the comments, implement zero, find out if follower actually means every LOC for one motor does the same
- * thing to the other?, positionrequest never used in IOFX
- */
