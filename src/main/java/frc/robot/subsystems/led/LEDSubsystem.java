@@ -204,9 +204,31 @@ public class LEDSubsystem extends MeasurableSubsystem {
         new Measure(
             "State", "the current Overall state of the LEDSubsystem", () -> currState.ordinal()),
         new Measure(
+            "HasAlgea", "the current algea state of the LEDSubsystem", () -> hasAlgae ? 0 : 1),
+        new Measure(
             "CoralState",
             "the current Coral state of the LEDSubsystem",
-            () -> coralState.ordinal()));
+            () -> coralState.ordinal()),
+        new Measure(
+            "Level",
+            "the current assumed Level of the LEDSubsystem",
+            () -> (levelState.ordinal() + 1)),
+        new Measure(
+            "PlaceState",
+            "the current Placement state of the LEDSubsystem",
+            () -> placeState.ordinal()),
+        new Measure(
+            "GetAlgea",
+            "the current get algea state of the LEDSubsystem",
+            () -> shouldGetAlgea ? 0 : 1),
+        new Measure(
+            "autoPlacing",
+            "the current autoPlacing state of the LEDSubsystem",
+            () -> autoPlacing ? 0 : 1),
+        new Measure(
+            "currentLimiting",
+            "the current currentLimiting state of the LEDSubsystem",
+            () -> isLimiting ? 0 : 1));
   }
 
   public enum LEDStates {
