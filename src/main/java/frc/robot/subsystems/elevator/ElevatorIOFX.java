@@ -57,9 +57,7 @@ public class ElevatorIOFX implements ElevatorIO {
     inputs.velocity = currVelocity.getValueAsDouble();
     inputs.position =
         currPosition
-            .getValueAsDouble(); // .minus(relSetpointOffset); (offset probably from the absolute,
-    // add
-    // constant)
+            .getValueAsDouble();
   }
 
   @Override

@@ -21,7 +21,7 @@ public class ElevatorConstants {
   public static final double kMaxFwd = 0; // TODO all of these fields need to be filled out
   public static final double kMaxRev = 0;
   public static final int kZeroMultiple =
-      0; // some constant to multiply, add by to turn the analog input into a position
+    0; // some constant to multiply, add by to turn the analog input into a position
   public static final double kZeroSpeed = -.05;
   public static final int kZeroCounter = 3;
   public static final double kZeroedThreshhold = .0001;
