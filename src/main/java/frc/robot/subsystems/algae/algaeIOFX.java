@@ -1,3 +1,5 @@
+//PING EPICPIGGUY ON DISCORD IF QUESTIONS
+
 package frc.robot.subsystems.algae;
 
 import org.slf4j.Logger;
@@ -6,7 +8,9 @@ import org.strykeforce.telemetry.TelemetryService;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
@@ -14,6 +18,7 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.AlgaeConstants;
+import frc.robot.constants.ExampleConstants;
 
 public class algaeIOFX implements algaeIO {
   private Logger logger;
@@ -21,7 +26,9 @@ public class algaeIOFX implements algaeIO {
   private AlgaeIOInputs inputs;
 
   // FX Access objects
-  TalonFXConfigurator configurator;
+    TalonFXConfigurator configurator;
+  private MotionMagicDutyCycle positionRequest =
+      new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
   StatusSignal<AngularVelocity> currVelocity;
   StatusSignal<ForwardLimitValue> forwardLimitSwitch;
   StatusSignal<ReverseLimitValue> reverseLimitSwitch;
@@ -48,5 +55,7 @@ public class algaeIOFX implements algaeIO {
     return talonFX.getVelocity().getValue();
   }
 
-  public void registerWith(TelemetryService telemetryService) {}
+  public void registerWith(TelemetryService telemetryService) {
+    telemetryService.register(talonFX, true);
+  }
 }

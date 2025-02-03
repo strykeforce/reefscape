@@ -1,3 +1,6 @@
+//PING EPICPIGGUY ON DISCORD IF QUESTIONS
+
+
 package frc.robot.subsystems.algae;
 
 import static edu.wpi.first.units.Units.Rotations;
@@ -31,7 +34,6 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
 
     public AlgaeSubsystem(algaeIO io) {
         this.io = io;
-        zero();
     }
 
     public AlgaeState getState() {
@@ -54,11 +56,11 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     public boolean atSpeed() {
         return inputs.velocity.equals(desiredSpeed);
     }
-
-    public void zero() {
-        setpoint = Rotations.of(0);
-        io.zero();
-    }
+    //not sure if i need this
+    // public void zero() {
+    //     setpoint = Rotations.of(0);
+    //     io.zero();
+    // }
 
     private void updateAlgaeState() {
         if (inputs.reverseLimitSwitch.equals(1)) {
