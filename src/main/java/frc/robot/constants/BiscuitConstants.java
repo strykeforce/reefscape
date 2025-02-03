@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -14,12 +16,10 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
-
-import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 
 public class BiscuitConstants {
-// These are all wrong right now because we don't have any actual info
+  // These are all wrong right now because we don't have any actual info
 
   public static Angle kZero = Rotations.of(42); // Will need to be experimentally determined
   public static int talonID = 3;
@@ -57,7 +57,6 @@ public class BiscuitConstants {
   // Algae scoring
   public static final Angle kProcessorSetpoint = Rotations.of(0.0);
   public static final Angle kBargeSetpoint = Rotations.of(0.0);
-
 
   // Disables the TalonFXS by setting it's voltage to zero. Not very shocking.
   public static VoltageConfigs disableTalon() {

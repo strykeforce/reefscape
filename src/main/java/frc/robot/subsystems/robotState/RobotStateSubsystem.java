@@ -13,6 +13,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -289,7 +290,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toPlaceCoral() {
-    coralSubsystem.place();
+    coralSubsystem.eject();
 
     setState(RobotStates.PLACE_CORAL);
   }
