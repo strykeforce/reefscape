@@ -55,9 +55,7 @@ public class ElevatorIOFX implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     BaseStatusSignal.refreshAll(currVelocity, currPosition);
     inputs.velocity = currVelocity.getValueAsDouble();
-    inputs.position =
-        currPosition
-            .getValueAsDouble();
+    inputs.position = currPosition.getValueAsDouble();
   }
 
   @Override
