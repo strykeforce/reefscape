@@ -3,93 +3,115 @@
 
 package frc.robot.subsystems.algae;
 
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import edu.wpi.first.units.AngularVelocityUnit;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Velocity;
 import frc.robot.constants.AlgaeConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
-import frc.robot.subsystems.algae.algaeIO.AlgaeIOInputs;
-
+import frc.robot.subsystems.algae.AlgaeIO.AlgaeIOInputs;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
-    private final algaeIO io;
-    private final AlgaeIOInputs inputs = new AlgaeIOInputs();
-    private Angle setpoint = Rotations.of(0.0);
-    private AngularVelocity desiredSpeed;
+  private org.slf4j.Logger logger = LoggerFactory.getLogger(AlgaeSubsystem.class);
 
-    private enum AlgaeState {
-        ALGAE_PRESENT,
-        NO_ALGAE
-    }
+  private final AlgaeIO io;
+  private final AlgaeIOInputs inputs = new AlgaeIOInputs();
+  private AngularVelocity desiredSpeed;
 
-    private AlgaeState currentAlgaeState = AlgaeState.NO_ALGAE;
+  private AlgaeStates curState = AlgaeStates.IDLE;
 
-    public AlgaeSubsystem(algaeIO io) {
-        this.io = io;
-    }
+  public AlgaeSubsystem(AlgaeIO io) {
+    this.io = io;
+  }
 
-    public AlgaeState getState() {
-        return currentAlgaeState;
-    }
+  public AlgaeStates getState() {
+    return curState;
+  }
 
-    public Angle getPosition() {
-        return inputs.position;
-    }
+  public void setState(AlgaeStates newState) {
+    logger.info("{} -> {}", curState, newState);
+    curState = newState;
+  }
 
-    public void setSpeed(AngularVelocity speed) {
-        io.setSpeed(speed);
-        desiredSpeed = speed;
-    }
+  public void intake() {
+    setSpeed(AlgaeConstants.kIntakingSpeed);
+  }
 
-    public AngularVelocity getSpeed() {
-        return inputs.velocity;
-    }
+  public void scoreProcessor() {
+    setSpeed(AlgaeConstants.kProcessorScoreSpeed);
+  }
 
-    public boolean atSpeed() {
-        return inputs.velocity.equals(desiredSpeed);
-    }
-    //not sure if i need this
-    // public void zero() {
-    //     setpoint = Rotations.of(0);
-    //     io.zero();
-    // }
+  public void scoreBarge() {
+    setSpeed(AlgaeConstants.kBargeScoreSpeed);
+  }
 
-    private void updateAlgaeState() {
-        if (inputs.reverseLimitSwitch.equals(1)) {
-            currentAlgaeState = AlgaeState.ALGAE_PRESENT;
-        } else if (!inputs.reverseLimitSwitch.equals(1)) {
-            currentAlgaeState = AlgaeState.NO_ALGAE;
+  public void hold() {
+    setSpeed(AlgaeConstants.kHoldSpeed);
+  }
+
+  @Override
+  public void setSpeed(AngularVelocity speed) {
+    io.setSpeed(speed);
+    desiredSpeed = speed;
+  }
+
+  public void setPct(double pct) {
+    io.setPct(pct);
+  }
+
+  @Override
+  public AngularVelocity getSpeed() {
+    return inputs.velocity;
+  }
+
+  @Override
+  public boolean atSpeed() {
+    return inputs.velocity.minus(desiredSpeed).abs(RotationsPerSecond)
+        < AlgaeConstants.kCloseEnough.in(RotationsPerSecond);
+  }
+
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.recordOutput("Algae/state", curState);
+    Logger.recordOutput("Algae/setpoint", desiredSpeed.in(RotationsPerSecond));
+
+    switch (curState) {
+      case HAS_ALGAE -> {
+        if (!inputs.isFwdLimitSwitchClosed) {
+          setState(AlgaeStates.EMPTY);
+          setSpeed(RotationsPerSecond.of(0));
         }
-    }
-
-    public void periodic() {
-        io.updateInputs(inputs);
-        updateAlgaeState();
-        Logger.recordOutput("Algae/state", currentAlgaeState.ordinal());
-        Logger.recordOutput("Algae/setpoint", setpoint.in(Rotations));
-
-        switch (currentAlgaeState) {
-            case ALGAE_PRESENT:
-                break;
-            case NO_ALGAE:
-                break;
+      }
+      case EMPTY -> {
+        if (inputs.isRevLimitSwitchClosed) { // FIXME: correct?
+          hold();
+          setState(AlgaeStates.HAS_ALGAE);
         }
+      }
+      case IDLE -> {}
     }
+  }
 
-    public void registerWith(TelemetryService telemetryService) {
-        super.registerWith(telemetryService);
-        io.registerWith(telemetryService);
-    }
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
+    io.registerWith(telemetryService);
+  }
 
-    public Set<Measure> getMeasures() {
-        return Set.of(new Measure("State", () -> currentAlgaeState.ordinal()));
-    }
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(new Measure("State", () -> curState.ordinal()));
+  }
+
+  public enum AlgaeStates {
+    HAS_ALGAE,
+    EMPTY,
+    IDLE
+  }
 }

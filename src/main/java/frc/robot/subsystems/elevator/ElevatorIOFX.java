@@ -1,3 +1,3 @@
 package frc.robot.subsystems.elevator;
 
-public class ElevatorIOFX {}
+public class ElevatorIOFX implements ElevatorIO {}
