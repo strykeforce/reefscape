@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -58,7 +59,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   // FIXME: uncomment when implemented
-  private int computeHexant(/* Alliance color */ ) {
+  public int computeHexant(/* Alliance color */ ) {
     Translation2d reefT = /* color == Alliance.Blue ? TagServoingConstants.kBlueReefPose : */
         TagServoingConstants.kRedReefPose;
     double offset = Units.degreesToRadians(30);
@@ -105,7 +106,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return curState;
   }
 
-  public void setup(/* Alliance color, */ boolean scoreLeft) {
+  public void setup(Alliance alliance, boolean scoreLeft) {
     targetPose = getTargetDrivePose(/* color */ );
 
     // Inverted, scoring left coral means aligning right camera
@@ -160,8 +161,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return vY;
   }
 
-  public void start(/* Alliance color, */ boolean scoreLeft) {
-    setup(/* color, */ scoreLeft);
+  public void start(Alliance alliance, boolean scoreLeft) {
+    setup(alliance, scoreLeft);
 
     curState = TagAlignStates.DRIVE;
   }

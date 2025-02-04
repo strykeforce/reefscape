@@ -8,7 +8,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
@@ -26,19 +26,48 @@ public class BiscuitConstants {
   public static double kCloseEnough = 2137473647; // This is a little out of wack.
   public static final Angle kMaxFwd = Rotations.of(100);
   public static final Angle kMaxRev = Rotations.of(-100);
-  // public static Angle Level1 = ;
 
-  // Disables the TalonFX by setting it's voltage to zero. Not very shocking.
+  // Setpoints
+  // Idle
+  public static final Angle kStowSetpoint = Rotations.of(0.0);
+  public static final Angle kFunnelSetpoint = Rotations.of(0.0);
+  public static final Angle kPrestageSetpoint = Rotations.of(0.0);
+
+  // Algae removal
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(0.0);
+
+  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(0.0);
+  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(0.0);
+
+  public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
+  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
+
+  // Coral score
+  public static final Angle kL1CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL2CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL3CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL4CoralSetpoint = Rotations.of(0.0);
+
+  // Algae obtaining
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kHpAlgaeSetpoint = Rotations.of(0.0);
+
+  // Algae scoring
+  public static final Angle kProcessorSetpoint = Rotations.of(0.0);
+  public static final Angle kBargeSetpoint = Rotations.of(0.0);
+
+  // Disables the TalonFXS by setting it's voltage to zero. Not very shocking.
   public static VoltageConfigs disableTalon() {
     VoltageConfigs voltage =
         new VoltageConfigs().withPeakForwardVoltage(0.0).withPeakReverseVoltage(0.0);
-    getFXConfig().Voltage = voltage;
+    getFXSConfig().Voltage = voltage;
     return voltage;
   }
 
-  // I copied and pasted this because I'm lazy
-  public static TalonFXConfiguration getFXConfig() {
-    TalonFXConfiguration fxConfig = new TalonFXConfiguration();
+  public static TalonFXSConfiguration getFXSConfig() {
+    TalonFXSConfiguration fxsConfig = new TalonFXSConfiguration();
 
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
@@ -49,7 +78,7 @@ public class BiscuitConstants {
             .withSupplyCurrentLowerLimit(8)
             .withSupplyCurrentLowerTime(0.02)
             .withSupplyCurrentLimitEnable(true);
-    fxConfig.CurrentLimits = current;
+    fxsConfig.CurrentLimits = current;
 
     HardwareLimitSwitchConfigs hwLimit =
         new HardwareLimitSwitchConfigs()
@@ -61,7 +90,7 @@ public class BiscuitConstants {
             .withReverseLimitEnable(false)
             .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
             .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
-    fxConfig.HardwareLimitSwitch = hwLimit;
+    fxsConfig.HardwareLimitSwitch = hwLimit;
 
     SoftwareLimitSwitchConfigs swLimit =
         new SoftwareLimitSwitchConfigs()
@@ -69,7 +98,7 @@ public class BiscuitConstants {
             .withForwardSoftLimitThreshold(kMaxFwd)
             .withReverseSoftLimitEnable(true)
             .withReverseSoftLimitThreshold(kMaxRev);
-    fxConfig.SoftwareLimitSwitch = swLimit;
+    fxsConfig.SoftwareLimitSwitch = swLimit;
 
     Slot0Configs slot0 =
         new Slot0Configs()
@@ -81,7 +110,7 @@ public class BiscuitConstants {
             .withKS(0)
             .withKV(0)
             .withKA(0);
-    fxConfig.Slot0 = slot0;
+    fxsConfig.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs()
@@ -90,14 +119,14 @@ public class BiscuitConstants {
             .withMotionMagicExpo_kA(0)
             .withMotionMagicExpo_kV(0)
             .withMotionMagicJerk(0);
-    fxConfig.MotionMagic = motionMagic;
+    fxsConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
             .withDutyCycleNeutralDeadband(0.01)
             .withNeutralMode(NeutralModeValue.Coast);
-    fxConfig.MotorOutput = motorOut;
+    fxsConfig.MotorOutput = motorOut;
 
-    return fxConfig;
+    return fxsConfig;
   }
 }

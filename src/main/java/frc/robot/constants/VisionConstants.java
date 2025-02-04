@@ -93,7 +93,7 @@ public final class VisionConstants {
       VecBuilder.fill(Units.degreesToRadians(0.01));
 
   // Increase these numbers to trust global measurements from vision less. This matrix is in the
-  // form [x, y, theta]ᵀ, with units in meters and radians.
+  // form [x, y, theta], with units in meters and radians.
   // Vision Odometry Standard devs
   public static Matrix<N3, N1> kVisionMeasurementStdDevs =
       VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(360));
