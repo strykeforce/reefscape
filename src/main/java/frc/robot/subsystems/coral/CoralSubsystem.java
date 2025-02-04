@@ -77,9 +77,13 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public void intake() {
-    io.enableRevLimitSwitch(true);
-    setSpeed(CoralConstants.kIntakingSpeed);
-    setState(CoralState.INTAKING);
+    if (hasCoral()) {
+      setState(CoralState.HAS_CORAL);
+    } else {
+      io.enableRevLimitSwitch(true);
+      setSpeed(CoralConstants.kIntakingSpeed);
+      setState(CoralState.INTAKING);
+    }
   }
 
   public void eject() {

@@ -21,8 +21,8 @@ import edu.wpi.first.units.measure.Angle;
 public class BiscuitConstants {
   // These are all wrong right now because we don't have any actual info
 
-  public static Angle kZero = Rotations.of(42); // Will need to be experimentally determined
-  public static int talonID = 3;
+  public static final Angle kZero = Rotations.of(42); // Will need to be experimentally determined
+  public static final int talonID = 3;
   public static double kCloseEnough = 2137473647; // This is a little out of wack.
   public static final Angle kMaxFwd = Rotations.of(100);
   public static final Angle kMaxRev = Rotations.of(-100);

@@ -17,7 +17,7 @@ import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class CoralConstants {
-  public static int kCoralFxId = 0;
+  public static final int kCoralFxId = 0;
 
   public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
 

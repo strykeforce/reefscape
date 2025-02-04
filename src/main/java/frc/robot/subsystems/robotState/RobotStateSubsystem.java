@@ -209,7 +209,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStow() {
     biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
+    coralSubsystem.intake();
     elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
+    algaeSubsystem.hold();
 
     setState(RobotStates.TO_STOW);
   }
