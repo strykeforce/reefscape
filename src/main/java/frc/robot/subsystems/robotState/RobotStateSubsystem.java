@@ -43,7 +43,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private RobotStates curState;
   private RobotStates nextState;
   private RobotStates futureState;
-
   private ScoringLevel scoringLevel;
   private ScoreSide scoreSide;
   private AlgaeHeight algaeHeight;
