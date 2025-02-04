@@ -29,9 +29,9 @@
 | Drive     | FX       | drive                     | 13  | FD      |          | 1         | kraken |         |
 | Elevator  | FX       | elevatorMain              | 20  | rio     |          | 21        | kraken |         |
 | Elevator  | FX       | elevatorFollow            | 21  | rio     |          | 20        | kraken |         |
-| Biscuit   | FXS      | biscuit                   | 25  | rio     |          | 2         | Minion |         |
+| Biscuit   | FXS      | biscuit                   | 25  | rio     |          | 3         | Minion |         |
 | Algae     | FXS      | algae                     | 30  | rio     |          |           | Minion |         |
-| Coral     | FXS      | coral                     | 35  | rio     |          | 3         | Minion |         |
+| Coral     | FXS      | coral                     | 35  | rio     |          | 2         | Minion |         |
 | Funnel    | FXS      | rollers                   | 40  | rio     |          |           | Minion |         |
 | Climb     | FX       | rollers                   | 45  | rio     |          |           | Minion |         |
 | Climb     | FX       | pivot                     | 46  | rio     |          |           | kraken |         |
@@ -75,32 +75,32 @@
 | AutoSwitch | switch    | 9   |
 
 ## MXP
-| Subsystem | name      | ID  |
-| --------- | --------- | --- |
-| TagServo  | wallSense | 10  |
-|           |           | 11  |
-|           |           | 12  |
-|           |           | 13  |
-|           |           | 14  |
-|           |           | 15  |
-|           |           | 16  |
-|           |           | 17  |
-|           |           | 18  |
-|           |           | 19  |
-|           |           | 20  |
-|           |           | 21  |
-|           |           | 22  |
-|           |           | 23  |
-|           |           | 24  |
-|           |           | 25  |
+| Subsystem | name        | ID  |
+| --------- | ----------- | --- |
+| TagServo  | wallSense   | 10  |
+| Climb     | cageAligned | 11  |
+|           |             | 12  |
+|           |             | 13  |
+|           |             | 14  |
+|           |             | 15  |
+|           |             | 16  |
+|           |             | 17  |
+|           |             | 18  |
+|           |             | 19  |
+|           |             | 20  |
+|           |             | 21  |
+|           |             | 22  |
+|           |             | 23  |
+|           |             | 24  |
+|           |             | 25  |
 
 
 ## PWM
 | Subsystem | name         | ID  |
 | --------- | ------------ | --- |
 | LED       | lights       | 0   |
-|           |              | 1   |
-|           |              | 2   |
+| Climb     | deployServo  | 1   |
+| Climb     | ratchetServo | 2   |
 |           |              | 3   |
 |           |              | 4   |
 |           |              | 5   |
