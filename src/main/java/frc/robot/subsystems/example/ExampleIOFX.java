@@ -65,8 +65,8 @@ public class ExampleIOFX implements ExampleIO {
   @Override
   public void updateInputs(ExampleIOInputs inputs) {
     BaseStatusSignal.refreshAll(currVelocity, currPosition);
-    inputs.velocity = currVelocity.refresh().getValue();
-    inputs.position = currPosition.refresh().getValue().minus(relSetpointOffset);
+    inputs.velocity = currVelocity.getValue();
+    inputs.position = currPosition.getValue().minus(relSetpointOffset);
   }
 
   @Override

@@ -1,3 +1,9 @@
 package frc.robot.constants;
 
-public class RobotStateConstants {}
+public class RobotStateConstants {
+  public static final double[] kNodeAngles = {0.0, 60.0, 120.0, 180.0, -120.0, -60.0};
+  public static final double kAlgaeRetreatDistance = 0;
+
+  public static final double kRedBargeSafeX = 9.5;
+  public static final double kBlueBargeSafeX = 8;
+}

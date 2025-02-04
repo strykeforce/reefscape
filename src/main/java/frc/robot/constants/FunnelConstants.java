@@ -12,48 +12,49 @@ import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public class FunnelConstants {
-    public static final double kFunnelPercentOutput = 0;
+  public static final double kFunnelPercentOutput = 0;
 
-    public static int FunnelFxsId = 0;
+  public static int FunnelFxsId = 0;
+  public static final int kFunnelBeamCounts = 3;
 
-    public static TalonFXSConfiguration getFXSConfig() {
-        TalonFXSConfiguration fxsConfig = new TalonFXSConfiguration();
+  public static TalonFXSConfiguration getFXSConfig() {
+    TalonFXSConfiguration fxsConfig = new TalonFXSConfiguration();
 
-        CurrentLimitsConfigs current =
-            new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(10)
-                .withStatorCurrentLimitEnable(false)
-                .withStatorCurrentLimit(20)
-                .withSupplyCurrentLimit(10)
-                .withSupplyCurrentLowerLimit(8)
-                .withSupplyCurrentLowerTime(0.02)
-                .withSupplyCurrentLimitEnable(true);
-        fxsConfig.CurrentLimits = current;
+    CurrentLimitsConfigs current =
+        new CurrentLimitsConfigs()
+            .withStatorCurrentLimit(10)
+            .withStatorCurrentLimitEnable(false)
+            .withStatorCurrentLimit(20)
+            .withSupplyCurrentLimit(10)
+            .withSupplyCurrentLowerLimit(8)
+            .withSupplyCurrentLowerTime(0.02)
+            .withSupplyCurrentLimitEnable(true);
+    fxsConfig.CurrentLimits = current;
 
-        HardwareLimitSwitchConfigs hwLimit =
-            new HardwareLimitSwitchConfigs()
-                .withForwardLimitAutosetPositionEnable(false)
-                .withForwardLimitEnable(false)
-                .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen)
-                .withForwardLimitSource(ForwardLimitSourceValue.LimitSwitchPin)
-                .withReverseLimitAutosetPositionEnable(false)
-                .withReverseLimitEnable(false)
-                .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
-                .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
-        fxsConfig.HardwareLimitSwitch = hwLimit;
+    HardwareLimitSwitchConfigs hwLimit =
+        new HardwareLimitSwitchConfigs()
+            .withForwardLimitAutosetPositionEnable(false)
+            .withForwardLimitEnable(false)
+            .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen)
+            .withForwardLimitSource(ForwardLimitSourceValue.LimitSwitchPin)
+            .withReverseLimitAutosetPositionEnable(false)
+            .withReverseLimitEnable(false)
+            .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
+            .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
+    fxsConfig.HardwareLimitSwitch = hwLimit;
 
-        SoftwareLimitSwitchConfigs swLimit =
-            new SoftwareLimitSwitchConfigs()
-                .withForwardSoftLimitEnable(false)
-                .withReverseSoftLimitEnable(false);
-        fxsConfig.SoftwareLimitSwitch = swLimit;
-        
-        MotorOutputConfigs motorOut =
-            new MotorOutputConfigs()
-                .withDutyCycleNeutralDeadband(0.01)
-                .withNeutralMode(NeutralModeValue.Coast);
-        fxsConfig.MotorOutput = motorOut;
+    SoftwareLimitSwitchConfigs swLimit =
+        new SoftwareLimitSwitchConfigs()
+            .withForwardSoftLimitEnable(false)
+            .withReverseSoftLimitEnable(false);
+    fxsConfig.SoftwareLimitSwitch = swLimit;
 
-        return fxsConfig;
-    }
+    MotorOutputConfigs motorOut =
+        new MotorOutputConfigs()
+            .withDutyCycleNeutralDeadband(0.01)
+            .withNeutralMode(NeutralModeValue.Coast);
+    fxsConfig.MotorOutput = motorOut;
+
+    return fxsConfig;
+  }
 }

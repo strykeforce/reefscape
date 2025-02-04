@@ -1,22 +1,20 @@
 package frc.robot.subsystems.funnel;
 
+import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
-import edu.wpi.first.units.measure.AngularVelocity;
+public interface FunnelIO {
 
-public interface FunnelIo {
+  @AutoLog
+  public static class FunnelIOInputs {
+    public AngularVelocity velocity;
+    public boolean isRevBeamBroken = false;
+  }
 
-    @AutoLog
-    public static class FunnelIoInputs{
-        public AngularVelocity velocity;
-        // Open = beam isnt broken
-        public boolean revBeamOpen = false;
-    }
+  public default void setPct(double percentOutput) {}
 
-    public default void setPct(double percentOutput) {}
+  public default void updateInputs(FunnelIOInputs inputs) {}
 
-    public default void updateInputs(FunnelIoInputs inputs) {}
-
-    public default void registerWith(TelemetryService telemetryService) {}
+  public default void registerWith(TelemetryService telemetryService) {}
 }

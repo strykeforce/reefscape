@@ -1,95 +1,95 @@
 package frc.robot.subsystems.funnel;
 
+import frc.robot.constants.FunnelConstants;
+import frc.robot.standards.OpenLoopSubsystem;
 import java.util.Set;
-
 import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
-import frc.robot.constants.FunnelConstants;
-import frc.robot.standards.OpenLoopSubsystem;
-import frc.robot.subsystems.funnel.FunnelIOInputsAutoLogged;
+public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubsystem {
 
-public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubsystem{
+  // Private Variables
+  private final FunnelIO io;
+  private final FunnelIOInputsAutoLogged inputs = new FunnelIOInputsAutoLogged();
+  private float totalBreaks = 0;
 
-    // Private Variables
-    private final FunnelIo io;
-    private final FunnelIOInputsAutoLogged inputs = new FunnelIOInputsAutoLogged();
-    private float totalBreaks = 0;
+  public FunnelState curState = FunnelState.HasNotSeenCoral;
 
-    public FunnelState curState = FunnelState.HasNotSeenCoral;
+  // Constructor
+  public FunnelSubsystem(FunnelIO io) {
+    this.io = io;
+  }
 
-    // Constructor
-    public FunnelSubsystem(FunnelIo io) {
-        this.io = io;
-    }
+  // Getter/Setter Methods
+  public FunnelState getState() {
+    return curState;
+  }
 
-    // Getter/Setter Methods
-    public FunnelState getState() {
-        return curState;
-    }
+  public boolean hasCoral() {
+    return curState == FunnelState.HasSeenCoral;
+  }
 
-    @Override
-    public void periodic() {
-        // Update Inputs
-        io.updateInputs(inputs);
-        Logger.processInputs("funnelInputs", inputs);
+  @Override
+  public void periodic() {
+    // Update Inputs
+    io.updateInputs(inputs);
+    Logger.processInputs("funnelInputs", inputs);
 
-        switch (curState){
-            case HasSeenCoral:
-                break;
-            case HasNotSeenCoral:
-            if(inputs.revBeamOpen == false){
-                totalBreaks += 1;
-            }else{
-                totalBreaks = 0;
-            }
-
-            if(totalBreaks >= 3){
-                curState = FunnelState.HasSeenCoral;
-            }
-                break;
+    switch (curState) {
+      case HasSeenCoral:
+        break;
+      case HasNotSeenCoral:
+        if (inputs.isRevBeamBroken == true) {
+          totalBreaks += 1;
+        } else {
+          totalBreaks = 0;
         }
 
-        // Log Outputs
-        Logger.recordOutput("Funnel/curState", curState);
-        Logger.recordOutput("Funnel/totalBreaks", totalBreaks);
+        if (totalBreaks >= FunnelConstants.kFunnelBeamCounts) {
+          curState = FunnelState.HasSeenCoral;
+        }
+        break;
     }
 
-    // Grapher
-    @Override
-    public void registerWith(TelemetryService telemetryService) {
-        io.registerWith(telemetryService);
-        super.registerWith(telemetryService);
-    }
+    // Log Outputs
+    Logger.recordOutput("Funnel/curState", curState);
+    Logger.recordOutput("Funnel/totalBreaks", totalBreaks);
+  }
 
-    @Override
-    public Set<Measure> getMeasures() {
-        return Set.of(new Measure("State", () -> curState.ordinal()));
-    }
+  // Grapher
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
+  }
 
-    // State Enum
-    public enum FunnelState {
-        HasSeenCoral,
-        HasNotSeenCoral
-    }
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(new Measure("State", () -> curState.ordinal()));
+  }
 
-    @Override
-    public void setPercent(double pct) {
-        io.setPct(pct);
-    }
+  // State Enum
+  public enum FunnelState {
+    HasSeenCoral,
+    HasNotSeenCoral
+  }
 
-    public void StartMotor() {
-        setPercent(FunnelConstants.kFunnelPercentOutput);
-    }
+  @Override
+  public void setPercent(double pct) {
+    io.setPct(pct);
+  }
 
-    public void StopMotor() {
-        setPercent(0.0);
-    }
+  public void StartMotor() {
+    setPercent(FunnelConstants.kFunnelPercentOutput);
+  }
 
-    public void ClearCoral() {
-        curState = FunnelState.HasNotSeenCoral;
-    }
-    
+  public void StopMotor() {
+    setPercent(0.0);
+  }
+
+  public void ClearCoral() {
+    curState = FunnelState.HasNotSeenCoral;
+  }
 }
