@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
@@ -21,6 +22,8 @@ import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
+import frc.robot.subsystems.algae.AlgaeIOFX;
+import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.coral.CoralIO;
 import frc.robot.subsystems.coral.CoralIOFX;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -33,14 +36,18 @@ import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
-  private Swerve swerve;
-  private DriveSubsystem driveSubsystem;
 
   private ElevatorIO elevatorIO;
   private ElevatorSubsystem elevatorSubsystem;
 
   private final CoralIO coralIO;
   private final CoralSubsystem coralSubsystem;
+
+  private AlgaeIOFX algaeIO;
+  private AlgaeSubsystem algaeSubsystem;
+
+  private Swerve swerve;
+  private DriveSubsystem driveSubsystem;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -49,6 +56,9 @@ public class RobotContainer {
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   public RobotContainer() {
+    algaeIO = new AlgaeIOFX();
+    algaeSubsystem = new AlgaeSubsystem(algaeIO);
+
     swerve = new Swerve();
     driveSubsystem = new DriveSubsystem(swerve);
 
@@ -66,6 +76,8 @@ public class RobotContainer {
   private void configureTelemetry() {
     telemetryService.register(driveSubsystem);
     telemetryService.register(coralSubsystem);
+    telemetryService.register(algaeSubsystem);
+    telemetryService.register(elevatorSubsystem);
     telemetryService.start();
   }
 
@@ -103,6 +115,12 @@ public class RobotContainer {
     // Zero Elevator
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new ZeroElevatorCommand(elevatorSubsystem));
+
+    // Algae Buttons
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .onTrue(new OpenLoopAlgaeCommand(algaeSubsystem, 0.5));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .onTrue(new OpenLoopAlgaeCommand(algaeSubsystem, -0.5));
   }
 
   public Command getAutonomousCommand() {
