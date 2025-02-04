@@ -103,7 +103,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public ScoringLevel getAlgaeLevel() {
-    return tagAlignSubsystem.computeHexant() % 2 == 0 ? ScoringLevel.L3 : ScoringLevel.L2;
+    return tagAlignSubsystem.computeHexant(allianceColor) % 2 == 0
+        ? ScoringLevel.L3
+        : ScoringLevel.L2;
   }
 
   public boolean hasCoral() {
@@ -284,7 +286,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
 
     if (drive) {
-      tagAlignSubsystem.setup(allianceColor, scoreSide == ScoreSide.LEFT);
       tagAlignSubsystem.start(allianceColor, scoreSide == ScoreSide.LEFT);
     }
   }
@@ -602,7 +603,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     REMOVE_ALGAE,
     SAFE_REMOVE_ALGAE_ABOVE,
     SAFE_REMOVE_ALGAE_ROTATE,
-    // CORAL_REALIGN,
     PLACE_CORAL,
     FUNNEL_LOAD,
     LOADING_CORAL,

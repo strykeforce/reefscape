@@ -36,34 +36,33 @@ import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
-
-  private ElevatorIO elevatorIO;
-  private ElevatorSubsystem elevatorSubsystem;
+  private final AlgaeIOFX algaeIO;
+  private final AlgaeSubsystem algaeSubsystem;
 
   private final CoralIO coralIO;
   private final CoralSubsystem coralSubsystem;
 
-  private AlgaeIOFX algaeIO;
-  private AlgaeSubsystem algaeSubsystem;
+  private final Swerve swerve;
+  private final DriveSubsystem driveSubsystem;
 
-  private Swerve swerve;
-  private DriveSubsystem driveSubsystem;
+  private final ElevatorIO elevatorIO;
+  private ElevatorSubsystem elevatorSubsystem;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
-
   private final FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
+
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   public RobotContainer() {
     algaeIO = new AlgaeIOFX();
     algaeSubsystem = new AlgaeSubsystem(algaeIO);
 
-    swerve = new Swerve();
-    driveSubsystem = new DriveSubsystem(swerve);
-
     coralIO = new CoralIOFX();
     coralSubsystem = new CoralSubsystem(coralIO);
+
+    swerve = new Swerve();
+    driveSubsystem = new DriveSubsystem(swerve);
 
     elevatorIO = new ElevatorIOFX();
     elevatorSubsystem = new ElevatorSubsystem(elevatorIO);
@@ -95,12 +94,12 @@ public class RobotContainer {
     // Intake Coral
     new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(new OpenLoopCoralCommand(coralSubsystem, -0.5))
-        .onTrue(new EnableEjectBeamCommand(false, coralSubsystem));
+        .onTrue(new EnableEjectBeamCommand(true, coralSubsystem));
 
     // Eject Coral
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .onTrue(new OpenLoopCoralCommand(coralSubsystem, -0.5))
-        .onTrue(new EnableEjectBeamCommand(true, coralSubsystem));
+        .onTrue(new EnableEjectBeamCommand(false, coralSubsystem));
 
     // Move Elevator
     new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))

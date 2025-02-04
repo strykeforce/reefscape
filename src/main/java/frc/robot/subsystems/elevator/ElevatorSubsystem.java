@@ -16,7 +16,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private ElevatorStates currState = ElevatorStates.ZEROED;
+  private ElevatorStates curState = ElevatorStates.ZEROED;
 
   private Angle setpoints;
 
@@ -36,7 +36,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
     // Log outputs
     Logger.recordOutput("Elevator/setpoints", setpoints);
 
-    switch (currState) {
+    switch (curState) {
       case ZEROING:
         if (Math.abs(inputs.velocity) < ElevatorConstants.kZeroedThreshhold) {
           zeroCounter++;
@@ -44,7 +44,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
             io.zero();
             zeroCounter = 0;
             io.setCurrentLimitConfig(ElevatorConstants.getBothFXConfig().CurrentLimits);
-            currState = ElevatorStates.ZEROED;
+            curState = ElevatorStates.ZEROED;
           }
         } else {
           zeroCounter = 0;
@@ -79,11 +79,11 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
   public boolean isFinished() {
     return Math.abs(getPosition().minus(setpoints).in(Rotations))
             < ElevatorConstants.kCloseEnoughRotations
-        && currState != ElevatorStates.ZEROING;
+        && curState != ElevatorStates.ZEROING;
   }
 
   public void zero() {
-    currState = ElevatorStates.ZEROING;
+    curState = ElevatorStates.ZEROING;
     io.setCurrentLimitConfig(ElevatorConstants.getZeroingCurrentLimitsConfigs());
     io.setVelocityOpenLoop(ElevatorConstants.kZeroSpeed);
   }
