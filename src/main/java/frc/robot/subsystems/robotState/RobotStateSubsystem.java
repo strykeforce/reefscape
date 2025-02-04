@@ -150,6 +150,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.getAlgaeOnCycle = getAlgaeOnCycle;
   }
 
+  public boolean getGetAlgaeOnCycle(){
+    return getAlgaeOnCycle;
+  }
+
   public void setCurrentLimiting(boolean isCurrentLimiting) {
     this.isCurrentLimiting = isCurrentLimiting;
   }

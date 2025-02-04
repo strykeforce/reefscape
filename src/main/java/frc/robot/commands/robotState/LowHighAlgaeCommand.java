@@ -8,6 +8,9 @@ public class LowHighAlgaeCommand extends InstantCommand {
     RobotStateSubsystem robotState;
     public LowHighAlgaeCommand(RobotStateSubsystem robotState){
         this.robotState = robotState;
+    }
+    @Override
+    public void initialize() {
         if(AlgaeHeight.LOW == AlgaeHeight.valueOf(getName())) {
             robotState.setAlgaeHeight(AlgaeHeight.HIGH);
         }

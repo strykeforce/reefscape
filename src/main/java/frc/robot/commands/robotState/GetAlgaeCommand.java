@@ -8,6 +8,14 @@ public class GetAlgaeCommand extends InstantCommand {
     RobotStateSubsystem robotState;
     public GetAlgaeCommand(RobotStateSubsystem robotState){
         this.robotState = robotState;
-        //skipfornow
     }
-}
+    @Override
+        public void initialize() {
+            if( == true) {
+                robotState.setGetAlgaeOnCycle(false);
+            }
+            else{
+                robotState.setGetAlgaeOnCycle(true);
+            }
+        }
+    }

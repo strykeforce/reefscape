@@ -8,6 +8,9 @@ public class ToggleLeftRightCommand extends InstantCommand {
     RobotStateSubsystem robotState;
     public ToggleLeftRightCommand(RobotStateSubsystem robotState){
         this.robotState = robotState;
+    }
+    @Override
+    public void initialize() {
         if (ScoreSide.valueOf(getName()) == ScoreSide.LEFT){
             robotState.setScoreSide(ScoreSide.RIGHT);
         }
