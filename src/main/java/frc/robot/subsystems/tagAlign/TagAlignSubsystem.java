@@ -28,4 +28,9 @@ public class TagAlignSubsystem {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'start'");
   }
+
+public void terminate() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'terminate'");
+}
 }

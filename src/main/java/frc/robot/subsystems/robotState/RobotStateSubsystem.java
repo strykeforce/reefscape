@@ -383,6 +383,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toInterrupted() {
+    if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
+      tagAlignSubsystem.terminate();
+    }
+    
     biscuitSubsystem.setPosition(biscuitSubsystem.getPosition());
     elevatorSubsystem.setPosition(elevatorSubsystem.getPosition());
 
