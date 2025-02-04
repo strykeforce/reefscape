@@ -22,7 +22,6 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
 
   private AlgaeStates curState = AlgaeStates.IDLE;
 
-
   public AlgaeSubsystem(AlgaeIO io) {
     this.io = io;
   }
@@ -89,7 +88,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
       case EMPTY -> {
         if (inputs.isRevLimitSwitchClosed) { // FIXME: correct?
           hold();
-          setState(AlgaeStates.HAS_ALGAE); 
+          setState(AlgaeStates.HAS_ALGAE);
         }
       }
       case IDLE -> {}
@@ -111,5 +110,10 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     HAS_ALGAE,
     EMPTY,
     IDLE
+  }
+
+  public boolean hasAlgae() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'hasAlgae'");
   }
 }
