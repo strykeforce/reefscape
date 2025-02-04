@@ -26,9 +26,9 @@ import java.util.Set;
 import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-import edu.wpi.first.math.Matrix;
 
 public class VisionSubsystem extends MeasurableSubsystem {
 
@@ -83,16 +83,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Logger logger;
   private UdpSubscriber[] udpSubscriber;
   private AprilTagFieldLayout field;
-  private boolean updating = true;
+  private boolean visionUpdating = true;
   private int minTags;
   private CircularBuffer<Double> gyroBuffer =
       new CircularBuffer<Double>(VisionConstants.kCircularBufferSize);
   private double timeSinceLastUpdate;
-  private int updatesToWheels;  private Matrix adaptiveMatrix;
+  private int updatesToWheels;
+  private Matrix adaptiveMatrix;
   private ArrayList<Pair<WallEyeResult, Integer>> validResults = new ArrayList<>();
-  private WallEyeResult[] lastResult;
-  private Matrix<N3,N1> adativeMatrix;
-  private Matrix<N3,N1> stdMatrix;
+  private WallEyeTagResult[] lastResult;
+  private Matrix<N3, N1> adativeMatrix;
+  private Matrix<N3, N1> stdMatrix;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -118,7 +119,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
   // Setter Methods
   public void setVisionUpdating(boolean updating) {
-    this.updating = updating;
+    this.visionUpdating = updating;
   }
 
   public void setMinTags(int minTags) {
@@ -126,7 +127,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
   // Getter Methods
   public boolean isVisionUpdating() {
-    return updating;
+    return visionUpdating;
   }
 
   public boolean cameraConnected(int index) {
@@ -313,56 +314,96 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     if (getSeconds() - timeSinceLastUpdate >= VisionConstants.kTimeToDecayDev) {
-      for (int i = 0; i < 2; i++){
+      for (int i = 0; i < 2; i++) {
 
-        double scaledWeight = VisionConstants.kVisionMeasurementStdDevs.get(i, 0)
-        + VisionConstants.kStdDevDecayCoeff
-        * ((getSeconds() - timeSinceLastUpdate) - VisionConstants.kTimeToDecayDev);
+        double scaledWeight =
+            VisionConstants.kVisionMeasurementStdDevs.get(i, 0)
+                + VisionConstants.kStdDevDecayCoeff
+                    * ((getSeconds() - timeSinceLastUpdate) - VisionConstants.kTimeToDecayDev);
 
-        adaptiveMatrix.set(i, 0, 
-        scaledWeight >= VisionConstants.kMinStdDev 
-          ? scaledWeight : VisionConstants.kMinStdDev);
+        adaptiveMatrix.set(
+            i,
+            0,
+            scaledWeight >= VisionConstants.kMinStdDev ? scaledWeight : VisionConstants.kMinStdDev);
       }
     }
 
-    for(Pair<WallEyeResult, Integer>res : validResults){
-      if(res.getFirst() instanceof WallEyeResult){
-        //adaptiveMatrix.set(0, 0, .1);
-        //adaptiveMatrix.set(1, 0, .1);
+    for (Pair<WallEyeResult, Integer> res : validResults) {
+      if (res.getFirst() instanceof WallEyeResult) {
+        // I don't understand why we would do this. So i didn't
+        adaptiveMatrix.set(0, 0, .1);
+        adaptiveMatrix.set(1, 0, .1);
 
         WallEyePoseResult result = (WallEyePoseResult) res.getFirst();
         int idx = res.getSecond();
 
-        for (int i = 0; i < 2; i++){
-        
-        stdMatrix.set(i, 0,
-        .1 / getStdDevFactor(minTagDistance(result), result.getNumTags(), camNames[idx]));
+        for (int i = 0; i < 2; i++) {
+
+          stdMatrix.set(
+              i,
+              0,
+              .1 / getStdDevFactor(minTagDistance(result), result.getNumTags(), camNames[idx]));
         }
 
         Pose3d cameraPose;
-        Translation3d centerPose;
-        Rotation3d cameraRotation;
+        Translation3d centerPose = new Translation3d();
+        Rotation3d cameraRotation = new Rotation3d();
 
-        if(result.getNumTags() > 1){
+        if (result.getNumTags() > 1) {
           cameraPose = result.getCameraPose();
 
-          centerPose = cameraPose.getTranslation()
-          .minus(camPositions[idx]
-            .rotateBy(cameraPose.getRotation()))
-            .rotateBy(camRotations[idx]);
+          centerPose =
+              cameraPose
+                  .getTranslation()
+                  .minus(camPositions[idx].rotateBy(cameraPose.getRotation()))
+                  .rotateBy(camRotations[idx]);
+        } else {
+          Pose3d cam1Pose = result.getFirstPose();
+          Pose3d cam2Pose = result.getSecondPose();
+
+          cam1Pose =
+              new Pose3d(
+                  cam1Pose.getTranslation(), cam1Pose.getRotation().rotateBy(camRotations[idx]));
+          cam2Pose =
+              new Pose3d(
+                  cam2Pose.getTranslation(), cam2Pose.getRotation().rotateBy(camRotations[idx]));
+
+          cameraPose = getCorrectPose(cam1Pose, cam2Pose, result.getTimeStamp(), idx);
+          centerPose =
+              cameraPose
+                  .getTranslation()
+                  .minus(camPositions[idx].rotateBy(cameraPose.getRotation()))
+                  .rotateBy(camRotations[idx]);
+          cameraRotation = cameraPose.getRotation();
         }
-        else{
-          //Work on this on Monday
+        if (camsWithinField(centerPose, result)) {
+          updatesToWheels++;
+
+          if (visionUpdating) {
+            driveSubsystem.addVisionMeasurement(
+                new Pose2d(centerPose.toTranslation2d(), cameraRotation.toRotation2d()),
+                result.getTimeStamp(),
+                stdMatrix);
+          }
         }
+      } else if (res.getFirst() instanceof WallEyeTagResult) {
+        WallEyeTagResult tags = (WallEyeTagResult) res.getFirst();
+        int idx = res.getSecond();
       }
     }
-
-
-
   }
- 
+
+  public WallEyeTagResult getLastResult(int index) {
+    return lastResult[index];
+  }
+
   @Override
   public Set<Measure> getMeasures() {
     return Set.of();
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    super.registerWith(telemetryService);
   }
 }
