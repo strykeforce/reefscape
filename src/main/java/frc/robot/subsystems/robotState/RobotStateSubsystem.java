@@ -162,6 +162,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.isAuto = isAuto;
   }
 
+  public boolean getIsAuto(){
+    return isAuto;
+  }
+
   private boolean needSafeAlgaeTransfer(RobotStates nextState) {
     if (algaeSubsystem.hasAlgae()) {
       switch (curState) {

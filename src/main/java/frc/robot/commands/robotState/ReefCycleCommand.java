@@ -1,9 +1,16 @@
 package frc.robot.commands.robotState;
 
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
-public class ReefCycleCommand extends Command {
-    //skipfornow
+public class ReefCycleCommand extends InstantCommand {
+    RobotStateSubsystem robotState;
+    public ReefCycleCommand(RobotStateSubsystem robotState){
+        this.robotState = robotState;
+    }
+    @Override
+    public void initialize() {
+        robotState.
+    }
 }
