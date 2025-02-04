@@ -112,7 +112,6 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
       case EJECTING -> {
         if (!isExitBeamBroken()) {
           setState(CoralState.EMPTY);
-          
         }
       }
       case EMPTY -> {}
