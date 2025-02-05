@@ -46,7 +46,7 @@ public class RobotContainer {
   private final DriveSubsystem driveSubsystem;
 
   private final ElevatorIO elevatorIO;
-  private ElevatorSubsystem elevatorSubsystem;
+  private final ElevatorSubsystem elevatorSubsystem;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
