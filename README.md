@@ -33,8 +33,8 @@
 | Algae     | FXS      | algae                     | 30  | rio     |          |           | Minion |         |
 | Coral     | FXS      | coral                     | 35  | rio     |          | 2         | Minion |         |
 | Funnel    | FXS      | rollers                   | 40  | rio     |          |           | Minion |         |
-| Climb     | FX       | rollers                   | 45  | rio     |          |           | Minion |         |
-| Climb     | FX       | pivot                     | 46  | rio     |          |           | kraken |         |
+| Climb     | FX       | frontMain                 | 45  | rio     |          |           | Minion |         |
+| Climb     | FX       | backFollow                | 46  | rio     |          |           | kraken |         |
 | Climb     | CANcoder | CANCoder                  | 47  | ri0     |          |           | n/a    |         |
 | -         | -        | rio                       | -   | both    |          | 12        |        |         |
 | -         | -        | vrm (radio, pigeon)       | -   | -       |          | 13        |        |         |
