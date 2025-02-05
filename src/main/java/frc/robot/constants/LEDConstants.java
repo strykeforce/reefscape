@@ -11,6 +11,7 @@ public class LEDConstants {
   public static final int kGetAlgeaStart = kStripLength / 9 * 8;
 
   public static final Color kAlmostBlack = new Color(0, 0, 1);
+
   // Normal LED Colors
   public static final Color kHasAlgea = Color.kAquamarine;
   public static final Color kNotHasAlgea = kAlmostBlack;
@@ -34,5 +35,16 @@ public class LEDConstants {
   public static final Color kCurrentLimiting = Color.kRed;
 
   public static final Color kAutoPlacing = Color.kPurple;
+
   // Climb LED Colors
+  public static final Color kWaitingForCage = Color.kRed;
+  public static final Color kHasCage = Color.kGreen;
+  public static final Color[] gameColors = {
+    Color.kDarkRed,
+    Color.kDarkGreen,
+    Color.kDarkBlue,
+    Color.kPink,
+    Color.kLightGreen,
+    Color.kLightBlue
+  };
 }

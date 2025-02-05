@@ -1,8 +1,10 @@
 package frc.robot.subsystems.led;
 
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.constants.LEDConstants;
 import java.util.Map;
@@ -53,7 +55,16 @@ public class LEDSubsystem extends MeasurableSubsystem {
       case NORMAL:
         buildBase();
         break;
-      case CLIMB:
+      case CLIMB_EMPTY:
+        io.setStrip(LEDConstants.kWaitingForCage);
+        break;
+      case CLIMB_FULL:
+        io.setStrip(LEDConstants.kHasCage);
+        break;
+      case CLIMB_UP:
+        base =
+            LEDPattern.gradient(GradientType.kContinuous, Color.kLightGoldenrodYellow, Color.kBlack)
+                .scrollAtRelativeSpeed(Percent.per(Seconds).of(1));
         break;
       default:
         break;
@@ -192,7 +203,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
         }
         io.setStrip(base);
         break;
-      case CLIMB:
+      case CLIMB_EMPTY:
         break;
     }
     io.updateLEDs();
@@ -234,7 +245,9 @@ public class LEDSubsystem extends MeasurableSubsystem {
   public enum LEDStates {
     OFF,
     NORMAL,
-    CLIMB
+    CLIMB_EMPTY,
+    CLIMB_FULL,
+    CLIMB_UP
   }
 
   public enum CoralStates {
