@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 import net.jafama.FastMath;
-import org.slf4j.Logger;
+import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -32,8 +32,10 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 public class VisionSubsystem extends MeasurableSubsystem {
 
+  // Array of cameras
   WallEyeCam[] cams;
 
+  // Array of camera positions
   Translation3d[] camPositions = {
     VisionConstants.kCam1Pose.getTranslation(),
     VisionConstants.kCam2Pose.getTranslation(),
@@ -42,6 +44,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Pose.getTranslation()
   };
 
+  // Array of camera rotations
   Rotation3d[] camRotations = {
     VisionConstants.kCam1Pose.getRotation(),
     VisionConstants.kCam2Pose.getRotation(),
@@ -50,6 +53,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Pose.getRotation()
   };
 
+  // Array of camera heights
   private double[] camHeights = {
     VisionConstants.kCam1Pose.getMeasureZ().in(Meters),
     VisionConstants.kCam2Pose.getMeasureZ().in(Meters),
@@ -58,6 +62,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Pose.getMeasureZ().in(Meters)
   };
 
+  // Array of camera names
   String[] camNames = {
     VisionConstants.kCam1Name,
     VisionConstants.kCam2Name,
@@ -66,10 +71,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Name
   };
 
+  // Array of orange pi names
   String[] piNames = {
     VisionConstants.kPi1Name, VisionConstants.kPi2Name, VisionConstants.kPi3Name,
   };
 
+  // Array of camera indexs
   int[] camIndex = {
     VisionConstants.kCam1Idx,
     VisionConstants.kCam2Idx,
@@ -80,7 +87,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   private Swerve swerve = new Swerve();
   private DriveSubsystem driveSubsystem = new DriveSubsystem(swerve);
-  private Logger logger;
+  /*Because we use two seperate loggers we can import one and then define the
+  other here.*/
+  private org.slf4j.Logger textLogger;
   private UdpSubscriber[] udpSubscriber;
   private AprilTagFieldLayout field;
   private boolean visionUpdating = true;
@@ -94,25 +103,29 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private WallEyeTagResult[] lastResult;
   private Matrix<N3, N1> adativeMatrix;
   private Matrix<N3, N1> stdMatrix;
+  private Logger logger;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
-    logger = LoggerFactory.getLogger("Vision");
+    textLogger = LoggerFactory.getLogger("Vision");
 
     cams = new WallEyeCam[VisionConstants.kNumCams];
     udpSubscriber = new UdpSubscriber[VisionConstants.kNumPis];
+    // We copy the matrix from our constants
     adaptiveMatrix = VisionConstants.kVisionMeasurementStdDevs.copy();
+    // We then copy the adaptive matrix because they will differ later
     stdMatrix = adaptiveMatrix.copy();
+    // I'm not sure why we put this in a try catch maybe could be removed
     try {
       field = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile);
     } catch (IOException e) {
-      logger.error("BAD NEWS BEARS NO APRIL TAG LAYOUT");
+      textLogger.error("BAD NEWS BEARS NO APRIL TAG LAYOUT");
     }
-
+    // Fill our camera array
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
       cams[i] = new WallEyeCam(piNames[i], camIndex[i], -1);
     }
-
+    // Initialize our udpSubscribers
     udpSubscriber[0] = new UdpSubscriber(0, cams[0], cams[1]);
     udpSubscriber[1] = new UdpSubscriber(1, cams[2], cams[3]);
     udpSubscriber[2] = new UdpSubscriber(2, cams[4]);
@@ -142,11 +155,13 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     Translation2d camLoc = result.getCameraPose().getTranslation().toTranslation2d();
     int[] ids = result.getTagIDs();
+    // This number's value doesn't really matter it just needs to be large
     double minDistance = 2767;
 
+    // Go through the camera locations and finds the one closest to the tag
     for (int id : ids) {
-      Translation2d tagLoc = field.getTagPose(id).get().getTranslation().toTranslation2d();
-      double dist = camLoc.getDistance(camLoc);
+      double dist =
+          camLoc.getDistance(field.getTagPose(id).get().getTranslation().toTranslation2d());
 
       if (dist < minDistance) {
         minDistance = dist;
@@ -161,6 +176,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     int[] ids = result.getTagIDs();
     double totalDistance = 0.0;
 
+    // Goes through the camera locations and gets the average distance
     for (int id : ids) {
       totalDistance +=
           camLoc.getDistance(field.getTagPose(id).get().getTranslation().toTranslation2d());
@@ -181,6 +197,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     double dispMagnitude = Math.sqrt(Math.pow(disp.getX(), 2) + Math.pow(disp.getY(), 2));
 
+    /*This gets our displacement and compares it to who much we could
+    have moved.It does this by getting the velocity and plotting it on a
+    graph. The graph will be in the readme.*/
     return result.getNumTags() >= minTags
         && dispMagnitude
             <= (velMagnitude * VisionConstants.kLinearCoeffOnVelFilter
@@ -189,18 +208,19 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private boolean camsWithinField(Translation3d pose, WallEyePoseResult result) {
-
     return (result.getNumTags() >= 2 || result.getAmbiguity() < VisionConstants.kMaxAmbig)
         && pose.getMeasureX().in(Meters) < field.getFieldLength()
         && pose.getMeasureY().in(Meters) < field.getFieldWidth();
   }
 
+  /*Large switch case to see get the standard deviation factor based on camera, how many
+  tags we see and distance. An example of this graph will be in the readme.*/
   private double getStdDevFactor(double distance, int numTags, String camName) {
     switch (camName) {
       case "Upper Right":
       case "Upper Left":
         if (numTags == 1)
-          return 1.0
+          return 1
               / VisionConstants.FOV58YUYVBaseTrust
               * FastMath.pow(
                   VisionConstants.baseNumber,
@@ -270,6 +290,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private Pose3d getCloserPose(Pose3d pose1, Pose3d pose2, double rotation) {
+    /*Which pose rotation is closer to our gyro. We subtract the absolute value of the gyro
+    from the rotation of the pose and compare the two*/
     if (Math.abs(new Rotation2d(rotation).minus(pose1.getRotation().toRotation2d()).getRadians())
         <= Math.abs(
             new Rotation2d(rotation).minus(pose2.getRotation().toRotation2d()).getRadians()))
@@ -280,16 +302,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Pose3d getCorrectPose(Pose3d pose1, Pose3d pose2, double time, int camIndex) {
     double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
     double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
-
-    if (dist1 < dist2 && dist1 < 0.5 && dist1 > 0) {
+    // This filters out results by seeing if they are the height of the robot.
+    if (dist1 < dist2 && dist1 < VisionConstants.kRobotHeight && dist1 > 0) {
       return pose1;
     }
-    if (dist2 < dist1 && dist2 < 0.5 && dist2 > 0) {
+    if (dist2 < dist1 && dist2 < VisionConstants.kRobotHeight && dist2 > 0) {
       return pose2;
     }
-
+    // If we don't have enough data in the gyro buffer we default to returning a pose
     if (gyroBuffer.size() < VisionConstants.kCircularBufferSize) return pose1;
 
+    // See what pose is closer the the gyro at the time of the photo's capture.
     double rotation =
         gyroBuffer.get(FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
     return getCloserPose(pose1, pose2, rotation);
@@ -297,8 +320,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
-    gyroBuffer.addFirst(
-        FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians()));
+
+    double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
+    gyroBuffer.addFirst(gyroData);
+    logger.recordOutput("Vision/Gyro Buffer", gyroData);
 
     if (getSeconds() - timeSinceLastUpdate > VisionConstants.kMaxTimeNoVision) {
       updatesToWheels = 0;
@@ -314,8 +339,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     if (getSeconds() - timeSinceLastUpdate >= VisionConstants.kTimeToDecayDev) {
+      // Decrease the thresholds required for a good pose over time. A graph is in the readme
       for (int i = 0; i < 2; i++) {
-
         double scaledWeight =
             VisionConstants.kVisionMeasurementStdDevs.get(i, 0)
                 + VisionConstants.kStdDevDecayCoeff
@@ -330,15 +355,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     for (Pair<WallEyeResult, Integer> res : validResults) {
       if (res.getFirst() instanceof WallEyeResult) {
-        // I don't understand why we would do this. So i didn't
+        /*Reset the adaptive matrix to a stricter value once we get a result.
+        We set it to a stricter value then initially.*/
         adaptiveMatrix.set(0, 0, .1);
         adaptiveMatrix.set(1, 0, .1);
 
         WallEyePoseResult result = (WallEyePoseResult) res.getFirst();
+        logger.recordOutput("Vision", result.getTimeStamp());
         int idx = res.getSecond();
-
         for (int i = 0; i < 2; i++) {
-
           stdMatrix.set(
               i,
               0,
@@ -350,6 +375,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         Rotation3d cameraRotation = new Rotation3d();
 
         if (result.getNumTags() > 1) {
+          // If there our more then one tag in an image we can get pose possible pose
           cameraPose = result.getCameraPose();
 
           centerPose =
@@ -358,6 +384,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
                   .minus(camPositions[idx].rotateBy(cameraPose.getRotation()))
                   .rotateBy(camRotations[idx]);
         } else {
+          // If there is one we get two possible poses and have to filter them.
           Pose3d cam1Pose = result.getFirstPose();
           Pose3d cam2Pose = result.getSecondPose();
 
@@ -368,6 +395,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
               new Pose3d(
                   cam2Pose.getTranslation(), cam2Pose.getRotation().rotateBy(camRotations[idx]));
 
+          logger.recordOutput("Vision/Camera 1", cam1Pose);
+          logger.recordOutput("Vision/Camera 2", cam2Pose);
+
           cameraPose = getCorrectPose(cam1Pose, cam2Pose, result.getTimeStamp(), idx);
           centerPose =
               cameraPose
@@ -377,16 +407,21 @@ public class VisionSubsystem extends MeasurableSubsystem {
           cameraRotation = cameraPose.getRotation();
         }
         if (camsWithinField(centerPose, result)) {
+          // Is the pose in the field? If so, enjoy a updated position drive subsystem
           updatesToWheels++;
-
+          logger.recordOutput("Vision/Accepted Cam", centerPose);
+          // However we do have to be accepting the poses to use them
           if (visionUpdating) {
             driveSubsystem.addVisionMeasurement(
                 new Pose2d(centerPose.toTranslation2d(), cameraRotation.toRotation2d()),
                 result.getTimeStamp(),
                 stdMatrix);
           }
+        } else {
+          logger.recordOutput("Vision/Rejected Cam", centerPose);
         }
       } else if (res.getFirst() instanceof WallEyeTagResult) {
+        // I don't know what it does. I don't it does anything. But be careful about deletion.
         WallEyeTagResult tags = (WallEyeTagResult) res.getFirst();
         int idx = res.getSecond();
       }
