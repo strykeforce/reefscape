@@ -108,6 +108,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         : ScoringLevel.L2;
   }
 
+  public ScoreSide getScoreSide() {
+    return scoreSide;
+  }
+
   public boolean hasCoral() {
     return coralSubsystem.hasCoral();
   }
@@ -220,7 +224,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     if (isAuto) {
       toReefAlign(false, false);
     } else {
-      toReefAlign(getAlgaeOnCycle, false);
+      toReefAlign(getAlgaeOnCycle, false); // Manual scoring
     }
   }
 
@@ -492,7 +496,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case REEF_ALIGN_CORAL -> {
         if (tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE) {
-          toPlaceCoral();
+          if (isAutoPlacing) {
+            toPlaceCoral();
+          }
         }
       }
       case REMOVE_ALGAE -> {

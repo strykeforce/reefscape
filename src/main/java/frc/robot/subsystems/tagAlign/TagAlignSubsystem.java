@@ -77,7 +77,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                                 - offset)
                         / Units.degreesToRadians(60)
                     + offset))
-            + 3)
+            + (color == Alliance.Blue ? 0 : 3))
         % 6;
   }
 
@@ -122,7 +122,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         !scoreLeft ? TagServoingConstants.kLeftServoCam : TagServoingConstants.kRightServoCam;
     targetTagId =
         alliance == Alliance.Blue
-            ? TagServoingConstants.kRedTargetTag[computeHexant(alliance)]
+            ? TagServoingConstants.kBlueTargetTag[computeHexant(alliance)]
             : TagServoingConstants.kRedTargetTag[computeHexant(alliance)];
 
     fieldRelHexant = computeFieldRelHexant(alliance);
