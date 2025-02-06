@@ -17,11 +17,15 @@ import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+
 import java.util.Set;
+
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+
+import edu.wpi.first.wpilibj.RobotController;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -163,6 +167,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
+  }
+
+  public void setAutoPlacingLed(boolean isAutoPlacing) {
+    ledSubsystem.setAutoPlacing(isAutoPlacing);
   }
 
   private boolean needSafeAlgaeTransfer(RobotStates nextState) {
