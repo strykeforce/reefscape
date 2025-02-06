@@ -148,7 +148,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private double getSeconds() {
-    return RobotController.getFPGATime();
+    return RobotController.getFPGATime() / 1_000_000;
   }
 
   private double minTagDistance(WallEyePoseResult result) {
@@ -185,7 +185,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   // Filters
-  private boolean camsAgreeWithWheels(Translation3d pose, WallEyeResult result) {
+  private boolean camsAgreeWithWheels(Translation3d pose, WallEyeTagResult result) {
 
     ChassisSpeeds vel = driveSubsystem.getFieldRelSpeed();
     Pose2d curPose = driveSubsystem.getPoseMeters();
@@ -300,13 +300,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private Pose3d getCorrectPose(Pose3d pose1, Pose3d pose2, double time, int camIndex) {
-    double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
-    double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
     // This filters out results by seeing if they are the height of the robot.
-    if (dist1 < dist2 && dist1 < VisionConstants.kRobotHeight && dist1 > 0) {
+    if (pose1.getZ() < VisionConstants.kRobotHeight && pose1.getZ() > 0) {
       return pose1;
     }
-    if (dist2 < dist1 && dist2 < VisionConstants.kRobotHeight && dist2 > 0) {
+    if (pose2.getZ() < VisionConstants.kRobotHeight && pose2.getZ() > 0) {
       return pose2;
     }
     // If we don't have enough data in the gyro buffer we default to returning a pose
@@ -420,10 +418,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
         } else {
           logger.recordOutput("Vision/Rejected Cam", centerPose);
         }
-      } else if (res.getFirst() instanceof WallEyeTagResult) {
-        // I don't know what it does. I don't it does anything. But be careful about deletion.
-        WallEyeTagResult tags = (WallEyeTagResult) res.getFirst();
-        int idx = res.getSecond();
       }
     }
   }
