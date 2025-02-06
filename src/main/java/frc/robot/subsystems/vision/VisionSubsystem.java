@@ -199,7 +199,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     /*This gets our displacement and compares it to who much we could
     have moved.It does this by getting the velocity and plotting it on a
-    graph. The graph will be in the readme.*/
+    graph. The graph will be in the docs.*/
     return result.getNumTags() >= minTags
         && dispMagnitude
             <= (velMagnitude * VisionConstants.kLinearCoeffOnVelFilter
@@ -214,7 +214,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   /*Large switch case to see get the standard deviation factor based on camera, how many
-  tags we see and distance. An example of this graph will be in the readme.*/
+  tags we see and distance. An example of this graph will be in the docs.*/
   private double getStdDevFactor(double distance, int numTags, String camName) {
     switch (camName) {
       case "Upper Right":
@@ -337,7 +337,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     if (getSeconds() - timeSinceLastUpdate >= VisionConstants.kTimeToDecayDev) {
-      // Decrease the thresholds required for a good pose over time. A graph is in the readme
+      // Decrease the thresholds required for a good pose over time. A graph is in the docs
       for (int i = 0; i < 2; i++) {
         double scaledWeight =
             VisionConstants.kVisionMeasurementStdDevs.get(i, 0)
