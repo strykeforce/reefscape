@@ -55,11 +55,7 @@ public class ElevatorIOFX implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     BaseStatusSignal.refreshAll(currVelocity, currPosition);
     inputs.velocity = currVelocity.getValueAsDouble();
-    inputs.position =
-        currPosition
-            .getValueAsDouble(); // .minus(relSetpointOffset); (offset probably from the absolute,
-    // add
-    // constant)
+    inputs.position = currPosition.getValueAsDouble();
   }
 
   @Override

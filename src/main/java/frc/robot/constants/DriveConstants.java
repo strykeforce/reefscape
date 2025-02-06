@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveConstants {
+  public static final double kAlgaeRemovalSpeed = 0;
+
   public static final double kDeadbandAllStick = 0.075;
   public static final double kExpoScaleYawFactor = 0.75;
   public static final double kRateLimitFwdStr = 3.5;
