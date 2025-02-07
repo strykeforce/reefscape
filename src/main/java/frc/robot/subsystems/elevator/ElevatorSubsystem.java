@@ -18,7 +18,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   private ElevatorStates currState = ElevatorStates.ZEROED;
 
-  private Angle setpoints;
+  private Angle setpoint = Rotations.of(0);
 
   private int zeroCounter = 0;
 
@@ -28,31 +28,32 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   @Override
   public void setPosition(Angle position) {
-    setpoints = position;
+    setpoint = position;
     io.setPosition(position);
   }
 
   @Override
   public Angle getPosition() {
-    return setpoints;
+    return Rotations.of(inputs.position);
+  }
+
+  public ElevatorStates getState() {
+    return currState;
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(getPosition().minus(setpoints).in(Rotations))
+    return Math.abs(getPosition().minus(setpoint).in(Rotations))
             < ElevatorConstants.kCloseEnoughRotations
         && currState != ElevatorStates.ZEROING;
   }
 
   @Override
   public void zero() {
-    // FIXME: immediately zeroed for testing
-    io.zero();
-
-    // currState = ElevatorStates.ZEROING;
+    currState = ElevatorStates.ZEROING;
     // io.setCurrentLimitConfig(ElevatorConstants.getZeroingCurrentLimitsConfigs());
-    // io.setSoftLimitConfig(ElevatorConstants.getZeroingSoftLimitConfigs());
-    // io.setVelocityOpenLoop(ElevatorConstants.kZeroSpeed);
+    io.setSoftLimitConfig(ElevatorConstants.getZeroingSoftLimitConfigs());
+    io.setVoltageOpenLoop(ElevatorConstants.kZeroVolts);
   }
 
   @Override
@@ -62,7 +63,8 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
     org.littletonrobotics.junction.Logger.processInputs("ElevatorInputs", inputs);
 
     // Log outputs
-    Logger.recordOutput("Elevator/setpoints", setpoints);
+    Logger.recordOutput("Elevator/setpoints", setpoint);
+    Logger.recordOutput("Elevator/state", currState);
 
     switch (currState) {
       case ZEROING -> {
@@ -74,6 +76,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
             io.setCurrentLimitConfig(ElevatorConstants.getBothFXConfig().CurrentLimits);
             io.setSoftLimitConfig(ElevatorConstants.getBothFXConfig().SoftwareLimitSwitch);
             currState = ElevatorStates.ZEROED;
+            setPosition(Rotations.of(0));
           }
         } else {
           zeroCounter = 0;
@@ -86,8 +89,8 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
   // Grapher
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    super.registerWith(telemetryService);
     io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   @Override

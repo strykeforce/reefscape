@@ -18,7 +18,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
 
   private BiscuitIO io;
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();
-  private Angle setPoint;
+  private Angle setPoint = Rotations.of(0);
 
   @Override
   public void setPosition(Angle position) {

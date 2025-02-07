@@ -26,19 +26,21 @@ public class ElevatorConstants {
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
   public static final double kZeroSpeed = -.05;
-  public static final int kZeroCounter = 3;
-  public static final double kZeroedThreshhold = .0001;
+  public static final double kZeroVolts = -0.5;
+  public static final int kZeroCounter = 2;
+  public static final double kZeroedThreshhold = .025;
 
   public static final int heightAnalogID = 0;
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
 
-  public static final double kJogAmount = 0.1;
+  public static final double kJogAmountUp = 1;
+  public static final double kJogAmountDown = -1.5;
 
   // Setpoints
   // Idle
-  public static final Angle kStowSetpoint = Rotations.of(0.0);
-  public static final Angle kFunnelSetpoint = Rotations.of(0.0);
+  public static final Angle kFunnelSetpoint = Rotations.of(2.40430);
+  public static final Angle kStowSetpoint = kFunnelSetpoint;
   public static final Angle kPrestageSetpoint = Rotations.of(0.0);
 
   // Algae removal
@@ -52,10 +54,10 @@ public class ElevatorConstants {
   public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
 
   // Coral score
-  public static final Angle kL1CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL2CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL3CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL4CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL1CoralSetpoint = Rotations.of(13.04053);
+  public static final Angle kL2CoralSetpoint = Rotations.of(19.62793);
+  public static final Angle kL3CoralSetpoint = Rotations.of(30.42969);
+  public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);
 
   // Algae obtaining
   public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);
@@ -140,8 +142,7 @@ public class ElevatorConstants {
   public static SoftwareLimitSwitchConfigs getZeroingSoftLimitConfigs() {
     SoftwareLimitSwitchConfigs swLimit =
         new SoftwareLimitSwitchConfigs()
-            .withForwardSoftLimitEnable(true)
-            .withForwardSoftLimitThreshold(kMaxFwd)
+            .withForwardSoftLimitEnable(false)
             .withReverseSoftLimitEnable(false);
 
     return swLimit;

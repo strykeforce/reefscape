@@ -24,6 +24,8 @@ public interface ElevatorIO {
 
   public default void setCurrentLimitConfig(CurrentLimitsConfigs config) {}
 
+  public default void setVoltageOpenLoop(double voltsOut) {}
+
   public default void setSoftLimitConfig(SoftwareLimitSwitchConfigs config) {}
 
   public default void zero() {}

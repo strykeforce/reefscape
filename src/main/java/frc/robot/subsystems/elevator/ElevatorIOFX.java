@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -32,8 +33,9 @@ public class ElevatorIOFX implements ElevatorIO {
   public AnalogInput heightAnalogInput = new AnalogInput(ElevatorConstants.heightAnalogID);
   private MotionMagicVoltage positionRequestMain =
       new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
-  private Follower positionRequestFollow = new Follower(ElevatorConstants.kFxIDMain, true);
+  private Follower positionRequestFollow = new Follower(ElevatorConstants.kFxIDMain, false);
   private DutyCycleOut openLoopVelocityRequest = new DutyCycleOut(0);
+  private VoltageOut openLoopVoltageRequest = new VoltageOut(0);
 
   public ElevatorIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -49,6 +51,8 @@ public class ElevatorIOFX implements ElevatorIO {
     // Attach status signals
     currPosition = talonFxFront.getPosition();
     currVelocity = talonFxFront.getVelocity();
+
+    talonFxBack.setControl(positionRequestFollow);
   }
 
   @Override
@@ -67,12 +71,18 @@ public class ElevatorIOFX implements ElevatorIO {
   @Override
   public void setPosition(Angle position) {
     talonFxFront.setControl(positionRequestMain.withPosition(position));
+
     setpoints = position;
   }
 
   @Override
   public void setVelocityOpenLoop(double dutyCycleOut) {
     talonFxFront.setControl(openLoopVelocityRequest.withOutput(dutyCycleOut));
+  }
+
+  @Override
+  public void setVoltageOpenLoop(double voltsOut) {
+    talonFxFront.setControl(openLoopVoltageRequest.withOutput(voltsOut));
   }
 
   @Override

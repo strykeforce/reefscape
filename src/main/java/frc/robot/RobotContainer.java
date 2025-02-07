@@ -17,7 +17,9 @@ import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.elevator.HoldElevatorCommand;
 import frc.robot.commands.elevator.JogElevatorCommand;
+import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -78,6 +80,7 @@ public class RobotContainer {
     telemetryService.register(coralSubsystem);
     telemetryService.register(algaeSubsystem);
     telemetryService.register(elevatorSubsystem);
+    elevatorIO.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -94,23 +97,25 @@ public class RobotContainer {
 
     // Intake Coral
     new JoystickButton(xboxController, XboxController.Button.kY.value)
-        .onTrue(new OpenLoopCoralCommand(coralSubsystem, -0.5))
-        .onTrue(new EnableEjectBeamCommand(false, coralSubsystem));
+        .onTrue(new OpenLoopCoralCommand(coralSubsystem, 0.5))
+        .onTrue(new EnableEjectBeamCommand(true, coralSubsystem));
 
     // Eject Coral
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new OpenLoopCoralCommand(coralSubsystem, -0.5))
-        .onTrue(new EnableEjectBeamCommand(true, coralSubsystem));
+        .onTrue(new OpenLoopCoralCommand(coralSubsystem, 1))
+        .onTrue(new EnableEjectBeamCommand(false, coralSubsystem));
 
     // Move Elevator
-    new Trigger((() -> xboxController.getRightY() > RobotConstants.kJoystickDeadband))
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
         .onTrue(
             new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmount, Rotations)));
-    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kJoystickDeadband))
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
         .onTrue(
             new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(-ElevatorConstants.kJogAmount, Rotations)));
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
 
     // Zero Elevator
     new JoystickButton(xboxController, XboxController.Button.kX.value)
@@ -121,6 +126,24 @@ public class RobotContainer {
         .onTrue(new OpenLoopAlgaeCommand(algaeSubsystem, 0.5));
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
         .onTrue(new OpenLoopAlgaeCommand(algaeSubsystem, -0.5));
+
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(
+            new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kFunnelSetpoint));
+    new JoystickButton(xboxController, XboxController.Button.kBack.value)
+        .onTrue(new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kStowSetpoint));
+    (new Trigger(() -> xboxController.getPOV() == 0))
+        .onTrue(
+            new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL1CoralSetpoint));
+    (new Trigger(() -> xboxController.getPOV() == 90))
+        .onTrue(
+            new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL2CoralSetpoint));
+    (new Trigger(() -> xboxController.getPOV() == 180))
+        .onTrue(
+            new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL3CoralSetpoint));
+    (new Trigger(() -> xboxController.getPOV() == 270))
+        .onTrue(
+            new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL4CoralSetpoint));
   }
 
   public Command getAutonomousCommand() {
