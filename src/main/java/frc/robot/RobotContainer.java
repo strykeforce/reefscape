@@ -17,6 +17,7 @@ import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
+import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.elevator.HoldElevatorCommand;
 import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
@@ -24,6 +25,7 @@ import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
+import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.algae.AlgaeIOFX;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.coral.CoralIO;
@@ -88,6 +90,9 @@ public class RobotContainer {
     driveSubsystem.setDefaultCommand(
         new DriveTeleopCommand(
             () -> flysky.getFwd(), () -> flysky.getStr(), () -> flysky.getYaw(), driveSubsystem));
+
+    // Reset Gyro Command
+    new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
   }
 
   private void configureOperatorBindings() {
@@ -127,6 +132,7 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
         .onTrue(new OpenLoopAlgaeCommand(algaeSubsystem, -0.5));
 
+    // Elevator setpoint testing
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
         .onTrue(
             new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kFunnelSetpoint));
