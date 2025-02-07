@@ -12,6 +12,7 @@ public class JogElevatorCommand extends Command {
   public JogElevatorCommand(ElevatorSubsystem elevatorSubsystem, Angle positionChange) {
     this.elevatorSubsystem = elevatorSubsystem;
     this.positionChange = positionChange;
+    addRequirements(elevatorSubsystem);
   }
 
   @Override
@@ -20,7 +21,12 @@ public class JogElevatorCommand extends Command {
   }
 
   @Override
+  public void execute() {
+    elevatorSubsystem.setPosition(elevatorSubsystem.getPosition().plus(positionChange));
+  }
+
+  @Override
   public boolean isFinished() {
-    return elevatorSubsystem.isFinished();
+    return false;
   }
 }

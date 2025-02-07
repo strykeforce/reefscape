@@ -21,24 +21,26 @@ import edu.wpi.first.units.measure.Angle;
 public class ElevatorConstants {
 
   public static final double kCloseEnoughRotations = 0.0083;
-  public static final double kMaxFwd = 0; // TODO all of these fields need to be filled out
-  public static final double kMaxRev = 0;
+  public static final double kMaxFwd = 53; // TODO all of these fields need to be filled out
+  public static final double kMaxRev = 2;
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
   public static final double kZeroSpeed = -.05;
-  public static final int kZeroCounter = 3;
-  public static final double kZeroedThreshhold = .0001;
+  public static final double kZeroVolts = -0.5;
+  public static final int kZeroCounter = 2;
+  public static final double kZeroedThreshhold = .025;
 
   public static final int heightAnalogID = 0;
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
 
-  public static final double kJogAmount = 0.1;
+  public static final double kJogAmountUp = 1;
+  public static final double kJogAmountDown = -1.5;
 
   // Setpoints
   // Idle
-  public static final Angle kStowSetpoint = Rotations.of(0.0);
-  public static final Angle kFunnelSetpoint = Rotations.of(0.0);
+  public static final Angle kFunnelSetpoint = Rotations.of(2.40430);
+  public static final Angle kStowSetpoint = kFunnelSetpoint;
   public static final Angle kPrestageSetpoint = Rotations.of(0.0);
 
   // Algae removal
@@ -52,10 +54,10 @@ public class ElevatorConstants {
   public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
 
   // Coral score
-  public static final Angle kL1CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL2CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL3CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL4CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL1CoralSetpoint = Rotations.of(13.04053);
+  public static final Angle kL2CoralSetpoint = Rotations.of(19.62793);
+  public static final Angle kL3CoralSetpoint = Rotations.of(30.42969);
+  public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);
 
   // Algae obtaining
   public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);
@@ -72,11 +74,11 @@ public class ElevatorConstants {
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20)
-            .withSupplyCurrentLimit(10)
-            .withSupplyCurrentLowerLimit(8)
-            .withSupplyCurrentLowerTime(0.02)
-            .withSupplyCurrentLimitEnable(true);
+            // .withStatorCurrentLimit(20)
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(40)
+            .withSupplyCurrentLowerLimit(10)
+            .withSupplyCurrentLowerTime(2);
     fxConfig.CurrentLimits = current;
 
     HardwareLimitSwitchConfigs hwLimit =
@@ -93,37 +95,32 @@ public class ElevatorConstants {
 
     SoftwareLimitSwitchConfigs swLimit =
         new SoftwareLimitSwitchConfigs()
-            .withForwardSoftLimitEnable(false)
+            .withForwardSoftLimitEnable(true)
             .withForwardSoftLimitThreshold(kMaxFwd)
-            .withReverseSoftLimitEnable(false)
+            .withReverseSoftLimitEnable(true)
             .withReverseSoftLimitThreshold(kMaxRev);
     fxConfig.SoftwareLimitSwitch = swLimit;
 
     Slot0Configs slot0 =
         new Slot0Configs()
-            .withKP(0.4)
-            .withKI(0.1)
+            .withKP(2)
+            .withKI(0)
             .withKD(0)
             .withGravityType(GravityTypeValue.Elevator_Static)
-            .withKG(0)
+            .withKG(0.36)
             .withKS(0)
-            .withKV(0.12)
+            .withKV(0.13)
             .withKA(0);
     fxConfig.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(130)
-            .withMotionMagicCruiseVelocity(0)
-            .withMotionMagicExpo_kA(0)
-            .withMotionMagicExpo_kV(0)
-            .withMotionMagicJerk(1000);
+        new MotionMagicConfigs().withMotionMagicCruiseVelocity(50).withMotionMagicAcceleration(100);
     fxConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
             .withDutyCycleNeutralDeadband(0.01)
-            .withNeutralMode(NeutralModeValue.Coast)
+            .withNeutralMode(NeutralModeValue.Brake)
             .withInverted(InvertedValue.CounterClockwise_Positive);
     fxConfig.MotorOutput = motorOut;
 
@@ -140,5 +137,14 @@ public class ElevatorConstants {
             .withSupplyCurrentLowerTime(0.02)
             .withSupplyCurrentLimitEnable(true);
     return current;
+  }
+
+  public static SoftwareLimitSwitchConfigs getZeroingSoftLimitConfigs() {
+    SoftwareLimitSwitchConfigs swLimit =
+        new SoftwareLimitSwitchConfigs()
+            .withForwardSoftLimitEnable(false)
+            .withReverseSoftLimitEnable(false);
+
+    return swLimit;
   }
 }

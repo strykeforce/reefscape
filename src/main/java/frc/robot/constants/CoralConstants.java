@@ -2,22 +2,26 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class CoralConstants {
-  public static final int kCoralFxId = 0;
+  public static int kCoralFxId = 35;
 
   public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
 
@@ -41,7 +45,7 @@ public class CoralConstants {
     HardwareLimitSwitchConfigs hwLimit =
         new HardwareLimitSwitchConfigs()
             .withForwardLimitAutosetPositionEnable(false)
-            .withForwardLimitEnable(false)
+            .withForwardLimitEnable(true)
             .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen)
             .withForwardLimitSource(ForwardLimitSourceValue.LimitSwitchPin)
             .withReverseLimitAutosetPositionEnable(false)
@@ -74,8 +78,17 @@ public class CoralConstants {
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
             .withDutyCycleNeutralDeadband(0.01)
-            .withNeutralMode(NeutralModeValue.Coast);
+            .withNeutralMode(NeutralModeValue.Brake);
     fxsConfig.MotorOutput = motorOut;
+
+    CommutationConfigs commutationConfigs =
+        new CommutationConfigs().withMotorArrangement(MotorArrangementValue.Minion_JST);
+    fxsConfig.Commutation = commutationConfigs;
+
+    ExternalFeedbackConfigs externalFeedbackConfigs =
+        new ExternalFeedbackConfigs()
+            .withExternalFeedbackSensorSource(ExternalFeedbackSensorSourceValue.Commutation);
+    fxsConfig.ExternalFeedback = externalFeedbackConfigs;
 
     return fxsConfig;
   }

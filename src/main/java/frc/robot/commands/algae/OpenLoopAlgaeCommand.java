@@ -10,6 +10,7 @@ public class OpenLoopAlgaeCommand extends InstantCommand {
   public OpenLoopAlgaeCommand(AlgaeSubsystem algaeSubsystem, double pct) {
     this.algaeSubsystem = algaeSubsystem;
     this.pct = pct;
+    addRequirements(algaeSubsystem);
   }
 
   @Override
