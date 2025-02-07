@@ -18,13 +18,42 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   private ElevatorStates currState = ElevatorStates.ZEROED;
 
-  private Angle setpoints;
+  private Angle setpoint = Rotations.of(0);
 
   private int zeroCounter = 0;
 
-  // Constructor
   public ElevatorSubsystem(ElevatorIO io) {
     this.io = io;
+  }
+
+  @Override
+  public void setPosition(Angle position) {
+    setpoint = position;
+    io.setPosition(position);
+  }
+
+  @Override
+  public Angle getPosition() {
+    return Rotations.of(inputs.position);
+  }
+
+  public ElevatorStates getState() {
+    return currState;
+  }
+
+  @Override
+  public boolean isFinished() {
+    return Math.abs(getPosition().minus(setpoint).in(Rotations))
+            < ElevatorConstants.kCloseEnoughRotations
+        && currState != ElevatorStates.ZEROING;
+  }
+
+  @Override
+  public void zero() {
+    currState = ElevatorStates.ZEROING;
+    // io.setCurrentLimitConfig(ElevatorConstants.getZeroingCurrentLimitsConfigs());
+    io.setSoftLimitConfig(ElevatorConstants.getZeroingSoftLimitConfigs());
+    io.setVoltageOpenLoop(ElevatorConstants.kZeroVolts);
   }
 
   @Override
@@ -34,58 +63,39 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
     org.littletonrobotics.junction.Logger.processInputs("ElevatorInputs", inputs);
 
     // Log outputs
-    Logger.recordOutput("Elevator/setpoints", setpoints);
+    Logger.recordOutput("Elevator/setpoints", setpoint);
+    Logger.recordOutput("Elevator/state", currState);
 
     switch (currState) {
-      case ZEROING:
+      case ZEROING -> {
         if (Math.abs(inputs.velocity) < ElevatorConstants.kZeroedThreshhold) {
           zeroCounter++;
           if (zeroCounter >= ElevatorConstants.kZeroCounter) {
             io.zero();
             zeroCounter = 0;
             io.setCurrentLimitConfig(ElevatorConstants.getBothFXConfig().CurrentLimits);
+            io.setSoftLimitConfig(ElevatorConstants.getBothFXConfig().SoftwareLimitSwitch);
             currState = ElevatorStates.ZEROED;
+            setPosition(Rotations.of(0));
           }
         } else {
           zeroCounter = 0;
         }
-        break;
-      case ZEROED:
-        break;
+      }
+      case ZEROED -> {}
     }
   }
 
   // Grapher
   @Override
   public void registerWith(TelemetryService telemetryService) {
-
-    super.registerWith(telemetryService);
     io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
+  @Override
   public Set<Measure> getMeasures() {
-    return Set.of();
-  }
-
-  public void setPosition(Angle position) {
-    setpoints = position;
-    io.setPosition(position);
-  }
-
-  public Angle getPosition() {
-    return setpoints;
-  }
-
-  public boolean isFinished() {
-    return Math.abs(getPosition().minus(setpoints).in(Rotations))
-            < ElevatorConstants.kCloseEnoughRotations
-        && currState != ElevatorStates.ZEROING;
-  }
-
-  public void zero() {
-    currState = ElevatorStates.ZEROING;
-    io.setCurrentLimitConfig(ElevatorConstants.getZeroingCurrentLimitsConfigs());
-    io.setVelocityOpenLoop(ElevatorConstants.kZeroSpeed);
+    return Set.of(new Measure("state", () -> currState.ordinal()));
   }
 
   public enum ElevatorStates {

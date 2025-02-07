@@ -48,7 +48,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public void enableEjectBeam(boolean enable) {
-    io.enableRevLimitSwitch(enable);
+    io.enableFwdLimitSwitch(enable);
   }
 
   @Override
@@ -58,11 +58,11 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public boolean isEnterBeamBroken() {
-    return inputs.isFwdBeamBroken;
+    return inputs.isRevBeamBroken;
   }
 
   public boolean isExitBeamBroken() {
-    return inputs.isRevBeamBroken;
+    return inputs.isFwdBeamBroken;
   }
 
   public boolean hasCoral() {
@@ -77,13 +77,13 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public void intake() {
-    io.enableRevLimitSwitch(true);
+    io.enableFwdLimitSwitch(true);
     setSpeed(CoralConstants.kIntakingSpeed);
     setState(CoralState.INTAKING);
   }
 
   public void eject() {
-    io.enableRevLimitSwitch(false);
+    io.enableFwdLimitSwitch(false);
     setSpeed(CoralConstants.kEjectingSpeed);
     setState(CoralState.EJECTING);
   }

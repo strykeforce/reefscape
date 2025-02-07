@@ -12,6 +12,7 @@ public class SetElevatorPositionCommand extends Command {
   public SetElevatorPositionCommand(ElevatorSubsystem elevatorSubsystem, Angle position) {
     this.elevatorSubsystem = elevatorSubsystem;
     this.position = position;
+    addRequirements(elevatorSubsystem);
   }
 
   @Override

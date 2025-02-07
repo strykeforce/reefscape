@@ -10,6 +10,7 @@ public class OpenLoopCoralCommand extends InstantCommand {
   public OpenLoopCoralCommand(CoralSubsystem coralSubsystem, double pct) {
     this.coralSubsystem = coralSubsystem;
     this.pct = pct;
+    addRequirements(coralSubsystem);
   }
 
   @Override
