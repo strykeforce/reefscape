@@ -22,6 +22,9 @@ import frc.robot.commands.elevator.HoldElevatorCommand;
 import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
+import frc.robot.commands.robotState.ScoreReefManualCommand;
+import frc.robot.commands.robotState.SetScoringLevelCommand;
+import frc.robot.commands.robotState.StowCommand;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -45,6 +48,7 @@ import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDIO;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import org.strykeforce.telemetry.TelemetryController;
@@ -156,9 +160,31 @@ public class RobotContainer {
 
     // Reset Gyro Command
     new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
+    new JoystickButton(driveJoystick, Button.M_SWH.id)
+        .onTrue(new ScoreReefManualCommand(robotStateSubsystem));
   }
 
   private void configureOperatorBindings() {
+    // Set Levels
+    new Trigger(() -> xboxController.getLeftTriggerAxis() > RobotConstants.kTriggerDeadband)
+        .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L1));
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L2));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L3));
+    new Trigger(() -> xboxController.getRightTriggerAxis() > RobotConstants.kTriggerDeadband)
+        .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L4));
+
+    // Stow
+    new JoystickButton(xboxController, XboxController.Button.kBack.value)
+        .onTrue(new StowCommand(robotStateSubsystem));
+
+    // zero elevator, slated for removal
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
+        .onTrue(new ZeroElevatorCommand(elevatorSubsystem));
+  }
+
+  private void configureTestOperatorBindings() {
     // Stop Coral
     new JoystickButton(xboxController, XboxController.Button.kB.value)
         .onTrue(new OpenLoopCoralCommand(coralSubsystem, 0));

@@ -20,7 +20,7 @@ import edu.wpi.first.units.measure.Angle;
 
 public class ElevatorConstants {
 
-  public static final double kCloseEnoughRotations = 0.0083;
+  public static final double kCloseEnoughRotations = 0.1;
   public static final double kMaxFwd = 53; // TODO all of these fields need to be filled out
   public static final double kMaxRev = 2;
   public static final int kZeroMultiple =

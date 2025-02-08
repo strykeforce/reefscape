@@ -67,7 +67,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
 
   public boolean hasCoral() {
     switch (curState) {
-      case CORAL_LOADING, HAS_CORAL, EJECTING -> {
+      case HAS_CORAL, EJECTING -> {
         return true;
       }
       default -> {
@@ -78,13 +78,15 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
 
   public void intake() {
     io.enableFwdLimitSwitch(true);
-    setSpeed(CoralConstants.kIntakingSpeed);
+    // setSpeed(CoralConstants.kIntakingSpeed);
+    setPct(.5);
     setState(CoralState.INTAKING);
   }
 
   public void eject() {
     io.enableFwdLimitSwitch(false);
-    setSpeed(CoralConstants.kEjectingSpeed);
+    // setSpeed(CoralConstants.kEjectingSpeed);
+    setPct(1);
     setState(CoralState.EJECTING);
   }
 
