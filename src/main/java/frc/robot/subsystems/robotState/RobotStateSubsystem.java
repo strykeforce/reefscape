@@ -40,7 +40,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private TagAlignSubsystem tagAlignSubsystem;
   private VisionSubsystem visionSubsystem;
 
-  private RobotStates curState;
+  private RobotStates curState = RobotStates.IDLE;
   private RobotStates nextState;
   private RobotStates futureState;
 
@@ -216,16 +216,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStow() {
-    biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
+    // biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
     coralSubsystem.intake();
     elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
-    algaeSubsystem.hold();
+    // algaeSubsystem.hold();
 
     setState(RobotStates.TO_STOW);
   }
 
   public void toPrepCoral() {
-    if (isAuto) {
+    if (curState == RobotStates.REEF_ALIGN_CORAL) {
+      toPlaceCoral();
+    } else if (isAuto) {
       toReefAlign(false, false);
     } else {
       toReefAlign(getAlgaeOnCycle, false); // Manual scoring
@@ -233,7 +235,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toFunnelLoad() {
-    biscuitSubsystem.setPosition(BiscuitConstants.kFunnelSetpoint);
+    // biscuitSubsystem.setPosition(BiscuitConstants.kFunnelSetpoint);
     coralSubsystem.intake();
     elevatorSubsystem.setPosition(ElevatorConstants.kFunnelSetpoint);
 
@@ -276,19 +278,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
         switch (scoringLevel) {
           case L1 -> {
-            biscuitSubsystem.setPosition(BiscuitConstants.kL1CoralSetpoint);
+            // biscuitSubsystem.setPosition(BiscuitConstants.kL1CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL1CoralSetpoint);
           }
           case L2 -> {
-            biscuitSubsystem.setPosition(BiscuitConstants.kL2CoralSetpoint);
+            // biscuitSubsystem.setPosition(BiscuitConstants.kL2CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL2CoralSetpoint);
           }
           case L3 -> {
-            biscuitSubsystem.setPosition(BiscuitConstants.kL3CoralSetpoint);
+            // biscuitSubsystem.setPosition(BiscuitConstants.kL3CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL3CoralSetpoint);
           }
           case L4 -> {
-            biscuitSubsystem.setPosition(BiscuitConstants.kL4CoralSetpoint);
+            // biscuitSubsystem.setPosition(BiscuitConstants.kL4CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL4CoralSetpoint);
           }
         }
@@ -431,15 +433,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     switch (curState) {
       case TRANSFER -> {
-        if (biscuitSubsystem.isFinished()
-            && elevatorSubsystem.isFinished()
-            && climbSubsystem.isFinished()) {
+        if (
+        // biscuitSubsystem.isFinished() &&
+        elevatorSubsystem.isFinished()
+        // && climbSubsystem.isFinished()
+        ) {
           setState(nextState);
         }
       }
 
       case TO_STOW -> {
-        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+        if (
+        // biscuitSubsystem.isFinished() &&
+        elevatorSubsystem.isFinished()) {
           setState(RobotStates.STOW);
         }
       }
@@ -592,6 +598,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case PREP_CLIMB -> {}
       case CLIMB -> {}
       case INTERRUPTED -> {}
+      case IDLE -> {}
       default -> logger.error("Unhandled state: {}", curState);
     }
   }
@@ -627,7 +634,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PREP_CLIMB,
     CLIMB,
     INTERRUPTED,
-    TRANSFER
+    TRANSFER,
+    IDLE // this should be removed
   }
 
   public enum ScoringLevel {

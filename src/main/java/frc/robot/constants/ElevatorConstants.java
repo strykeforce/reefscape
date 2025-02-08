@@ -41,7 +41,6 @@ public class ElevatorConstants {
   // Idle
   public static final Angle kFunnelSetpoint = Rotations.of(2.40430);
   public static final Angle kStowSetpoint = kFunnelSetpoint;
-  public static final Angle kPrestageSetpoint = Rotations.of(0.0);
 
   // Algae removal
   public static final Angle kL2AlgaeSetpoint = Rotations.of(0.0);
@@ -58,6 +57,8 @@ public class ElevatorConstants {
   public static final Angle kL2CoralSetpoint = Rotations.of(19.62793);
   public static final Angle kL3CoralSetpoint = Rotations.of(30.42969);
   public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);
+
+  public static final Angle kPrestageSetpoint = kL3CoralSetpoint;
 
   // Algae obtaining
   public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);

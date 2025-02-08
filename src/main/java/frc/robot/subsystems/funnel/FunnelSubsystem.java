@@ -28,7 +28,8 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
   }
 
   public boolean hasCoral() {
-    return curState == FunnelState.HasSeenCoral;
+    return true;
+    // return curState == FunnelState.HasSeenCoral;
   }
 
   @Override
