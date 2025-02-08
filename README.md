@@ -5,9 +5,10 @@
 ## Controls
 
 ### Driver Controller
-
+![flysky](docs/driver-controls.png)
 
 ### Operator Controller
+![operator](docs/operator-controls.png)
 
 ## State Diagrams
 
