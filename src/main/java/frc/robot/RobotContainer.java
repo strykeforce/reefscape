@@ -28,6 +28,11 @@ import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.algae.AlgaeIOFX;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.battMon.BattMonSubsystem;
+import frc.robot.subsystems.biscuit.BiscuitIO;
+import frc.robot.subsystems.biscuit.BiscuitIOFX;
+import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.coral.CoralIO;
 import frc.robot.subsystems.coral.CoralIOFX;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -36,12 +41,28 @@ import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOFX;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.funnel.FunnelSubsystem;
+import frc.robot.subsystems.led.LEDIO;
+import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
+
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
+  private final RobotStateSubsystem robotStateSubsystem;
+
   private final AlgaeIOFX algaeIO;
   private final AlgaeSubsystem algaeSubsystem;
+
+  private final BattMonSubsystem battMonSubsystem;
+
+  private final BiscuitIOFX biscuitIO;
+  private final BiscuitSubsystem biscuitSubsystem;
+
+  private final ClimbSubsystem climbSubsystem;
 
   private final CoralIO coralIO;
   private final CoralSubsystem coralSubsystem;
@@ -52,6 +73,15 @@ public class RobotContainer {
   private final ElevatorIO elevatorIO;
   private final ElevatorSubsystem elevatorSubsystem;
 
+  private final FunnelSubsystem funnelSubsystem;
+
+  private final LEDIO ledIO;
+  private final LEDSubsystem ledSubsystem;
+
+  private final TagAlignSubsystem tagAlignSubsystem;
+
+  private final VisionSubsystem visionSubsystem;
+
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
   private final FlyskyJoystick flysky = new FlyskyJoystick(driveJoystick);
@@ -59,8 +89,16 @@ public class RobotContainer {
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   public RobotContainer() {
+
     algaeIO = new AlgaeIOFX();
     algaeSubsystem = new AlgaeSubsystem(algaeIO);
+
+    battMonSubsystem = new BattMonSubsystem();
+
+    biscuitIO = new BiscuitIOFX();
+    biscuitSubsystem = new BiscuitSubsystem();
+
+    climbSubsystem = new ClimbSubsystem();
 
     coralIO = new CoralIOFX();
     coralSubsystem = new CoralSubsystem(coralIO);
@@ -70,6 +108,17 @@ public class RobotContainer {
 
     elevatorIO = new ElevatorIOFX();
     elevatorSubsystem = new ElevatorSubsystem(elevatorIO);
+
+    funnelSubsystem = new FunnelSubsystem();
+    
+    ledIO = new LEDIO();
+    ledSubsystem = new LEDSubsystem();
+
+    visionSubsystem = new VisionSubsystem();
+
+    tagAlignSubsystem = new TagAlignSubsystem(driveSubsystem, visionSubsystem);
+
+    robotStateSubsystem = new RobotStateSubsystem(algaeSubsystem, null, null, null, coralSubsystem, driveSubsystem, elevatorSubsystem, null, null, null, null);
 
     configureTelemetry();
     configureDriverBindings();

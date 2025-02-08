@@ -16,7 +16,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private ElevatorStates curState = ElevatorStates.ZEROED;
+  private ElevatorStates currState = ElevatorStates.ZEROED;
 
   private Angle setpoint = Rotations.of(0);
 
