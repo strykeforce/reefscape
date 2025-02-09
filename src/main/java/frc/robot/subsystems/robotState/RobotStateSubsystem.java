@@ -230,7 +230,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPrepCoral() {
     if (curState == RobotStates.REEF_ALIGN_CORAL) {
-      toPlaceCoral();
+      if (elevatorSubsystem.isFinished()) {
+        toPlaceCoral();
+      }
     } else if (isAuto) {
       toReefAlign(false, false);
     } else {
@@ -309,6 +311,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPlaceCoral() {
     coralSubsystem.eject();
+    funnelSubsystem.ClearCoral();
     scoringTimer.stop();
     scoringTimer.reset();
     scoringTimer.start();
@@ -569,6 +572,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case FUNNEL_LOAD -> {
+        if (elevatorSubsystem.isFinished()) {
+          funnelSubsystem.startMotor();
+        }
         if (funnelSubsystem.hasCoral()) {
           coralLoc = CoralLoc.TRANSFER;
           setState(RobotStates.LOADING_CORAL);
@@ -579,6 +585,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           coralLoc = CoralLoc.CORAL;
           // biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
           elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
+          funnelSubsystem.stopMotor();
 
           setState(RobotStates.PRESTAGE, true);
         }

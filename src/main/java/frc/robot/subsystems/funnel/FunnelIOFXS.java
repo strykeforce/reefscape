@@ -48,7 +48,7 @@ public class FunnelIOFXS implements FunnelIO {
   public void updateInputs(FunnelIOInputs inputs) {
     BaseStatusSignal.refreshAll(curVelocity, curRevLimit);
     inputs.velocity = curVelocity.getValue();
-    inputs.isRevBeamBroken = curRevLimit.getValue().value == 1;
+    inputs.isRevBeamBroken = curRevLimit.getValue().value == 0;
   }
 
   @Override

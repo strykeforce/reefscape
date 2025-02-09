@@ -18,6 +18,7 @@ import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -345,6 +346,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
     IDLE,
     SAFE,
     SAFE_HOLD
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   @Override

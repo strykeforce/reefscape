@@ -1,20 +1,30 @@
 package frc.robot.commands.robotState;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
 public class ScoreReefManualCommand extends Command {
-  public RobotStateSubsystem robotStateSubsystem;
-  public RobotStates robotState;
+  private RobotStateSubsystem robotStateSubsystem;
+  private ElevatorSubsystem elevatorSubsystem;
+  private RobotStates startingRobotState;
+  private boolean startingElevatorFinished;
 
-  public ScoreReefManualCommand(RobotStateSubsystem robotStateSubsystem) {
+  public ScoreReefManualCommand(
+      RobotStateSubsystem robotStateSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      CoralSubsystem coralSubsystem) {
     this.robotStateSubsystem = robotStateSubsystem;
+    this.elevatorSubsystem = elevatorSubsystem;
+    addRequirements(elevatorSubsystem, coralSubsystem);
   }
 
   @Override
   public void initialize() {
-    robotState = robotStateSubsystem.getState();
+    startingRobotState = robotStateSubsystem.getState();
+    startingElevatorFinished = elevatorSubsystem.isFinished();
     robotStateSubsystem.setIsAuto(false);
     robotStateSubsystem.setGetAlgaeOnCycle(false);
     robotStateSubsystem.toPrepCoral();
@@ -22,12 +32,13 @@ public class ScoreReefManualCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    if (robotState == RobotStates.PRESTAGE || robotState == RobotStates.STOW) {
+    if (startingRobotState == RobotStates.PRESTAGE || startingRobotState == RobotStates.STOW) {
       return robotStateSubsystem.getState() == RobotStates.REEF_ALIGN_CORAL;
     }
-    if (robotState == RobotStates.REEF_ALIGN_CORAL) {
+    if (startingRobotState == RobotStates.REEF_ALIGN_CORAL) {
       return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
-          || robotStateSubsystem.getState() == RobotStates.LOADING_CORAL;
+          || robotStateSubsystem.getState() == RobotStates.LOADING_CORAL
+          || !startingElevatorFinished;
     }
     return false;
   }

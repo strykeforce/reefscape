@@ -145,11 +145,11 @@ public class RobotContainer {
   }
 
   private void configureTelemetry() {
-    telemetryService.register(driveSubsystem);
-    telemetryService.register(coralSubsystem);
-    telemetryService.register(algaeSubsystem);
-    telemetryService.register(elevatorSubsystem);
-    elevatorIO.registerWith(telemetryService);
+    driveSubsystem.registerWith(telemetryService);
+    coralSubsystem.registerWith(telemetryService);
+    algaeSubsystem.registerWith(telemetryService);
+    elevatorSubsystem.registerWith(telemetryService);
+    funnelSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -161,7 +161,7 @@ public class RobotContainer {
     // Reset Gyro Command
     new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.M_SWH.id)
-        .onTrue(new ScoreReefManualCommand(robotStateSubsystem));
+        .onTrue(new ScoreReefManualCommand(robotStateSubsystem, elevatorSubsystem, coralSubsystem));
   }
 
   private void configureOperatorBindings() {
@@ -177,7 +177,9 @@ public class RobotContainer {
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .onTrue(new StowCommand(robotStateSubsystem));
+        .onTrue(
+            new StowCommand(
+                robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem));
 
     // zero elevator, slated for removal
     new JoystickButton(xboxController, XboxController.Button.kX.value)
