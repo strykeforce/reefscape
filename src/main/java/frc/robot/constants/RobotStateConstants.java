@@ -6,4 +6,6 @@ public class RobotStateConstants {
 
   public static final double kRedBargeSafeX = 9.5;
   public static final double kBlueBargeSafeX = 8;
+
+  public static final double kCoralEjectTimer = 0.5;
 }

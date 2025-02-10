@@ -127,8 +127,8 @@
 ## Cameras
 | Camera      | IP Address  | Type    |
 | ----------- | ----------- | ------- |
-| Left Servo  | 10.27.67.XX | USB 3.0 |
-| Right Servo | 10.27.67.YY | USB 3.0 |
-| Upper Left  | 10.27.67.XX | USB 2.0 |
-| Upper Right | 10.27.67.YY | USB 2.0 |
-| Rear        | 10.27.67.ZZ | USB 2.0 |
+| Left Servo  | 10.27.67.11 | USB 3.0 |
+| Right Servo | 10.27.67.12 | USB 3.0 |
+| Upper Left  | 10.27.67.11 | USB 2.0 |
+| Upper Right | 10.27.67.12 | USB 2.0 |
+| Rear        | 10.27.67.13 | USB 2.0 |

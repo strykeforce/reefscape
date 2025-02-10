@@ -10,12 +10,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.DriveConstants;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -38,6 +41,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double trajectoryActive = 0.0;
 
   private int gyroDifferentCount = 0;
+
+  private RobotStateSubsystem robotStateSubsystem;
 
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
@@ -147,6 +152,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", msg);
   }
 
+  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
+    this.robotStateSubsystem = robotStateSubsystem;
+  }
+
   public Trajectory<SwerveSample> getAutoTrajectory() {
     if (autoTrajectory != null) {
       return autoTrajectory;
@@ -225,8 +234,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void teleResetGyro() {
     logger.info("Driver Joystick: Reset Gyro");
-    // double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
-    double gyroResetDegs = 0.0; // TODO change this to the above once we have RobotStateSubsystem
+    double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     io.resetGyro();
     io.resetOdometry(
@@ -241,8 +249,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Field flipping stuff
   public boolean shouldFlip() {
-    // return robotStateSubsystem.getAllianceColor() == Alliance.Red;
-    return true; // TODO change this to the above once we have RobotStateSubsystem
+    return robotStateSubsystem.getAllianceColor() == Alliance.Red;
   }
 
   public Translation2d apply(Translation2d translation) {
@@ -339,6 +346,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
     IDLE,
     SAFE,
     SAFE_HOLD
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   @Override

@@ -93,7 +93,7 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
+    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "rio");
     pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
     navx = new SF_AHRS();
     swerveDrive = new SwerveDrive(false, 0.02, pigeon, swerveModules);
