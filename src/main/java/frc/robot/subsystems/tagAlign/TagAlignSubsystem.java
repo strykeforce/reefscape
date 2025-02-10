@@ -56,6 +56,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("TagAlignSubsystem/TargetArea", -1);
     Logger.recordOutput("TagAlignSubsystem/TargetTag", -1);
     Logger.recordOutput("TagAlignSubsystem/TargetCenterX", -1);
+    Logger.recordOutput("TagAlignSubsystem/Hexant", -1);
   }
 
   // FIXME: uncomment when implemented
@@ -64,19 +65,24 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         TagServoingConstants.kRedReefPose;
     double offset = Units.degreesToRadians(30);
 
-    return (((int)
-                (FastMath.normalizeZeroTwoPi(
-                            driveSubsystem
-                                    .getPoseMeters()
-                                    .getTranslation()
-                                    .minus(reefT)
-                                    .getAngle()
-                                    .getRadians()
-                                - offset)
-                        / Units.degreesToRadians(60)
-                    + offset))
-            + 3)
-        % 6;
+    int hexant =
+        (((int)
+                    (FastMath.normalizeZeroTwoPi(
+                                driveSubsystem
+                                        .getPoseMeters()
+                                        .getTranslation()
+                                        .minus(reefT)
+                                        .getAngle()
+                                        .getRadians()
+                                    - offset)
+                            / Units.degreesToRadians(60)
+                        + offset))
+                + 3)
+            % 6;
+
+    Logger.recordOutput("TagAlignSubsystem/Hexant", hexant);
+
+    return hexant;
   }
 
   // Red reef numbered like blue (red 0 is facing the same direction as blue 0)
