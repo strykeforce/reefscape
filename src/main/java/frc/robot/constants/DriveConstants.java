@@ -21,8 +21,8 @@ public class DriveConstants {
   public static final double kGyroDifferentThreshold = 5.0; // 5 degrees
   public static final int kGyroDifferentCount = 3;
 
-  public static final double kRobotLength = 22.0;
-  public static final double kRobotWidth = 22.0;
+  public static final double kRobotLength = 0.4556125;
+  public static final double kRobotWidth = 0.4556125;
   public static final double kFieldMaxX = 17.548225;
   public static final double kFieldMaxY = 8.0518;
 
