@@ -42,6 +42,10 @@ public class LEDSubsystem extends MeasurableSubsystem {
   private boolean autoPlacing = false;
   private boolean isLimiting = false;
 
+  // game stuff
+  private int[] BottomUnits = new int[LEDConstants.kStripLength];
+  private int[] TopUnits = new int[LEDConstants.kStripLength];
+
   public LEDSubsystem(LEDIO io) {
     this.io = io;
   }
@@ -62,9 +66,10 @@ public class LEDSubsystem extends MeasurableSubsystem {
         io.setStrip(LEDConstants.kHasCage);
         break;
       case CLIMB_UP:
-        base =
-            LEDPattern.gradient(GradientType.kContinuous, Color.kLightGoldenrodYellow, Color.kBlack)
-                .scrollAtRelativeSpeed(Percent.per(Seconds).of(1));
+        // base =
+        //     LEDPattern.gradient(GradientType.kContinuous, Color.kLightGoldenrodYellow, Color.kBlack)
+        //         .scrollAtRelativeSpeed(Percent.per(Seconds).of(1));
+        io.setOff();
         break;
       default:
         break;
@@ -189,6 +194,58 @@ public class LEDSubsystem extends MeasurableSubsystem {
     base = getAlgea.overlayOn(place.overlayOn(level.overlayOn(algea.overlayOn(coral))));
   }
 
+  //game stuff
+  private void advanceUnits() {
+    for (int i = 0; i <= LEDConstants.kStripLength-1; i++) {
+      BottomUnits[i + 1] = BottomUnits[i];
+      TopUnits[i] = TopUnits[i + 1];
+      if (i == 0) 
+        BottomUnits[i] = 0;
+      if (i == LEDConstants.kStripLength)
+        TopUnits[i] = 0;
+      if (TopUnits[i] != 0 && BottomUnits[i] != 0) {
+        if (BottomUnits[i] == TopUnits[i]) {
+          BottomUnits[i] = 0;
+          TopUnits[i] = 0;
+        } else if (BottomUnits[i] > TopUnits[i] || (BottomUnits[i] == 1 && TopUnits[i] == 3)) {
+          TopUnits[i] = 0;
+        } else {
+          BottomUnits[i] = 0;
+        }
+      }
+      if (TopUnits[i + 1] != 0 && BottomUnits[i] != 0) {
+        if (BottomUnits[i] == TopUnits[i + 1]) {
+          BottomUnits[i] = 0;
+          TopUnits[i + 1] = 0;
+        } else if (BottomUnits[i] > TopUnits[i + 1] || (BottomUnits[i] == 1 && TopUnits[i + 1] == 3)) {
+          TopUnits[i + 1] = 0;
+        } else {
+          BottomUnits[i + 1] = 0;
+        }
+      }
+    }
+  }
+
+  private void displayUnits() {
+    for (int i = 0; i <= LEDConstants.kStripLength-1; i++) {
+      io.setLED(i, LEDConstants.kGameColors[BottomUnits[i]]);
+      if (TopUnits[i] != 0){
+        io.setLED(i, LEDConstants.kGameColors[TopUnits[i] + 3]);
+      }
+    }
+  }
+
+  public void addGameUnit(boolean isBottom, int unitNum) {
+    // the unitNum starts at 1 and ends at 3. if you use anything else, it will be ignored
+    if (unitNum >= 1 && unitNum <= 3) {
+      if (isBottom){
+        BottomUnits[0] = unitNum;
+      } else {
+        TopUnits[LEDConstants.kStripLength - 1] = unitNum;
+      }
+    }
+  }
+
   public void periodic() {
     switch (currState) {
       case OFF:
@@ -205,6 +262,11 @@ public class LEDSubsystem extends MeasurableSubsystem {
         break;
       case CLIMB_EMPTY:
         break;
+      case CLIMB_FULL:
+        break;
+      case CLIMB_UP:
+        advanceUnits();
+        displayUnits();
     }
     io.updateLEDs();
   }

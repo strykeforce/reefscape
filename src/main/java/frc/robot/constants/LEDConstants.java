@@ -39,7 +39,8 @@ public class LEDConstants {
   // Climb LED Colors
   public static final Color kWaitingForCage = Color.kRed;
   public static final Color kHasCage = Color.kGreen;
-  public static final Color[] gameColors = {
+  public static final Color[] kGameColors = {
+    Color.kBlack, // a dummy color
     Color.kDarkRed,
     Color.kDarkGreen,
     Color.kDarkBlue,
