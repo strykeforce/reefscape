@@ -13,6 +13,13 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveConstants {
+  public static final double kAlgaeRemovalSpeed = 0;
+
+  public static final double kDeadbandAllStick = 0.075;
+  public static final double kExpoScaleYawFactor = 0.75;
+  public static final double kRateLimitFwdStr = 3.5;
+  public static final double kRateLimitYaw = 8.0;
+
   public static final double kDriveGearRatio = 6.5;
   public static final double kWheelDiameterInches = 4.0;
   public static final double kMaxSpeedMetersPerSecond = 12.0;
@@ -53,6 +60,60 @@ public class DriveConstants {
   public static final double kTripTemp = 1300;
   public static final double kRecoverTemp = 1290;
   public static final double kNotifyTemp = 1295;
+
+  // public static TalonFXSConfiguration
+  //     getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
+  //   // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
+  //   TalonFXSConfiguration azimuthConfig = new TalonFXSConfiguration();
+
+  //   HardwareLimitSwitchConfigs hardwareLimitSwitchConfigs = new HardwareLimitSwitchConfigs();
+  //   hardwareLimitSwitchConfigs.ForwardLimitEnable = false;
+  //   hardwareLimitSwitchConfigs.ReverseLimitEnable = false;
+  //   azimuthConfig.HardwareLimitSwitch = hardwareLimitSwitchConfigs;
+
+  //   CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
+  //   currentConfig.SupplyCurrentLowerTime = 0;
+  //   currentConfig.SupplyCurrentLowerLimit = 0;
+
+  //   currentConfig.SupplyCurrentLimit = 10;
+  //   currentConfig.SupplyCurrentLimitEnable = true;
+
+  //   azimuthConfig.CurrentLimits = currentConfig;
+
+  //   Slot0Configs slot0Config = new Slot0Configs();
+  //   slot0Config.kP = 360.35;
+  //   slot0Config.kI = 0.0;
+  //   slot0Config.kD = 3.604;
+
+  //   azimuthConfig.Slot0 = slot0Config;
+
+  //   ExternalFeedbackConfigs externalFeedbackConfigs = new ExternalFeedbackConfigs();
+  //   externalFeedbackConfigs.VelocityFilterTimeConstant = 0.1;
+  //   externalFeedbackConfigs.ExternalFeedbackSensorSource =
+  //       ExternalFeedbackSensorSourceValue.PulseWidth;
+  //   azimuthConfig.ExternalFeedback = externalFeedbackConfigs;
+
+  //   VoltageConfigs voltageConfig = new VoltageConfigs();
+  //   voltageConfig.SupplyVoltageTimeConstant = 3.2; // FIXME, seems very long
+  //   azimuthConfig.Voltage = voltageConfig;
+
+  //   MotionMagicConfigs motionConfig = new MotionMagicConfigs();
+  //   motionConfig.MotionMagicCruiseVelocity = 800;
+  //   motionConfig.MotionMagicAcceleration = 10_000;
+  //   azimuthConfig.MotionMagic = motionConfig;
+
+  //   MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
+  //   motorConfigs.DutyCycleNeutralDeadband = 0.04;
+  //   motorConfigs.NeutralMode = NeutralModeValue.Coast;
+  //   azimuthConfig.MotorOutput = motorConfigs;
+
+  //   CommutationConfigs commutationConfigs = new CommutationConfigs();
+  //   commutationConfigs.MotorArrangement = MotorArrangementValue.Minion_JST;
+
+  //   azimuthConfig.Commutation = commutationConfigs;
+
+  //   return azimuthConfig;
+  // }
 
   public static TalonSRXConfiguration
       getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
@@ -115,18 +176,18 @@ public class DriveConstants {
     return driveConfig;
   }
 
-  public static final int kPigeonCanID = 1000; // fix later
+  public static final int kPigeonCanID = 4;
 
   public static Pigeon2Configuration getPigeon2Configuration() {
     Pigeon2Configuration config = new Pigeon2Configuration();
 
-    config.MountPose.MountPoseYaw = -90.0;
+    config.MountPose.MountPoseYaw = 0.0;
     config.MountPose.MountPoseRoll = 0.0;
     config.MountPose.MountPosePitch = 0.0;
 
     config.GyroTrim.GyroScalarX = 0.0;
     config.GyroTrim.GyroScalarY = 0.0;
-    config.GyroTrim.GyroScalarZ = -2.12;
+    config.GyroTrim.GyroScalarZ = -4.55;
 
     return config;
   }

@@ -5,9 +5,10 @@
 ## Controls
 
 ### Driver Controller
-
+![flysky](docs/driver-controls.png)
 
 ### Operator Controller
+![operator](docs/operator-controls.png)
 
 ## State Diagrams
 
@@ -17,35 +18,35 @@
 
 ## CAN Bus
 
-| Subsystem | Type     | Talon                     | ID  | CAN BUS | Comp PDP | Proto PDP | Motor | Breaker |
-| --------- | -------- | ------------------------- | --- | ------- | -------- | --------- | ----- | ------- |
-| Drive     | FXS      | azimuth                   | 0   | FD      |          | Minion    |       |         |
-| Drive     | FXS      | azimuth                   | 1   | FD      |          | Minion    |       |         |
-| Drive     | FXS      | azimuth                   | 2   | FD      |          | Minion    |       |         |
-| Drive     | FXS      | azimuth                   | 3   | FD      |          | Minion    |       |         |
-| Drive     | FX       | drive                     | 10  | FD      |          | kraken    |       |         |
-| Drive     | FX       | drive                     | 11  | FD      |          | kraken    |       |         |
-| Drive     | FX       | drive                     | 12  | FD      |          | kraken    |       |         |
-| Drive     | FX       | drive                     | 13  | FD      |          | kraken    |       |         |
-| Elevator  | FX       | elevatorMain              | 20  | rio     |          | kraken    |       |         |
-| Elevator  | FX       | elevatorFollow            | 21  | rio     |          | kraken    |       |         |
-| Biscuit   | FXS      | biscuit                   | 25  | rio     |          | minion    |       |         |
-| Algae     | FXS      | rollers                   | 30  | rio     |          | minion    |       |         |
-| Coral     | FXS      | wheels                    | 35  | rio     |          | minion    |       |         |
-| Funnel    | FXS      | rollers                   | 40  | rio     |          | minion    |       |         |
-| Climb     | FX       | rollers                   | 45  | rio     |          |           |       |         |
-| Climb     | FX       | pivot                     | 46  | rio     |          | kraken    |       |         |
-| Climb     | CANcoder | CANCoder                  | 47  | ri0     |          |           |       |         |
-| -         | -        | rio                       | -   | both    |          |           |       |         |
-| -         | -        | radio                     | -   | -       |          |           |       |         |
-| -         | -        | custom circuit (pi power) | -   | -       |          |           |       |         |
+| Subsystem | Type     | Talon                     | ID  | CAN BUS | Comp PDP | Proto PDP | Motor  | Breaker |
+| --------- | -------- | ------------------------- | --- | ------- | -------- | --------- | ------ | ------- |
+| Drive     | FXS      | azimuth                   | 0   | FD      |          | 16        | Minion |         |
+| Drive     | FXS      | azimuth                   | 1   | FD      |          | 17        | Minion |         |
+| Drive     | FXS      | azimuth                   | 2   | FD      |          | 6         | Minion |         |
+| Drive     | FXS      | azimuth                   | 3   | FD      |          | 7         | Minion |         |
+| Drive     | FX       | drive                     | 10  | FD      |          | 23        | kraken |         |
+| Drive     | FX       | drive                     | 11  | FD      |          | 22        | kraken |         |
+| Drive     | FX       | drive                     | 12  | FD      |          | 0         | kraken |         |
+| Drive     | FX       | drive                     | 13  | FD      |          | 1         | kraken |         |
+| Elevator  | FX       | elevatorMain              | 20  | rio     |          | 21        | kraken |         |
+| Elevator  | FX       | elevatorFollow            | 21  | rio     |          | 20        | kraken |         |
+| Biscuit   | FXS      | biscuit                   | 25  | rio     |          | 3         | Minion |         |
+| Algae     | FXS      | algae                     | 30  | rio     |          |           | Minion |         |
+| Coral     | FXS      | coral                     | 35  | rio     |          | 2         | Minion |         |
+| Funnel    | FXS      | rollers                   | 40  | rio     |          |           | Minion |         |
+| Climb     | FX       | frontMain                 | 45  | rio     |          |           | Minion |         |
+| Climb     | FX       | backFollow                | 46  | rio     |          |           | kraken |         |
+| Climb     | CANcoder | CANCoder                  | 47  | ri0     |          |           | n/a    |         |
+| -         | -        | rio                       | -   | both    |          | 12        |        |         |
+| -         | -        | vrm (radio, pigeon)       | -   | -       |          | 13        |        |         |
+| -         | -        | custom circuit (pi power) | -   | -       |          |           |        |         |
 
 ## VRM
-| Device          | Voltage | Current |
-| --------------- | ------- | ------- |
-| Pigeon 2        | 12      | 2       |
-| Ethernet Switch | 12      | 2       |
-|                 |         |         |
+| Device          | Voltage | Current | ID  |
+| --------------- | ------- | ------- | --- |
+| Pigeon 2        | 12      | 0.5     | 4   |
+| Ethernet Switch | 12      | 2       |     |
+|                 |         |         |     |
 
 ## Beam Breaks
 | Subsystem | Talon   | ID  | Fwd/Rev | Purpose            |
@@ -75,32 +76,32 @@
 | AutoSwitch | switch    | 9   |
 
 ## MXP
-| Subsystem | name      | ID  |
-| --------- | --------- | --- |
-| TagServo  | wallSense | 10  |
-|           |           | 11  |
-|           |           | 12  |
-|           |           | 13  |
-|           |           | 14  |
-|           |           | 15  |
-|           |           | 16  |
-|           |           | 17  |
-|           |           | 18  |
-|           |           | 19  |
-|           |           | 20  |
-|           |           | 21  |
-|           |           | 22  |
-|           |           | 23  |
-|           |           | 24  |
-|           |           | 25  |
+| Subsystem | name        | ID  |
+| --------- | ----------- | --- |
+| TagServo  | wallSense   | 10  |
+| Climb     | cageAligned | 11  |
+|           |             | 12  |
+|           |             | 13  |
+|           |             | 14  |
+|           |             | 15  |
+|           |             | 16  |
+|           |             | 17  |
+|           |             | 18  |
+|           |             | 19  |
+|           |             | 20  |
+|           |             | 21  |
+|           |             | 22  |
+|           |             | 23  |
+|           |             | 24  |
+|           |             | 25  |
 
 
 ## PWM
 | Subsystem | name         | ID  |
 | --------- | ------------ | --- |
 | LED       | lights       | 0   |
-|           |              | 1   |
-|           |              | 2   |
+| Climb     | deployServo  | 1   |
+| Climb     | ratchetServo | 2   |
 |           |              | 3   |
 |           |              | 4   |
 |           |              | 5   |
