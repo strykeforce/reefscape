@@ -422,6 +422,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
           // However we do have to be accepting the poses to use them
           if (visionUpdating) {
             driveSubsystem.addVisionMeasurement(robotPose, result.getTimeStamp(), stdMatrix);
+            logger.recordOutput("Vision/Vision Updating", visionUpdating);
           }
         } else {
           logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);
