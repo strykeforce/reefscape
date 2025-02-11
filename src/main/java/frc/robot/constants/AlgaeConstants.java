@@ -18,7 +18,7 @@ import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class AlgaeConstants {
-  public static int kFxId = 30;
+  public static final int kFxId = 30;
 
   public static final AngularVelocity kCloseEnough = RotationsPerSecond.of(0.1);
   public static final AngularVelocity kMaxFwd = RotationsPerSecond.of(100);

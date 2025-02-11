@@ -1,21 +1,25 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public class FunnelConstants {
-  public static final double kFunnelPercentOutput = 0;
+  public static final double kFunnelPercentOutput = 0.5;
 
-  public static int FunnelFxsId = 0;
-  public static final int kFunnelBeamCounts = 3;
+  public static int FunnelFxsId = 40;
+  public static final int kFunnelBeamCounts = 1;
 
   public static TalonFXSConfiguration getFXSConfig() {
     TalonFXSConfiguration fxsConfig = new TalonFXSConfiguration();
@@ -54,6 +58,15 @@ public class FunnelConstants {
             .withDutyCycleNeutralDeadband(0.01)
             .withNeutralMode(NeutralModeValue.Coast);
     fxsConfig.MotorOutput = motorOut;
+
+    CommutationConfigs commutation =
+        new CommutationConfigs().withMotorArrangement(MotorArrangementValue.Minion_JST);
+    fxsConfig.Commutation = commutation;
+
+    ExternalFeedbackConfigs external =
+        new ExternalFeedbackConfigs()
+            .withExternalFeedbackSensorSource(ExternalFeedbackSensorSourceValue.Commutation);
+    fxsConfig.ExternalFeedback = external;
 
     return fxsConfig;
   }

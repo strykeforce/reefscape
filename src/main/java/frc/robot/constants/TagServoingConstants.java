@@ -6,11 +6,11 @@ import edu.wpi.first.math.util.Units;
 public class TagServoingConstants {
   // Cameras
   public static final int kLeftServoCam = 0; // Score RIGHT coral
-  public static final int kRightServoCam = 1; // Score LEFT coral
+  public static final int kRightServoCam = 2; // Score LEFT coral
 
   // Targets
   public static final double kHorizontalTarget = 800;
-  public static final double kAreaTarget = 800;
+  public static final double kAreaTarget = 90_000;
 
   public static final double[] kAngleTarget = {
     Units.degreesToRadians(0),
@@ -31,7 +31,7 @@ public class TagServoingConstants {
   public static final double kAngleCloseEnough = Units.degreesToRadians(3.0);
 
   // Drive
-  public static final double kInitialDriveRadius = 1.5;
+  public static final double kInitialDriveRadius = 5;
   public static final double kStopXDriveRadius = 1.2; // Should be closer to reef than target pose
   public static final double kDriveCloseEnough = 0.3;
 

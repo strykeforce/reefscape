@@ -20,9 +20,16 @@ public class DriveConstants {
   public static final double kRateLimitFwdStr = 3.5;
   public static final double kRateLimitYaw = 8.0;
 
-  public static final double kDriveGearRatio = 6.5;
+  public static final double kDriveMotorOutputGear = 22;
+  public static final double kDriveInputGear = 52;
+  public static final double kBevelInputGear = 15;
+  public static final double kBevelOutputGear = 45;
+
+  public static final double kDriveGearRatio =
+      (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
+
   public static final double kWheelDiameterInches = 4.0;
-  public static final double kMaxSpeedMetersPerSecond = 12.0;
+  public static final double kMaxSpeedMetersPerSecond = 3.384;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
   public static final double kGyroDifferentThreshold = 5.0; // 5 degrees

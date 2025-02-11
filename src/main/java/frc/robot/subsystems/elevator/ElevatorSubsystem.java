@@ -63,8 +63,9 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
     org.littletonrobotics.junction.Logger.processInputs("ElevatorInputs", inputs);
 
     // Log outputs
-    Logger.recordOutput("Elevator/setpoints", setpoint);
+    Logger.recordOutput("Elevator/setpoint", setpoint.in(Rotations));
     Logger.recordOutput("Elevator/state", currState);
+    Logger.recordOutput("Elevator/isFinished", isFinished());
 
     switch (currState) {
       case ZEROING -> {
