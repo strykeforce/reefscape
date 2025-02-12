@@ -9,7 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.ReverseLimitValue;
+import com.ctre.phoenix6.signals.ForwardLimitValue;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.FunnelConstants;
@@ -22,7 +22,7 @@ public class FunnelIOFXS implements FunnelIo{
     // FX Acces Objects
     TalonFXSConfigurator configurator;
     StatusSignal<AngularVelocity> curVelocity;
-    StatusSignal<ReverseLimitValue> curRevLimit;
+    StatusSignal<ForwardLimitValue> curForLimit;
 
     private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0.0).withEnableFOC(false);
 
@@ -37,7 +37,7 @@ public class FunnelIOFXS implements FunnelIo{
 
         // Attach status signals
         curVelocity = talonfxs.getVelocity();
-        curRevLimit = talonfxs.getReverseLimit();
+        curForLimit = talonfxs.getForwardLimit();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class FunnelIOFXS implements FunnelIo{
     @Override
     public void updateInputs(FunnelIoInputs inputs) {
         inputs.velocity = curVelocity.refresh().getValue();
-        inputs.revBeamOpen = curRevLimit.refresh().getValue().value == 1;
+        inputs.forBeamOpen = curForLimit.refresh().getValue().value == 1;
     }
 
     @Override

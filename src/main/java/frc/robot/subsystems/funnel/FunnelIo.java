@@ -11,7 +11,8 @@ public interface FunnelIo {
     public static class FunnelIoInputs{
         public AngularVelocity velocity;
         // Open = beam isnt broken
-        public boolean revBeamOpen = false;
+        public boolean forBeamOpen = false;
+        public boolean beamEnabled = true;
     }
 
     public default void setPct(double percentOutput) {}
