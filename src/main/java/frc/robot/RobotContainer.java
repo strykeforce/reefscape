@@ -251,4 +251,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
+
+  public void stopTagAlign() {
+    tagAlignSubsystem.terminate();
+  }
 }

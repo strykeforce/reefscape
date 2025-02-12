@@ -334,6 +334,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
+
     if (Math.abs(inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees())
         > DriveConstants.kGyroDifferentThreshold) {
       gyroDifferentCount++;

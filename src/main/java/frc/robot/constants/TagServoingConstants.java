@@ -10,7 +10,8 @@ public class TagServoingConstants {
 
   // Targets
   public static final double kHorizontalTarget = 800;
-  public static final double kAreaTarget = 90_000;
+  public static final double kLeftCamDiagTarget = 1550;
+  public static final double kRightCamDiagTarget = 950;
 
   public static final double[] kAngleTarget = {
     Units.degreesToRadians(0),
@@ -26,9 +27,10 @@ public class TagServoingConstants {
   public static final int[] kRedTargetTag = {7, 8, 9, 10, 11, 6};
 
   // Tag align
-  public static final double kAreaCloseEnough = 0;
-  public static final double kHorizontalCloseEnough = 0;
+  public static final double kHorizontalCloseEnough = 10;
   public static final double kAngleCloseEnough = Units.degreesToRadians(3.0);
+  public static final double kDiagCloseEnough = 20;
+  public static final double kNoUpdateMicrosec = 500_000;
 
   // Drive
   public static final double kInitialDriveRadius = 5;
