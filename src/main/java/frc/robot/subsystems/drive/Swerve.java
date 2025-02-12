@@ -113,6 +113,8 @@ public class Swerve implements SwerveIO, Checkable {
             getSwerveModulePositions());
 
     swerveDrive.setOdometry(odometryStrategy);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Swerve/OdometryStratgey Pose", odometryStrategy.getPoseMeters());
   }
 
   // Getters/Setter
@@ -249,6 +251,7 @@ public class Swerve implements SwerveIO, Checkable {
 
     inputs.odometryX = swerveDrive.getPoseMeters().getX();
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
+    inputs.swervePose = odometryStrategy.getPoseMeters();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
     inputs.gyroRotation2d = swerveDrive.getHeading();
     inputs.navxRotation2d = navx.getRotation2d().rotateBy(navxOffset);

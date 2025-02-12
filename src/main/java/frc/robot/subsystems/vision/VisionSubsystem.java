@@ -7,6 +7,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -308,12 +309,13 @@ public class VisionSubsystem extends MeasurableSubsystem {
     double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
     double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
     // This filters out results by seeing if they are close to the right height
-    if (dist1 < dist2 && dist1 < 0.5) {
+    // If you use height ot gyro rotation should be determined experimentally
+    /*if (dist1 < dist2 && dist1 < 0.5) {
       return pose1;
     }
     if (dist2 < dist1 && dist2 < 0.5) {
       return pose2;
-    }
+    }*/
     // If we don't have enough data in the gyro buffer we default to returning a pose
     if (gyroBuffer.size() < VisionConstants.kCircularBufferSize) return pose1;
 
@@ -369,7 +371,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         WallEyePoseResult result = (WallEyePoseResult) res.getFirst();
         int idx = res.getSecond();
 
-        logger.recordOutput("Vision", result.getTimeStamp());
+        logger.recordOutput("Vision/resultTime", result.getTimeStamp());
         for (int i = 0; i < 2; i++) {
           stdMatrix.set(
               i,
@@ -421,8 +423,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
           logger.recordOutput("Vision/Accepted Cam " + camNames[idx], robotPose);
           // However we do have to be accepting the poses to use them
           if (visionUpdating) {
-            driveSubsystem.addVisionMeasurement(robotPose, result.getTimeStamp(), stdMatrix);
+            Matrix<N3, N1> testingMatrix = VecBuilder.fill(0.0001, 0.0001, 0.0001);
+            driveSubsystem.addVisionMeasurement(
+                robotPose, result.getTimeStamp() / 1_000_000, testingMatrix);
             logger.recordOutput("Vision/Vision Updating", visionUpdating);
+            logger.recordOutput("Vision/std", stdMatrix.get(0, 0));
           }
         } else {
           logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);

@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -168,10 +169,21 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update", MathSharedStore.getTimestamp() - timestamp);
     io.addVisionMeasurement(pose, timestamp);
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/stdDevvs", stdDevvs);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update", MathSharedStore.getTimestamp() - timestamp);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Vision Timestamp", timestamp);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Vision MathShared Time", MathSharedStore.getTimestamp());
     io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
@@ -334,6 +346,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Swerve Pose", inputs.swervePose);
     if (Math.abs(inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees())
         > DriveConstants.kGyroDifferentThreshold) {
       gyroDifferentCount++;
