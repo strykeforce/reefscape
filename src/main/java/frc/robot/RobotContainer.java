@@ -14,17 +14,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
+import frc.robot.commands.biscuit.HoldBiscuitCommand;
+import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.elevator.HoldElevatorCommand;
-import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.ScoreReefManualCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StowCommand;
+import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
+import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -141,7 +143,7 @@ public class RobotContainer {
 
     configureTelemetry();
     configureDriverBindings();
-    configureOperatorBindings();
+    configureTestOperatorBindings();
   }
 
   private void configureTelemetry() {
@@ -150,6 +152,7 @@ public class RobotContainer {
     algaeSubsystem.registerWith(telemetryService);
     elevatorSubsystem.registerWith(telemetryService);
     funnelSubsystem.registerWith(telemetryService);
+    biscuitSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -182,8 +185,12 @@ public class RobotContainer {
                 robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem));
 
     // zero elevator, slated for removal
-    new JoystickButton(xboxController, XboxController.Button.kX.value)
+    new JoystickButton(xboxController, XboxController.Button.kY.value)
         .onTrue(new ZeroElevatorCommand(elevatorSubsystem));
+
+    // Algae
+    new JoystickButton(xboxController, XboxController.Button.kX.value)
+        .onTrue(new ToggleGetAlgaeCommand(robotStateSubsystem));
   }
 
   private void configureTestOperatorBindings() {
@@ -204,14 +211,14 @@ public class RobotContainer {
     // Move Elevator
     new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
         .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
     new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
         .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
 
     // Zero Elevator
     new JoystickButton(xboxController, XboxController.Button.kX.value)

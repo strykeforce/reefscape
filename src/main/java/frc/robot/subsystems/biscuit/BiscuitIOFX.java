@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
@@ -26,6 +27,8 @@ public class BiscuitIOFX implements BiscuitIO {
   private StatusSignal<Angle> position;
   private StatusSignal<AngularVelocity> velocity;
   private StatusSignal<ForwardLimitTypeValue> fwdLimitSwitch;
+  private StatusSignal<Angle> rawQuadrature;
+  private StatusSignal<Angle> rawPulseWidth;
   private boolean didZero;
   private boolean fwdLimitSwitchOpen;
   private Angle offset;
@@ -51,6 +54,11 @@ public class BiscuitIOFX implements BiscuitIO {
     // Set our variables
     velocity = talon.getVelocity();
     position = talon.getPosition();
+    rawQuadrature = talon.getRawQuadraturePosition();
+    rawQuadrature.setUpdateFrequency(20);
+    rawPulseWidth = talon.getRawPulseWidthPosition();
+    rawPulseWidth.setUpdateFrequency(20);
+    zero();
   }
 
   @Override
@@ -76,8 +84,10 @@ public class BiscuitIOFX implements BiscuitIO {
   public void zero() {
     didZero = false;
     if (fwdLimitSwitchOpen == true) {
-      Angle pos = position.getValue();
-      offset = BiscuitConstants.kZero.minus(pos);
+      double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
+      double setPos = BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos);
+      talon.setPosition(setPos);
+      logger.info("set Biscuit position to " + setPos);
       didZero = true;
     } else {
       rangeAlert.set(true);

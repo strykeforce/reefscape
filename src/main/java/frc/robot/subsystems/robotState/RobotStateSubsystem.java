@@ -174,6 +174,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ledSubsystem.setAutoPlacing(isAutoPlacing);
   }
 
+  public void ToggleGetAlgaeOnCycle() {
+    getAlgaeOnCycle = !getAlgaeOnCycle;
+  }
+
   private boolean needSafeAlgaeTransfer(RobotStates nextState) {
     // if (algaeSubsystem.hasAlgae()) {
     //   switch (curState) {
@@ -221,7 +225,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStow() {
-    // biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
+    biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
     elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
     // algaeSubsystem.hold();
 
@@ -241,7 +245,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toFunnelLoad() {
-    // biscuitSubsystem.setPosition(BiscuitConstants.kFunnelSetpoint);
+    biscuitSubsystem.setPosition(BiscuitConstants.kFunnelSetpoint);
     coralSubsystem.intake();
     elevatorSubsystem.setPosition(ElevatorConstants.kFunnelSetpoint);
 
@@ -253,7 +257,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toReefAlign(boolean getAlgae, boolean drive) {
-    if (getAlgae) {
+    if (!coralSubsystem.hasCoral()) {
+      getAlgae = true;
+    }
+    if (getAlgae && scoreSide == ScoreSide.LEFT) {
       if (needSafeAlgaeTransfer(RobotStates.REEF_ALIGN_ALGAE)) {
         return;
       }
@@ -285,19 +292,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         currentLevel = scoringLevel;
         switch (scoringLevel) {
           case L1 -> {
-            // biscuitSubsystem.setPosition(BiscuitConstants.kL1CoralSetpoint);
+            biscuitSubsystem.setPosition(BiscuitConstants.kL1CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL1CoralSetpoint);
           }
           case L2 -> {
-            // biscuitSubsystem.setPosition(BiscuitConstants.kL2CoralSetpoint);
+            biscuitSubsystem.setPosition(BiscuitConstants.kL2CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL2CoralSetpoint);
           }
           case L3 -> {
-            // biscuitSubsystem.setPosition(BiscuitConstants.kL3CoralSetpoint);
+            biscuitSubsystem.setPosition(BiscuitConstants.kL3CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL3CoralSetpoint);
           }
           case L4 -> {
-            // biscuitSubsystem.setPosition(BiscuitConstants.kL4CoralSetpoint);
+            biscuitSubsystem.setPosition(BiscuitConstants.kL4CoralSetpoint);
             elevatorSubsystem.setPosition(ElevatorConstants.kL4CoralSetpoint);
           }
         }
@@ -447,9 +454,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     switch (curState) {
       case TRANSFER -> {
-        if (
-        // biscuitSubsystem.isFinished() &&
-        elevatorSubsystem.isFinished()
+        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()
         // && climbSubsystem.isFinished()
         ) {
           setState(nextState);
@@ -457,9 +462,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case TO_STOW -> {
-        if (
-        // biscuitSubsystem.isFinished() &&
-        elevatorSubsystem.isFinished()) {
+        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
           setState(RobotStates.STOW);
         }
       }
@@ -583,7 +586,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case LOADING_CORAL -> {
         if (coralSubsystem.hasCoral()) {
           coralLoc = CoralLoc.CORAL;
-          // biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
+          biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
           elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
           funnelSubsystem.stopMotor();
 
