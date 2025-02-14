@@ -162,12 +162,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.getAlgaeOnCycle = getAlgaeOnCycle;
   }
 
+  public boolean getGetAlgaeOnCycle(){
+    return getAlgaeOnCycle;
+  }
+
   public void setCurrentLimiting(boolean isCurrentLimiting) {
     this.isCurrentLimiting = isCurrentLimiting;
   }
 
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
+  }
+
+  public boolean getIsAuto(){
+    return isAuto;
   }
 
   public void setAutoPlacingLed(boolean isAutoPlacing) {
