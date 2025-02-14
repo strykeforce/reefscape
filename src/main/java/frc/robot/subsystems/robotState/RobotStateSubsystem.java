@@ -154,6 +154,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.algaeHeight = algaeHeight;
   }
 
+  public void toggleAlgaeHeight(AlgaeHeight algaeHeight) {
+    this.algaeHeight = algaeHeight == AlgaeHeight.LOW ? AlgaeHeight.HIGH : AlgaeHeight.LOW;
+  }
+
   public void setAutoPlacing(boolean isAutoPlacing) {
     this.isAutoPlacing = isAutoPlacing;
   }
@@ -164,6 +168,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public boolean getGetAlgaeOnCycle(){
     return getAlgaeOnCycle;
+  }
+
+  public void ToggleGetAlgaeOnCycle() {
+    getAlgaeOnCycle = !getAlgaeOnCycle;
   }
 
   public void setCurrentLimiting(boolean isCurrentLimiting) {
@@ -180,10 +188,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setAutoPlacingLed(boolean isAutoPlacing) {
     ledSubsystem.setAutoPlacing(isAutoPlacing);
-  }
-
-  public void ToggleGetAlgaeOnCycle() {
-    getAlgaeOnCycle = !getAlgaeOnCycle;
   }
 
   private boolean needSafeAlgaeTransfer(RobotStates nextState) {
