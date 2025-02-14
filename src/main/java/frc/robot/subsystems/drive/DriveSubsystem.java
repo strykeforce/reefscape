@@ -248,8 +248,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
     double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     io.resetGyro();
-    io.resetOdometry(
-        new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
+    // io.resetOdometry(
+    //     new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
   }
 
   // Make whether a trajectory is currently active obvious on grapher

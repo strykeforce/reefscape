@@ -305,15 +305,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private Pose3d getCorrectPose(Pose3d pose1, Pose3d pose2, double time, int camIndex) {
-    double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
-    double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
-    // This filters out results by seeing if they are close to the right height
-    if (dist1 < dist2 && dist1 < 0.5) {
-      return pose1;
-    }
-    if (dist2 < dist1 && dist2 < 0.5) {
-      return pose2;
-    }
+    // double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
+    // double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
+    // // This filters out results by seeing if they are close to the right height
+    // if (dist1 < dist2 && dist1 < 0.5) {
+    //   return pose1;
+    // }
+    // if (dist2 < dist1 && dist2 < 0.5) {
+    //   return pose2;
+    // }
     // If we don't have enough data in the gyro buffer we default to returning a pose
     if (gyroBuffer.size() < VisionConstants.kCircularBufferSize) return pose1;
 

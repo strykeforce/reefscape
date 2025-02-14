@@ -14,6 +14,7 @@ import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
@@ -69,22 +70,20 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             : TagServoingConstants.kRedReefPose;
     double offset = Units.degreesToRadians(30);
 
-    // int hexant =
-    //     (((int)
-    //                 (FastMath.normalizeZeroTwoPi(
-    //                             driveSubsystem
-    //                                     .getPoseMeters()
-    //                                     .getTranslation()
-    //                                     .minus(reefT)
-    //                                     .getAngle()
-    //                                     .getRadians()
-    //                                 - offset)
-    //                         / Units.degreesToRadians(60)
-    //                     + offset))
-    //             + (color == Alliance.Blue ? 0 : 3))
-    //         % 6;
-
-    int hexant = 5;
+    int hexant =
+        (((int)
+                    (FastMath.normalizeZeroTwoPi(
+                                driveSubsystem
+                                        .getPoseMeters()
+                                        .getTranslation()
+                                        .minus(reefT)
+                                        .getAngle()
+                                        .getRadians()
+                                    - offset)
+                            / Units.degreesToRadians(60)
+                        + offset))
+                + (color == Alliance.Blue ? 0 : 3))
+            % 6;
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", hexant);
 
@@ -251,7 +250,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
         driveSubsystem.move(0, 0, vOmega, true);
 
-        // driveSubsystem.move(adjusted.getX(), adjusted.getY(), vOmega, true);
+        driveSubsystem.move(adjusted.getX(), adjusted.getY(), vOmega, true);
       }
 
       case TAG_ALIGN -> {

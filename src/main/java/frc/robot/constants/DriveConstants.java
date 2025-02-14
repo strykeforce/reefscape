@@ -10,6 +10,8 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveConstants {
@@ -66,6 +68,9 @@ public class DriveConstants {
   public static final double kTripTemp = 1300;
   public static final double kRecoverTemp = 1290;
   public static final double kNotifyTemp = 1295;
+
+  public static final Pose2d kResetOdomPose =
+      new Pose2d(new Translation2d(0.5, 3.62), Rotation2d.fromDegrees(67));
 
   // public static TalonFXSConfiguration
   //     getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
