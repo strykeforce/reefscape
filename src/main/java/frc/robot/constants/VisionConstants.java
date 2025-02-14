@@ -30,7 +30,7 @@ public final class VisionConstants {
   public static final double kOffsetOnVelFilter = 0.10;
   public static final double kSquaredCoeffOnVelFilter = 0.1;
 
-  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(1, 1, Units.degreesToRadians(0));
+  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(1, 1, Units.degreesToRadians(360));
 
   public static final double kTimeStampOffset = 0.0;
 
@@ -109,11 +109,11 @@ public final class VisionConstants {
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [x, y, theta], with units in radians.
   public static Matrix<N1, N1> kLocalMeasurementStdDevs =
-      VecBuilder.fill(Units.degreesToRadians(0.01));
+      VecBuilder.fill(Units.degreesToRadians(360));
 
   // Increase these numbers to trust global measurements from vision less. This matrix is in the
   // form [x, y, theta]ᵀ, with units in meters and radians.
   // Vision Odometry Standard devs
   public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(360));
+      VecBuilder.fill(0.0005, 0.0005, Units.degreesToRadians(1));
 }

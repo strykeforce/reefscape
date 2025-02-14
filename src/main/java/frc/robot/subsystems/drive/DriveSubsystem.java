@@ -14,6 +14,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.util.Set;
@@ -168,10 +169,25 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update",
+        RobotController.getFPGATime() / 1_000_000 - timestamp);
     io.addVisionMeasurement(pose, timestamp);
   }
 
   public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/stdDevvs", stdDevvs.get(0, 0));
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update",
+        RobotController.getFPGATime() / 1_000_000.0 - timestamp);
+
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/FPGA Seconds", RobotController.getFPGATime() / 1_000_000.0);
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Result Seconds", timestamp);
+
     io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
@@ -248,8 +264,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
     double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     io.resetGyro();
-    // io.resetOdometry(
-    //     new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
+    io.resetOdometry(
+        new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));
   }
 
   // Make whether a trajectory is currently active obvious on grapher
@@ -334,7 +350,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
-
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Swerve Pose", inputs.swervePose);
     if (Math.abs(inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees())
         > DriveConstants.kGyroDifferentThreshold) {
       gyroDifferentCount++;

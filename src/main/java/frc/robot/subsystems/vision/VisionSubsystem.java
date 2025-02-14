@@ -7,6 +7,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -107,7 +108,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private WallEyeTagResult[] lastResult = new WallEyeTagResult[VisionConstants.kNumCams];
   private Matrix<N3, N1> adativeMatrix;
   private Matrix<N3, N1> stdMatrix;
-  private Logger logger;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -299,9 +299,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
     from the rotation of the pose and compare the two*/
     if (Math.abs(new Rotation2d(rotation).minus(pose1.getRotation().toRotation2d()).getRadians())
         <= Math.abs(
-            new Rotation2d(rotation).minus(pose2.getRotation().toRotation2d()).getRadians()))
+            new Rotation2d(rotation).minus(pose2.getRotation().toRotation2d()).getRadians())) {
+      Logger.recordOutput("Vision/Wrong Pose", pose2);
+      Logger.recordOutput("Vision/Right Pose", pose1);
       return pose1;
-    else return pose2;
+    } else {
+      Logger.recordOutput("Vision/Wrong Pose", pose1);
+      Logger.recordOutput("Vision/Right Pose", pose2);
+      return pose2;
+    }
   }
 
   private Pose3d getCorrectPose(Pose3d pose1, Pose3d pose2, double time, int camIndex) {
@@ -320,6 +326,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
     // See what pose is closer the the gyro at the time of the photo's capture.
     double rotation =
         gyroBuffer.get(FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
+    Logger.recordOutput(
+        "Vision/Gyro Queried Loop Count",
+        FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
     return getCloserPose(pose1, pose2, rotation);
   }
 
@@ -328,7 +337,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
     gyroBuffer.addFirst(gyroData);
-    logger.recordOutput("Vision/Gyro Buffer", gyroData);
+    Logger.recordOutput("Vision/Gyro Buffer", gyroData);
+    Logger.recordOutput(
+        "Vision/Gyro Loop Count",
+        FastMath.floorToInt(
+            ((RobotController.getFPGATime() / 1_000_000.0) / VisionConstants.kLoopTime)));
 
     if (getSeconds() - timeSinceLastUpdate > VisionConstants.kMaxTimeNoVision) {
       updatesToWheels = 0;
@@ -369,7 +382,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         WallEyePoseResult result = (WallEyePoseResult) res.getFirst();
         int idx = res.getSecond();
 
-        logger.recordOutput("Vision", result.getTimeStamp());
+        Logger.recordOutput("Vision/resultTime", result.getTimeStamp());
         for (int i = 0; i < 2; i++) {
           stdMatrix.set(
               i,
@@ -402,8 +415,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
               new Pose3d(
                   cam2Pose.getTranslation(), cam2Pose.getRotation().rotateBy(camRotations[idx]));
 
-          logger.recordOutput("Vision/Raw Camera 1 " + camNames[idx], cam1Pose);
-          logger.recordOutput("Vision/Raw Camera 2 " + camNames[idx], cam2Pose);
+          Logger.recordOutput("Vision/Raw Camera 1 " + camNames[idx], cam1Pose);
+          Logger.recordOutput("Vision/Raw Camera 2 " + camNames[idx], cam2Pose);
 
           cameraPose = getCorrectPose(cam1Pose, cam2Pose, result.getTimeStamp(), idx);
           robotTranslation =
@@ -418,13 +431,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (camsWithinField(robotTranslation, result)) {
           // Is the pose in the field? If so, enjoy a updated position drive subsystem
           updatesToWheels++;
-          logger.recordOutput("Vision/Accepted Cam " + camNames[idx], robotPose);
+          Logger.recordOutput("Vision/Accepted Cam " + camNames[idx], robotPose);
           // However we do have to be accepting the poses to use them
           if (visionUpdating) {
-            driveSubsystem.addVisionMeasurement(robotPose, result.getTimeStamp(), stdMatrix);
+            Matrix<N3, N1> testingMatrix = VecBuilder.fill(0.0001, 0.0001, 0.0001);
+            driveSubsystem.addVisionMeasurement(
+                robotPose, result.getTimeStamp() / 1_000_000.0, testingMatrix);
+            Logger.recordOutput("Vision/Vision Updating", visionUpdating);
+            Logger.recordOutput("Vision/std", stdMatrix.get(0, 0));
           }
         } else {
-          logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);
+          Logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);
         }
       }
     }
