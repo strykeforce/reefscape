@@ -68,11 +68,10 @@ public class BiscuitIOFX implements BiscuitIO {
 
   @Override
   public void updateInputs(BiscuitIOInputs inputs) {
-    BaseStatusSignal.refreshAll(velocity, position, fwdLimitSwitch);
     inputs.velocity = velocity.getValue();
     inputs.position = position.getValue();
-    inputs.fwdLimitSwitchOpen = fwdLimitSwitch.getValueAsDouble() == 1;
     inputs.didZero = didZero;
+    BaseStatusSignal.refreshAll(velocity, position);
   }
 
   @Override

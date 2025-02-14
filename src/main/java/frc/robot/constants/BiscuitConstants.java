@@ -35,37 +35,38 @@ public class BiscuitConstants {
   // Setpoints
   // Idle
   public static final Angle kStowSetpoint = Rotations.of(0.0);
-  public static final Angle kFunnelSetpoint = Rotations.of(0.0);
-  public static final Angle kPrestageSetpoint = Rotations.of(0.0);
+  public static final Angle kFunnelSetpoint = kStowSetpoint;
+  public static final Angle kPrestageSetpoint = kStowSetpoint;
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kL3AlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(120.12604);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(120.12604);
 
-  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(0.0);
-  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(0.0);
+  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(120.12604);
+  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(120.12604);
 
   public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
   public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
 
   // Coral score
-  public static final Angle kL1CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL2CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL3CoralSetpoint = Rotations.of(0.0);
-  public static final Angle kL4CoralSetpoint = Rotations.of(0.0);
+  public static final Angle kL1CoralSetpoint = kStowSetpoint;
+  public static final Angle kL2CoralSetpoint = kStowSetpoint;
+  public static final Angle kL3CoralSetpoint = kStowSetpoint;
+  public static final Angle kL4CoralSetpoint = kStowSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(320.74);
   public static final Angle kMicAlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kHpAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kHpAlgaeSetpoint = Rotations.of(106.6608);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(0.0);
-  public static final Angle kBargeSetpoint = Rotations.of(0.0);
+  public static final Angle kProcessorSetpoint = Rotations.of(319.6908);
+  public static final Angle kBargeSetpoint = Rotations.of(77.5906);
+  public static final Angle kBargeBackwardsSetpoint = Rotations.of(-77.5906);
 
   // jogging
-  public static final double kJogAmountUp = 1;
-  public static final double kJogAmountDown = 1;
+  public static final double kJogAmountUp = 10;
+  public static final double kJogAmountDown = -10;
 
   // Disables the TalonFXS by setting it's voltage to zero. Not very shocking.
   public static VoltageConfigs disableTalon() {
@@ -80,7 +81,7 @@ public class BiscuitConstants {
 
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(10)
+            .withStatorCurrentLimit(0)
             .withStatorCurrentLimitEnable(false)
             .withSupplyCurrentLimit(20)
             .withSupplyCurrentLowerLimit(5)
@@ -115,8 +116,8 @@ public class BiscuitConstants {
             .withKD(0)
             .withGravityType(GravityTypeValue.Elevator_Static)
             .withKG(0)
-            .withKS(1)
-            .withKV(0)
+            .withKS(0)
+            .withKV(0.1)
             .withKA(0);
     fxsConfig.Slot0 = slot0;
 
@@ -132,7 +133,7 @@ public class BiscuitConstants {
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
             .withDutyCycleNeutralDeadband(0.01)
-            .withNeutralMode(NeutralModeValue.Coast);
+            .withNeutralMode(NeutralModeValue.Brake);
     fxsConfig.MotorOutput = motorOut;
 
     CommutationConfigs commutation =
@@ -142,6 +143,7 @@ public class BiscuitConstants {
     ExternalFeedbackConfigs feedBack =
         new ExternalFeedbackConfigs()
             .withExternalFeedbackSensorSource(ExternalFeedbackSensorSourceValue.Commutation);
+    fxsConfig.ExternalFeedback = feedBack;
 
     return fxsConfig;
   }

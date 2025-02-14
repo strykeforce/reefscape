@@ -20,6 +20,8 @@ import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.elevator.HoldElevatorCommand;
+import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.ScoreReefManualCommand;
@@ -208,7 +210,7 @@ public class RobotContainer {
         .onTrue(new OpenLoopCoralCommand(coralSubsystem, 1))
         .onTrue(new EnableEjectBeamCommand(false, coralSubsystem));
 
-    // Move Elevator
+    // Move biscuit
     new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
         .onTrue(
             new JogBiscuitCommand(
@@ -219,6 +221,18 @@ public class RobotContainer {
             new JogBiscuitCommand(
                 biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
         .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
 
     // Zero Elevator
     new JoystickButton(xboxController, XboxController.Button.kX.value)
