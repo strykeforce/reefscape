@@ -38,9 +38,16 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
         switch (curState){
             case HasSeenCoral:
+            if(inputs.fwdBeamOpen == false) {
+                setPercent(0.0);
+            }else{
+                setPercent(FunnelConstants.kFunnelPercentOutput);
+            }
                 break;
             case HasNotSeenCoral:
-            if(inputs.forBeamOpen == false){
+            setPercent(FunnelConstants.kFunnelPercentOutput);
+
+            if(inputs.fwdBeamOpen == false){
                 totalBreaks += 1;
             }else{
                 totalBreaks = 0;
@@ -81,11 +88,13 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     }
 
     public void PassCoral() {
-
+        io.enableFwdLimitSwitch(false);
+        setPercent(FunnelConstants.kFunnelPercentOutput);
     }
 
     public void StopCoral() {
-
+        io.enableFwdLimitSwitch(true);
+        setPercent(0.0);
     }
  
     public void StopMotor() {

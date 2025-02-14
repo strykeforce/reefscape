@@ -22,7 +22,7 @@ public class FunnelIOFXS implements FunnelIo{
     // FX Acces Objects
     TalonFXSConfigurator configurator;
     StatusSignal<AngularVelocity> curVelocity;
-    StatusSignal<ForwardLimitValue> curForLimit;
+    StatusSignal<ForwardLimitValue> curFwdLimit;
 
     private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0.0).withEnableFOC(false);
 
@@ -37,7 +37,7 @@ public class FunnelIOFXS implements FunnelIo{
 
         // Attach status signals
         curVelocity = talonfxs.getVelocity();
-        curForLimit = talonfxs.getForwardLimit();
+        curFwdLimit = talonfxs.getForwardLimit();
     }
 
     @Override
@@ -48,11 +48,21 @@ public class FunnelIOFXS implements FunnelIo{
     @Override
     public void updateInputs(FunnelIoInputs inputs) {
         inputs.velocity = curVelocity.refresh().getValue();
-        inputs.forBeamOpen = curForLimit.refresh().getValue().value == 1;
+        inputs.fwdBeamOpen = curFwdLimit.refresh().getValue().value == 1;
     }
 
     @Override
     public void registerWith(TelemetryService telemetryService) {
         telemetryService.register(talonfxs, true);
     }
+
+    @Override
+    public void enableFwdLimitSwitch(boolean enabled) {
+    talonfxs
+        .getConfigurator()
+        .apply(
+            FunnelConstants.getFXSConfig()
+                .HardwareLimitSwitch
+                .withForwardLimitEnable(enabled));
+  }
 }
