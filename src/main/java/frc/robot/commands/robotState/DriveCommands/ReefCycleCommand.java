@@ -3,9 +3,9 @@ package frc.robot.commands.robotState.DriveCommands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
-public class ReefCycleComand extends InstantCommand {
+public class ReefCycleCommand extends InstantCommand {
     RobotStateSubsystem robotState;
-    public ReefCycleComand(RobotStateSubsystem robotState){
+    public ReefCycleCommand(RobotStateSubsystem robotState){
         this.robotState = robotState;
     }
     @Override
