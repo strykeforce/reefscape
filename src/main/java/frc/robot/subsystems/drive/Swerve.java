@@ -257,7 +257,7 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.gyroRotation2d = swerveDrive.getHeading();
     inputs.navxRotation2d = navx.getRotation2d().rotateBy(navxOffset);
     inputs.normalizedGyroRotation =
-        FastMath.toDegrees(FastMath.normalizeZeroTwoPi(swerveDrive.getHeading().getRadians()));
+        FastMath.normalizeMinusPiPi(swerveDrive.getHeading().getRadians());
     inputs.gyroPitch = pigeon.getPitch();
     inputs.gyroRoll = pigeon.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();

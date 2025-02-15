@@ -73,16 +73,15 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     int hexant =
         (((int)
                     (FastMath.normalizeZeroTwoPi(
-                                driveSubsystem
-                                        .getPoseMeters()
-                                        .getTranslation()
-                                        .minus(reefT)
-                                        .getAngle()
-                                        .getRadians()
-                                    - offset)
-                            / Units.degreesToRadians(60)
-                        + offset))
-                + (color == Alliance.Blue ? 0 : 3))
+                            driveSubsystem
+                                    .getPoseMeters()
+                                    .getTranslation()
+                                    .minus(reefT)
+                                    .getAngle()
+                                    .getRadians()
+                                + offset)
+                        / Units.degreesToRadians(60)))
+                + (color == Alliance.Blue ? 3 : 0))
             % 6;
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", hexant);
@@ -207,6 +206,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         alliance == Alliance.Blue
             ? TagServoingConstants.kBlueTargetTag[computeHexant(alliance)]
             : TagServoingConstants.kRedTargetTag[computeHexant(alliance)]; // TODO: REMOVE
+    computeHexant(alliance);
 
     calculateAlignY();
 

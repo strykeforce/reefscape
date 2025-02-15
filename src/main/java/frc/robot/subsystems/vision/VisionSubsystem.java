@@ -7,7 +7,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,7 +19,6 @@ import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.drive.Swerve;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
@@ -90,8 +88,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Idx
   };
 
-  private Swerve swerve = new Swerve();
-  private DriveSubsystem driveSubsystem = new DriveSubsystem(swerve);
+  private DriveSubsystem driveSubsystem;
   /*Because we use two seperate loggers we can import one and then define the
   other here.*/
   private org.slf4j.Logger textLogger;
@@ -197,9 +194,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
     Translation2d disp = (curPose.getTranslation().minus(pose.toTranslation2d()));
 
     double velMagnitude =
-        Math.sqrt(Math.pow(vel.vxMetersPerSecond, 2) + Math.pow(vel.vyMetersPerSecond, 2));
+        FastMath.sqrt(
+            FastMath.pow(vel.vxMetersPerSecond, 2) + FastMath.pow(vel.vyMetersPerSecond, 2));
 
-    double dispMagnitude = Math.sqrt(Math.pow(disp.getX(), 2) + Math.pow(disp.getY(), 2));
+    double dispMagnitude =
+        FastMath.sqrt(FastMath.pow(disp.getX(), 2) + FastMath.pow(disp.getY(), 2));
 
     /*This gets our displacement and compares it to who much we could
     have moved.It does this by getting the velocity and plotting it on a
@@ -208,13 +207,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
         && dispMagnitude
             <= (velMagnitude * VisionConstants.kLinearCoeffOnVelFilter
                 + VisionConstants.kOffsetOnVelFilter
-                + Math.pow(velMagnitude * VisionConstants.kSquaredCoeffOnVelFilter, 2));
+                + FastMath.pow(velMagnitude * VisionConstants.kSquaredCoeffOnVelFilter, 2));
   }
 
   private boolean camsWithinField(Translation3d pose, WallEyePoseResult result) {
     return (result.getNumTags() >= 2 || result.getAmbiguity() < VisionConstants.kMaxAmbig)
         && pose.getX() < field.getFieldLength()
-        && pose.getY() < field.getFieldWidth();
+        && pose.getX() > 0
+        && pose.getY() < field.getFieldWidth()
+        && pose.getY() > 0;
   }
 
   /*Large switch case to see get the standard deviation factor based on camera, how many
@@ -224,72 +225,72 @@ public class VisionSubsystem extends MeasurableSubsystem {
       case VisionConstants.kCam2Name, VisionConstants.kCam4Name -> {
         if (numTags == 1)
           return 1
-              / VisionConstants.FOV58YUYVBaseTrust
-              * FastMath.pow(
-                  VisionConstants.baseNumber,
-                  FastMath.pow(
-                      VisionConstants.FOV58YUYVSingleTagCoeff * distance,
-                      VisionConstants.FOV58YUYVPowerNumber));
+              / (VisionConstants.FOV58YUYVBaseTrust
+                  * FastMath.pow(
+                      VisionConstants.baseNumber,
+                      FastMath.pow(
+                          VisionConstants.FOV58YUYVSingleTagCoeff * distance,
+                          VisionConstants.FOV58YUYVPowerNumber)));
 
         return 1
-            / VisionConstants.FOV58YUYVBaseTrust
-            * FastMath.pow(
-                VisionConstants.baseNumber,
-                FastMath.pow(
-                    VisionConstants.FOV58YUYVMultiTagCoeff * distance,
-                    VisionConstants.FOV58YUYVPowerNumber));
+            / (VisionConstants.FOV58YUYVBaseTrust
+                * FastMath.pow(
+                    VisionConstants.baseNumber,
+                    FastMath.pow(
+                        VisionConstants.FOV58YUYVMultiTagCoeff * distance,
+                        VisionConstants.FOV58YUYVPowerNumber)));
       }
       case VisionConstants.kCam5Name -> {
         if (numTags == 1)
           return 1
-              / VisionConstants.FOV58YUYVBaseTrust
-              * FastMath.pow(
-                  VisionConstants.baseNumber,
-                  FastMath.pow(
-                      VisionConstants.FOV58MJPGSingleTagCoeff * distance,
-                      VisionConstants.FOV58YUYVPowerNumber));
+              / (VisionConstants.FOV58YUYVBaseTrust
+                  * FastMath.pow(
+                      VisionConstants.baseNumber,
+                      FastMath.pow(
+                          VisionConstants.FOV58MJPGSingleTagCoeff * distance,
+                          VisionConstants.FOV58YUYVPowerNumber)));
 
         return 1
-            / VisionConstants.FOV58YUYVBaseTrust
-            * FastMath.pow(
-                VisionConstants.baseNumber,
-                FastMath.pow(
-                    VisionConstants.FOV58MJPGSingleTagCoeff * distance,
-                    VisionConstants.FOV58YUYVPowerNumber));
+            / (VisionConstants.FOV58YUYVBaseTrust
+                * FastMath.pow(
+                    VisionConstants.baseNumber,
+                    FastMath.pow(
+                        VisionConstants.FOV58MJPGSingleTagCoeff * distance,
+                        VisionConstants.FOV58YUYVPowerNumber)));
       }
 
       case VisionConstants.kCam1Name, VisionConstants.kCam3Name -> {
         if (numTags == 1)
           return 1
-              / VisionConstants.FOV75YUYVBaseTrust
-              * FastMath.pow(
-                  VisionConstants.baseNumber,
-                  FastMath.pow(
-                      VisionConstants.FOV75YUYVSingleTagCoeff * distance,
-                      VisionConstants.FOV75YUYVPowerNumber));
+              / (VisionConstants.FOV75YUYVBaseTrust
+                  * FastMath.pow(
+                      VisionConstants.baseNumber,
+                      FastMath.pow(
+                          VisionConstants.FOV75YUYVSingleTagCoeff * distance,
+                          VisionConstants.FOV75YUYVPowerNumber)));
         return 1
-            / VisionConstants.FOV75YUYVBaseTrust
-            * FastMath.pow(
-                VisionConstants.baseNumber,
-                FastMath.pow(
-                    VisionConstants.FOV75YUYVMultiTagCoeff * distance,
-                    VisionConstants.FOV75YUYVPowerNumber));
+            / (VisionConstants.FOV75YUYVBaseTrust
+                * FastMath.pow(
+                    VisionConstants.baseNumber,
+                    FastMath.pow(
+                        VisionConstants.FOV75YUYVMultiTagCoeff * distance,
+                        VisionConstants.FOV75YUYVPowerNumber)));
       }
 
       default -> {
         if (numTags == 1)
           return 1
-              / VisionConstants.baseTrust
-              * FastMath.pow(
-                  VisionConstants.baseNumber,
-                  FastMath.pow(
-                      VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber));
+              / (VisionConstants.baseTrust
+                  * FastMath.pow(
+                      VisionConstants.baseNumber,
+                      FastMath.pow(
+                          VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber)));
         return 1
-            / VisionConstants.baseTrust
-            * FastMath.pow(
-                VisionConstants.baseNumber,
-                FastMath.pow(
-                    VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber));
+            / (VisionConstants.baseTrust
+                * FastMath.pow(
+                    VisionConstants.baseNumber,
+                    FastMath.pow(
+                        VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber)));
       }
     }
   }
@@ -297,15 +298,26 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Pose3d getCloserPose(Pose3d pose1, Pose3d pose2, double rotation) {
     /*Which pose rotation is closer to our gyro. We subtract the absolute value of the gyro
     from the rotation of the pose and compare the two*/
-    if (Math.abs(new Rotation2d(rotation).minus(pose1.getRotation().toRotation2d()).getRadians())
-        <= Math.abs(
-            new Rotation2d(rotation).minus(pose2.getRotation().toRotation2d()).getRadians())) {
-      Logger.recordOutput("Vision/Wrong Pose", pose2);
-      Logger.recordOutput("Vision/Right Pose", pose1);
+    double pose1Error =
+        FastMath.abs(
+            Rotation2d.fromRadians(rotation)
+                .minus(pose1.getRotation().toRotation2d())
+                .getRadians());
+    double pose2Error =
+        FastMath.abs(
+            Rotation2d.fromRadians(rotation)
+                .minus(pose2.getRotation().toRotation2d())
+                .getRadians());
+
+    Logger.recordOutput("Vision/Pose 1 Yaw Error", pose1Error);
+    Logger.recordOutput("Vision/Pose 2 Yaw Error", pose2Error);
+    Logger.recordOutput("Vision/Historical yaw", rotation);
+
+    if (pose1Error < pose2Error) {
+      if (pose1Error > VisionConstants.kYawErrorThreshold) {}
+
       return pose1;
     } else {
-      Logger.recordOutput("Vision/Wrong Pose", pose1);
-      Logger.recordOutput("Vision/Right Pose", pose2);
       return pose2;
     }
   }
@@ -325,7 +337,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // See what pose is closer the the gyro at the time of the photo's capture.
     double rotation =
-        gyroBuffer.get(FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
+        gyroBuffer.get(
+            FastMath.floorToInt(
+                (((RobotController.getFPGATime() - time) / 1_000_000.0)
+                    / VisionConstants.kLoopTime)));
     Logger.recordOutput(
         "Vision/Gyro Queried Loop Count",
         FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
@@ -334,14 +349,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
-
     double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
     gyroBuffer.addFirst(gyroData);
+
+    if (gyroBuffer.size() >= 1000) {
+      Logger.recordOutput("Vision/Gyro Buffer Delayed", gyroBuffer.get(25));
+    }
+
     Logger.recordOutput("Vision/Gyro Buffer", gyroData);
-    Logger.recordOutput(
-        "Vision/Gyro Loop Count",
-        FastMath.floorToInt(
-            ((RobotController.getFPGATime() / 1_000_000.0) / VisionConstants.kLoopTime)));
 
     if (getSeconds() - timeSinceLastUpdate > VisionConstants.kMaxTimeNoVision) {
       updatesToWheels = 0;
@@ -373,7 +388,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     for (Pair<WallEyeResult, Integer> res : validResults) {
-      if (res.getFirst() instanceof WallEyeResult) {
+      if (res.getFirst() instanceof WallEyePoseResult) {
         /*Reset the adaptive matrix to a stricter value once we get a result.
         We set it to a stricter value then initially.*/
         adaptiveMatrix.set(0, 0, .1);
@@ -401,8 +416,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
           robotTranslation =
               cameraPose
                   .getTranslation()
-                  .minus(camPositions[idx].rotateBy(cameraPose.getRotation()))
-                  .rotateBy(camRotations[idx]);
+                  .minus(
+                      camPositions[idx]
+                          .rotateBy(cameraPose.getRotation())
+                          .rotateBy(camRotations[idx]));
+
+          cameraRotation = cameraPose.getRotation().rotateBy(camRotations[idx]);
         } else {
           // If there is one we get two possible poses and have to filter them.
           Pose3d cam1Pose = result.getFirstPose();
@@ -434,11 +453,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
           Logger.recordOutput("Vision/Accepted Cam " + camNames[idx], robotPose);
           // However we do have to be accepting the poses to use them
           if (visionUpdating) {
-            Matrix<N3, N1> testingMatrix = VecBuilder.fill(0.0001, 0.0001, 0.0001);
             driveSubsystem.addVisionMeasurement(
-                robotPose, result.getTimeStamp() / 1_000_000.0, testingMatrix);
-            Logger.recordOutput("Vision/Vision Updating", visionUpdating);
-            Logger.recordOutput("Vision/std", stdMatrix.get(0, 0));
+                robotPose, result.getTimeStamp() / 1_000_000.0, stdMatrix);
           }
         } else {
           Logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);

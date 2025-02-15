@@ -30,7 +30,7 @@ public final class VisionConstants {
   public static final double kOffsetOnVelFilter = 0.10;
   public static final double kSquaredCoeffOnVelFilter = 0.1;
 
-  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(1, 1, Units.degreesToRadians(360));
+  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, 0);
 
   public static final double kTimeStampOffset = 0.0;
 
@@ -38,13 +38,13 @@ public final class VisionConstants {
   public static final double singleTagCoeff = 25.0 / 100.0;
   public static final double multiTagCoeff = 18.0 / 100.0;
   public static final double baseNumber = Math.E;
-  public static final double powerNumber = 4.0;
+  public static final double powerNumber = 2.0;
   public static final double baseTrust = 3.0;
 
   public static final double FOV45MultiTagCoeff = 16.0 / 100.0;
   public static final double FOV45powerNumber = 4.5;
   public static final double FOV45SingleTagCoeff = 21.0 / 100.0;
-  public static final double FOV45BaseTrust = 3.0;
+  public static final double FOV45BaseTrust = 2.0;
 
   public static final double FOV58MJPGMultiTagCoeff = 16.0 / 100.0;
   public static final double FOV58MJPGPowerNumber = 3.5;
@@ -52,14 +52,17 @@ public final class VisionConstants {
   public static final double FOV58MJPGBaseTrust = 3.0;
 
   public static final double FOV58YUYVMultiTagCoeff = 17.0 / 100.0;
-  public static final double FOV58YUYVPowerNumber = 4.0;
+  public static final double FOV58YUYVPowerNumber = 2.0;
   public static final double FOV58YUYVSingleTagCoeff = 22.0 / 100.0;
   public static final double FOV58YUYVBaseTrust = 3.0;
 
   public static final double FOV75YUYVMultiTagCoeff = 17.0 / 100.0;
-  public static final double FOV75YUYVPowerNumber = 4.0;
+  public static final double FOV75YUYVPowerNumber = 2.0;
   public static final double FOV75YUYVSingleTagCoeff = 22.0 / 100.0;
   public static final double FOV75YUYVBaseTrust = 3.0;
+
+  // Gyro error scaling
+  public static final double kYawErrorThreshold = Units.degreesToRadians(45);
 
   // Constants for cameras
   public static final int kNumCams = 5;
@@ -107,13 +110,13 @@ public final class VisionConstants {
           new Translation3d(-0.22, -0.335, 0.50),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
-  // in the form [x, y, theta], with units in radians.
+  // in the form [theta], with units in radians.
   public static Matrix<N1, N1> kLocalMeasurementStdDevs =
-      VecBuilder.fill(Units.degreesToRadians(360));
+      VecBuilder.fill(Units.degreesToRadians(0.01));
 
   // Increase these numbers to trust global measurements from vision less. This matrix is in the
   // form [x, y, theta]ᵀ, with units in meters and radians.
   // Vision Odometry Standard devs
   public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-      VecBuilder.fill(0.0005, 0.0005, Units.degreesToRadians(1));
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(360));
 }
