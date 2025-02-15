@@ -5,6 +5,7 @@ import WallEye.WallEyeTagResult;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -111,7 +112,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180 + 90));
 
     return new Pose2d(
-        reefT.plus(offset).plus(sideOffset),
+        reefT.plus(offset).minus(sideOffset),
         Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
   }
 
@@ -120,7 +121,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         color == Alliance.Blue
             ? TagServoingConstants.kBlueReefPose
             : TagServoingConstants.kRedReefPose;
-    return driveSubsystem.getPoseMeters().getTranslation().minus(reefT).getNorm();
+
+    Translation2d reefRelative = driveSubsystem.getPoseMeters().getTranslation().minus(reefT);
+    return FastMath.hypot(reefRelative.getX(), reefRelative.getY());
   }
 
   public TagAlignStates getState() {
@@ -247,11 +250,13 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                 .rotateBy(
                     Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
 
+        Transform2d poseError = targetPose.minus(current);
+
         if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
-            && (targetPose.minus(current).getTranslation().getNorm()
+            && (FastMath.hypot(poseError.getX(), poseError.getY())
                     < TagServoingConstants.kDriveCloseEnough
                 || ignoreX
-                    && Math.abs(tagRelError.getY()) < TagServoingConstants.kDriveCloseEnough)) {
+                    && FastMath.abs(tagRelError.getY()) < TagServoingConstants.kDriveCloseEnough)) {
           alignX.reset(0);
           alignY.reset(0);
           alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());

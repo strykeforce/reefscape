@@ -32,10 +32,10 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class VisionSubsystem extends MeasurableSubsystem {
 
   // Array of cameras
-  WallEyeCam[] cams;
+  private WallEyeCam[] cams;
 
   // Array of camera positions
-  Translation3d[] camPositions = {
+  private Translation3d[] camPositions = {
     VisionConstants.kCam1Pose.getTranslation(),
     VisionConstants.kCam2Pose.getTranslation(),
     VisionConstants.kCam3Pose.getTranslation(),
@@ -44,7 +44,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   };
 
   // Array of camera rotations
-  Rotation3d[] camRotations = {
+  private Rotation3d[] camRotations = {
     VisionConstants.kCam1Pose.getRotation(),
     VisionConstants.kCam2Pose.getRotation(),
     VisionConstants.kCam3Pose.getRotation(),
@@ -52,17 +52,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Pose.getRotation()
   };
 
-  // Array of camera heights
-  private double[] camHeights = {
-    VisionConstants.kCam1Pose.getZ(),
-    VisionConstants.kCam2Pose.getZ(),
-    VisionConstants.kCam3Pose.getZ(),
-    VisionConstants.kCam4Pose.getZ(),
-    VisionConstants.kCam5Pose.getZ()
-  };
-
   // Array of camera names
-  String[] camNames = {
+  private String[] camNames = {
     VisionConstants.kCam1Name,
     VisionConstants.kCam2Name,
     VisionConstants.kCam3Name,
@@ -71,7 +62,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   };
 
   // Array of orange pi names
-  String[] piNames = {
+  private String[] piNames = {
     VisionConstants.kPi1Name,
     VisionConstants.kPi1Name,
     VisionConstants.kPi2Name,
@@ -80,7 +71,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   };
 
   // Array of camera indexs
-  int[] camIndex = {
+  private int[] camIndex = {
     VisionConstants.kCam1Idx,
     VisionConstants.kCam2Idx,
     VisionConstants.kCam3Idx,
@@ -154,15 +145,16 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   private double minTagDistance(WallEyePoseResult result) {
 
-    Translation2d camLoc = result.getCameraPose().getTranslation().toTranslation2d();
+    Pose3d camLoc = result.getCameraPose();
     int[] ids = result.getTagIDs();
     // This number's value doesn't really matter it just needs to be large
-    double minDistance = 2767;
+    double minDistance = 2000;
 
     // Go through the camera locations and finds the one closest to the tag
     for (int id : ids) {
-      double dist =
-          camLoc.getDistance(field.getTagPose(id).get().getTranslation().toTranslation2d());
+      Pose3d tagPose = field.getTagPose(id).get();
+
+      double dist = FastMath.hypot(tagPose.getX() - camLoc.getX(), tagPose.getY() - camLoc.getY());
 
       if (dist < minDistance) {
         minDistance = dist;
@@ -173,14 +165,16 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   private double averageTagDistance(WallEyePoseResult result) {
 
-    Translation2d camLoc = result.getCameraPose().getTranslation().toTranslation2d();
+    Pose3d camLoc = result.getCameraPose();
+
     int[] ids = result.getTagIDs();
     double totalDistance = 0.0;
 
     // Goes through the camera locations and gets the average distance
     for (int id : ids) {
+      Pose3d tagPose = field.getTagPose(id).get();
       totalDistance +=
-          camLoc.getDistance(field.getTagPose(id).get().getTranslation().toTranslation2d());
+          FastMath.hypot(tagPose.getX() - camLoc.getX(), tagPose.getY() - camLoc.getY());
     }
     return totalDistance / ids.length;
   }
@@ -397,12 +391,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
         WallEyePoseResult result = (WallEyePoseResult) res.getFirst();
 
         if (result.getCameraPose() == null) { // TODO figure out why it sometimes is null
+          textLogger.error("Pose is null, skipping!");
           continue;
         }
 
         int idx = res.getSecond();
 
-        Logger.recordOutput("Vision/resultTime", result.getTimeStamp());
         for (int i = 0; i < 2; i++) {
           stdMatrix.set(
               i,
