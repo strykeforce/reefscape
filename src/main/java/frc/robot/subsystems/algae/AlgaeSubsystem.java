@@ -51,14 +51,18 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     setSpeed(AlgaeConstants.kHoldSpeed);
   }
 
+  public boolean hasAlgae() {
+    return curState == AlgaeStates.HAS_ALGAE;
+  }
+
   @Override
   public void setSpeed(AngularVelocity speed) {
-    io.setSpeed(speed);
-    desiredSpeed = speed;
+    // io.setSpeed(speed);
+    // desiredSpeed = speed;
   }
 
   public void setPct(double pct) {
-    io.setPct(pct);
+    // io.setPct(pct);
   }
 
   @Override
@@ -80,13 +84,13 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
 
     switch (curState) {
       case HAS_ALGAE -> {
-        if (!inputs.isFwdLimitSwitchClosed) {
+        if (!inputs.isLimitSwitchClosed) {
           setState(AlgaeStates.EMPTY);
           setSpeed(RotationsPerSecond.of(0));
         }
       }
       case EMPTY -> {
-        if (inputs.isRevLimitSwitchClosed) { // FIXME: correct?
+        if (inputs.isLimitSwitchClosed) { // FIXME: correct?
           hold();
           setState(AlgaeStates.HAS_ALGAE);
         }
@@ -110,10 +114,5 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     HAS_ALGAE,
     EMPTY,
     IDLE
-  }
-
-  public boolean hasAlgae() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'hasAlgae'");
   }
 }

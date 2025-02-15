@@ -24,18 +24,18 @@ import frc.robot.commands.elevator.HoldElevatorCommand;
 import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
-import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
-import frc.robot.commands.robotState.ToggleAutoCommand;
-import frc.robot.commands.robotState.GetAlgaeCommand;
+import frc.robot.commands.robotState.FloorAlgaeCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
-import frc.robot.commands.robotState.InteruptAutoCommand;
+import frc.robot.commands.robotState.InterruptAutoCommand;
+import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
-import frc.robot.commands.robotState.ScoreLeftCommand;
-import frc.robot.commands.robotState.ScoreReefManualCommand;
-import frc.robot.commands.robotState.ScoreRightCommand;
+import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StowCommand;
+import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
+import frc.robot.commands.robotState.ToggleAutoCommand;
 import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
+import frc.robot.commands.robotState.setScoreSideLeftCommand;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -153,7 +153,7 @@ public class RobotContainer {
 
     configureTelemetry();
     configureDriverBindings();
-    configureTestOperatorBindings();
+    configureOperatorBindings();
   }
 
   private void configureTelemetry() {
@@ -171,26 +171,52 @@ public class RobotContainer {
         new DriveTeleopCommand(
             () -> flysky.getFwd(), () -> flysky.getStr(), () -> flysky.getYaw(), driveSubsystem));
 
-    // Reset Gyro Command, stow, and interrupt Auton
+    // Reset Gyro Command, stow, interrupt Auton, and zero elev
     new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
     new JoystickButton(driveJoystick, Button.SWD.id)
-        .onTrue(new StowCommand(robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem))
-        .onFalse(new StowCommand(robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem));
+        .onTrue(
+            new StowCommand(
+                robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem))
+        .onFalse(
+            new StowCommand(
+                robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem));
     new JoystickButton(driveJoystick, Button.SWA.id)
-        .onTrue(new InteruptAutoCommand(robotStateSubsystem))
-        .onFalse(new InteruptAutoCommand(robotStateSubsystem));
+        .onTrue(new InterruptAutoCommand(robotStateSubsystem))
+        .onFalse(new InterruptAutoCommand(robotStateSubsystem));
+    new JoystickButton(driveJoystick, Button.SWB_UP.id)
+        .onTrue(new ZeroElevatorCommand(elevatorSubsystem))
+        .onFalse(new ZeroElevatorCommand(elevatorSubsystem));
+    new JoystickButton(driveJoystick, Button.SWB_DWN.id)
+        .onTrue(new ZeroElevatorCommand(elevatorSubsystem))
+        .onFalse(new ZeroElevatorCommand(elevatorSubsystem));
 
     // other stuff
     new JoystickButton(driveJoystick, Button.M_SWH.id)
-        .onTrue(new ScoreReefManualCommand(robotStateSubsystem, elevatorSubsystem, coralSubsystem));
+        .onTrue(
+            new ReefCycleCommand(
+                robotStateSubsystem,
+                elevatorSubsystem,
+                coralSubsystem,
+                biscuitSubsystem,
+                algaeSubsystem));
     new JoystickButton(driveJoystick, Button.M_SWE.id)
-        .onTrue(new ScoreAlgaeCommand(robotStateSubsystem));
+        .onTrue(
+            new ScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onTrue(new GetAlgaeCommand(robotStateSubsystem))
-        .onFalse(new GetAlgaeCommand(robotStateSubsystem));
+        .onTrue(
+            new FloorAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
+        .onFalse(
+            new FloorAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
     new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onTrue(new GetAlgaeCommand(robotStateSubsystem))
-        .onFalse(new GetAlgaeCommand(robotStateSubsystem));
+        .onTrue(
+            new FloorAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
+        .onFalse(
+            new FloorAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
   }
 
   private void configureOperatorBindings() {
@@ -216,16 +242,18 @@ public class RobotContainer {
     new JoystickButton(xboxController, XboxController.Button.kX.value)
         .onTrue(new ToggleGetAlgaeCommand(robotStateSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kB.value)
-        .onTrue(new HPAlgaeCommand(robotStateSubsystem));
+        .onTrue(
+            new HPAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
 
     // Scoring
     new JoystickButton(xboxController, XboxController.Button.kA.value)
         .onTrue(new ToggleAutoCommand(robotStateSubsystem));
 
     new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
-        .onTrue(new ScoreRightCommand(robotStateSubsystem));
+        .onTrue(new SetScoreSideRightCommand(robotStateSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
-        .onTrue(new ScoreLeftCommand(robotStateSubsystem));
+        .onTrue(new setScoreSideLeftCommand(robotStateSubsystem));
   }
 
   private void configureTestOperatorBindings() {

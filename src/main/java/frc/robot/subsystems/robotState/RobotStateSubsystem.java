@@ -166,7 +166,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.getAlgaeOnCycle = getAlgaeOnCycle;
   }
 
-  public boolean getGetAlgaeOnCycle(){
+  public boolean getGetAlgaeOnCycle() {
     return getAlgaeOnCycle;
   }
 
@@ -182,7 +182,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.isAuto = isAuto;
   }
 
-  public boolean getIsAuto(){
+  public boolean getIsAuto() {
     return isAuto;
   }
 
@@ -191,47 +191,47 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private boolean needSafeAlgaeTransfer(RobotStates nextState) {
-    // if (algaeSubsystem.hasAlgae()) {
-    //   switch (curState) {
-    //     case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE, INTERRUPTED -> {
-    //       switch (nextState) {
-    //           // These are all the states that could possibly be entered that are also possibly
-    //           // dangerous
-    //           // Each futureState must be handled in STOW
-    //         case REEF_ALIGN_ALGAE, REEF_ALIGN_CORAL, PREP_CLIMB -> {
-    //           futureState = nextState;
-    //           toStow();
-    //           return true;
-    //         }
-    //         default -> {}
-    //       }
-    //     }
-    //     default -> {}
-    //   }
+    if (algaeSubsystem.hasAlgae()) {
+      switch (curState) {
+        case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE, INTERRUPTED -> {
+          switch (nextState) {
+              // These are all the states that could possibly be entered that are also possibly
+              // dangerous
+              // Each futureState must be handled in STOW
+            case REEF_ALIGN_ALGAE, REEF_ALIGN_CORAL, PREP_CLIMB -> {
+              futureState = nextState;
+              toStow();
+              return true;
+            }
+            default -> {}
+          }
+        }
+        default -> {}
+      }
 
-    //   switch (curState) {
-    //     case REEF_ALIGN_ALGAE,
-    //         REEF_ALIGN_CORAL,
-    //         REMOVE_ALGAE,
-    //         SAFE_REMOVE_ALGAE_ABOVE,
-    //         SAFE_REMOVE_ALGAE_ROTATE,
-    //         PLACE_CORAL,
-    //         INTERRUPTED -> {
-    //       switch (nextState) {
-    //           // These are all the states that could possibly be entered that are also
-    //           // dangerous
-    //           // Each futureState must be handled in STOW
-    //         case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE, PREP_CLIMB -> {
-    //           futureState = nextState;
-    //           toStow();
-    //           return true;
-    //         }
-    //         default -> {}
-    //       }
-    //     }
-    //     default -> {}
-    //   }
-    // }
+      switch (curState) {
+        case REEF_ALIGN_ALGAE,
+            REEF_ALIGN_CORAL,
+            REMOVE_ALGAE,
+            SAFE_REMOVE_ALGAE_ABOVE,
+            SAFE_REMOVE_ALGAE_ROTATE,
+            PLACE_CORAL,
+            INTERRUPTED -> {
+          switch (nextState) {
+              // These are all the states that could possibly be entered that are also
+              // dangerous
+              // Each futureState must be handled in STOW
+            case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE, PREP_CLIMB -> {
+              futureState = nextState;
+              toStow();
+              return true;
+            }
+            default -> {}
+          }
+        }
+        default -> {}
+      }
+    }
 
     return false;
   }
@@ -239,6 +239,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toStow() {
     biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
     elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
+    driveSubsystem.removeDriveMultiplier();
     // algaeSubsystem.hold();
 
     setState(RobotStates.TO_STOW);
@@ -365,6 +366,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toScoreAlgae() {
+    if (curState == RobotStates.BARGE_ALGAE || curState == RobotStates.PROCESSOR_ALGAE) {
+      toStow();
+    }
     switch (algaeHeight) {
       case LOW -> {
         toProcessor();
@@ -373,6 +377,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (needSafeAlgaeTransfer(RobotStates.BARGE_ALGAE)) {
           return;
         }
+
+        driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
 
         double poseX = driveSubsystem.getPoseMeters().getX();
 

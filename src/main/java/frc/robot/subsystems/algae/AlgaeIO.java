@@ -8,8 +8,7 @@ public interface AlgaeIO {
   @AutoLog
   public static class AlgaeIOInputs {
     public AngularVelocity velocity;
-    public boolean isFwdLimitSwitchClosed;
-    public boolean isRevLimitSwitchClosed;
+    public boolean isLimitSwitchClosed;
   }
 
   public default void updateInputs(AlgaeIOInputs inputs) {}

@@ -63,7 +63,7 @@ public class ElevatorConstants {
 
   // Algae obtaining
   public static final Angle kFloorAlgaeSetpoint = Rotations.of(8.81836);
-  public static final Angle kMicAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(17.708);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
   // Algae scoring

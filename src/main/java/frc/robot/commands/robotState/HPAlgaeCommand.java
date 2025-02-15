@@ -1,15 +1,36 @@
 package frc.robot.commands.robotState;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
-public class HPAlgaeCommand extends InstantCommand {
-    RobotStateSubsystem robotState;
-    public HPAlgaeCommand(RobotStateSubsystem robotState){
-        this.robotState = robotState;
+public class HPAlgaeCommand extends Command {
+  RobotStateSubsystem robotState;
+  private boolean hasTriedToGrab = false;
+
+  public HPAlgaeCommand(
+      RobotStateSubsystem robotState,
+      ElevatorSubsystem elevatorSubsystem,
+      BiscuitSubsystem biscuitSubsystem,
+      AlgaeSubsystem algaeSubsystem) {
+    this.robotState = robotState;
+    addRequirements(elevatorSubsystem, biscuitSubsystem, algaeSubsystem);
+  }
+
+  @Override
+  public void initialize() {
+    hasTriedToGrab = false;
+    robotState.toHpAlgae();
+  }
+
+  @Override
+  public boolean isFinished() {
+    if (robotState.getState() == RobotStates.HP_ALGAE) {
+      hasTriedToGrab = true;
     }
-    @Override
-    public void initialize() {
-        robotState.toHpAlgae();
-    }
+    return robotState.getState() == RobotStates.STOW && hasTriedToGrab;
+  }
 }

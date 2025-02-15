@@ -3,15 +3,16 @@ package frc.robot.commands.robotState;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
-public class ToggleAlgaeHeightCommand extends InstantCommand {
+public class InterruptAutoCommand
+    extends InstantCommand { // TODO fix this command, it dose not work
   RobotStateSubsystem robotState;
 
-  public ToggleAlgaeHeightCommand(RobotStateSubsystem robotState) {
+  public InterruptAutoCommand(RobotStateSubsystem robotState) {
     this.robotState = robotState;
   }
 
   @Override
   public void initialize() {
-    robotState.toggleAlgaeHeight(null);
+    robotState.toInterrupted();
   }
 }

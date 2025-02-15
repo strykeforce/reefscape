@@ -56,7 +56,7 @@ public class BiscuitConstants {
 
   // Algae obtaining
   public static final Angle kFloorAlgaeSetpoint = Rotations.of(320.74);
-  public static final Angle kMicAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(324.33);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(106.6608);
 
   // Algae scoring

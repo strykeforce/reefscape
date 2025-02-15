@@ -1,6 +1,7 @@
 package frc.robot.subsystems.algae;
 
-import com.ctre.phoenix6.BaseStatusSignal;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -8,7 +9,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.units.measure.AngularVelocity;
-import frc.robot.constants.AlgaeConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -27,18 +27,19 @@ public class AlgaeIOFX implements AlgaeIO {
 
   public AlgaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    talonFX = new TalonFX(AlgaeConstants.kFxId);
-    fwdLimitSwitch = talonFX.getForwardLimit();
-    revLimitSwitch = talonFX.getReverseLimit();
-    curVelocity = talonFX.getVelocity();
+    // talonFX = new TalonFX(AlgaeConstants.kFxId);
+    // fwdLimitSwitch = talonFX.getForwardLimit();
+    // revLimitSwitch = talonFX.getReverseLimit();
+    // curVelocity = talonFX.getVelocity();
   }
 
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
-    BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
-    inputs.velocity = curVelocity.refresh().getValue();
-    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.getValue().value == 1; // FIXME check right value
-    inputs.isRevLimitSwitchClosed = revLimitSwitch.getValue().value == 0; // FIXME check right value
+    // BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
+    // inputs.velocity = curVelocity.refresh().getValue();
+    // inputs.isLimitSwitchClosed = fwdLimitSwitch.getValue().value == 1; // FIXME check right value
+    inputs.velocity = RotationsPerSecond.of(0);
+    inputs.isLimitSwitchClosed = true;
   }
 
   @Override
@@ -57,6 +58,6 @@ public class AlgaeIOFX implements AlgaeIO {
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    telemetryService.register(talonFX, true);
+    // telemetryService.register(talonFX, true);
   }
 }
