@@ -95,6 +95,7 @@ public final class VisionConstants {
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(new Translation3d(0.28, 0.02, 0.30), new Rotation3d());
+
   public static final Pose3d kCam2Pose =
       new Pose3d(
           new Translation3d(-0.21, -0.31, 0.44),

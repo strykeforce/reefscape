@@ -395,6 +395,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
         adaptiveMatrix.set(1, 0, .1);
 
         WallEyePoseResult result = (WallEyePoseResult) res.getFirst();
+
+        if (result.getCameraPose() == null) { // TODO figure out why it sometimes is null
+          continue;
+        }
+
         int idx = res.getSecond();
 
         Logger.recordOutput("Vision/resultTime", result.getTimeStamp());

@@ -38,7 +38,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private int targetCamId;
   private int targetTagId;
   private int fieldRelHexant;
-  private Alliance alliance;
+  private Alliance alliance = Alliance.Blue;
   private double goalTargetDiag;
 
   public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
@@ -46,12 +46,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     this.visionSubsystem = visionSubsystem;
 
     // FIXME: need sane constants
-    this.driveX = new ProfiledPIDController(0.000019, 0, 0, new Constraints(1, 3.0));
-    this.driveY = new ProfiledPIDController(0.0015, 0, 0, new Constraints(1, 1.0));
+    this.driveX = new ProfiledPIDController(2, 0, 0, new Constraints(1, 1.0));
+    this.driveY = new ProfiledPIDController(2, 0, 0, new Constraints(1, 1.0));
     this.driveOmega = new ProfiledPIDController(5.0, 0, 0, new Constraints(1.0, 1.0));
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
-    this.alignX = new ProfiledPIDController(0.0015, 0, 0, new Constraints(1.0, 3.0));
+    this.alignX = new ProfiledPIDController(0.001, 0, 0, new Constraints(1.0, 3.0)); // 0.0015
     this.alignY = new ProfiledPIDController(0.001, 0, 0, new Constraints(1.0, 1.0));
     this.alignOmega = new ProfiledPIDController(5.2, 0, 0, new Constraints(1.0, 1.0));
     this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
@@ -94,7 +94,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return (computeHexant(color) + (color == Alliance.Blue ? 0 : 3)) % 6;
   }
 
-  private Pose2d getTargetDrivePose(Alliance color) {
+  private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft) {
     Translation2d reefT =
         color == Alliance.Blue
             ? TagServoingConstants.kBlueReefPose
@@ -103,10 +103,16 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     Translation2d offset =
         new Translation2d(
             TagServoingConstants.kInitialDriveRadius,
-            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
+            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180));
+
+    Translation2d sideOffset =
+        new Translation2d(
+            scoreLeft ? TagServoingConstants.kRightCamOffset : TagServoingConstants.kLeftCamOffset,
+            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180 + 90));
 
     return new Pose2d(
-        reefT.plus(offset), Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
+        reefT.plus(offset).plus(sideOffset),
+        Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
   }
 
   private double getCurRadius(Alliance color) {
@@ -122,7 +128,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public void setup(Alliance alliance, boolean scoreLeft) {
-    targetPose = getTargetDrivePose(alliance);
+    targetPose = getTargetDrivePose(alliance, scoreLeft);
     this.alliance = alliance;
     this.goalTargetDiag =
         scoreLeft
@@ -141,6 +147,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Logger.recordOutput("TagAlignSubsystem/TargetTag", targetTagId);
     Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", goalTargetDiag);
+    Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
 
     Pose2d current = driveSubsystem.getPoseMeters();
 
@@ -202,14 +209,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   public void periodic() {
     Logger.recordOutput("TagAlignSubsystem/State", curState.toString());
 
-    targetTagId =
-        alliance == Alliance.Blue
-            ? TagServoingConstants.kBlueTargetTag[computeHexant(alliance)]
-            : TagServoingConstants.kRedTargetTag[computeHexant(alliance)]; // TODO: REMOVE
-    computeHexant(alliance);
-
-    calculateAlignY();
-
     switch (curState) {
       case DRIVE -> {
         Pose2d current = driveSubsystem.getPoseMeters();
@@ -217,8 +216,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double vX = driveX.calculate(current.getX(), targetPose.getX());
         double vY = driveY.calculate(current.getY(), targetPose.getY());
         double vOmega =
-            driveX.calculate(
+            driveOmega.calculate(
                 current.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+        Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", driveOmega.getPositionError());
 
         Translation2d tagRelVel =
             new Translation2d(vX, vY)
@@ -228,13 +231,27 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double tagRelX = tagRelVel.getX();
         double tagRelY = tagRelVel.getY();
 
-        if (getCurRadius(alliance) < TagServoingConstants.kStopXDriveRadius) {
+        double radius = getCurRadius(alliance);
+        boolean ignoreX =
+            radius < TagServoingConstants.kStopXDriveRadius
+                && radius > TagServoingConstants.kMinStopXDriveRadius;
+
+        if (ignoreX) {
           tagRelX = 0;
         }
 
-        if (Math.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
-        /*&& targetPose.minus(current).getTranslation().getNorm()
-        < TagServoingConstants.kDriveCloseEnough*/ ) {
+        Translation2d tagRelError =
+            targetPose
+                .minus(current)
+                .getTranslation()
+                .rotateBy(
+                    Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
+
+        if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
+            && (targetPose.minus(current).getTranslation().getNorm()
+                    < TagServoingConstants.kDriveCloseEnough
+                || ignoreX
+                    && Math.abs(tagRelError.getY()) < TagServoingConstants.kDriveCloseEnough)) {
           alignX.reset(0);
           alignY.reset(0);
           alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
@@ -247,8 +264,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             new Translation2d(tagRelX, tagRelY)
                 .rotateBy(
                     Rotation2d.fromRadians(TagServoingConstants.kAngleTarget[fieldRelHexant]));
-
-        driveSubsystem.move(0, 0, vOmega, true);
 
         driveSubsystem.move(adjusted.getX(), adjusted.getY(), vOmega, true);
       }
@@ -294,11 +309,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
           terminate();
         }
 
-        if (Math.abs(goalTargetDiag - diag) < TagServoingConstants.kDiagCloseEnough
+        if (FastMath.abs(goalTargetDiag - diag) < TagServoingConstants.kDiagCloseEnough
             || diag > goalTargetDiag) {
           vX = 0;
 
-          if (Math.abs(TagServoingConstants.kHorizontalTarget - center.x())
+          if (FastMath.abs(TagServoingConstants.kHorizontalTarget - center.x())
               < TagServoingConstants.kHorizontalCloseEnough) {
 
             terminate();

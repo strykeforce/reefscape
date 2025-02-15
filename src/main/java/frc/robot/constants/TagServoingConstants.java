@@ -8,9 +8,13 @@ public class TagServoingConstants {
   public static final int kLeftServoCam = 0; // Score RIGHT coral
   public static final int kRightServoCam = 2; // Score LEFT coral
 
+  // Offsets
+  public static final double kLeftCamOffset = VisionConstants.kCam1Pose.getY();
+  public static final double kRightCamOffset = VisionConstants.kCam2Pose.getY();
+
   // Targets
   public static final double kHorizontalTarget = 800;
-  public static final double kLeftCamDiagTarget = 1550;
+  public static final double kLeftCamDiagTarget = 1610;
   public static final double kRightCamDiagTarget = 950;
 
   public static final double[] kAngleTarget = {
@@ -27,20 +31,20 @@ public class TagServoingConstants {
   public static final int[] kRedTargetTag = {7, 8, 9, 10, 11, 6};
 
   // Tag align
-  public static final double kHorizontalCloseEnough = 10;
+  public static final double kHorizontalCloseEnough = 20;
   public static final double kAngleCloseEnough = Units.degreesToRadians(3.0);
   public static final double kDiagCloseEnough = 20;
   public static final double kNoUpdateMicrosec = 500_000;
 
   // Drive
-  public static final double kInitialDriveRadius = 5;
-  public static final double kStopXDriveRadius = 1.2; // Should be closer to reef than target pose
-  public static final double kDriveCloseEnough = 0.3;
+  public static final double kInitialDriveRadius = 2;
+  public static final double kStopXDriveRadius =
+      kInitialDriveRadius; // Should be closer to reef than target pose
+  public static final double kMinStopXDriveRadius = 1.5;
+  public static final double kDriveCloseEnough = 0.1;
 
   // Reef
-  public static final Translation2d kBlueReefPose =
-      new Translation2d(Units.inchesToMeters(223.5), Units.inchesToMeters(158.5));
+  public static final Translation2d kBlueReefPose = new Translation2d(4.524, 4.033);
 
-  public static final Translation2d kRedReefPose =
-      kBlueReefPose.plus(new Translation2d(Units.inchesToMeters(337.39), 0));
+  public static final Translation2d kRedReefPose = new Translation2d(13.084, 4.033);
 }

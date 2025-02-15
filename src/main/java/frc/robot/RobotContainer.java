@@ -18,16 +18,15 @@ import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
-import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.elevator.HoldElevatorCommand;
 import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
+import frc.robot.commands.robotState.AutoScoreReefCommand;
 import frc.robot.commands.robotState.ScoreReefManualCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.tagAlign.TagAlignCommand;
-import frc.robot.constants.DriveConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -157,9 +156,11 @@ public class RobotContainer {
   }
 
   private void configureDriverBindings() {
-    // Reset odom test
+    // Auto score testing
     new JoystickButton(driveJoystick, Button.M_RTRIM_UP.id)
-        .onTrue(new ResetOdometryCommand(driveSubsystem, DriveConstants.kResetOdomPose));
+        .onTrue(
+            new AutoScoreReefCommand(
+                robotStateSubsystem, elevatorSubsystem, coralSubsystem, driveSubsystem));
 
     driveSubsystem.setDefaultCommand(
         new DriveTeleopCommand(

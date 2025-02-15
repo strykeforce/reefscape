@@ -16,7 +16,7 @@ public class TagAlignCommand extends Command {
 
   @Override
   public void initialize() {
-    tagAlignSubsystem.start(Alliance.Blue, true);
+    tagAlignSubsystem.start(Alliance.Blue, false);
   }
 
   @Override
