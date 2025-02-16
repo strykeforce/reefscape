@@ -14,8 +14,8 @@ public class TagServoingConstants {
 
   // Targets
   public static final double kHorizontalTarget = 800;
-  public static final double kLeftCamDiagTarget = 1610;
-  public static final double kRightCamDiagTarget = 950;
+  public static final double kLeftCamDiagTarget = 1180;
+  public static final double kRightCamDiagTarget = 985;
 
   public static final double[] kAngleTarget = {
     Units.degreesToRadians(0),
@@ -37,11 +37,12 @@ public class TagServoingConstants {
   public static final double kNoUpdateMicrosec = 500_000;
 
   // Drive
-  public static final double kInitialDriveRadius = 2;
+  public static final double kInitialDriveRadius = 1.5;
   public static final double kStopXDriveRadius =
       kInitialDriveRadius; // Should be closer to reef than target pose
-  public static final double kMinStopXDriveRadius = 1.5;
+  public static final double kMinStopXDriveRadius = 1.35;
   public static final double kDriveCloseEnough = 0.1;
+  public static final double kMinVelX = 0.85;
 
   // Reef
   public static final Translation2d kBlueReefPose = new Translation2d(4.524, 4.033);
