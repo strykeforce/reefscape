@@ -6,13 +6,21 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import java.util.Map;
+
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
@@ -92,8 +100,10 @@ public class RobotContainer {
 
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
-  public RobotContainer() {
+  private Alliance alliance = Alliance.Blue;
+  private SuppliedValueWidget<Boolean> allianceColor;
 
+  public RobotContainer() {
     algaeIO = new AlgaeIOFX();
     algaeSubsystem = new AlgaeSubsystem(algaeIO);
 
@@ -142,6 +152,8 @@ public class RobotContainer {
     configureTelemetry();
     configureDriverBindings();
     configureOperatorBindings();
+    configureMatchDashboard();
+    robotStateSubsystem.setAllianceColor(Alliance.Blue);
   }
 
   private void configureTelemetry() {
@@ -242,6 +254,22 @@ public class RobotContainer {
         .onTrue(
             new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL4CoralSetpoint));
   }
+
+  private void configureMatchDashboard() {
+    allianceColor =
+        Shuffleboard.getTab("Match")
+            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+            .withProperties(Map.of("colorWhenFalse", "blue", "colorWhenTrue", "red"))
+            .withSize(2, 2)
+            .withPosition(0, 0);
+
+    Shuffleboard.getTab("Match")
+    .addString("Get Left/Right", () -> robotStateSubsystem.getScoreSide().name())
+    .withPosition(3, 1)
+    .withSize(1, 1);
+
+
+}
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
