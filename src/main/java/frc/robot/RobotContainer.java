@@ -265,10 +265,28 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Match")
     .addString("Get Left/Right", () -> robotStateSubsystem.getScoreSide().name())
+    .withPosition(4, 1)
+    .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+    .addBoolean("Auto vs. Manual", () -> robotStateSubsystem.getIsAuto())
     .withPosition(3, 1)
     .withSize(1, 1);
 
+    Shuffleboard.getTab("Match")
+    .addBoolean("Has Coral", () -> robotStateSubsystem.hasCoral())
+    .withPosition(3, 1)
+    .withSize(1, 1);
 
+    Shuffleboard.getTab("Match")
+    .addString("Coral Location", () -> robotStateSubsystem.getCoralLoc().name())
+    .withPosition(2, 3)
+    .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+    .addBoolean("Has Algae", () -> robotStateSubsystem.hasAlgae())
+    .withPosition(3, 3)
+    .withSize(1, 1);
 }
 
   public Command getAutonomousCommand() {

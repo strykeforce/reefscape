@@ -117,6 +117,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return scoreSide;
   }
 
+  public boolean getIsAuto(){
+    return isAuto;
+  }
+
   public boolean hasCoral() {
     return coralSubsystem.hasCoral();
   }
