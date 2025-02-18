@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -9,8 +10,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.util.Set;
@@ -164,6 +168,29 @@ public class DriveSubsystem extends MeasurableSubsystem {
     } else {
       return null;
     }
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update",
+        RobotController.getFPGATime() / 1_000_000 - timestamp);
+    io.addVisionMeasurement(pose, timestamp);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/stdDevvs", stdDevvs.get(0, 0));
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update",
+        RobotController.getFPGATime() / 1_000_000.0 - timestamp);
+
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/FPGA Seconds", RobotController.getFPGATime() / 1_000_000.0);
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Result Seconds", timestamp);
+
+    io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController(double yaw) {

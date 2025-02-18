@@ -31,6 +31,8 @@ public class BiscuitConstants {
   public static double kCloseEnough = 0.05; // This was a little out of wack.
   public static final Angle kMaxFwd = Rotations.of(100);
   public static final Angle kMaxRev = Rotations.of(-100);
+  public static final double kSafeToStowUpper = 40;
+  public static final double kSafeToStowLower = -5;
 
   // Setpoints
   // Idle
@@ -39,11 +41,11 @@ public class BiscuitConstants {
   public static final Angle kPrestageSetpoint = kStowSetpoint;
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(120.12604);
-  public static final Angle kL3AlgaeSetpoint = Rotations.of(120.12604);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(19.11865);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(19.11865);
 
-  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(120.12604);
-  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(120.12604);
+  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(19.11865);
+  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(19.11865);
 
   public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
   public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
@@ -55,14 +57,14 @@ public class BiscuitConstants {
   public static final Angle kL4CoralSetpoint = kStowSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(320.74);
-  public static final Angle kMicAlgaeSetpoint = Rotations.of(324.33);
-  public static final Angle kHpAlgaeSetpoint = Rotations.of(106.6608);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(51.04735);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(51.61872);
+  public static final Angle kHpAlgaeSetpoint = Rotations.of(16.97559);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(319.6908);
-  public static final Angle kBargeSetpoint = Rotations.of(77.5906);
-  public static final Angle kBargeBackwardsSetpoint = Rotations.of(-77.5906);
+  public static final Angle kProcessorSetpoint = Rotations.of(50.88037);
+  public static final Angle kBargeSetpoint = Rotations.of(12.3489);
+  public static final Angle kBargeBackwardSetpoint = Rotations.of(-12.3489);
 
   // jogging
   public static final double kJogAmountUp = 10;

@@ -20,7 +20,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   private final AlgaeIOInputs inputs = new AlgaeIOInputs();
   private AngularVelocity desiredSpeed = RotationsPerSecond.of(0);
 
-  private AlgaeStates curState = AlgaeStates.IDLE;
+  private AlgaeStates curState = AlgaeStates.EMPTY;
 
   public AlgaeSubsystem(AlgaeIO io) {
     this.io = io;
@@ -84,16 +84,16 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
 
     switch (curState) {
       case HAS_ALGAE -> {
-        if (!inputs.isLimitSwitchClosed) {
-          setState(AlgaeStates.EMPTY);
-          setSpeed(RotationsPerSecond.of(0));
-        }
+        // if (!inputs.isLimitSwitchClosed) {
+        //   setState(AlgaeStates.EMPTY);
+        //   setSpeed(RotationsPerSecond.of(0));
+        // }
       }
       case EMPTY -> {
-        if (inputs.isLimitSwitchClosed) { // FIXME: correct?
-          hold();
-          setState(AlgaeStates.HAS_ALGAE);
-        }
+        // if (inputs.isLimitSwitchClosed) { // FIXME: correct?
+        //   hold();
+        //   setState(AlgaeStates.HAS_ALGAE);
+        // }
       }
       case IDLE -> {}
     }

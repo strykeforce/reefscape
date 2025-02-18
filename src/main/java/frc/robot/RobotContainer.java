@@ -9,11 +9,13 @@ import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
+import frc.robot.commands.algae.ToggleHasAlgaeCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
@@ -131,7 +133,7 @@ public class RobotContainer {
     ledIO = new LEDIO();
     ledSubsystem = new LEDSubsystem();
 
-    visionSubsystem = new VisionSubsystem();
+    visionSubsystem = new VisionSubsystem(driveSubsystem);
 
     tagAlignSubsystem = new TagAlignSubsystem(driveSubsystem, visionSubsystem);
 
@@ -154,6 +156,7 @@ public class RobotContainer {
     configureTelemetry();
     configureDriverBindings();
     configureOperatorBindings();
+    configurePitDashboard();
   }
 
   private void configureTelemetry() {
@@ -323,6 +326,14 @@ public class RobotContainer {
     (new Trigger(() -> xboxController.getPOV() == 270))
         .onTrue(
             new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL4CoralSetpoint));
+  }
+
+  public void configurePitDashboard() {
+
+    Shuffleboard.getTab("Pit")
+        .add("Toggle HasAlgae", new ToggleHasAlgaeCommand(algaeSubsystem))
+        .withPosition(3, 2)
+        .withSize(1, 1);
   }
 
   public Command getAutonomousCommand() {

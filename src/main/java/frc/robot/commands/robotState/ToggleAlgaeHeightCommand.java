@@ -12,6 +12,6 @@ public class ToggleAlgaeHeightCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    robotState.toggleAlgaeHeight(null);
+    robotState.toggleAlgaeHeight();
   }
 }

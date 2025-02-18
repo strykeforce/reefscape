@@ -48,9 +48,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private ScoringLevel scoringLevel = ScoringLevel.L4;
   private ScoringLevel currentLevel = ScoringLevel.L4;
-  private ScoreSide scoreSide;
-  private AlgaeHeight algaeHeight;
-  private CoralLoc coralLoc;
+  private ScoreSide scoreSide = ScoreSide.LEFT;
+  private AlgaeHeight algaeHeight = AlgaeHeight.LOW;
+  private CoralLoc coralLoc = CoralLoc.CORAL;
 
   private boolean isAutoPlacing = false;
   private boolean getAlgaeOnCycle = false;
@@ -108,7 +108,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public ScoringLevel getAlgaeLevel() {
-    return tagAlignSubsystem.computeHexant(allianceColor) % 2 == 0
+    return (tagAlignSubsystem.computeHexant(allianceColor) % 2) == 0
         ? ScoringLevel.L3
         : ScoringLevel.L2;
   }
@@ -133,8 +133,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         curState = RobotStates.TRANSFER;
       } else {
         logger.info("{} -> {}", this.curState, robotState);
+        curState = nextState = robotState;
       }
-      curState = nextState = robotState;
     }
   }
 
@@ -154,8 +154,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.algaeHeight = algaeHeight;
   }
 
-  public void toggleAlgaeHeight(AlgaeHeight algaeHeight) {
-    this.algaeHeight = algaeHeight == AlgaeHeight.LOW ? AlgaeHeight.HIGH : AlgaeHeight.LOW;
+  public void toggleAlgaeHeight() {
+    algaeHeight = algaeHeight == AlgaeHeight.LOW ? AlgaeHeight.HIGH : AlgaeHeight.LOW;
   }
 
   public void setAutoPlacing(boolean isAutoPlacing) {
@@ -243,6 +243,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     // algaeSubsystem.hold();
 
     setState(RobotStates.TO_STOW);
+  }
+
+  public void toStowSafe() {
+    biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
+    driveSubsystem.removeDriveMultiplier();
+    // algaeSubsystem.hold();
+
+    setState(RobotStates.TO_STOW_SAFE);
   }
 
   public void toPrepCoral() {
@@ -384,7 +392,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
         if (poseX > RobotStateConstants.kRedBargeSafeX
             || poseX < RobotStateConstants.kBlueBargeSafeX) {
-          biscuitSubsystem.setPosition(BiscuitConstants.kBargeSetpoint);
+          biscuitSubsystem.setPosition(BiscuitConstants.kBargeBackwardSetpoint);
           elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
 
           setState(RobotStates.BARGE_ALGAE, true);
@@ -469,6 +477,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("RobotState/state", curState);
     Logger.recordOutput("RobotState/hasCoral", hasCoral());
     Logger.recordOutput("RobotState/scoringLevel", scoringLevel);
+    Logger.recordOutput("RobotState/algeaHeight", algaeHeight);
+    Logger.recordOutput("RobotState/getAlgea", getAlgaeOnCycle);
 
     switch (curState) {
       case TRANSFER -> {
@@ -484,6 +494,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           setState(RobotStates.STOW);
         }
       }
+
+      case TO_STOW_SAFE -> {
+        if (biscuitSubsystem.isSafeToStow()) {
+          elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
+          setState(RobotStates.TO_STOW);
+        }
+      }
+
       case STOW -> {
         if (futureState != null) {
           switch (futureState) {
@@ -520,13 +538,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                 biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeRemovalSetpoint);
                 elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
 
-                // FIXME: if driving to remove algae
-                switch (scoringLevel) {
-                  case L1, L2 -> {
-                    driveSubsystem.move(DriveConstants.kAlgaeRemovalSpeed, 0, 0, false);
-                  }
-                  default -> {}
-                }
+                // // FIXME: if driving to remove algae
+                // switch (scoringLevel) {
+                //   case L1, L2 -> {
+                //     driveSubsystem.move(DriveConstants.kAlgaeRemovalSpeed, 0, 0, false);
+                //   }
+                //   default -> {}
+                // }
               }
               case L3 -> {
                 biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeRemovalSetpoint);
@@ -552,13 +570,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (getAlgaeLevel() == ScoringLevel.L2) {
           switch (scoringLevel) {
             case L1, L2 -> {
-              // FIXME: if driving to remove algae
-              if (driveSubsystem.getPoseMeters().minus(algaeRemovalPose).getTranslation().getNorm()
-                  > RobotStateConstants.kAlgaeRetreatDistance) {
-                driveSubsystem.move(0, 0, 0, false);
-                toReefAlign(false, true);
-              }
-              // FIXME: if not driving to remove algae
+              // // FIXME: if driving to remove algae
+              // if
+              // (driveSubsystem.getPoseMeters().minus(algaeRemovalPose).getTranslation().getNorm()
+              //     > RobotStateConstants.kAlgaeRetreatDistance) {
+              //   driveSubsystem.move(0, 0, 0, false);
+              //   toReefAlign(false, true);
+              // }
+              // // FIXME: if not driving to remove algae
               biscuitSubsystem.setPosition(BiscuitConstants.kSafeAlgaeRemovalSetpoint);
               elevatorSubsystem.setPosition(ElevatorConstants.kSafeAlgaeRemovalSetpoint);
               setState(RobotStates.SAFE_REMOVE_ALGAE_ABOVE, true);
@@ -619,22 +638,22 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case PROCESSOR_ALGAE -> {
         if (!algaeSubsystem.hasAlgae()) {
-          toStow();
+          toStowSafe();
         }
       }
       case BARGE_ALGAE -> {
         if (!algaeSubsystem.hasAlgae()) {
-          toStow();
+          toStowSafe();
         }
       }
       case MIC_ALGAE -> {
         if (algaeSubsystem.hasAlgae()) {
-          toStow();
+          toStowSafe();
         }
       }
       case FLOOR_ALGAE -> {
         if (algaeSubsystem.hasAlgae()) {
-          toStow();
+          toStowSafe();
         }
       }
       case PREP_CLIMB -> {}
@@ -658,6 +677,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public enum RobotStates {
     STOW,
     TO_STOW,
+    TO_STOW_SAFE,
     PREP_CORAL,
     REEF_ALIGN_ALGAE,
     REEF_ALIGN_CORAL,

@@ -10,6 +10,8 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveConstants {
@@ -21,9 +23,16 @@ public class DriveConstants {
   public static final double kRateLimitFwdStr = 3.5;
   public static final double kRateLimitYaw = 8.0;
 
-  public static final double kDriveGearRatio = 6.5;
+  public static final double kDriveMotorOutputGear = 22;
+  public static final double kDriveInputGear = 52;
+  public static final double kBevelInputGear = 15;
+  public static final double kBevelOutputGear = 45;
+
+  public static final double kDriveGearRatio =
+      (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
+
   public static final double kWheelDiameterInches = 4.0;
-  public static final double kMaxSpeedMetersPerSecond = 12.0;
+  public static final double kMaxSpeedMetersPerSecond = 3.384;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
   public static final double kGyroDifferentThreshold = 5.0; // 5 degrees
@@ -60,6 +69,9 @@ public class DriveConstants {
   public static final double kTripTemp = 1300;
   public static final double kRecoverTemp = 1290;
   public static final double kNotifyTemp = 1295;
+
+  public static final Pose2d kResetOdomPose =
+      new Pose2d(new Translation2d(0.5, 3.62), Rotation2d.fromDegrees(67));
 
   // public static TalonFXSConfiguration
   //     getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
