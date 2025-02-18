@@ -153,6 +153,7 @@ public class RobotContainer {
     configureDriverBindings();
     configureOperatorBindings();
     configureMatchDashboard();
+    configurePitDashboard();
     robotStateSubsystem.setAllianceColor(Alliance.Blue);
   }
 
@@ -287,6 +288,20 @@ public class RobotContainer {
     .addBoolean("Has Algae", () -> robotStateSubsystem.hasAlgae())
     .withPosition(3, 3)
     .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+    .addString("Coral Level", () -> robotStateSubsystem.getAlgaeLevel().name())
+    .withPosition(4, 3)
+    .withSize(1, 1);
+}
+
+private void configurePitDashboard(){
+    Shuffleboard.getTab("Pit")
+        .add(
+            "robotStateSubsystem. Stop Axis",
+            //new stopAxis(robotStateSubsystem))
+        .withPosition(3, 2)
+        .withSize(1, 1);
 }
 
   public Command getAutonomousCommand() {
