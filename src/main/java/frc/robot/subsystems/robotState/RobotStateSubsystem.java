@@ -489,7 +489,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         // }
       case REEF_ALIGN -> {
         if (!isAutoPlacing
-            || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE) {
+            || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.TAG_ALIGN) {
           toReefAlign(getAlgaeOnCycle, false);
         }
       }
