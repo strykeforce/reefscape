@@ -298,7 +298,7 @@ public class RobotContainer {
 private void configurePitDashboard(){
     Shuffleboard.getTab("Pit")
         .add(
-            "robotStateSubsystem. Stop Axis",
+            "ADD CODE",
             //new stopAxis(robotStateSubsystem))
         .withPosition(3, 2)
         .withSize(1, 1);

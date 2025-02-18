@@ -2,6 +2,7 @@ package frc.robot.subsystems.robotState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.BiscuitConstants;
@@ -371,6 +372,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
     }
+  }
+
+  public void stopAxis(){
+    //set all to zero
   }
 
   public void releaseAlgae() {
