@@ -6,7 +6,6 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
-import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 
 public class AutoScoreReefCommand extends Command {
   private RobotStateSubsystem robotStateSubsystem;
@@ -26,7 +25,6 @@ public class AutoScoreReefCommand extends Command {
     robotStateSubsystem.setIsAuto(false);
     robotStateSubsystem.setAutoPlacing(true);
     robotStateSubsystem.setGetAlgaeOnCycle(false);
-    robotStateSubsystem.setScoreSide(ScoreSide.LEFT);
     robotStateSubsystem.toReefAlign();
   }
 

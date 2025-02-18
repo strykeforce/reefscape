@@ -24,6 +24,7 @@ import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoScoreReefCommand;
 import frc.robot.commands.robotState.ScoreReefManualCommand;
+import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.tagAlign.TagAlignCommand;
@@ -50,6 +51,7 @@ import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDIO;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -186,6 +188,12 @@ public class RobotContainer {
         .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L3));
     new Trigger(() -> xboxController.getRightTriggerAxis() > RobotConstants.kTriggerDeadband)
         .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L4));
+
+    // Set scoring side
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.LEFT));
+    new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+        .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.RIGHT));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)

@@ -49,14 +49,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     this.visionSubsystem = visionSubsystem;
 
     // FIXME: need sane constants
-    this.driveX = new ProfiledPIDController(2, 0, 0, new Constraints(1, 1.0));
+    this.driveX = new ProfiledPIDController(3, 0, 0, new Constraints(1, 1.0));
     this.driveY = new ProfiledPIDController(5, 0, 0, new Constraints(2, 3));
     this.driveOmega = new ProfiledPIDController(5.0, 0, 0, new Constraints(1.0, 1.0));
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
-    this.alignX = new ProfiledPIDController(0.0015, 0, 0, new Constraints(1.0, 1.0)); // 0.0015
-    this.alignY = new ProfiledPIDController(0.001, 0, 0, new Constraints(1.0, 1.0));
-    this.alignOmega = new ProfiledPIDController(5.2, 0, 0, new Constraints(1.0, 1.0));
+    this.alignX = new ProfiledPIDController(0.0017, 0, 0, new Constraints(1.0, 1.0)); // 0.0015
+    this.alignY = new ProfiledPIDController(0.0017, 0, 0, new Constraints(1.0, 1.0));
+    this.alignOmega = new ProfiledPIDController(5.5, 0, 0, new Constraints(1.0, 1.0));
     this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     Logger.recordOutput("TagAlignSubsystem/TargetDiag", -1);
