@@ -20,9 +20,14 @@ import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.console.SSD1306.Rotation;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
@@ -375,7 +380,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void stopAxis(){
-    //set all to zero
+    coralSubsystem.setSpeed(RotationsPerSecond.of(0));
+    funnelSubsystem.setPercent(0);
   }
 
   public void releaseAlgae() {

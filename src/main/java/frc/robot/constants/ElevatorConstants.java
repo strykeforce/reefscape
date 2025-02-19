@@ -23,6 +23,7 @@ public class ElevatorConstants {
   public static final double kCloseEnoughRotations = 0.1;
   public static final double kMaxFwd = 53; // TODO all of these fields need to be filled out
   public static final double kMaxRev = 2;
+  public static final double kElevatorLiftHeight = 1; //for pit command
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
   public static final double kZeroSpeed = -.05;

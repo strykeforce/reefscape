@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.Map;
 
@@ -32,7 +33,10 @@ import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.ScoreReefManualCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
+import frc.robot.commands.robotState.SpinUpWheelsCommand;
+import frc.robot.commands.robotState.StopAllAxisCommand;
 import frc.robot.commands.robotState.StowCommand;
+import frc.robot.commands.robotState.lockwheelscommand;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
@@ -298,9 +302,37 @@ public class RobotContainer {
 private void configurePitDashboard(){
     Shuffleboard.getTab("Pit")
         .add(
-            "ADD CODE",
-            //new stopAxis(robotStateSubsystem))
-        .withPosition(3, 2)
+            "Stop All Moving Parts",
+            new StopAllAxisCommand(robotStateSubsystem))
+        .withPosition(1, 1)
+        .withSize(1, 1);
+
+        Shuffleboard.getTab("Pit")
+        .add(
+            "Zero Elevator",
+            new ZeroElevatorCommand(elevatorSubsystem))
+        .withPosition(2, 1)
+        .withSize(1, 1);
+
+        Shuffleboard.getTab("Pit")
+        .add(
+            "Lock Wheels",
+            new lockwheelscommand(driveSubsystem))
+        .withPosition(3, 1)
+        .withSize(1, 1);
+
+        Shuffleboard.getTab("Pit")
+        .add(
+            "Set Azmuth Velocity 20%",
+            new SpinUpWheelsCommand(driveSubsystem))
+        .withPosition(4, 1)
+        .withSize(1, 1);
+
+        Shuffleboard.getTab("Pit")
+        .add(
+            "Raise Elevator",
+            new SetElevatorPositionCommand(elevatorSubsystem, Rotations.of(ElevatorConstants.kElevatorLiftHeight)))
+        .withPosition(5, 1)
         .withSize(1, 1);
 }
 
