@@ -27,7 +27,11 @@ public class ScoreAlgaeCommand extends Command {
   public void initialize() {
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
-    robotStateSubsystem.toScoreAlgae();
+    if (startState == RobotStates.BARGE_ALGAE || startState == RobotStates.PROCESSOR_ALGAE) {
+      robotStateSubsystem.releaseAlgae();
+    } else {
+      robotStateSubsystem.toScoreAlgae();
+    }
   }
 
   @Override
@@ -38,7 +42,8 @@ public class ScoreAlgaeCommand extends Command {
           || !startingElevatorFinished;
     } else {
       return robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE
-          || robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE;
+          || robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
+          || !robotStateSubsystem.isBargeSafe;
     }
   }
 }

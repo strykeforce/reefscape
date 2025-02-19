@@ -48,6 +48,11 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
         && currState != ElevatorStates.ZEROING;
   }
 
+  public boolean isHigherThan(Angle higherThanPos) {
+    return getPosition().in(Rotations) > higherThanPos.in(Rotations)
+        && currState != ElevatorStates.ZEROING;
+  }
+
   @Override
   public void zero() {
     currState = ElevatorStates.ZEROING;

@@ -82,16 +82,10 @@ public class BiscuitIOFX implements BiscuitIO {
   @Override
   public void zero() {
     didZero = false;
-    if (fwdLimitSwitchOpen == true) {
-      double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
-      double setPos = BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos);
-      talon.setPosition(setPos);
-      logger.info("set Biscuit position to " + setPos);
-      didZero = true;
-    } else {
-      rangeAlert.set(true);
-      logger.error("Biscuit overextended! Shutting down movement!");
-      configurator.apply(BiscuitConstants.disableTalon());
-    }
+    double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
+    double setPos = BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos);
+    talon.setPosition(setPos);
+    logger.info("set Biscuit position to " + setPos);
+    didZero = true;
   }
 }

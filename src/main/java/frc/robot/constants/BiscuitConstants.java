@@ -23,14 +23,13 @@ import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.Angle;
 
 public class BiscuitConstants {
-  // These are all wrong right now because we don't have any actual info
 
-  public static double kZero = 0.02; // TODO Will need to be experimentally determined
+  public static double kZero = .37;
   public static double kTicksPerRot = 160;
   public static int talonID = 25;
-  public static double kCloseEnough = 0.05; // This was a little out of wack.
-  public static final Angle kMaxFwd = Rotations.of(100);
-  public static final Angle kMaxRev = Rotations.of(-100);
+  public static double kCloseEnough = 0.05;
+  public static final Angle kMaxFwd = Rotations.of(51.04735 + 5);
+  public static final Angle kMaxRev = Rotations.of(-12.3489 - 5);
   public static final double kSafeToStowUpper = 40;
   public static final double kSafeToStowLower = -5;
 
@@ -70,7 +69,7 @@ public class BiscuitConstants {
   public static final double kJogAmountUp = 10;
   public static final double kJogAmountDown = -10;
 
-  // Disables the TalonFXS by setting it's voltage to zero. Not very shocking.
+  // Disables the TalonFXS by setting its voltage to zero.
   public static VoltageConfigs disableTalon() {
     VoltageConfigs voltage =
         new VoltageConfigs().withPeakForwardVoltage(0.0).withPeakReverseVoltage(0.0);
@@ -105,9 +104,9 @@ public class BiscuitConstants {
 
     SoftwareLimitSwitchConfigs swLimit =
         new SoftwareLimitSwitchConfigs()
-            .withForwardSoftLimitEnable(false)
+            .withForwardSoftLimitEnable(true)
             .withForwardSoftLimitThreshold(kMaxFwd)
-            .withReverseSoftLimitEnable(false)
+            .withReverseSoftLimitEnable(true)
             .withReverseSoftLimitThreshold(kMaxRev);
     fxsConfig.SoftwareLimitSwitch = swLimit;
 

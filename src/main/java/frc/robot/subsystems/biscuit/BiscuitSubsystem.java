@@ -60,7 +60,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
     Logger.recordOutput("Biscuit setPoint", setPoint.in(Rotations));
-    Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
+    Logger.recordOutput("Is Biscuit Finished", isFinished());
   }
 
   @Override
