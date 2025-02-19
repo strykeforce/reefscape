@@ -29,6 +29,11 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
         return curState;
     }
 
+    public boolean hasCoral() {
+      // return true;
+      return curState == FunnelState.HasSeenCoral;
+    }
+
     @Override
     public void periodic() {
         // Update Inputs
@@ -46,7 +51,7 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
                 }
 
                 if(totalBreaks >= 3){
-                    setPercent(0.0);
+                    stopMotor();
                     curState = FunnelState.HasSeenCoral;
                 }
                 break;
@@ -80,17 +85,19 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
         io.setPct(pct);
     }
 
-    public void EnableBeamBreak() {
-        io.enableFwdLimitSwitch(true);
-        curState = FunnelState.HasNotSeenCoral;
+    public void startMotor() {
+        setPercent(FunnelConstants.kFunnelPercentOutput);
+        io.enableFwdLimitSwitch(false);
     }
 
-    public void DisableBeamBreak() {
-        io.enableFwdLimitSwitch(false);
+    public void ClearCoral() {
+        curState = FunnelState.HasNotSeenCoral;
         setPercent(FunnelConstants.kFunnelPercentOutput);
+        io.enableFwdLimitSwitch(true);
     }
  
-    public void StopMotor() {
+    public void stopMotor() {
         setPercent(0.0);
+        io.enableFwdLimitSwitch(false);
     }
 }
