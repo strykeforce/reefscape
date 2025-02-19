@@ -3,8 +3,6 @@ package frc.robot.subsystems.funnel;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
-import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
-
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface FunnelIo {

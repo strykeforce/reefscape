@@ -9,7 +9,6 @@ import org.strykeforce.telemetry.measurable.Measure;
 
 import frc.robot.constants.FunnelConstants;
 import frc.robot.standards.OpenLoopSubsystem;
-import frc.robot.subsystems.funnel.FunnelIOInputsAutoLogged;
 
 public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubsystem{
 
@@ -38,24 +37,18 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
 
         switch (curState){
             case HasSeenCoral:
-            if(inputs.fwdBeamOpen == false) {
-                setPercent(0.0);
-            }else{
-                setPercent(FunnelConstants.kFunnelPercentOutput);
-            }
                 break;
             case HasNotSeenCoral:
-            setPercent(FunnelConstants.kFunnelPercentOutput);
+                if(inputs.fwdBeamOpen == false){
+                    totalBreaks += 1;
+                }else{
+                    totalBreaks = 0;
+                }
 
-            if(inputs.fwdBeamOpen == false){
-                totalBreaks += 1;
-            }else{
-                totalBreaks = 0;
-            }
-
-            if(totalBreaks >= 3){
-                curState = FunnelState.HasSeenCoral;
-            }
+                if(totalBreaks >= 3){
+                    setPercent(0.0);
+                    curState = FunnelState.HasSeenCoral;
+                }
                 break;
         }
 
@@ -87,22 +80,17 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
         io.setPct(pct);
     }
 
-    public void PassCoral() {
-        io.enableFwdLimitSwitch(false);
-        setPercent(FunnelConstants.kFunnelPercentOutput);
+    public void EnableBeamBreak() {
+        io.enableFwdLimitSwitch(true);
+        curState = FunnelState.HasNotSeenCoral;
     }
 
-    public void StopCoral() {
-        io.enableFwdLimitSwitch(true);
-        setPercent(0.0);
+    public void DisableBeamBreak() {
+        io.enableFwdLimitSwitch(false);
+        setPercent(FunnelConstants.kFunnelPercentOutput);
     }
  
     public void StopMotor() {
         setPercent(0.0);
     }
-
-    public void ClearCoral() {
-        curState = FunnelState.HasNotSeenCoral;
-    }
-    
 }
