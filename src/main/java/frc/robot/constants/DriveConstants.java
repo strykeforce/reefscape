@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveConstants {
   public static final double kAlgaeRemovalSpeed = 0;
+  public static final double kBargeScoreStickMultiplier = 0.5;
 
   public static final double kDeadbandAllStick = 0.075;
   public static final double kExpoScaleYawFactor = 0.75;
@@ -40,6 +41,7 @@ public class DriveConstants {
   public static final double kRobotLength = 0.6223;
   public static final double kRobotWidth = 0.6223;
   public static final double kFieldMaxX = 17.526;
+  public static final double kCenterLineX = 8.763;
 
   public static final double kPOmega = 4.5;
   public static final double kIOmega = 0.0;

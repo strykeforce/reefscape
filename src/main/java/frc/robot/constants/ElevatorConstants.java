@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.Angle;
 public class ElevatorConstants {
 
   public static final double kCloseEnoughRotations = 0.1;
-  public static final double kMaxFwd = 53; // TODO all of these fields need to be filled out
+  public static final double kMaxFwd = 53;
   public static final double kMaxRev = 2;
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
@@ -43,14 +43,14 @@ public class ElevatorConstants {
   public static final Angle kStowSetpoint = kFunnelSetpoint;
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kL3AlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(2.8677);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(17.513);
 
-  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(0.0);
-  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(0.0);
+  public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;
+  public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
 
-  public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
-  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
+  public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(2.8677);
+  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(15.542);
 
   // Coral score
   public static final Angle kL1CoralSetpoint = Rotations.of(13.04053);
@@ -62,13 +62,14 @@ public class ElevatorConstants {
   public static final Angle kPrestageSetpoint = kL2CoralSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kMicAlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kHpAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(6.66);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(17.07);
+  public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(0.0);
-  public static final Angle kBargeSetpoint = Rotations.of(0.0);
+  public static final Angle kProcessorSetpoint = Rotations.of(4.297);
+  public static final Angle kBargeSetpoint = Rotations.of(41.936); // 40.913
+  public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 
   public static TalonFXConfiguration getBothFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();

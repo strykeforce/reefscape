@@ -213,6 +213,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     Logger.recordOutput("TagAlignSubsystem/State", curState.toString());
+    // Logger.recordOutput("TagAlignSubsystem/Hexant", computeHexant(alliance));
 
     switch (curState) {
       case DRIVE -> {

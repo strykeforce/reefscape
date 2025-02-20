@@ -2,9 +2,11 @@ package frc.robot.subsystems.algae;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -15,8 +17,10 @@ import org.strykeforce.telemetry.TelemetryService;
 
 public class AlgaeIOFX implements AlgaeIO {
   private Logger logger;
-  private TalonFX talonFX;
+  private TalonFXS talonFXS;
   private AlgaeIOInputs inputs;
+
+  private TalonFXSConfigurator configurator;
 
   // FX Access objects
   private StatusSignal<AngularVelocity> curVelocity;
@@ -27,36 +31,36 @@ public class AlgaeIOFX implements AlgaeIO {
 
   public AlgaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
-    talonFX = new TalonFX(AlgaeConstants.kFxId);
-    fwdLimitSwitch = talonFX.getForwardLimit();
-    revLimitSwitch = talonFX.getReverseLimit();
-    curVelocity = talonFX.getVelocity();
+    talonFXS = new TalonFXS(AlgaeConstants.kFxId);
+
+    configurator = talonFXS.getConfigurator();
+    configurator.apply(new TalonFXSConfiguration()); // Factory default motor controller
+    configurator.apply(AlgaeConstants.getFXConfig());
+
+    fwdLimitSwitch = talonFXS.getForwardLimit();
+    revLimitSwitch = talonFXS.getReverseLimit();
+    curVelocity = talonFXS.getVelocity();
   }
 
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
     BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
-    inputs.velocity = curVelocity.refresh().getValue();
-    inputs.isFwdLimitSwitchClosed = fwdLimitSwitch.getValue().value == 1; // FIXME check right value
-    inputs.isRevLimitSwitchClosed = revLimitSwitch.getValue().value == 0; // FIXME check right value
+    inputs.velocity = curVelocity.getValueAsDouble();
+    inputs.isBeamBroken = fwdLimitSwitch.getValue().value == 0;
   }
 
   @Override
-  public void setSpeed(AngularVelocity speed) {
-    talonFX.setControl(speedRequest.withVelocity(speed));
+  public void setSpeed(double speed) {
+    talonFXS.setControl(speedRequest.withVelocity(speed));
   }
 
   @Override
   public void setPct(double pct) {
-    talonFX.setControl(dutyCycleRequest.withOutput(pct));
-  }
-
-  public AngularVelocity AngularVelocity() {
-    return talonFX.getVelocity().getValue();
+    talonFXS.setControl(dutyCycleRequest.withOutput(pct));
   }
 
   @Override
   public void registerWith(TelemetryService telemetryService) {
-    telemetryService.register(talonFX, true);
+    telemetryService.register(talonFXS, true);
   }
 }

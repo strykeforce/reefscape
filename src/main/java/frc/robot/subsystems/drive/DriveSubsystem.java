@@ -44,6 +44,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Trajectory<SwerveSample> autoTrajectory;
   private double trajectoryActive = 0.0;
 
+  private double driveMultiplier = 1.0;
+
   private int gyroDifferentCount = 0;
 
   private RobotStateSubsystem robotStateSubsystem;
@@ -81,7 +83,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
-    io.drive(vXmps, vYmps, vOmegaRadps, true);
+    io.drive(vXmps * driveMultiplier, vYmps * driveMultiplier, vOmegaRadps, true);
   }
 
   public void setAzimuthVel(double vel) {
@@ -344,6 +346,18 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public PIDController getomegaControllerNonProfiled() {
     return new PIDController(
         omegaController.getP(), omegaController.getI(), omegaController.getD());
+  }
+
+  public void setDriveMultiplier(double multiplier) {
+    driveMultiplier = multiplier;
+  }
+
+  public double getDriveMultiplier() {
+    return driveMultiplier;
+  }
+
+  public void removeDriveMultiplier() {
+    driveMultiplier = 1.0;
   }
 
   @Override
