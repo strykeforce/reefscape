@@ -44,13 +44,13 @@ public class ElevatorConstants {
 
   // Algae removal
   public static final Angle kL2AlgaeSetpoint = Rotations.of(2.8677);
-  public static final Angle kL3AlgaeSetpoint = Rotations.of(14.724);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(17.513);
 
-  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(2.8677);
-  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(14.724);
+  public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;
+  public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
 
   public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(2.8677);
-  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(14.724);
+  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(15.542);
 
   // Coral score
   public static final Angle kL1CoralSetpoint = Rotations.of(13.04053);
@@ -62,13 +62,13 @@ public class ElevatorConstants {
   public static final Angle kPrestageSetpoint = kL3CoralSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(8.81836);
-  public static final Angle kMicAlgaeSetpoint = Rotations.of(17.708);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(6.66);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(17.07);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(14.9063);
-  public static final Angle kBargeSetpoint = Rotations.of(40.913);
+  public static final Angle kProcessorSetpoint = Rotations.of(4.297);
+  public static final Angle kBargeSetpoint = Rotations.of(41.936); // 40.913
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 
   public static TalonFXConfiguration getBothFXConfig() {

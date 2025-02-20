@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.algae.IntakeAlgaeCommand;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
+import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.algae.ToggleHasAlgaeCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
@@ -156,6 +158,7 @@ public class RobotContainer {
     configureTelemetry();
     configureDriverBindings();
     configureOperatorBindings();
+    // configureTestOperatorBindings();
     configurePitDashboard();
   }
 
@@ -223,6 +226,30 @@ public class RobotContainer {
   }
 
   private void configureOperatorBindings() {
+    // Move biscuit
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+
     // Set Levels
     new Trigger(() -> xboxController.getLeftTriggerAxis() > RobotConstants.kTriggerDeadband)
         .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L1));
@@ -260,6 +287,35 @@ public class RobotContainer {
   }
 
   private void configureTestOperatorBindings() {
+    new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value)
+        .onTrue(new IntakeAlgaeCommand(algaeSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kRightBumper.value)
+        .onTrue(new ProcessorAlgaeCommand(algaeSubsystem));
+
+    // Move biscuit
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+
     // Stop Coral
     new JoystickButton(xboxController, XboxController.Button.kB.value)
         .onTrue(new OpenLoopCoralCommand(coralSubsystem, 0));
@@ -331,8 +387,13 @@ public class RobotContainer {
   public void configurePitDashboard() {
 
     Shuffleboard.getTab("Pit")
-        .add("Toggle HasAlgae", new ToggleHasAlgaeCommand(algaeSubsystem))
+        .add("Toggle Has Algae", new ToggleHasAlgaeCommand(algaeSubsystem))
         .withPosition(3, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Zero Elevator", new ZeroElevatorCommand(elevatorSubsystem))
+        .withPosition(2, 1)
         .withSize(1, 1);
   }
 

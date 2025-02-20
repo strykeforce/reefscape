@@ -1,24 +1,21 @@
 package frc.robot.subsystems.algae;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
-import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.AlgaeConstants;
-import frc.robot.standards.ClosedLoopSpeedSubsystem;
-import frc.robot.subsystems.algae.AlgaeIO.AlgaeIOInputs;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
-public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpeedSubsystem {
+public class AlgaeSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(AlgaeSubsystem.class);
 
   private final AlgaeIO io;
-  private final AlgaeIOInputs inputs = new AlgaeIOInputs();
-  private AngularVelocity desiredSpeed = RotationsPerSecond.of(0);
+  private final AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
+  private double desiredSpeed = 0;
+  private double slowCounts = 0;
 
   private AlgaeStates curState = AlgaeStates.EMPTY;
 
@@ -36,64 +33,75 @@ public class AlgaeSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public void intake() {
-    setSpeed(AlgaeConstants.kIntakingSpeed);
+    // setSpeed(AlgaeConstants.kIntakingSpeed);
+    setPct(0.5);
+    slowCounts = 0;
   }
 
   public void scoreProcessor() {
-    setSpeed(AlgaeConstants.kProcessorScoreSpeed);
+    // setSpeed(AlgaeConstants.kProcessorScoreSpeed);
+    setPct(-1);
   }
 
   public void scoreBarge() {
-    setSpeed(AlgaeConstants.kBargeScoreSpeed);
+    // setSpeed(AlgaeConstants.kBargeScoreSpeed);
+    setPct(-1);
   }
 
   public void hold() {
-    setSpeed(AlgaeConstants.kHoldSpeed);
+    // setSpeed(AlgaeConstants.kHoldSpeed);
+    setPct(-0);
   }
 
   public boolean hasAlgae() {
     return curState == AlgaeStates.HAS_ALGAE;
   }
 
-  @Override
-  public void setSpeed(AngularVelocity speed) {
+  public void setSpeed(double speed) {
     // io.setSpeed(speed);
     // desiredSpeed = speed;
   }
 
   public void setPct(double pct) {
-    // io.setPct(pct);
+    io.setPct(pct);
   }
 
-  @Override
-  public AngularVelocity getSpeed() {
+  public double getSpeed() {
     return inputs.velocity;
   }
 
-  @Override
   public boolean atSpeed() {
-    return inputs.velocity.minus(desiredSpeed).abs(RotationsPerSecond)
-        < AlgaeConstants.kCloseEnough.in(RotationsPerSecond);
+    return FastMath.abs(inputs.velocity - desiredSpeed) < AlgaeConstants.kCloseEnough;
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
     Logger.recordOutput("Algae/state", curState);
-    Logger.recordOutput("Algae/setpoint", desiredSpeed.in(RotationsPerSecond));
+    Logger.recordOutput("Algae/setpoint", desiredSpeed);
 
     switch (curState) {
       case HAS_ALGAE -> {
-        // if (!inputs.isLimitSwitchClosed) {
-        //   setState(AlgaeStates.EMPTY);
-        //   setSpeed(RotationsPerSecond.of(0));
-        // }
+        if (!inputs.isBeamBroken) {
+          setState(AlgaeStates.EMPTY);
+          // setPct(0);
+          // setSpeed(RotationsPerSecond.of(0));
+        }
       }
       case EMPTY -> {
-        // if (inputs.isLimitSwitchClosed) { // FIXME: correct?
-        //   hold();
-        //   setState(AlgaeStates.HAS_ALGAE);
-        // }
+        if (inputs.isBeamBroken) {
+          if (FastMath.abs(inputs.velocity) < AlgaeConstants.kHasAlgaeVelThreshold) {
+            slowCounts++;
+          } else {
+            slowCounts = 0;
+          }
+
+          if (slowCounts >= AlgaeConstants.kHasAlgaeCounts) {
+            hold();
+            setState(AlgaeStates.HAS_ALGAE);
+          }
+        }
       }
       case IDLE -> {}
     }

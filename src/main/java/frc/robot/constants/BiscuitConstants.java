@@ -24,10 +24,10 @@ import edu.wpi.first.units.measure.Angle;
 
 public class BiscuitConstants {
 
-  public static double kZero = .37;
-  public static double kTicksPerRot = 160;
-  public static int talonID = 25;
-  public static double kCloseEnough = 0.05;
+  public static final double kZero = .36;
+  public static final double kTicksPerRot = 160;
+  public static final int talonID = 25;
+  public static final double kCloseEnough = 0.05;
   public static final Angle kMaxFwd = Rotations.of(51.04735 + 5);
   public static final Angle kMaxRev = Rotations.of(-12.3489 - 5);
   public static final double kSafeToStowUpper = 40;
@@ -35,16 +35,16 @@ public class BiscuitConstants {
 
   // Setpoints
   // Idle
-  public static final Angle kStowSetpoint = Rotations.of(0.0);
+  public static final Angle kStowSetpoint = Rotations.of(1.862);
   public static final Angle kFunnelSetpoint = kStowSetpoint;
   public static final Angle kPrestageSetpoint = kStowSetpoint;
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(19.11865);
-  public static final Angle kL3AlgaeSetpoint = Rotations.of(19.11865);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(20.848);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(24.562);
 
-  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(19.11865);
-  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(19.11865);
+  public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;
+  public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
 
   public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
   public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
@@ -56,12 +56,12 @@ public class BiscuitConstants {
   public static final Angle kL4CoralSetpoint = kStowSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(51.04735);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(49.627);
   public static final Angle kMicAlgaeSetpoint = Rotations.of(51.61872);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(16.97559);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(50.88037);
+  public static final Angle kProcessorSetpoint = Rotations.of(41.193);
   public static final Angle kBargeSetpoint = Rotations.of(12.3489);
   public static final Angle kBargeBackwardSetpoint = Rotations.of(-12.3489);
 

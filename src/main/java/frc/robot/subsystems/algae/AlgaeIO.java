@@ -1,19 +1,18 @@
 package frc.robot.subsystems.algae;
 
-import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
 public interface AlgaeIO {
   @AutoLog
   public static class AlgaeIOInputs {
-    public AngularVelocity velocity;
-    public boolean isLimitSwitchClosed;
+    public double velocity;
+    public boolean isBeamBroken;
   }
 
   public default void updateInputs(AlgaeIOInputs inputs) {}
 
-  public default void setSpeed(AngularVelocity speed) {}
+  public default void setSpeed(double speed) {}
 
   public default void setPct(double pct) {}
 
