@@ -384,7 +384,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         Rotation3d cameraRotation = new Rotation3d();
 
         if (result.getNumTags() > 1) {
-          // If there our more then one tag in an image we can get pose possible pose
+          // If there our more then one tag in an image we get one possible pose
           cameraPose = result.getCameraPose();
 
           robotTranslation =
@@ -424,8 +424,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
           // However we do have to be accepting the poses to use them
           if (visionUpdating) {
             Matrix<N3, N1> testingMatrix = VecBuilder.fill(0.0001, 0.0001, 0.0001);
-            driveSubsystem.addVisionMeasurement(
-                robotPose, result.getTimeStamp() / 1_000_000, testingMatrix);
+            driveSubsystem.addVisionMeasurement(robotPose, result.getTimeStamp() / 1_000_000);
             logger.recordOutput("Vision/Vision Updating", visionUpdating);
             logger.recordOutput("Vision/std", stdMatrix.get(0, 0));
           }
