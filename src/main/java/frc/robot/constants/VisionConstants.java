@@ -85,7 +85,7 @@ public final class VisionConstants {
   public static final int kCam2Idx = 1;
   public static final int kCam3Idx = 0;
   public static final int kCam4Idx = 1;
-  public static final int kCam5Idx = 0;  //?
+  public static final int kCam5Idx = 0; // ?
 
   public static final double kLoopTime = 0.02;
   public static final int kCircularBufferSize = 1000;

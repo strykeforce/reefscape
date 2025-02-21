@@ -20,7 +20,6 @@ import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.drive.Swerve;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
@@ -90,8 +89,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Idx
   };
 
-  private Swerve swerve = new Swerve();
-  private DriveSubsystem driveSubsystem = new DriveSubsystem(swerve);
+  private DriveSubsystem driveSubsystem;
   /*Because we use two seperate loggers we can import one and then define the
   other here.*/
   private org.slf4j.Logger textLogger;
@@ -321,7 +319,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // See what pose is closer the the gyro at the time of the photo's capture.
     double rotation =
-        gyroBuffer.get(FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
+        gyroBuffer.get(
+            FastMath.floorToInt(
+                (((RobotController.getFPGATime() - time) / 1_000_000.0)
+                    / VisionConstants.kLoopTime)));
     return getCloserPose(pose1, pose2, rotation);
   }
 
