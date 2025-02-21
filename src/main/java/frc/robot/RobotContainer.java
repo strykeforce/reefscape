@@ -297,6 +297,13 @@ public class RobotContainer {
     .addString("Coral Level", () -> robotStateSubsystem.getAlgaeLevel().name())
     .withPosition(4, 3)
     .withSize(1, 1);
+
+    // Shuffleboard.getTab("Match")
+    // .addBoolean(
+    // "Cams Connected",
+    // () -> visionSubsystem.isCameraConnected(0) && visionSubsystem.isCameraConnected(1))
+    // .withSize(1, 1)
+    // .withPosition(4, 0);
 }
 
 private void configurePitDashboard(){
@@ -329,11 +336,24 @@ private void configurePitDashboard(){
         .withSize(1, 1);
 
         Shuffleboard.getTab("Pit")
+        .add("Stop Azimuths", new StopAllAxisCommand(robotStateSubsystem))
+        .withPosition(5, 1)
+        .withSize(1, 1);
+
+        Shuffleboard.getTab("Pit")
         .add(
             "Raise Elevator",
             new SetElevatorPositionCommand(elevatorSubsystem, Rotations.of(ElevatorConstants.kElevatorLiftHeight)))
         .withPosition(5, 1)
         .withSize(1, 1);
+
+        Shuffleboard.getTab("Pit")
+        .add(
+            "Stow",
+            new StowCommand(
+                robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem))
+        .withSize(1, 1)
+        .withPosition(0, 0);
 }
 
   public Command getAutonomousCommand() {
