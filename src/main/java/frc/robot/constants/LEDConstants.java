@@ -3,7 +3,9 @@ package frc.robot.constants;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class LEDConstants {
-  public static final int kStripLength = 42;
+  // Auto/Operator = 27
+  // other = 21.5
+  public static final int kStripLength = 70;
 
   public static final int kAlgeaEnd = kStripLength / 3;
   public static final int kLevelStart = kStripLength / 3;
