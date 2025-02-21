@@ -30,7 +30,7 @@ public class ReefCycleCommand extends Command {
   public void initialize() {
     startingRobotState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
-    isAutoPlacing = robotStateSubsystem.getIsAuto();
+    isAutoPlacing = robotStateSubsystem.getAutoPlaceOnCycle();
     robotStateSubsystem.toPrepCoral();
   }
 

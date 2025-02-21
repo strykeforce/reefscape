@@ -12,10 +12,10 @@ public class ToggleAutoCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    if (robotState.getIsAuto() == false) {
-      robotState.setIsAuto(true);
+    if (robotState.getAutoPlaceOnCycle() == false) {
+      robotState.setAutoPlaceOnCycle(true);
     } else {
-      robotState.setIsAuto(false);
+      robotState.setAutoPlaceOnCycle(false);
     }
   }
 }
