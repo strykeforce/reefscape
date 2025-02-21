@@ -158,6 +158,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.algaeHeight = algaeHeight;
   }
 
+  public void setIsAutoPlacing(boolean autoPlace) {
+    this.isAutoPlacing = autoPlace;
+  }
+
   public void toggleAlgaeHeight() {
     algaeHeight = algaeHeight == AlgaeHeight.LOW ? AlgaeHeight.HIGH : AlgaeHeight.LOW;
   }
@@ -188,6 +192,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public boolean getIsAuto() {
     return isAuto;
+  }
+
+  public boolean getIsAutoPlacing() {
+    return isAutoPlacing;
   }
 
   public void setAutoPlacingLed(boolean isAutoPlacing) {
@@ -297,8 +305,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     if (drive) {
       tagAlignSubsystem.start(allianceColor, scoreSide == ScoreSide.LEFT);
       setState(RobotStates.REEF_ALIGN);
-    } else if ((getAlgae || !coralSubsystem.hasCoral())
-    && (scoreSide == ScoreSide.LEFT || !isAutoPlacing)) {
+    }
+    if ((getAlgae || !coralSubsystem.hasCoral())
+        && (scoreSide == ScoreSide.LEFT || !isAutoPlacing)
+        && !algaeSubsystem.hasAlgae()) {
       if (needSafeAlgaeTransfer(RobotStates.REEF_ALIGN_ALGAE)) {
         return;
       }
@@ -317,7 +327,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
       }
-    } else {
+    } else if (!drive) {
       if (!coralSubsystem.hasCoral()) {
         toStow();
         return;
@@ -506,7 +516,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("RobotState/scoringLevel", scoringLevel);
     Logger.recordOutput("RobotState/algeaHeight", algaeHeight);
     Logger.recordOutput("RobotState/algeaLevelSideBased", getAlgaeLevel());
-    Logger.recordOutput("RobotState/getAlgea", getAlgaeOnCycle);
+    Logger.recordOutput("RobotState/getAlgae", getAlgaeOnCycle);
+    Logger.recordOutput("RobotState/isAutoPlacing", isAutoPlacing);
+    Logger.recordOutput("RobotState/scoreSide", scoreSide);
 
     switch (curState) {
       case TRANSFER -> {
@@ -564,7 +576,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         // }
       case REEF_ALIGN -> {
         if (!isAutoPlacing
-            || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.TAG_ALIGN) {
+            || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE
+            || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.TAG_ALIGN) {
           toReefAlign(getAlgaeOnCycle, false);
         }
       }
@@ -572,8 +585,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (!isAutoPlacing
             || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE) {
           if (algaeSubsystem.hasAlgae()) {
-            algaeRemovalPose = driveSubsystem.getPoseMeters();
-
             switch (getAlgaeLevel()) {
               case L2 -> {
                 biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeRemovalSetpoint);
@@ -600,32 +611,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case REMOVE_ALGAE -> {
-        if (getAlgaeLevel() == ScoringLevel.L2) {
-
-          if (coralSubsystem.hasCoral()) {
-            toReefAlign(false, false);
-          } else {
-            toStowSequential();
-          }
-
-        } else if (coralSubsystem.hasCoral()) {
-          toReefAlign(false, false);
-        } else {
-          toStowSequential();
-        }
-      }
-
-      case SAFE_REMOVE_ALGAE_ABOVE -> {
-        biscuitSubsystem.setPosition(BiscuitConstants.kSafeAlgaeRemovalRotateSetpoint);
-        elevatorSubsystem.setPosition(ElevatorConstants.kSafeAlgaeRemovalRotateSetpoint);
-        setState(RobotStates.SAFE_REMOVE_ALGAE_ROTATE, true);
-      }
-
-      case SAFE_REMOVE_ALGAE_ROTATE -> {
         if (coralSubsystem.hasCoral()) {
           toReefAlign(false, false);
         } else {
-          toStowSafe();
+          toStowSequential();
         }
       }
 

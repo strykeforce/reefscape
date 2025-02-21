@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
@@ -11,6 +12,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 public class ReefCycleCommand extends Command {
   private RobotStateSubsystem robotStateSubsystem;
   private ElevatorSubsystem elevatorSubsystem;
+  private DriveSubsystem driveSubsystem;
   private RobotStates startingRobotState;
   private boolean startingElevatorFinished;
   private boolean isAutoPlacing;
@@ -23,6 +25,7 @@ public class ReefCycleCommand extends Command {
       AlgaeSubsystem algaeSubsystem) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
+
     addRequirements(elevatorSubsystem, coralSubsystem, biscuitSubsystem, algaeSubsystem);
   }
 
@@ -30,7 +33,8 @@ public class ReefCycleCommand extends Command {
   public void initialize() {
     startingRobotState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
-    isAutoPlacing = robotStateSubsystem.getIsAuto();
+    isAutoPlacing = robotStateSubsystem.getIsAutoPlacing();
+
     robotStateSubsystem.toPrepCoral();
   }
 

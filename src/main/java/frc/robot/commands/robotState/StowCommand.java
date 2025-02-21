@@ -1,6 +1,7 @@
 package frc.robot.commands.robotState;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -14,9 +15,10 @@ public class StowCommand extends Command {
       RobotStateSubsystem robotState,
       ElevatorSubsystem elevatorSubsystem,
       CoralSubsystem coralSubsystem,
-      BiscuitSubsystem biscuitSubsystem) {
+      BiscuitSubsystem biscuitSubsystem,
+      AlgaeSubsystem algaeSubsystem) {
     this.robotState = robotState;
-    addRequirements(elevatorSubsystem, coralSubsystem, biscuitSubsystem);
+    addRequirements(elevatorSubsystem, coralSubsystem, biscuitSubsystem, algaeSubsystem);
   }
 
   @Override

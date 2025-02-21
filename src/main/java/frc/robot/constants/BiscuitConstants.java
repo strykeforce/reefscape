@@ -40,14 +40,11 @@ public class BiscuitConstants {
   public static final Angle kPrestageSetpoint = kStowSetpoint;
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(20.848);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(24.104);
   public static final Angle kL3AlgaeSetpoint = Rotations.of(24.562);
 
   public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;
   public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
-
-  public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
-  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
 
   // Coral score
   public static final Angle kL1CoralSetpoint = kStowSetpoint;

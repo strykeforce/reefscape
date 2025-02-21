@@ -43,14 +43,11 @@ public class ElevatorConstants {
   public static final Angle kStowSetpoint = kFunnelSetpoint;
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(2.8677);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(6.308);
   public static final Angle kL3AlgaeSetpoint = Rotations.of(17.513);
 
   public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;
   public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
-
-  public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(2.8677);
-  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(15.542);
 
   // Coral score
   public static final Angle kL1CoralSetpoint = Rotations.of(13.04053);
