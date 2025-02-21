@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.constants.LEDConstants;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.CoralLoc;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
+
 import java.util.Map;
 import java.util.Set;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -20,7 +23,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
   // section patterns
   private LEDPattern algea =
       LEDPattern.steps(
-          Map.of(0, LEDConstants.kHasAlgea, LEDConstants.kStripLength / 3, Color.kBlack));
+          Map.of(0, LEDConstants.kHasAlgea, LEDConstants.kAlgeaEnd, Color.kBlack));
   private LEDPattern coral = LEDPattern.solid(LEDConstants.kCoralInRobot);
   private LEDPattern level = LEDPattern.steps(Map.of(LEDConstants.kLevelStart, LEDConstants.kL1));
   private LEDPattern place =
@@ -28,23 +31,23 @@ public class LEDSubsystem extends MeasurableSubsystem {
   private LEDPattern getAlgea =
       LEDPattern.steps(Map.of(LEDConstants.kGetAlgeaStart, LEDConstants.kNotGetAlgea));
   private LEDPattern autoplace =
-      LEDPattern.steps(Map.of(LEDConstants.kStripLength / 3 * 2, LEDConstants.kAutoPlacing))
+      LEDPattern.steps(Map.of(LEDConstants.kAutoPlacingStart, LEDConstants.kAutoPlacing))
           .blink(Seconds.of(0.25));
   private LEDPattern currentLimiting =
       LEDPattern.solid(LEDConstants.kCurrentLimiting).blink(Seconds.of(1), Seconds.of(2));
 
   // section booleans and states
   private boolean hasAlgae = false;
-  private CoralStates coralState = CoralStates.NO_PIECE;
-  private LevelStates levelState = LevelStates.L1;
+  private CoralLoc coralState = CoralLoc.NONE;
+  private ScoringLevel levelState = ScoringLevel.L1;
   private PlaceStates placeState = PlaceStates.MANUAL;
   private boolean shouldGetAlgea = false;
   private boolean autoPlacing = false;
   private boolean isLimiting = false;
 
   // game stuff
-  private int[] BottomUnits = new int[LEDConstants.kStripLength];
-  private int[] TopUnits = new int[LEDConstants.kStripLength];
+  private int[] BottomUnits = new int[LEDConstants.kTopStripLength];
+  private int[] TopUnits = new int[LEDConstants.kTopStripLength];
 
   public LEDSubsystem(LEDIO io) {
     this.io = io;
@@ -66,10 +69,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
         io.setStrip(LEDConstants.kHasCage);
         break;
       case CLIMB_UP:
-        // base =
-        //     LEDPattern.gradient(GradientType.kContinuous, Color.kLightGoldenrodYellow, Color.kBlack)
-        //         .scrollAtRelativeSpeed(Percent.per(Seconds).of(1));
-        io.setOff();
+        io.setStrip(LEDConstants.kClimbed);
         break;
       default:
         break;
@@ -86,12 +86,12 @@ public class LEDSubsystem extends MeasurableSubsystem {
     buildBase();
   }
 
-  public void setCoralLights(CoralStates state) {
+  public void setCoralLights(CoralLoc state) {
     coralState = state;
     buildBase();
   }
 
-  public void setLevelLights(LevelStates state) {
+  public void setLevelLights(ScoringLevel state) {
     levelState = state;
     buildBase();
   }
@@ -121,11 +121,11 @@ public class LEDSubsystem extends MeasurableSubsystem {
     return hasAlgae;
   }
 
-  public CoralStates getCoralLights() {
+  public CoralLoc getCoralLights() {
     return coralState;
   }
 
-  public LevelStates getLevelLights() {
+  public ScoringLevel getLevelLights() {
     return levelState;
   }
 
@@ -151,16 +151,18 @@ public class LEDSubsystem extends MeasurableSubsystem {
             Map.of(
                 0,
                 hasAlgae ? LEDConstants.kHasAlgea : LEDConstants.kNotHasAlgea,
-                LEDConstants.kStripLength / 3,
+                LEDConstants.kAlgeaEnd,
                 Color.kBlack));
     switch (coralState) {
-      case IN_FUNNEL:
+      case FUNNEL:
+      case TRANSFER:
         coral = LEDPattern.solid(LEDConstants.kCoralInFunnel);
         break;
-      case IN_ROBOT:
+      case CORAL:
+      case SCORING:
         coral = LEDPattern.solid(LEDConstants.kCoralInRobot);
         break;
-      case NO_PIECE:
+      case NONE:
         coral = LEDPattern.solid(LEDConstants.kCoralNotInRobot);
         break;
     }
@@ -196,12 +198,12 @@ public class LEDSubsystem extends MeasurableSubsystem {
 
   //game stuff
   private void advanceUnits() {
-    for (int i = 0; i <= LEDConstants.kStripLength-1; i++) {
+    for (int i = 0; i <= LEDConstants.kTopStripLength+1; i++) {
       BottomUnits[i + 1] = BottomUnits[i];
       TopUnits[i] = TopUnits[i + 1];
       if (i == 0) 
         BottomUnits[i] = 0;
-      if (i == LEDConstants.kStripLength)
+      if (i == LEDConstants.kTopStripLength)
         TopUnits[i] = 0;
       if (TopUnits[i] != 0 && BottomUnits[i] != 0) {
         if (BottomUnits[i] == TopUnits[i]) {
@@ -227,10 +229,10 @@ public class LEDSubsystem extends MeasurableSubsystem {
   }
 
   private void displayUnits() {
-    for (int i = 0; i <= LEDConstants.kStripLength-1; i++) {
-      io.setLED(i, LEDConstants.kGameColors[BottomUnits[i]]);
+    for (int i = 0; i <= LEDConstants.kTopStripLength+1; i++) {
+      io.setLEDTop(i, LEDConstants.kGameColors[BottomUnits[i]]);
       if (TopUnits[i] != 0){
-        io.setLED(i, LEDConstants.kGameColors[TopUnits[i] + 3]);
+        io.setLEDTop(i, LEDConstants.kGameColors[TopUnits[i] + 3]);
       }
     }
   }
@@ -241,7 +243,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
       if (isBottom){
         BottomUnits[0] = unitNum;
       } else {
-        TopUnits[LEDConstants.kStripLength - 1] = unitNum;
+        TopUnits[LEDConstants.kTopStripLength - 1] = unitNum;
       }
     }
   }
@@ -310,19 +312,6 @@ public class LEDSubsystem extends MeasurableSubsystem {
     CLIMB_EMPTY,
     CLIMB_FULL,
     CLIMB_UP
-  }
-
-  public enum CoralStates {
-    IN_FUNNEL,
-    IN_ROBOT,
-    NO_PIECE
-  }
-
-  public enum LevelStates {
-    L1,
-    L2,
-    L3,
-    L4
   }
 
   public enum PlaceStates {

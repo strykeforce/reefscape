@@ -5,12 +5,16 @@ import edu.wpi.first.wpilibj.util.Color;
 public class LEDConstants {
   // Auto/Operator = 27
   // other = 21.5
-  public static final int kStripLength = 70;
+  public static final int kTotalStripLength = 70;
+  public static final int kBottomStripLength = 43;
+  public static final int kTopStripLength = 27;
+  public static final int kTopFirstIndex = kBottomStripLength + 1;
 
-  public static final int kAlgeaEnd = kStripLength / 3;
-  public static final int kLevelStart = kStripLength / 3;
-  public static final int kPlaceStart = kStripLength / 9 * 7;
-  public static final int kGetAlgeaStart = kStripLength / 9 * 8;
+  public static final int kAlgeaEnd = kBottomStripLength / 3 + 1;
+  public static final int kLevelStart = kTopFirstIndex;
+  public static final int kPlaceStart = kTopFirstIndex + kTopStripLength / 3;
+  public static final int kGetAlgeaStart = kTopFirstIndex + kTopStripLength / 3 * 2;
+  public static final int kAutoPlacingStart = kTopFirstIndex;
 
   public static final Color kAlmostBlack = new Color(0, 0, 1);
 
@@ -41,6 +45,7 @@ public class LEDConstants {
   // Climb LED Colors
   public static final Color kWaitingForCage = Color.kRed;
   public static final Color kHasCage = Color.kGreen;
+  public static final Color kClimbed = Color.kGoldenrod;
   public static final Color[] kGameColors = {
     Color.kBlack, // a dummy color
     Color.kDarkRed,
