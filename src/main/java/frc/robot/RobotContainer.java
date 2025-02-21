@@ -337,14 +337,14 @@ private void configurePitDashboard(){
 
         Shuffleboard.getTab("Pit")
         .add("Stop Azimuths", new StopAllAxisCommand(robotStateSubsystem))
-        .withPosition(5, 1)
+        .withPosition(9, 1)
         .withSize(1, 1);
 
         Shuffleboard.getTab("Pit")
         .add(
             "Raise Elevator",
             new SetElevatorPositionCommand(elevatorSubsystem, Rotations.of(ElevatorConstants.kElevatorLiftHeight)))
-        .withPosition(5, 1)
+        .withPosition(1, 2)
         .withSize(1, 1);
 
         Shuffleboard.getTab("Pit")
@@ -353,7 +353,7 @@ private void configurePitDashboard(){
             new StowCommand(
                 robotStateSubsystem, elevatorSubsystem, coralSubsystem, biscuitSubsystem))
         .withSize(1, 1)
-        .withPosition(0, 0);
+        .withPosition(2, 2);
 }
 
   public Command getAutonomousCommand() {
