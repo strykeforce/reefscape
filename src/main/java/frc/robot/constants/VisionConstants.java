@@ -85,26 +85,26 @@ public final class VisionConstants {
   public static final int kCam2Idx = 1;
   public static final int kCam3Idx = 0;
   public static final int kCam4Idx = 1;
-  public static final int kCam5Idx = 0;
+  public static final int kCam5Idx = 0;  //?
 
   public static final double kLoopTime = 0.02;
   public static final int kCircularBufferSize = 1000;
   // Poses
   public static final Pose3d kCam1Pose =
-      new Pose3d(new Translation3d(0.28, 0.02, 0.30), new Rotation3d());
+      new Pose3d(new Translation3d(0.305, 0.025, 0.311), new Rotation3d());
   public static final Pose3d kCam2Pose =
       new Pose3d(
-          new Translation3d(-0.21, -0.31, 0.44),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(0.0)));
+          new Translation3d(0.236, -0.108, 0.932),
+          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(-45)));
   public static final Pose3d kCam3Pose =
-      new Pose3d(new Translation3d(0.09, -0.31, 0.36), new Rotation3d());
+      new Pose3d(new Translation3d(0.133, -0.305, 0.311), new Rotation3d());
   public static final Pose3d kCam4Pose =
       new Pose3d(
-          new Translation3d(-0.22, -0.335, 0.50),
+          new Translation3d(0.236, -0.038, 0.932),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
   public static final Pose3d kCam5Pose =
       new Pose3d(
-          new Translation3d(-0.22, -0.335, 0.50),
+          new Translation3d(-0.229, -0.073, 0.934),
           new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [x, y, theta], with units in radians.
