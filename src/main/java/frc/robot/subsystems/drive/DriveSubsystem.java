@@ -48,6 +48,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   private int gyroDifferentCount = 0;
 
+  private boolean ignoreSticks = false;
+
   private RobotStateSubsystem robotStateSubsystem;
 
   public DriveSubsystem(SwerveIO io) {
@@ -83,7 +85,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
-    io.drive(vXmps * driveMultiplier, vYmps * driveMultiplier, vOmegaRadps, true);
+    if (!ignoreSticks) {
+      io.drive(vXmps * driveMultiplier, vYmps * driveMultiplier, vOmegaRadps, true);
+    }
   }
 
   public void setAzimuthVel(double vel) {
@@ -160,6 +164,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
     this.robotStateSubsystem = robotStateSubsystem;
+  }
+
+  public void setIgnoreSticks(boolean ignore) {
+    this.ignoreSticks = ignore;
   }
 
   public Trajectory<SwerveSample> getAutoTrajectory() {
@@ -364,6 +372,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Swerve Pose", inputs.swervePose);
     if (Math.abs(inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees())
         > DriveConstants.kGyroDifferentThreshold) {
       gyroDifferentCount++;

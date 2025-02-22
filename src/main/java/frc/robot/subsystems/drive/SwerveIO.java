@@ -22,6 +22,7 @@ public interface SwerveIO {
   public static class SwerveIOInputs {
     public double odometryX = 0.0;
     public double odometryY = 0.0;
+    public Pose2d swervePose;
     public double odometryRotation2D = 0.0;
     public Rotation2d gyroRotation2d = new Rotation2d();
     public Rotation2d navxRotation2d = new Rotation2d();

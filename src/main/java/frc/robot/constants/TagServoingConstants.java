@@ -37,10 +37,10 @@ public class TagServoingConstants {
   public static final double kNoUpdateMicrosec = 500_000;
 
   // Drive
-  public static final double kInitialDriveRadius = 1.5;
+  public static final double kInitialDriveRadius = 1.7; // 1.5
   public static final double kStopXDriveRadius =
       kInitialDriveRadius; // Should be closer to reef than target pose
-  public static final double kMinStopXDriveRadius = 1.35;
+  public static final double kMinStopXDriveRadius = 1.55; // 1.35
   public static final double kDriveCloseEnough = 0.1;
   public static final double kMinVelX = 0.85;
 

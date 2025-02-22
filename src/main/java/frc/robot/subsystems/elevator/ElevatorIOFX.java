@@ -12,7 +12,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.constants.ElevatorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ public class ElevatorIOFX implements ElevatorIO {
   TalonFXConfigurator configuratorBack;
   StatusSignal<Angle> currPosition;
   StatusSignal<AngularVelocity> currVelocity;
-  public AnalogInput heightAnalogInput = new AnalogInput(ElevatorConstants.heightAnalogID);
   private MotionMagicVoltage positionRequestMain =
       new MotionMagicVoltage(0).withEnableFOC(false).withSlot(0);
   private Follower positionRequestFollow = new Follower(ElevatorConstants.kFxIDMain, false);

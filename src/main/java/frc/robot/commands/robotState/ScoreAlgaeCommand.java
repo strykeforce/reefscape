@@ -43,7 +43,7 @@ public class ScoreAlgaeCommand extends Command {
     } else {
       return robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE
           || robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
-          || !robotStateSubsystem.isBargeSafe;
+          || !robotStateSubsystem.getIsBargeSafe();
     }
   }
 }

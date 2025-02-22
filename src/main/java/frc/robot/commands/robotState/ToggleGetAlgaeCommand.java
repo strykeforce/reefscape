@@ -12,6 +12,6 @@ public class ToggleGetAlgaeCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.ToggleGetAlgaeOnCycle();
+    robotStateSubsystem.toggleGetAlgaeOnCycle();
   }
 }
