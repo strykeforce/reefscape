@@ -269,8 +269,8 @@ public class RobotContainer {
             .withPosition(0, 0);
 
     Shuffleboard.getTab("Match")
-    .addString("Get Left/Right", () -> robotStateSubsystem.getScoreSide().name())
-    .withPosition(4, 1)
+    .addString("Score Side", () -> robotStateSubsystem.getScoreSide().name())
+    .withPosition(4, 2)
     .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
