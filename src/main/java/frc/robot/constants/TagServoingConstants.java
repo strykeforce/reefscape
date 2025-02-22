@@ -32,15 +32,17 @@ public class TagServoingConstants {
 
   // Tag align
   public static final double kHorizontalCloseEnough = 20;
-  public static final double kAngleCloseEnough = Units.degreesToRadians(3.0);
+  public static final double kAngleCloseEnough = Units.degreesToRadians(1.0);
   public static final double kDiagCloseEnough = 20;
   public static final double kNoUpdateMicrosec = 500_000;
 
   // Drive
-  public static final double kInitialDriveRadius = 1.7; // 1.5
-  public static final double kStopXDriveRadius =
-      kInitialDriveRadius; // Should be closer to reef than target pose
-  public static final double kMinStopXDriveRadius = 1.55; // 1.35
+  public static final double kCoralInitialDriveRadius = 1.7; // 1.5
+  public static final double kCoralStopXDriveRadius =
+      kCoralInitialDriveRadius; // Should be closer to reef than target pose
+  public static final double kAlgaeInitialDriveRadius = 2.0; // 1.5
+  public static final double kAlgaeStopXDriveRadius =
+      kAlgaeInitialDriveRadius; // Should be closer to reef than target pose
   public static final double kDriveCloseEnough = 0.1;
   public static final double kMinVelX = 0.85;
 

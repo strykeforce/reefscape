@@ -35,6 +35,7 @@ import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
+import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StowCommand;
@@ -66,6 +67,7 @@ import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDIO;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -259,34 +261,10 @@ public class RobotContainer {
         .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L4));
 
     // Set scoring side
-    // new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
-    //     .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.LEFT));
-    // new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
-    //     .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.RIGHT));
-
-    // Move biscuit
-    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogBiscuitCommand(
-                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
-        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
-    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogBiscuitCommand(
-                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
-        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
-
-    // Move elevator
-    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
-    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.LEFT));
+    new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+        .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.RIGHT));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)

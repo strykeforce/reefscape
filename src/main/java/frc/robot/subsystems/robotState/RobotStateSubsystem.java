@@ -296,11 +296,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toReefAlign(boolean getAlgae, boolean drive) {
+    boolean wantAlgae = getAlgae || !coralSubsystem.hasCoral();
     if (drive) {
-      tagAlignSubsystem.start(allianceColor, scoreSide == ScoreSide.LEFT);
+      tagAlignSubsystem.start(
+          allianceColor, scoreSide == ScoreSide.LEFT || !coralSubsystem.hasCoral(), wantAlgae);
       setState(RobotStates.REEF_ALIGN);
     }
-    if ((getAlgae || !coralSubsystem.hasCoral())
+    if (wantAlgae
         && (scoreSide == ScoreSide.LEFT || !isAutoPlacing)
         && !algaeSubsystem.hasAlgae()) {
       if (needSafeAlgaeTransfer(RobotStates.REEF_ALIGN_ALGAE)) {
@@ -575,23 +577,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case REEF_ALIGN_ALGAE -> {
-        if (!isAutoPlacing
-            || tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE) {
-          if (algaeSubsystem.hasAlgae()) {
-            switch (getAlgaeLevel()) {
-              case L2 -> {
-                biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeRemovalSetpoint);
-                elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
-              }
-              case L3 -> {
-                biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeRemovalSetpoint);
-                elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
-              }
-              default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
+        if (algaeSubsystem.hasAlgae()) {
+          switch (getAlgaeLevel()) {
+            case L2 -> {
+              biscuitSubsystem.setPosition(BiscuitConstants.kL2AlgaeRemovalSetpoint);
+              elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
             }
-
-            setState(RobotStates.REMOVE_ALGAE);
+            case L3 -> {
+              biscuitSubsystem.setPosition(BiscuitConstants.kL3AlgaeRemovalSetpoint);
+              elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
+            }
+            default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
           }
+
+          setState(RobotStates.REMOVE_ALGAE);
         }
       }
       case REEF_ALIGN_CORAL -> {
@@ -651,7 +650,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case PROCESSOR_ALGAE -> {
         if (!algaeSubsystem.hasAlgae()
-            && scoringTimer.hasElapsed(RobotStateConstants.kCoralEjectTimer)
+            && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)
             && isEjectingAlgae) {
           isEjectingAlgae = false;
           toStowSafe();
@@ -680,7 +679,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case BARGE_ALGAE -> {
         if (!algaeSubsystem.hasAlgae()
-            && scoringTimer.hasElapsed(RobotStateConstants.kCoralEjectTimer)
+            && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)
             && isEjectingAlgae) {
           isEjectingAlgae = false;
           toStowSafe();

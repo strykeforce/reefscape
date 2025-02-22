@@ -7,5 +7,6 @@ public class RobotStateConstants {
   public static final double kBlueBargeSafeX = 7.6;
   public static final double kRedBargeSafeX = DriveConstants.kFieldMaxX - kBlueBargeSafeX;
 
-  public static final double kCoralEjectTimer = 0.5;
+  public static final double kCoralEjectTimer = 0.75;
+  public static final double kAlgaeEjectTimer = 0.5;
 }

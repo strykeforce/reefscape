@@ -247,7 +247,8 @@ public class PathHandler extends MeasurableSubsystem {
         if (runningPath && isServoing) {
           tagAlignSubsystem.setup(
               robotStateSubsystem.getAllianceColor(),
-              robotStateSubsystem.getScoreSide() == RobotStateSubsystem.ScoreSide.LEFT);
+              robotStateSubsystem.getScoreSide() == RobotStateSubsystem.ScoreSide.LEFT,
+              false);
           drivePathServo();
         }
       }

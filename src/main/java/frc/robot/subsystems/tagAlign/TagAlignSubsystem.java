@@ -41,6 +41,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private int fieldRelHexant;
   private Alliance alliance = Alliance.Blue;
   private double goalTargetDiag;
+  private double stopXRadius = TagServoingConstants.kCoralStopXDriveRadius;
+  private double driveRadius = TagServoingConstants.kCoralInitialDriveRadius;
+  private boolean algae = false;
 
   private long startServoTime;
 
@@ -50,7 +53,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     this.driveX = new ProfiledPIDController(5, 0, 0, new Constraints(2, 2.0));
     this.driveY = new ProfiledPIDController(5.5, 0, 0, new Constraints(2, 3));
-    this.driveOmega = new ProfiledPIDController(5.0, 0, 0, new Constraints(1.0, 1.0));
+    this.driveOmega = new ProfiledPIDController(5.0, 0, 0, new Constraints(1.0, 2.0));
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     this.alignX = new ProfiledPIDController(0.0017, 0, 0, new Constraints(1.0, 1.0)); // 0.0015
@@ -104,8 +107,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Translation2d offset =
         new Translation2d(
-            TagServoingConstants.kInitialDriveRadius,
-            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180));
+            driveRadius, Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180));
 
     Translation2d sideOffset =
         new Translation2d(
@@ -131,13 +133,23 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return curState;
   }
 
-  public void setup(Alliance alliance, boolean scoreLeft) {
+  public void setup(Alliance alliance, boolean scoreLeft, boolean algae) {
     targetPose = getTargetDrivePose(alliance, scoreLeft);
     this.alliance = alliance;
     this.goalTargetDiag =
         scoreLeft
             ? TagServoingConstants.kRightCamDiagTarget
             : TagServoingConstants.kLeftCamDiagTarget;
+
+    this.stopXRadius =
+        algae
+            ? TagServoingConstants.kAlgaeStopXDriveRadius
+            : TagServoingConstants.kCoralStopXDriveRadius;
+    this.driveRadius =
+        algae
+            ? TagServoingConstants.kAlgaeInitialDriveRadius
+            : TagServoingConstants.kCoralInitialDriveRadius;
+    this.algae = algae;
 
     // Inverted, scoring left coral means aligning right camera
     targetCamId =
@@ -198,13 +210,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return vY;
   }
 
-  public void start(Alliance alliance, boolean scoreLeft) {
-    setup(alliance, scoreLeft);
+  public void start(Alliance alliance, boolean scoreLeft, boolean algae) {
+    setup(alliance, scoreLeft, algae);
 
     curState = TagAlignStates.DRIVE;
   }
 
   public void terminate() {
+    driveSubsystem.setIgnoreSticks(false);
     driveSubsystem.move(0, 0, 0, false);
     driveSubsystem.drive(0, 0, 0);
     curState = TagAlignStates.DONE;
@@ -238,11 +251,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double tagRelY = tagRelVel.getY();
 
         double radius = getCurRadius(alliance);
-        boolean ignoreX = radius < TagServoingConstants.kStopXDriveRadius;
+        boolean ignoreX = radius < stopXRadius;
 
         tagRelX = tagRelX < TagServoingConstants.kMinVelX ? TagServoingConstants.kMinVelX : tagRelX;
 
-        if (radius < TagServoingConstants.kStopXDriveRadius) {
+        if (radius < stopXRadius && !algae) {
           tagRelX = 0;
         }
 

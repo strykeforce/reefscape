@@ -85,7 +85,7 @@ public class BiscuitIOFX implements BiscuitIO {
     double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
     double setPos = BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos);
     talon.setPosition(setPos);
-    logger.info("set Biscuit position to " + setPos);
+    logger.info("set Biscuit position to " + setPos + " abs pos: " + pos);
     didZero = true;
   }
 }
