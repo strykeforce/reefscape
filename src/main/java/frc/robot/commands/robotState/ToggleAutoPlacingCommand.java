@@ -3,10 +3,10 @@ package frc.robot.commands.robotState;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
-public class ToggleAutoCommand extends InstantCommand {
+public class ToggleAutoPlacingCommand extends InstantCommand {
   private RobotStateSubsystem robotStateSubsystem;
 
-  public ToggleAutoCommand(RobotStateSubsystem robotState) {
+  public ToggleAutoPlacingCommand(RobotStateSubsystem robotState) {
     this.robotStateSubsystem = robotState;
   }
 

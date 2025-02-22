@@ -7,6 +7,7 @@ import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 
 public class AutoReefCycleCommand extends Command {
@@ -34,12 +35,14 @@ public class AutoReefCycleCommand extends Command {
   public void initialize() {
     driveSubsystem.setIgnoreSticks(true);
     robotStateSubsystem.toReefAlign();
-    scoringCoral = robotStateSubsystem.hasCoral();
+    scoringCoral =
+        robotStateSubsystem.hasCoral()
+            && !(robotStateSubsystem.getGetAlgaeOnCycle()
+                && robotStateSubsystem.getScoreSide() == ScoreSide.RIGHT);
   }
 
   @Override
   public void end(boolean interrupted) {
-
     tagAlignSubsystem.terminate();
   }
 

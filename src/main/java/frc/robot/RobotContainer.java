@@ -40,7 +40,7 @@ import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
-import frc.robot.commands.robotState.ToggleAutoCommand;
+import frc.robot.commands.robotState.ToggleAutoPlacingCommand;
 import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
 import frc.robot.constants.BiscuitConstants;
@@ -288,7 +288,7 @@ public class RobotContainer {
 
     // Scoring
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new ToggleAutoCommand(robotStateSubsystem));
+        .onTrue(new ToggleAutoPlacingCommand(robotStateSubsystem));
 
     new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
         .onTrue(new SetScoreSideRightCommand(robotStateSubsystem));

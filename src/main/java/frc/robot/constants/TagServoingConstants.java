@@ -1,6 +1,7 @@
 package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 public class TagServoingConstants {
@@ -16,6 +17,15 @@ public class TagServoingConstants {
   public static final double kHorizontalTarget = 800;
   public static final double kLeftCamDiagTarget = 1180;
   public static final double kRightCamDiagTarget = 985;
+
+  // Constraints
+  public static final Constraints driveXConstraints = new Constraints(2, 2.0);
+  public static final Constraints driveYConstraints = new Constraints(2, 3.0);
+  public static final Constraints driveOmegaConstraints = new Constraints(1, 2.0);
+
+  public static final Constraints alignXConstraints = new Constraints(1, 1.0);
+  public static final Constraints alignYConstraints = new Constraints(1, 1.5);
+  public static final Constraints alignOmegaConstraints = new Constraints(1, 1);
 
   public static final double[] kAngleTarget = {
     Units.degreesToRadians(0),
@@ -40,10 +50,11 @@ public class TagServoingConstants {
   public static final double kCoralInitialDriveRadius = 1.7; // 1.5
   public static final double kCoralStopXDriveRadius =
       kCoralInitialDriveRadius; // Should be closer to reef than target pose
-  public static final double kAlgaeInitialDriveRadius = 2.0; // 1.5
+  public static final double kAlgaeInitialDriveRadius = 1.6;
   public static final double kAlgaeStopXDriveRadius =
       kAlgaeInitialDriveRadius; // Should be closer to reef than target pose
-  public static final double kDriveCloseEnough = 0.1;
+  public static final double kCoralDriveCloseEnough = 0.1;
+  public static final double kAlgaeDriveCloseEnough = 0.2;
   public static final double kMinVelX = 0.85;
 
   // Reef

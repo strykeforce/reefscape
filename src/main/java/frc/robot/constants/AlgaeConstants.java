@@ -32,7 +32,7 @@ public class AlgaeConstants {
   public static final double kIntakingSpeed = -1;
 
   public static final double kHasAlgaeVelThreshold = 10;
-  public static final double kHasAlgaeCounts = 1;
+  public static final double kHasAlgaeCounts = 3;
 
   // Example Talon FX Config
   public static TalonFXSConfiguration getFXConfig() {

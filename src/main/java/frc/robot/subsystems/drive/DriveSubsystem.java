@@ -90,6 +90,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void stopDriving() {
+    this.move(0, 0, 0, false);
+    io.drive(0, 0, 0, false);
+  }
+
   public void setAzimuthVel(double vel) {
     io.setAzimuthVel(vel);
   }
@@ -167,6 +172,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void setIgnoreSticks(boolean ignore) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Ignoring Sticks", ignore);
     this.ignoreSticks = ignore;
   }
 
