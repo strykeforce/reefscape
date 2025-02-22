@@ -25,12 +25,11 @@ public class ElevatorConstants {
   public static final double kMaxRev = 2;
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
-  public static final double kZeroSpeed = -.05;
+  public static final double kZeroSpeed = -0.05;
   public static final double kZeroVolts = -0.5;
   public static final int kZeroCounter = 2;
-  public static final double kZeroedThreshhold = .025;
+  public static final double kZeroedThreshhold = 0.025;
 
-  public static final int heightAnalogID = 0;
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
 
@@ -74,7 +73,6 @@ public class ElevatorConstants {
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
-            // .withStatorCurrentLimit(20)
             .withSupplyCurrentLimitEnable(true)
             .withSupplyCurrentLimit(40)
             .withSupplyCurrentLowerLimit(10)
@@ -129,7 +127,7 @@ public class ElevatorConstants {
 
   public static CurrentLimitsConfigs getZeroingCurrentLimitsConfigs() {
     CurrentLimitsConfigs current =
-        new CurrentLimitsConfigs() // TODO actually have correct limits for zeroing
+        new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
             .withStatorCurrentLimit(20)
             .withSupplyCurrentLimit(10)
