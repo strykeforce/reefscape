@@ -17,6 +17,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.led.LEDSubsystem.LEDStates;
 import frc.robot.subsystems.led.LEDSubsystem.PlaceStates;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -53,7 +54,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private ScoreSide scoreSide = ScoreSide.LEFT;
   private AlgaeHeight algaeHeight = AlgaeHeight.LOW;
   private AlgaeHeight currentAlgaeHeight = AlgaeHeight.LOW;
-  private CoralLoc coralLoc = CoralLoc.CORAL;
+  private CoralLoc coralLoc = CoralLoc.NONE;
   private Pose2d algaeRemovalPose;
 
   private boolean isAutoPlacing = false;
@@ -88,6 +89,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.ledSubsystem = ledSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.visionSubsystem = visionSubsystem;
+
+    ledSubsystem.setState(LEDStates.NORMAL);
   }
 
   public RobotStates getState() {
@@ -516,10 +519,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
-    if (funnelSubsystem.hasCoral()) {
-      coralLoc = CoralLoc.FUNNEL;
-    }
-
     Logger.recordOutput("RobotState/state", curState);
     Logger.recordOutput("RobotState/hasCoral", hasCoral());
     Logger.recordOutput("RobotState/hasAlgae", hasAlgae());
@@ -532,6 +531,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("RobotState/isAuto", isAuto);
     Logger.recordOutput("RobotState/currentLimiting", isCurrentLimiting);
     Logger.recordOutput("RobotState/isEjectingAlgae", isEjectingAlgae);
+    Logger.recordOutput("RobotState/coralLoc", coralLoc);
 
     switch (curState) {
       case TRANSFER -> {
@@ -640,6 +640,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case FUNNEL_LOAD -> {
+        if (funnelSubsystem.hasCoral()) {
+          coralLoc = CoralLoc.FUNNEL;
+        }
         if (elevatorSubsystem.isFinished()) {
           funnelSubsystem.startMotor();
         }
