@@ -45,7 +45,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private boolean algae = false;
   private double driveCloseEnough = TagServoingConstants.kCoralDriveCloseEnough;
   private boolean proceedToAlign = false;
-  private boolean waitingAlign = false;
 
   private long startServoTime;
 
@@ -75,10 +74,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void setProceedToAlign(boolean proceed) {
     this.proceedToAlign = proceed;
-  }
-
-  public boolean getIsWaitingToAlign() {
-    return waitingAlign;
   }
 
   public int computeHexant(Alliance color) {
@@ -179,7 +174,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     fieldRelHexant = computeFieldRelHexant(alliance);
     proceedToAlign = false;
-    waitingAlign = false;
 
     Logger.recordOutput("TagAlignSubsystem/TargetTag", targetTagId);
     Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", goalTargetDiag);
@@ -248,8 +242,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void terminate() {
     driveSubsystem.setIgnoreSticks(false);
-    driveSubsystem.move(0, 0, 0, false);
-    driveSubsystem.drive(0, 0, 0);
+    driveSubsystem.stopDriving();
     curState = TagAlignStates.DONE;
   }
 
@@ -257,7 +250,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   public void periodic() {
     Logger.recordOutput("TagAlignSubsystem/State", curState.toString());
     // Logger.recordOutput("TagAlignSubsystem/Hexant", computeHexant(alliance));
-    Logger.recordOutput("TagAlignSubsystem/waitingAlign", waitingAlign);
 
     switch (curState) {
       case DRIVE -> {
@@ -312,8 +304,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             tagAlign();
             break;
           } else {
-            tagRelX = 0;
-            waitingAlign = true;
             driveSubsystem.stopDriving();
             curState = TagAlignStates.WAITING;
             break;

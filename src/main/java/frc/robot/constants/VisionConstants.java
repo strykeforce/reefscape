@@ -98,18 +98,18 @@ public final class VisionConstants {
 
   public static final Pose3d kCam2Pose =
       new Pose3d(
-          new Translation3d(-0.21, -0.31, 0.44),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(0.0)));
+          new Translation3d(0.236, -0.108, 0.932),
+          new Rotation3d(0, Units.degreesToRadians(-10.0), Units.degreesToRadians(22.5)));
   public static final Pose3d kCam3Pose =
       new Pose3d(new Translation3d(0.09, -0.31, 0.36), new Rotation3d());
   public static final Pose3d kCam4Pose =
       new Pose3d(
-          new Translation3d(-0.22, -0.335, 0.50),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
+          new Translation3d(0.20, 0.035, 0.94),
+          new Rotation3d(0, Units.degreesToRadians(-10.0), Units.degreesToRadians(-22.5)));
   public static final Pose3d kCam5Pose =
       new Pose3d(
-          new Translation3d(-0.22, -0.335, 0.50),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
+          new Translation3d(-0.229, -0.073, 0.934),
+          new Rotation3d(0, Units.degreesToRadians(-10.0), Units.degreesToRadians(180.0)));
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
   public static Matrix<N1, N1> kLocalMeasurementStdDevs =
