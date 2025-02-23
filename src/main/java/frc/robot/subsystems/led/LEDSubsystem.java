@@ -1,15 +1,12 @@
 package frc.robot.subsystems.led;
 
-import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.constants.LEDConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.CoralLoc;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
-
 import java.util.Map;
 import java.util.Set;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
@@ -22,8 +19,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
 
   // section patterns
   private LEDPattern algea =
-      LEDPattern.steps(
-          Map.of(0, LEDConstants.kHasAlgea, LEDConstants.kAlgeaEnd, Color.kBlack));
+      LEDPattern.steps(Map.of(0, LEDConstants.kHasAlgea, LEDConstants.kAlgeaEnd, Color.kBlack));
   private LEDPattern coral = LEDPattern.solid(LEDConstants.kCoralInRobot);
   private LEDPattern level = LEDPattern.steps(Map.of(LEDConstants.kLevelStart, LEDConstants.kL1));
   private LEDPattern place =
@@ -196,15 +192,13 @@ public class LEDSubsystem extends MeasurableSubsystem {
     base = getAlgea.overlayOn(place.overlayOn(level.overlayOn(algea.overlayOn(coral))));
   }
 
-  //game stuff
+  // game stuff
   private void advanceUnits() {
-    for (int i = 0; i <= LEDConstants.kTopStripLength+1; i++) {
+    for (int i = 0; i <= LEDConstants.kTopStripLength + 1; i++) {
       BottomUnits[i + 1] = BottomUnits[i];
       TopUnits[i] = TopUnits[i + 1];
-      if (i == 0) 
-        BottomUnits[i] = 0;
-      if (i == LEDConstants.kTopStripLength)
-        TopUnits[i] = 0;
+      if (i == 0) BottomUnits[i] = 0;
+      if (i == LEDConstants.kTopStripLength) TopUnits[i] = 0;
       if (TopUnits[i] != 0 && BottomUnits[i] != 0) {
         if (BottomUnits[i] == TopUnits[i]) {
           BottomUnits[i] = 0;
@@ -219,7 +213,8 @@ public class LEDSubsystem extends MeasurableSubsystem {
         if (BottomUnits[i] == TopUnits[i + 1]) {
           BottomUnits[i] = 0;
           TopUnits[i + 1] = 0;
-        } else if (BottomUnits[i] > TopUnits[i + 1] || (BottomUnits[i] == 1 && TopUnits[i + 1] == 3)) {
+        } else if (BottomUnits[i] > TopUnits[i + 1]
+            || (BottomUnits[i] == 1 && TopUnits[i + 1] == 3)) {
           TopUnits[i + 1] = 0;
         } else {
           BottomUnits[i + 1] = 0;
@@ -229,9 +224,9 @@ public class LEDSubsystem extends MeasurableSubsystem {
   }
 
   private void displayUnits() {
-    for (int i = 0; i <= LEDConstants.kTopStripLength+1; i++) {
+    for (int i = 0; i <= LEDConstants.kTopStripLength + 1; i++) {
       io.setLEDTop(i, LEDConstants.kGameColors[BottomUnits[i]]);
-      if (TopUnits[i] != 0){
+      if (TopUnits[i] != 0) {
         io.setLEDTop(i, LEDConstants.kGameColors[TopUnits[i] + 3]);
       }
     }
@@ -240,7 +235,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
   public void addGameUnit(boolean isBottom, int unitNum) {
     // the unitNum starts at 1 and ends at 3. if you use anything else, it will be ignored
     if (unitNum >= 1 && unitNum <= 3) {
-      if (isBottom){
+      if (isBottom) {
         BottomUnits[0] = unitNum;
       } else {
         TopUnits[LEDConstants.kTopStripLength - 1] = unitNum;

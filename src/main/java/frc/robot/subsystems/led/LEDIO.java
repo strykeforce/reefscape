@@ -12,11 +12,11 @@ public class LEDIO {
   private AddressableLEDBuffer led;
   private AddressableLEDBufferView ledTop;
 
-  public LEDIO(int port, int length) {
-    ledBase = new AddressableLED(port);
-    ledBase.setLength(length);
+  public LEDIO() {
+    ledBase = new AddressableLED(LEDConstants.kLEDPort);
+    ledBase.setLength(LEDConstants.kTotalStripLength);
     ledBase.start();
-    led = new AddressableLEDBuffer(length);
+    led = new AddressableLEDBuffer(LEDConstants.kTotalStripLength);
     ledTop = led.createView(LEDConstants.kTopFirstIndex, LEDConstants.kTotalStripLength + 1);
     ledBase.setData(led);
   }

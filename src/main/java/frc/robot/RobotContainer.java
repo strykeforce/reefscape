@@ -135,7 +135,7 @@ public class RobotContainer {
     funnelSubsystem = new FunnelSubsystem(funnelIO);
 
     ledIO = new LEDIO();
-    ledSubsystem = new LEDSubsystem();
+    ledSubsystem = new LEDSubsystem(ledIO);
 
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
