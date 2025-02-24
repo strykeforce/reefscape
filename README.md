@@ -62,24 +62,24 @@
 | n/a       | USB       | CANivore |
 
 ## DIO
-| Subsystem  | name      | ID  |
-| ---------- | --------- | --- |
-| BattMon    | Batt V    | 0   |
-| BattMon    | Batt I    | 1   |
-| BattMon    | PDP V     | 2   |
-| BattMon    | Breaker T | 3   |
-| AutoSwitch | switch    | 4   |
-| AutoSwitch | switch    | 5   |
-| AutoSwitch | switch    | 6   |
-| AutoSwitch | switch    | 7   |
-| AutoSwitch | switch    | 8   |
-| AutoSwitch | switch    | 9   |
+| Subsystem  | name        | ID  |
+| ---------- | ----------- | --- |
+| BattMon    | Batt I      | 0   |
+| BattMon    | PDP V       | 1   |
+| BattMon    | Breaker T   | 2   |
+| Climb      | cageAligned | 3   |
+| AutoSwitch | switch      | 4   |
+| AutoSwitch | switch      | 5   |
+| AutoSwitch | switch      | 6   |
+| AutoSwitch | switch      | 7   |
+| AutoSwitch | switch      | 8   |
+| AutoSwitch | switch      | 9   |
 
 ## MXP
 | Subsystem | name        | ID  |
 | --------- | ----------- | --- |
 | TagServo  | wallSense   | 10  |
-| Climb     | cageAligned | 11  |
+| TagServo  | headLights  | 11  |
 |           |             | 12  |
 |           |             | 13  |
 |           |             | 14  |

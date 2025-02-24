@@ -25,7 +25,7 @@ public class ScoreReefManualCommand extends Command {
   public void initialize() {
     startingRobotState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
-    robotStateSubsystem.setIsAuto(false);
+    robotStateSubsystem.setIsAutoPlacing(false);
     robotStateSubsystem.setGetAlgaeOnCycle(false);
     robotStateSubsystem.toPrepCoral();
   }

@@ -3,31 +3,34 @@ package frc.robot.commands.robotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
-import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
-public class StowCommand extends Command {
+public class HPAlgaeCommand extends Command {
   RobotStateSubsystem robotState;
+  private boolean hasTriedToGrab = false;
 
-  public StowCommand(
+  public HPAlgaeCommand(
       RobotStateSubsystem robotState,
       ElevatorSubsystem elevatorSubsystem,
-      CoralSubsystem coralSubsystem,
       BiscuitSubsystem biscuitSubsystem,
       AlgaeSubsystem algaeSubsystem) {
     this.robotState = robotState;
-    addRequirements(elevatorSubsystem, coralSubsystem, biscuitSubsystem, algaeSubsystem);
+    addRequirements(elevatorSubsystem, biscuitSubsystem, algaeSubsystem);
   }
 
   @Override
   public void initialize() {
-    robotState.toStow();
+    hasTriedToGrab = false;
+    robotState.toHpAlgae();
   }
 
   @Override
   public boolean isFinished() {
-    return robotState.getState() == RobotStates.STOW;
+    if (robotState.getState() == RobotStates.HP_ALGAE) {
+      hasTriedToGrab = true;
+    }
+    return robotState.getState() == RobotStates.STOW && hasTriedToGrab;
   }
 }

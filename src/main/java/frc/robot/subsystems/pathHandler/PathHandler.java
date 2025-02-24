@@ -90,6 +90,7 @@ public class PathHandler extends MeasurableSubsystem {
   public void startPathHandler() {
     nodeNames.add(0, startNode);
     isHandling = true;
+    robotStateSubsystem.setIsAutoPlacing(false);
     curState = PathStates.DRIVE_FETCH;
   }
 
@@ -189,6 +190,7 @@ public class PathHandler extends MeasurableSubsystem {
     isHandling = false;
     curState = PathStates.DONE;
     runningPath = false;
+    robotStateSubsystem.setIsAutoPlacing(true);
     timer.stop();
     timer.reset();
   }

@@ -5,10 +5,12 @@ import WallEye.WallEyeTagResult;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -37,26 +39,30 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private int targetCamId;
   private int targetTagId;
   private int fieldRelHexant;
-  private Alliance alliance;
+  private Alliance alliance = Alliance.Blue;
+  private double goalTargetDiag;
+
+  private long startServoTime;
 
   public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.visionSubsystem = visionSubsystem;
 
-    // FIXME: need sane constants
-    this.driveX = new ProfiledPIDController(0.0019, 0, 0, new Constraints(3.0, 3.0));
-    this.driveY = new ProfiledPIDController(0.00001, 0, 0, new Constraints(2.0, 1.0));
+    this.driveX = new ProfiledPIDController(5, 0, 0, new Constraints(2, 2.0));
+    this.driveY = new ProfiledPIDController(5.5, 0, 0, new Constraints(2, 3));
     this.driveOmega = new ProfiledPIDController(5.0, 0, 0, new Constraints(1.0, 1.0));
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
-    this.alignX = new ProfiledPIDController(0.0019, 0, 0, new Constraints(3.0, 3.0));
-    this.alignY = new ProfiledPIDController(0.00001, 0, 0, new Constraints(2.0, 1.0));
-    this.alignOmega = new ProfiledPIDController(5.0, 0, 0, new Constraints(1.0, 1.0));
+    this.alignX = new ProfiledPIDController(0.0017, 0, 0, new Constraints(1.0, 1.0)); // 0.0015
+    this.alignY = new ProfiledPIDController(0.00195, 0, 0, new Constraints(1.0, 1.5));
+    this.alignOmega = new ProfiledPIDController(6, 0, 0, new Constraints(1.0, 1.0));
     this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
-    Logger.recordOutput("TagAlignSubsystem/TargetArea", -1);
+    Logger.recordOutput("TagAlignSubsystem/TargetDiag", -1);
     Logger.recordOutput("TagAlignSubsystem/TargetTag", -1);
     Logger.recordOutput("TagAlignSubsystem/TargetCenterX", -1);
+    Logger.recordOutput("TagAlignSubsystem/Hexant", -1);
+    Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", -1);
   }
 
   public int computeHexant(Alliance color) {
@@ -66,19 +72,23 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             : TagServoingConstants.kRedReefPose;
     double offset = Units.degreesToRadians(30);
 
-    return (((int)
-                (FastMath.normalizeZeroTwoPi(
+    int hexant =
+        (((int)
+                    (FastMath.normalizeZeroTwoPi(
                             driveSubsystem
                                     .getPoseMeters()
                                     .getTranslation()
                                     .minus(reefT)
                                     .getAngle()
                                     .getRadians()
-                                - offset)
-                        / Units.degreesToRadians(60)
-                    + offset))
-            + (color == Alliance.Blue ? 0 : 3))
-        % 6;
+                                + offset)
+                        / Units.degreesToRadians(60)))
+                + (color == Alliance.Blue ? 3 : 0))
+            % 6;
+
+    Logger.recordOutput("TagAlignSubsystem/Hexant", hexant);
+
+    return hexant;
   }
 
   // Red reef numbered like blue (red 0 is facing the same direction as blue 0)
@@ -86,7 +96,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return (computeHexant(color) + (color == Alliance.Blue ? 0 : 3)) % 6;
   }
 
-  private Pose2d getTargetDrivePose(Alliance color) {
+  private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft) {
     Translation2d reefT =
         color == Alliance.Blue
             ? TagServoingConstants.kBlueReefPose
@@ -95,10 +105,16 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     Translation2d offset =
         new Translation2d(
             TagServoingConstants.kInitialDriveRadius,
-            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
+            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180));
+
+    Translation2d sideOffset =
+        new Translation2d(
+            scoreLeft ? TagServoingConstants.kRightCamOffset : TagServoingConstants.kLeftCamOffset,
+            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180 + 90));
 
     return new Pose2d(
-        reefT.plus(offset), Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
+        reefT.plus(offset).plus(sideOffset),
+        Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
   }
 
   private double getCurRadius(Alliance color) {
@@ -106,7 +122,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         color == Alliance.Blue
             ? TagServoingConstants.kBlueReefPose
             : TagServoingConstants.kRedReefPose;
-    return driveSubsystem.getPoseMeters().getTranslation().minus(reefT).getNorm();
+
+    Translation2d reefRelative = driveSubsystem.getPoseMeters().getTranslation().minus(reefT);
+    return FastMath.hypot(reefRelative.getX(), reefRelative.getY());
   }
 
   public TagAlignStates getState() {
@@ -114,8 +132,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public void setup(Alliance alliance, boolean scoreLeft) {
-    targetPose = getTargetDrivePose(alliance);
+    targetPose = getTargetDrivePose(alliance, scoreLeft);
     this.alliance = alliance;
+    this.goalTargetDiag =
+        scoreLeft
+            ? TagServoingConstants.kRightCamDiagTarget
+            : TagServoingConstants.kLeftCamDiagTarget;
 
     // Inverted, scoring left coral means aligning right camera
     targetCamId =
@@ -128,6 +150,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     fieldRelHexant = computeFieldRelHexant(alliance);
 
     Logger.recordOutput("TagAlignSubsystem/TargetTag", targetTagId);
+    Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", goalTargetDiag);
+    Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
 
     Pose2d current = driveSubsystem.getPoseMeters();
 
@@ -135,14 +159,18 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     driveY.reset(current.getY());
     driveOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
-    alignX.reset(current.getX());
-    alignY.reset(current.getY());
+    alignX.reset(0);
+    alignY.reset(0);
     alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
   }
 
   // CALL setup() first!! Do not use in internal state machine
   public double calculateAlignY() {
     WallEyeTagResult result = visionSubsystem.getLastResult(targetCamId);
+
+    if (result == null) {
+      return 2767;
+    }
 
     int tagIndex = -1;
     int[] tags = result.getTagIDs();
@@ -160,10 +188,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     }
 
     Point center = result.getTagCenters().get(tagIndex);
+    double diag = result.getTagDiags()[tagIndex];
 
+    Logger.recordOutput("TagAlignSubsystem/TargetDiag", diag);
     Logger.recordOutput("TagAlignSubsystem/TargetCenterX", center.x());
 
-    double vY = alignY.calculate(center.x(), TagServoingConstants.kHorizontalTarget);
+    double vY = -alignY.calculate(TagServoingConstants.kHorizontalTarget - center.x(), 0);
 
     return vY;
   }
@@ -176,12 +206,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void terminate() {
     driveSubsystem.move(0, 0, 0, false);
+    driveSubsystem.drive(0, 0, 0);
     curState = TagAlignStates.DONE;
   }
 
   @Override
   public void periodic() {
     Logger.recordOutput("TagAlignSubsystem/State", curState.toString());
+    // Logger.recordOutput("TagAlignSubsystem/Hexant", computeHexant(alliance));
 
     switch (curState) {
       case DRIVE -> {
@@ -190,8 +222,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double vX = driveX.calculate(current.getX(), targetPose.getX());
         double vY = driveY.calculate(current.getY(), targetPose.getY());
         double vOmega =
-            driveX.calculate(
+            driveOmega.calculate(
                 current.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+        Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", driveOmega.getPositionError());
 
         Translation2d tagRelVel =
             new Translation2d(vX, vY)
@@ -201,20 +237,42 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double tagRelX = tagRelVel.getX();
         double tagRelY = tagRelVel.getY();
 
-        if (getCurRadius(alliance) < TagServoingConstants.kStopXDriveRadius) {
+        double radius = getCurRadius(alliance);
+        boolean ignoreX = radius < TagServoingConstants.kStopXDriveRadius;
+
+        tagRelX = tagRelX < TagServoingConstants.kMinVelX ? TagServoingConstants.kMinVelX : tagRelX;
+
+        if (radius < TagServoingConstants.kStopXDriveRadius) {
           tagRelX = 0;
         }
 
-        if (Math.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
-            && targetPose.minus(current).getTranslation().getNorm()
-                < TagServoingConstants.kDriveCloseEnough) {
-          alignX.reset(current.getX());
-          alignY.reset(current.getY());
+        Translation2d tagRelError =
+            targetPose
+                .minus(current)
+                .getTranslation()
+                .rotateBy(
+                    Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
+
+        Logger.recordOutput("TagAlignSubsystem/Tag Rel Y Error", tagRelError.getY());
+
+        Transform2d poseError = targetPose.minus(current);
+
+        if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
+            && (FastMath.hypot(poseError.getX(), poseError.getY())
+                    < TagServoingConstants.kDriveCloseEnough
+                || ignoreX
+                    && FastMath.abs(tagRelError.getY()) < TagServoingConstants.kDriveCloseEnough)) {
+          alignX.reset(0);
+          alignY.reset(0);
           alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
           curState = TagAlignStates.TAG_ALIGN;
+          startServoTime = RobotController.getFPGATime();
           break;
         }
+
+        Logger.recordOutput("TagAlignSubsystem/Tag Rel vX", tagRelX);
+        Logger.recordOutput("TagAlignSubsystem/Tag Rel vY", tagRelY);
 
         Translation2d adjusted =
             new Translation2d(tagRelX, tagRelY)
@@ -226,6 +284,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
       case TAG_ALIGN -> {
         WallEyeTagResult result = visionSubsystem.getLastResult(targetCamId);
+
+        if (result == null) {
+          return;
+        }
 
         int tagIndex = -1;
         int[] tags = result.getTagIDs();
@@ -242,19 +304,33 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         }
 
         Point center = result.getTagCenters().get(tagIndex);
-        double area = result.getTagAreas()[tagIndex];
+        double diag = result.getTagDiags()[tagIndex];
 
-        Logger.recordOutput("TagAlignSubsystem/TargetArea", area);
+        Logger.recordOutput("TagAlignSubsystem/TargetDiag", diag);
         Logger.recordOutput("TagAlignSubsystem/TargetCenterX", center.x());
 
-        double vX = alignX.calculate(area, TagServoingConstants.kAreaTarget);
-        double vY = alignY.calculate(center.x(), TagServoingConstants.kHorizontalTarget);
+        double vX = -alignX.calculate(goalTargetDiag - diag, 0);
+        double vY = -alignY.calculate(TagServoingConstants.kHorizontalTarget - center.x(), 0);
 
-        if (TagServoingConstants.kAreaTarget - area < TagServoingConstants.kAngleCloseEnough
-            || area > TagServoingConstants.kAreaTarget) {
+        Logger.recordOutput("TagAlignSubsystem/X Error", alignX.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/Y Error", alignY.getPositionError());
+        Logger.recordOutput(
+            "TagAlignSubsystem/Last result delay",
+            (RobotController.getFPGATime() - result.getTimeStamp()) / 1000);
+
+        if (RobotController.getFPGATime() - result.getTimeStamp()
+                > TagServoingConstants.kNoUpdateMicrosec
+            && RobotController.getFPGATime() - startServoTime
+                > TagServoingConstants.kNoUpdateMicrosec) {
+          terminate();
+          break;
+        }
+
+        if (FastMath.abs(goalTargetDiag - diag) < TagServoingConstants.kDiagCloseEnough
+            || diag > goalTargetDiag) {
           vX = 0;
 
-          if (Math.abs(TagServoingConstants.kHorizontalTarget - center.x())
+          if (FastMath.abs(TagServoingConstants.kHorizontalTarget - center.x())
               < TagServoingConstants.kHorizontalCloseEnough) {
 
             terminate();
