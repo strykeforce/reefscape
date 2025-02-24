@@ -53,6 +53,7 @@ public class DriveConstants {
   public static final double kPHolonomic = 3.0; // was 3
   public static final double kIHolonomic = 0.0000;
   public static final double kDHolonomic = 0.00; // kPHolonomic/100
+  public static double kFieldMaxY;
 
   public static Translation2d[] getWheelLocationMeters() {
     final double x = kRobotLength / 2.0; // front-back, was ROBOT_LENGTH
