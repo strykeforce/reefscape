@@ -12,12 +12,12 @@ public class LEDIO {
   private AddressableLEDBuffer led;
   private AddressableLEDBufferView ledTop;
 
-  public LEDIO(int port, int length) {
-    ledBase = new AddressableLED(port);
-    ledBase.setLength(length);
+  public LEDIO() {
+    ledBase = new AddressableLED(LEDConstants.kLEDPort);
+    ledBase.setLength(LEDConstants.kTotalStripLength);
     ledBase.start();
-    led = new AddressableLEDBuffer(length);
-    ledTop = led.createView(LEDConstants.kTopFirstIndex, LEDConstants.kTotalStripLength + 1);
+    led = new AddressableLEDBuffer(LEDConstants.kTotalStripLength);
+    ledTop = led.createView(LEDConstants.kTopFirstIndex, LEDConstants.kTotalStripLength - 1);
     ledBase.setData(led);
   }
 
@@ -32,7 +32,7 @@ public class LEDIO {
   public void setLength(int length) {
     ledBase.setLength(length);
     led = new AddressableLEDBuffer(length);
-    ledTop = led.createView(LEDConstants.kTopFirstIndex, LEDConstants.kTotalStripLength + 1);
+    ledTop = led.createView(LEDConstants.kTopFirstIndex, LEDConstants.kTotalStripLength - 1);
     ledBase.setData(led);
   }
 
