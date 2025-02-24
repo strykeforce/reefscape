@@ -28,6 +28,7 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
   }
 
   public boolean hasCoral() {
+    // return true;
     return curState == FunnelState.HasSeenCoral;
   }
 
@@ -81,15 +82,15 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     io.setPct(pct);
   }
 
-  public void StartMotor() {
+  public void startMotor() {
     setPercent(FunnelConstants.kFunnelPercentOutput);
   }
 
-  public void StopMotor() {
+  public void stopMotor() {
     setPercent(0.0);
   }
 
-  public void ClearCoral() {
+  public void clearCoral() {
     curState = FunnelState.HasNotSeenCoral;
   }
 }

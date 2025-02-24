@@ -20,17 +20,16 @@ import edu.wpi.first.units.measure.Angle;
 
 public class ElevatorConstants {
 
-  public static final double kCloseEnoughRotations = 0.0083;
-  public static final double kMaxFwd = 53; // TODO all of these fields need to be filled out
+  public static final double kCloseEnoughRotations = 0.1;
+  public static final double kMaxFwd = 53;
   public static final double kMaxRev = 2;
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
-  public static final double kZeroSpeed = -.05;
+  public static final double kZeroSpeed = -0.05;
   public static final double kZeroVolts = -0.5;
   public static final int kZeroCounter = 2;
-  public static final double kZeroedThreshhold = .025;
+  public static final double kZeroedThreshhold = 0.025;
 
-  public static final int heightAnalogID = 0;
   public static final int kFxIDMain = 20;
   public static final int kFxIDFollow = 21;
 
@@ -39,34 +38,34 @@ public class ElevatorConstants {
 
   // Setpoints
   // Idle
-  public static final Angle kFunnelSetpoint = Rotations.of(2.40430);
+  public static final Angle kFunnelSetpoint = Rotations.of(2.03125); // was 2.40430
   public static final Angle kStowSetpoint = kFunnelSetpoint;
-  public static final Angle kPrestageSetpoint = Rotations.of(0.0);
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kL3AlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(6.308);
+  public static final Angle kL3AlgaeSetpoint = Rotations.of(17.513);
 
-  public static final Angle kL2AlgaeRemovalSetpoint = Rotations.of(0.0);
-  public static final Angle kL3AlgaeRemovalSetpoint = Rotations.of(0.0);
-
-  public static final Angle kSafeAlgaeRemovalSetpoint = Rotations.of(0.0);
-  public static final Angle kSafeAlgaeRemovalRotateSetpoint = Rotations.of(0.0);
+  public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;
+  public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
 
   // Coral score
   public static final Angle kL1CoralSetpoint = Rotations.of(13.04053);
-  public static final Angle kL2CoralSetpoint = Rotations.of(19.62793);
-  public static final Angle kL3CoralSetpoint = Rotations.of(30.42969);
+  public static final Angle kL2CoralSetpoint = Rotations.of(21.0786); // 19.62793 -> 21.0786
+  public static final Angle kL3CoralSetpoint =
+      Rotations.of(31.0901); // was 30.42969 -> 31.7505 -> 31.0901
   public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);
 
+  public static final Angle kPrestageSetpoint = kL2CoralSetpoint;
+
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kMicAlgaeSetpoint = Rotations.of(0.0);
-  public static final Angle kHpAlgaeSetpoint = Rotations.of(0.0);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(6.66);
+  public static final Angle kMicAlgaeSetpoint = Rotations.of(17.07);
+  public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(0.0);
-  public static final Angle kBargeSetpoint = Rotations.of(0.0);
+  public static final Angle kProcessorSetpoint = Rotations.of(4.297);
+  public static final Angle kBargeSetpoint = Rotations.of(41.936); // 40.913
+  public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 
   public static TalonFXConfiguration getBothFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();
@@ -74,7 +73,6 @@ public class ElevatorConstants {
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
-            // .withStatorCurrentLimit(20)
             .withSupplyCurrentLimitEnable(true)
             .withSupplyCurrentLimit(40)
             .withSupplyCurrentLowerLimit(10)
@@ -129,7 +127,7 @@ public class ElevatorConstants {
 
   public static CurrentLimitsConfigs getZeroingCurrentLimitsConfigs() {
     CurrentLimitsConfigs current =
-        new CurrentLimitsConfigs() // TODO actually have correct limits for zeroing
+        new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
             .withStatorCurrentLimit(20)
             .withSupplyCurrentLimit(10)

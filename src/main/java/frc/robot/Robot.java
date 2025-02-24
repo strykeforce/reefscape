@@ -52,7 +52,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.stopTagAlign();
+  }
 
   @Override
   public void disabledPeriodic() {}

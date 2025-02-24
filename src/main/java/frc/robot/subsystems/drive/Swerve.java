@@ -21,6 +21,7 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import net.jafama.FastMath;
+import org.littletonrobotics.junction.Logger;
 import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
@@ -93,7 +94,7 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
+    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "rio");
     pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
     navx = new SF_AHRS();
     swerveDrive = new SwerveDrive(false, 0.02, pigeon, swerveModules);
@@ -210,11 +211,13 @@ public class Swerve implements SwerveIO, Checkable {
 
   @Override
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    Logger.recordOutput("Drive/VisionSampledPose", odometryStrategy.getSample(timestamp));
     odometryStrategy.addVisionMeasurement(pose, timestamp);
   }
 
   @Override
   public void addVisionMeasurement(Pose2d pose2d, double timestamp, Matrix<N3, N1> stdDevs) {
+    Logger.recordOutput("Drive/VisionSampledPose", odometryStrategy.getSample(timestamp));
     odometryStrategy.addVisionMeasurement(pose2d, timestamp, stdDevs);
   }
 
@@ -249,11 +252,12 @@ public class Swerve implements SwerveIO, Checkable {
 
     inputs.odometryX = swerveDrive.getPoseMeters().getX();
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
+    inputs.swervePose = odometryStrategy.getPoseMeters();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
     inputs.gyroRotation2d = swerveDrive.getHeading();
     inputs.navxRotation2d = navx.getRotation2d().rotateBy(navxOffset);
     inputs.normalizedGyroRotation =
-        FastMath.toDegrees(FastMath.normalizeZeroTwoPi(swerveDrive.getHeading().getRadians()));
+        FastMath.normalizeMinusPiPi(swerveDrive.getHeading().getRadians());
     inputs.gyroPitch = pigeon.getPitch();
     inputs.gyroRoll = pigeon.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();

@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -9,13 +10,19 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.DriveConstants;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -37,7 +44,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private Trajectory<SwerveSample> autoTrajectory;
   private double trajectoryActive = 0.0;
 
+  private double driveMultiplier = 1.0;
+
   private int gyroDifferentCount = 0;
+
+  private boolean ignoreSticks = false;
+
+  private RobotStateSubsystem robotStateSubsystem;
 
   public DriveSubsystem(SwerveIO io) {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
@@ -72,7 +85,9 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
-    io.drive(vXmps, vYmps, vOmegaRadps, true);
+    if (!ignoreSticks) {
+      io.drive(vXmps * driveMultiplier, vYmps * driveMultiplier, vOmegaRadps, true);
+    }
   }
 
   public void setAzimuthVel(double vel) {
@@ -147,12 +162,43 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", msg);
   }
 
+  public void setRobotStateSubsystem(RobotStateSubsystem robotStateSubsystem) {
+    this.robotStateSubsystem = robotStateSubsystem;
+  }
+
+  public void setIgnoreSticks(boolean ignore) {
+    this.ignoreSticks = ignore;
+  }
+
   public Trajectory<SwerveSample> getAutoTrajectory() {
     if (autoTrajectory != null) {
       return autoTrajectory;
     } else {
       return null;
     }
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update",
+        RobotController.getFPGATime() / 1_000_000 - timestamp);
+    io.addVisionMeasurement(pose, timestamp);
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevvs) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Pose from vision", pose);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/stdDevvs", stdDevvs.get(0, 0));
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Time Since Vision Update",
+        RobotController.getFPGATime() / 1_000_000.0 - timestamp);
+
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/FPGA Seconds", RobotController.getFPGATime() / 1_000_000.0);
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Result Seconds", timestamp);
+
+    io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
   public void resetHolonomicController(double yaw) {
@@ -225,8 +271,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void teleResetGyro() {
     logger.info("Driver Joystick: Reset Gyro");
-    // double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
-    double gyroResetDegs = 0.0; // TODO change this to the above once we have RobotStateSubsystem
+    double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     io.resetGyro();
     io.resetOdometry(
@@ -241,8 +286,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Field flipping stuff
   public boolean shouldFlip() {
-    // return robotStateSubsystem.getAllianceColor() == Alliance.Red;
-    return true; // TODO change this to the above once we have RobotStateSubsystem
+    return robotStateSubsystem.getAllianceColor() == Alliance.Red;
   }
 
   public Translation2d apply(Translation2d translation) {
@@ -312,10 +356,24 @@ public class DriveSubsystem extends MeasurableSubsystem {
         omegaController.getP(), omegaController.getI(), omegaController.getD());
   }
 
+  public void setDriveMultiplier(double multiplier) {
+    driveMultiplier = multiplier;
+  }
+
+  public double getDriveMultiplier() {
+    return driveMultiplier;
+  }
+
+  public void removeDriveMultiplier() {
+    driveMultiplier = 1.0;
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Swerve Pose", inputs.swervePose);
     if (Math.abs(inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees())
         > DriveConstants.kGyroDifferentThreshold) {
       gyroDifferentCount++;
@@ -339,6 +397,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
     IDLE,
     SAFE,
     SAFE_HOLD
+  }
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    io.registerWith(telemetryService);
+    super.registerWith(telemetryService);
   }
 
   @Override

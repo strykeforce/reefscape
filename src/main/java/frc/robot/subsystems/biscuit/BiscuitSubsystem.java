@@ -3,6 +3,7 @@
 package frc.robot.subsystems.biscuit;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -20,6 +21,10 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();
   private Angle setPoint = Rotations.of(0);
 
+  public BiscuitSubsystem(BiscuitIO io) {
+    this.io = io;
+  }
+
   @Override
   public void setPosition(Angle position) {
     io.setPosition(position);
@@ -28,11 +33,11 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
 
   @Override
   public Angle getPosition() {
-    return inputs.position;
+    return Rotations.of(inputs.position);
   }
 
   public AngularVelocity getVelocity(AngularVelocity velocity) {
-    return inputs.velocity;
+    return RotationsPerSecond.of(inputs.velocity);
   }
 
   @Override
@@ -42,15 +47,20 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
 
   @Override
   public boolean isFinished() {
-    return setPoint.minus(inputs.position).abs(Rotations) < BiscuitConstants.kCloseEnough;
+    return Math.abs(getPosition().minus(setPoint).in(Rotations)) < BiscuitConstants.kCloseEnough;
+  }
+
+  public boolean isSafeToStow() {
+    return getPosition().in(Rotations) < BiscuitConstants.kSafeToStowUpper
+        && getPosition().in(Rotations) > BiscuitConstants.kSafeToStowLower;
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
-    Logger.recordOutput("Biscuit setPoint", setPoint);
-    Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
+    Logger.recordOutput("Biscuit setPoint", setPoint.in(Rotations));
+    Logger.recordOutput("Is Biscuit Finished", isFinished());
   }
 
   @Override
