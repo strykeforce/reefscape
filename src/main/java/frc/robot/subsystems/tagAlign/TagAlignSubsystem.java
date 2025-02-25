@@ -62,7 +62,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         new ProfiledPIDController(0.0017, 0, 0, TagServoingConstants.alignXConstraints); // 0.0015
     this.alignY = new ProfiledPIDController(0.00195, 0, 0, TagServoingConstants.alignYConstraints);
     this.alignOmega =
-        new ProfiledPIDController(6, 0, 0, TagServoingConstants.alignOmegaConstraints);
+        new ProfiledPIDController(5.5, 0, 0, TagServoingConstants.alignOmegaConstraints);
     this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     Logger.recordOutput("TagAlignSubsystem/TargetDiag", -1);
@@ -357,8 +357,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double vX = -alignX.calculate(goalTargetDiag - diag, 0);
         double vY = -alignY.calculate(TagServoingConstants.kHorizontalTarget - center.x(), 0);
 
-        Logger.recordOutput("TagAlignSubsystem/Tag Align X Error", alignX.getPositionError());
-        Logger.recordOutput("TagAlignSubsystem/Tag Align Y Error", alignY.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/Diag Error", alignX.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/Horizontal Error", alignY.getPositionError());
         Logger.recordOutput(
             "TagAlignSubsystem/Last result delay",
             (RobotController.getFPGATime() - result.getTimeStamp()) / 1000);

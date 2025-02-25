@@ -161,15 +161,7 @@ public class Swerve implements SwerveIO, Checkable {
     return kinematics.toChassisSpeeds(swerveModuleStates);
   }
 
-  private ChassisSpeeds getFieldRelSpeed() {
-    // SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
-    // SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
-    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
-    for (int i = 0; i < 4; ++i) {
-      swerveModuleStates[i] = swerveModules[i].getState();
-    }
-    ChassisSpeeds roboRelSpeed = kinematics.toChassisSpeeds(swerveModuleStates);
-
+  private ChassisSpeeds getFieldRelSpeed(ChassisSpeeds roboRelSpeed) {
     Rotation2d heading = swerveDrive.getHeading().unaryMinus();
     fieldX =
         roboRelSpeed.vxMetersPerSecond * heading.getCos()
@@ -268,7 +260,8 @@ public class Swerve implements SwerveIO, Checkable {
       inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
     }
-    inputs.fieldRelSpeed = getFieldRelSpeed();
+    inputs.robotRelSpeed = getRobotRelSpeed();
+    inputs.fieldRelSpeed = getFieldRelSpeed(inputs.robotRelSpeed);
     inputs.fieldY = fieldY;
     inputs.fieldX = fieldX;
   }

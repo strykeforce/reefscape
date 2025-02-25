@@ -35,6 +35,7 @@ public interface SwerveIO {
     public double pigeonTemp = 0;
     public double fieldX = 0;
     public double fieldY = 0;
+    public ChassisSpeeds robotRelSpeed = new ChassisSpeeds();
     public ChassisSpeeds fieldRelSpeed = new ChassisSpeeds();
     public double[] azimuthVels = {0, 0, 0, 0};
     public double[] azimuthCurrent = {0, 0, 0, 0};

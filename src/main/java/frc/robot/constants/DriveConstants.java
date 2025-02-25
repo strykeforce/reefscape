@@ -166,7 +166,8 @@ public class DriveConstants {
 
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
     currentConfig.SupplyCurrentLimit = 60;
-
+    currentConfig.SupplyCurrentLowerLimit = 60;
+    currentConfig.SupplyCurrentLowerTime = 1.0;
     currentConfig.StatorCurrentLimit = 140;
 
     currentConfig.SupplyCurrentLimitEnable = true;
@@ -175,10 +176,13 @@ public class DriveConstants {
     driveConfig.CurrentLimits = currentConfig;
 
     Slot0Configs slot0Config = new Slot0Configs();
-    slot0Config.kP = 0.5; // 0.16 using phoenix 6 migrate
-    slot0Config.kI = 0.5; // 0.0002 using phoenix 6 migrate
+    slot0Config.kP = 0.2;
+    slot0Config.kI = 0.0;
     slot0Config.kD = 0.0;
-    slot0Config.kV = 0.12; // 0.047 using phoenix 6 migrate
+    slot0Config.kV = 0.117;
+    slot0Config.kS = 0.0;
+    slot0Config.kA = 0.0;
+    slot0Config.kG = 0.0;
     driveConfig.Slot0 = slot0Config;
 
     MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
