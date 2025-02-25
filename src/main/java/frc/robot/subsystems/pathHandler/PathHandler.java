@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import net.jafama.FastMath;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -21,6 +22,7 @@ public class PathHandler extends MeasurableSubsystem {
   private DriveSubsystem driveSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
   private TagAlignSubsystem tagAlignSubsystem;
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PathHandler.class);
 
   private PathStates curState = PathStates.DONE;
   private boolean isHandling = false;
@@ -45,7 +47,7 @@ public class PathHandler extends MeasurableSubsystem {
     this.driveSubsystem = driveSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
-    reassignAlliance();
+    // reassignAlliance();
   }
 
   public PathHandler(
@@ -106,8 +108,10 @@ public class PathHandler extends MeasurableSubsystem {
 
   public void reassignAlliance() {
     mirrorTrajectory = driveSubsystem.shouldFlip();
+    Optional<Trajectory<SwerveSample>> temp;
     for (int i = 0; i < 12; i++) {
-      Optional<Trajectory<SwerveSample>> temp = Choreo.loadTrajectory(pathNames[i][0]);
+      logger.info(i + "");
+      temp = Choreo.loadTrajectory(pathNames[i][0]);
       fetchPaths.add(temp.get());
       temp = Choreo.loadTrajectory(pathNames[i][1]);
       placePaths.add(temp.get());
