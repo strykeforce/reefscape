@@ -182,12 +182,18 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Pose2d current = driveSubsystem.getPoseMeters();
 
-    driveX.reset(current.getX());
-    driveY.reset(current.getY());
+    double vX = driveSubsystem.getFieldRelSpeed().vxMetersPerSecond;
+    double vY = driveSubsystem.getFieldRelSpeed().vyMetersPerSecond;
+
+    driveX.reset(current.getX(), vX);
+    driveY.reset(current.getY(), vY);
     driveOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
-    alignX.reset(this.goalTargetDiag);
-    alignY.reset(TagServoingConstants.kHorizontalTarget);
+    double robotVx = driveSubsystem.getRobotRelSpeed().vxMetersPerSecond;
+    double robotVy = driveSubsystem.getRobotRelSpeed().vyMetersPerSecond;
+
+    alignX.reset(this.goalTargetDiag, robotVx);
+    alignY.reset(TagServoingConstants.kHorizontalTarget, robotVy);
     alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
   }
 
@@ -232,8 +238,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   private void tagAlign() {
-    alignX.reset(0);
-    alignY.reset(0);
+    double robotVx = driveSubsystem.getRobotRelSpeed().vxMetersPerSecond;
+    double robotVy = driveSubsystem.getRobotRelSpeed().vyMetersPerSecond;
+    
+    alignX.reset(0, robotVx);
+    alignY.reset(0, robotVy);
     alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
     curState = TagAlignStates.TAG_ALIGN;

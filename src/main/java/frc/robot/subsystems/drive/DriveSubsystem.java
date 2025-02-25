@@ -240,6 +240,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return inputs.fieldRelSpeed;
   }
 
+  public ChassisSpeeds getRobotRelSpeed() {
+    return inputs.robotRelSpeed;
+  }
+
   public void setDriveState(DriveStates state) {
     currDriveState = state;
   }
