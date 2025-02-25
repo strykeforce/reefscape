@@ -9,4 +9,6 @@ public class RobotStateConstants {
 
   public static final double kCoralEjectTimer = 0.75;
   public static final double kAlgaeEjectTimer = 0.5;
+
+  public static final double kProcessorStowRadius = 0.5;
 }

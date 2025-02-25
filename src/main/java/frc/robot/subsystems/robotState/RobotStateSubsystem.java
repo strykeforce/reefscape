@@ -26,6 +26,7 @@ import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -59,7 +60,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private AlgaeHeight algaeHeight = AlgaeHeight.LOW;
   private AlgaeHeight currentAlgaeHeight = AlgaeHeight.LOW;
   private CoralLoc coralLoc = CoralLoc.NONE;
-  private Pose2d algaeRemovalPose;
+  private Pose2d processorReleasePose;
 
   private boolean isAutoPlacing = false;
   private boolean getAlgaeOnCycle = false;
@@ -497,6 +498,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     scoringTimer.reset();
     scoringTimer.start();
     isEjectingAlgae = true;
+
+    processorReleasePose = driveSubsystem.getPoseMeters();
+    Logger.recordOutput("RobotState/Processor Release Pose", processorReleasePose);
+
     switch (algaeHeight) {
       case LOW -> {
         algaeSubsystem.scoreProcessor();
@@ -718,11 +723,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case PROCESSOR_ALGAE -> {
-        if (!algaeSubsystem.hasAlgae()
-            && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)
-            && isEjectingAlgae) {
-          isEjectingAlgae = false;
-          toStowSafe();
+        if (isEjectingAlgae
+            && !algaeSubsystem.hasAlgae()
+            && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)) {
+          Pose2d currentPose = driveSubsystem.getPoseMeters();
+          double distanceFromRelease =
+              FastMath.hypot(
+                  currentPose.getX() - processorReleasePose.getX(),
+                  currentPose.getY() - processorReleasePose.getY());
+          Logger.recordOutput("RobotState/Processor Release Distance", distanceFromRelease);
+
+          if (distanceFromRelease > RobotStateConstants.kProcessorStowRadius) {
+            isEjectingAlgae = false;
+            toStowSafe();
+          }
         } else if (algaeHeight != currentAlgaeHeight) {
           toScoreAlgae();
         }
