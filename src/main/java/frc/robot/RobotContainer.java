@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.algae.IntakeAlgaeCommand;
@@ -137,7 +138,7 @@ public class RobotContainer {
     funnelSubsystem = new FunnelSubsystem(funnelIO);
 
     ledIO = new LEDIO();
-    ledSubsystem = new LEDSubsystem();
+    ledSubsystem = new LEDSubsystem(ledIO);
 
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
@@ -173,6 +174,7 @@ public class RobotContainer {
     elevatorSubsystem.registerWith(telemetryService);
     funnelSubsystem.registerWith(telemetryService);
     biscuitSubsystem.registerWith(telemetryService);
+    ledSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -403,6 +405,20 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Pit")
         .add("Zero Elevator", new ZeroElevatorCommand(elevatorSubsystem))
+        .withPosition(2, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Toggle LED autoplacing",
+            new InstantCommand(() -> ledSubsystem.setAutoPlacing(!ledSubsystem.getAutoPlacing())))
+        .withPosition(1, 1)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Toggle LED Current Limiting",
+            new InstantCommand(
+                () -> ledSubsystem.setCurrentLimiting(!ledSubsystem.getCurrentLimiting())))
         .withPosition(2, 1)
         .withSize(1, 1);
   }
