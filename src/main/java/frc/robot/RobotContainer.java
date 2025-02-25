@@ -19,10 +19,12 @@ import frc.robot.commands.algae.IntakeAlgaeCommand;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.algae.ToggleHasAlgaeCommand;
+import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.elevator.HoldElevatorCommand;
@@ -42,8 +44,10 @@ import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
 import frc.robot.commands.robotState.ToggleAutoCommand;
 import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
+import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -65,10 +69,12 @@ import frc.robot.subsystems.funnel.FunnelIOFXS;
 import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDIO;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.List;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -103,6 +109,8 @@ public class RobotContainer {
   private final TagAlignSubsystem tagAlignSubsystem;
 
   private final VisionSubsystem visionSubsystem;
+
+  private final PathHandler pathHandler;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -154,6 +162,8 @@ public class RobotContainer {
             ledSubsystem,
             tagAlignSubsystem,
             visionSubsystem);
+
+    pathHandler = new PathHandler(driveSubsystem, tagAlignSubsystem, robotStateSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
@@ -426,6 +436,43 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Zero Elevator", new ZeroElevatorCommand(elevatorSubsystem))
         .withPosition(2, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Five Meter Path",
+            new DriveAutonCommand(driveSubsystem, "FiveMeterTestPath", true, true, false))
+        .withPosition(2, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Turn Off Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, false))
+        .withPosition(0, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Turn On Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, true))
+        .withPosition(1, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Start Auton",
+            new NonProcessorShallowAutonCommand(
+                driveSubsystem,
+                pathHandler,
+                robotStateSubsystem,
+                algaeSubsystem,
+                biscuitSubsystem,
+                coralSubsystem,
+                elevatorSubsystem,
+                tagAlignSubsystem,
+                "startToJ",
+                PathHandlerConstants.pathNames,
+                List.of('K', 'L', 'M'),
+                List.of(4, 4, 4),
+                'J'))
+        .withPosition(3, 0)
         .withSize(1, 1);
   }
 

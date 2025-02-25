@@ -1,11 +1,12 @@
 package frc.robot.commands.auton;
 
-import java.util.List;
-
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.PathHandler.KillPathHandlerCommand;
-import frc.robot.commands.PathHandler.StartPathHandlerCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.SetGyroOffsetCommand;
+import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -13,50 +14,49 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import java.util.List;
 
 public class NonProcessorShallowAutonCommand extends SequentialCommandGroup {
 
-    private PathHandler pathHandler;
-    private DriveSubsystem driveSubsystem;
-    private DriveAutonCommand startPath;
+  private PathHandler pathHandler;
+  private DriveSubsystem driveSubsystem;
+  private DriveAutonCommand startPath;
 
-    public NonProcessorShallowAutonCommand (
-        DriveSubsystem driveSubsystem,
-        RobotStateSubsystem robotStateSubsystem,
-        AlgaeSubsystem algaeSubsystem,
-        BiscuitSubsystem biscuitSubsystem,
-        CoralSubsystem coralSubsystem,
-        ElevatorSubsystem elevatorSubsystem,
-        PathHandler pathHandler,
-        String startPathName,
-        String[][] pathNames,
-        List<Character> NodeNames,
-        List<Integer> NodeLevels,
-        boolean mirrorToProcessor
-    ) {
-        // addRequirements(driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
-        this.pathHandler = pathHandler;
-        this.driveSubsystem = driveSubsystem;
-        this.pathHandler.setPathNames(pathNames);
-        this.pathHandler.setStartNode(NodeNames.remove(0));
-        this.pathHandler.setNodeNames(NodeNames);
-        this.pathHandler.setNodeLevels(NodeLevels);
-        this.pathHandler.setMirrorToProcessor(mirrorToProcessor);
-        
-        startPath = new DriveAutonCommand(driveSubsystem, startPathName, false, true, mirrorToProcessor);
+  public NonProcessorShallowAutonCommand(
+      DriveSubsystem driveSubsystem,
+      PathHandler pathHandler,
+      RobotStateSubsystem robotStateSubsystem,
+      AlgaeSubsystem algaeSubsystem,
+      BiscuitSubsystem biscuitSubsystem,
+      CoralSubsystem coralSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      TagAlignSubsystem tagAlignSubsystem,
+      String startPathName,
+      String[][] pathNames,
+      List<Character> NodeNames,
+      List<Integer> NodeLevels,
+      char startNode) {
+    addRequirements(
+        driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
+    this.pathHandler = pathHandler;
+    this.driveSubsystem = driveSubsystem;
 
-        addCommands(
-            new SequentialCommandGroup(
-                // TODO fill in all zeroing and such
-                startPath,
-                new StartPathHandlerCommand(pathHandler),
-                new KillPathHandlerCommand(pathHandler)
-            )
-        );
-    }
+    startPath = new DriveAutonCommand(driveSubsystem, startPathName, false, true, false);
 
-    public void reassignAlliance() {
-        startPath.reassignAlliance();
-    }
-    
+    addCommands(
+        new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                new ZeroElevatorCommand(elevatorSubsystem),
+                new SequentialCommandGroup(
+                    new ResetGyroCommand(driveSubsystem),
+                    new SetGyroOffsetCommand(driveSubsystem, new Rotation2d(180)))),
+            startPath,
+            new frc.robot.commands.pathhHandler.StartPathHandlerCommand(
+                pathHandler, pathNames, NodeNames, NodeLevels, startNode, false)));
+  }
+
+  public void reassignAlliance() {
+    startPath.reassignAlliance();
+  }
 }
