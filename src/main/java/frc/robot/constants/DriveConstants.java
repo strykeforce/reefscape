@@ -31,15 +31,15 @@ public class DriveConstants {
   public static final double kDriveGearRatio =
       (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
 
-  public static final double kWheelDiameterInches = 4.0;
-  public static final double kMaxSpeedMetersPerSecond = 3.384;
+  public static final double kWheelDiameterInches = 3.375;
+  public static final double kMaxSpeedMetersPerSecond = 3.782;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
   public static final double kGyroDifferentThreshold = 5.0; // 5 degrees
   public static final int kGyroDifferentCount = 3;
 
-  public static final double kRobotLength = 0.6223;
-  public static final double kRobotWidth = 0.6223;
+  public static final double kRobotLength = 0.61595;
+  public static final double kRobotWidth = 0.61595;
   public static final double kFieldMaxX = 17.526;
   public static final double kCenterLineX = 8.763;
 
@@ -53,6 +53,7 @@ public class DriveConstants {
   public static final double kPHolonomic = 3.0; // was 3
   public static final double kIHolonomic = 0.0000;
   public static final double kDHolonomic = 0.00; // kPHolonomic/100
+  public static double kFieldMaxY;
 
   public static Translation2d[] getWheelLocationMeters() {
     final double x = kRobotLength / 2.0; // front-back, was ROBOT_LENGTH

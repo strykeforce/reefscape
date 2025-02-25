@@ -4,9 +4,11 @@ import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.auton.AutoCommandInterface;
+import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   private boolean isTherePath = false;
   private String trajectoryName;
   private boolean mirrorTrajectory = false;
+  private boolean mirrorToProcessor = false;
 
   private boolean resetOdometry;
   private boolean lastPath;
@@ -28,13 +31,15 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
       DriveSubsystem driveSubsystem,
       String trajectoryName,
       boolean lastPath,
-      boolean resetOdometry) {
+      boolean resetOdometry,
+      boolean mirrorToProcessor) {
 
     addRequirements(driveSubsystem);
     this.driveSubsystem = driveSubsystem;
     this.resetOdometry = resetOdometry;
     this.lastPath = lastPath;
     this.trajectoryName = trajectoryName;
+    this.mirrorToProcessor = mirrorToProcessor;
     Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
     if (tempTrajectory.isPresent()) {
       trajectory = tempTrajectory.get();
@@ -51,12 +56,46 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
     mirrorTrajectory = driveSubsystem.shouldFlip();
   }
 
+  private SwerveSample mirrorToProcessor(SwerveSample sample) {
+    if (mirrorToProcessor) {
+      sample =
+          new SwerveSample(
+              sample.t,
+              sample.x,
+              DriveConstants.kFieldMaxY - sample.y,
+              sample.heading * -1,
+              sample.vx,
+              DriveConstants.kFieldMaxY - sample.vy,
+              sample.omega * -1,
+              sample.ax,
+              DriveConstants.kFieldMaxY - sample.ay,
+              sample.alpha * -1,
+              sample.moduleForcesX(),
+              new double[] {
+                sample.moduleForcesY()[0] * -1,
+                sample.moduleForcesY()[1] * -1,
+                sample.moduleForcesY()[2] * -1,
+                sample.moduleForcesY()[3] * -1
+              });
+    }
+    return sample;
+  }
+
+  private Pose2d mirrorToProcessor(Pose2d pose) {
+    pose =
+        new Pose2d(
+            pose.getX(),
+            DriveConstants.kFieldMaxY - pose.getY(),
+            Rotation2d.fromDegrees(pose.getRotation().getDegrees() * -1));
+    return pose;
+  }
+
   @Override
   public void initialize() {
     if (isTherePath) {
       driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
       Pose2d initialPose = new Pose2d();
-      initialPose = trajectory.getInitialPose(mirrorTrajectory).get();
+      initialPose = mirrorToProcessor(trajectory.getInitialPose(mirrorTrajectory).get());
       if (resetOdometry) {
         driveSubsystem.resetOdometry(initialPose);
       }
@@ -66,7 +105,8 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
       driveSubsystem.grapherTrajectoryActive(true);
       timer.reset();
       logger.info("Begin Trajectory: {}", trajectoryName);
-      SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
+      SwerveSample desiredState =
+          mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
       driveSubsystem.calculateController(desiredState);
     }
   }
@@ -74,7 +114,8 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   @Override
   public void execute() {
     if (isTherePath) {
-      SwerveSample desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
+      SwerveSample desiredState =
+          mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
       driveSubsystem.calculateController(desiredState);
     }
   }
@@ -94,7 +135,8 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
 
     if (!interrupted && !lastPath) {
       driveSubsystem.calculateController(
-          trajectory.sampleAt(trajectory.getTotalTime(), mirrorTrajectory).get());
+          mirrorToProcessor(
+              trajectory.sampleAt(trajectory.getTotalTime(), mirrorTrajectory).get()));
     } else {
       driveSubsystem.drive(0, 0, 0);
     }
