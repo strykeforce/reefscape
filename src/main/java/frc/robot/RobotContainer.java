@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import java.util.List;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -19,6 +21,7 @@ import frc.robot.commands.algae.IntakeAlgaeCommand;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.algae.ToggleHasAlgaeCommand;
+import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
@@ -46,6 +49,7 @@ import frc.robot.commands.robotState.setScoreSideLeftCommand;
 import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -452,25 +456,24 @@ public class RobotContainer {
         .withPosition(1, 0)
         .withSize(1, 1);
 
-    // Shuffleboard.getTab("Pit")
-    //     .add(
-    //         "Start Auton",
-    //         new NonProcessorShallowAutonCommand(
-    //             driveSubsystem,
-    //             pathHandler,
-    //             robotStateSubsystem,
-    //             algaeSubsystem,
-    //             biscuitSubsystem,
-    //             coralSubsystem,
-    //             elevatorSubsystem,
-    //             tagAlignSubsystem,
-    //             "startToJ",
-    //             PathHandlerConstants.kpathNames,
-    //             List.of('K', 'L', 'M'),
-    //             List.of(4, 4, 4),
-    //             'J'))
-    //     .withPosition(3, 0)
-    //     .withSize(1, 1);
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Start Auton",
+            new NonProcessorShallowAutonCommand(
+                driveSubsystem,
+                pathHandler,
+                robotStateSubsystem,
+                algaeSubsystem,
+                biscuitSubsystem,
+                coralSubsystem,
+                elevatorSubsystem,
+                tagAlignSubsystem,
+                "startToJ",
+                List.of('K', 'L', 'M'),
+                List.of(4, 4, 4),
+                'J'))
+        .withPosition(3, 0)
+        .withSize(1, 1);
   }
 
   public Command getAutonomousCommand() {

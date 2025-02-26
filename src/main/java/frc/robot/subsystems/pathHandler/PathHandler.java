@@ -3,8 +3,10 @@ package frc.robot.subsystems.pathHandler;
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -24,21 +26,25 @@ public class PathHandler extends MeasurableSubsystem {
   private TagAlignSubsystem tagAlignSubsystem;
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PathHandler.class);
 
+  // parameters
+  private String[][] pathNames =
+      PathHandlerConstants.kShallowPathNames; // the array of paths, in string form
+  private List<Character> nodeNames; // the list of nodes, in order, to score on
+  private List<Integer> nodeLevels; // the list of levels, in order, to score on
+  private Character startNode = 'a'; // the node that the robot starts in front of
+  private boolean mirrorToProcessor =
+      false; // whether the robot starts and fetches on the processor side.
+
   private PathStates curState = PathStates.DONE;
   private boolean isHandling = false;
-  private List<Character> nodeNames;
-  private List<Integer> nodeLevels;
   private Timer timer = new Timer();
   private List<Trajectory<SwerveSample>> fetchPaths;
   private List<Trajectory<SwerveSample>> placePaths;
-  private String[][] pathNames = new String[12][2];
   private Trajectory<SwerveSample> currPath;
   private String currPathString;
   private boolean runningPath = false;
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
-  private boolean mirrorToProcessor = false;
-  private Character startNode = 'a';
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -55,8 +61,8 @@ public class PathHandler extends MeasurableSubsystem {
       TagAlignSubsystem tagAlignSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       String[][] pathNames,
-      List<Character> NodeNames,
-      List<Integer> NodeLevels,
+      List<Character> nodeNames,
+      List<Integer> nodeLevels,
       Character startNode,
       boolean mirrorToProcessor) {
     this.driveSubsystem = driveSubsystem;
@@ -73,17 +79,18 @@ public class PathHandler extends MeasurableSubsystem {
     if (!isHandling) {
       this.pathNames = pathNames;
     }
+    reassignAlliance();
   }
 
-  public void setNodeNames(List<Character> NodeNames) {
+  public void setNodeNames(List<Character> nodeNames) {
     if (!isHandling) {
-      this.nodeNames = NodeNames;
+      this.nodeNames = nodeNames;
     }
   }
 
-  public void setNodeLevels(List<Integer> NodeLevels) {
+  public void setNodeLevels(List<Integer> nodeLevels) {
     if (!isHandling) {
-      this.nodeLevels = NodeLevels;
+      this.nodeLevels = nodeLevels;
     }
   }
 
@@ -163,7 +170,7 @@ public class PathHandler extends MeasurableSubsystem {
     if (isHandling && runningPath && currPath != null && isServoing) {
       driveSubsystem.calculateControllerServo(
           mirrorToProcessor(currPath.sampleAt(timer.get(), mirrorTrajectory).get()),
-          0.0); // TODO: use tag servoing here when ready
+          tagAlignSubsystem.calculateAlignY());
       if (timer.hasElapsed(currPath.getTotalTime())) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
@@ -200,6 +207,8 @@ public class PathHandler extends MeasurableSubsystem {
   private void advanceNodes() {
     if (nodeNames.size() > 0) {
       nodeNames.remove(0);
+      tagAlignSubsystem.setup(
+          mirrorTrajectory ? Alliance.Red : Alliance.Blue, (nodeNames.get(0) - 'a') % 2 == 0);
     }
   }
 

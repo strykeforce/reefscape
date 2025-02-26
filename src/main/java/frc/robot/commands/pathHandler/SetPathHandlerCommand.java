@@ -1,10 +1,10 @@
-package frc.robot.commands.pathhHandler;
+package frc.robot.commands.pathHandler;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import java.util.List;
 
-public class StartPathHandlerCommand extends Command {
+public class SetPathHandlerCommand extends InstantCommand {
   private PathHandler pathHandler;
   private String[][] pathNames;
   private List<Character> NodeNames;
@@ -12,7 +12,7 @@ public class StartPathHandlerCommand extends Command {
   private Character startNode;
   private boolean mirrorToProcessor;
 
-  public StartPathHandlerCommand(
+  public SetPathHandlerCommand(
       PathHandler pathHandler,
       String[][] pathNames,
       List<Character> NodeNames,
@@ -27,24 +27,12 @@ public class StartPathHandlerCommand extends Command {
     this.mirrorToProcessor = mirrorToProcessor;
   }
 
-  public StartPathHandlerCommand(PathHandler pathHandler) {
-    this.pathHandler = pathHandler;
-  }
-
   @Override
   public void initialize() {
-    if (pathNames != null) {
-      pathHandler.setPathNames(pathNames);
-      pathHandler.setNodeNames(NodeNames);
-      pathHandler.setNodeLevels(NodeLevels);
-      pathHandler.setStartNode(startNode);
-      pathHandler.setMirrorToProcessor(mirrorToProcessor);
-    }
-    pathHandler.startPathHandler();
-  }
-
-  @Override
-  public boolean isFinished() {
-    return pathHandler.isFinished();
+    pathHandler.setPathNames(pathNames);
+    pathHandler.setNodeNames(NodeNames);
+    pathHandler.setNodeLevels(NodeLevels);
+    pathHandler.setStartNode(startNode);
+    pathHandler.setMirrorToProcessor(mirrorToProcessor);
   }
 }

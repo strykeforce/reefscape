@@ -7,6 +7,7 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
+import frc.robot.constants.PathHandlerConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -33,7 +34,6 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup {
       ElevatorSubsystem elevatorSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
       String startPathName,
-      String[][] pathNames,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
       char startNode) {
@@ -52,8 +52,13 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup {
                     new ResetGyroCommand(driveSubsystem),
                     new SetGyroOffsetCommand(driveSubsystem, new Rotation2d(180)))),
             startPath,
-            new frc.robot.commands.pathhHandler.StartPathHandlerCommand(
-                pathHandler, pathNames, NodeNames, NodeLevels, startNode, false)));
+            new frc.robot.commands.pathHandler.StartPathHandlerCommand(
+                pathHandler,
+                PathHandlerConstants.kShallowPathNames,
+                NodeNames,
+                NodeLevels,
+                startNode,
+                false)));
   }
 
   public void reassignAlliance() {

@@ -1,7 +1,7 @@
 package frc.robot.constants;
 
 public class PathHandlerConstants {
-  public static final String[][] kpathNames = {
+  public static final String[][] kShallowPathNames = {
     {
       "fetchToA",
       "fetchToB",
