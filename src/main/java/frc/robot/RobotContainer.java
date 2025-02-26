@@ -207,9 +207,15 @@ public class RobotContainer {
                 coralSubsystem,
                 biscuitSubsystem,
                 algaeSubsystem));
-    new JoystickButton(driveJoystick, Button.SWA.id)
+
+    // Interupt
+    new JoystickButton(driveJoystick, Button.SWG_UP.id)
         .onTrue(new InterruptAutoCommand(robotStateSubsystem))
         .onFalse(new InterruptAutoCommand(robotStateSubsystem));
+    new JoystickButton(driveJoystick, Button.SWG_DWN.id)
+        .onTrue(new InterruptAutoCommand(robotStateSubsystem))
+        .onFalse(new InterruptAutoCommand(robotStateSubsystem));
+
     new JoystickButton(driveJoystick, Button.SWB_UP.id)
         .onTrue(new ZeroElevatorCommand(elevatorSubsystem))
         .onFalse(new ZeroElevatorCommand(elevatorSubsystem));
