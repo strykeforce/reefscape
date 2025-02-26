@@ -37,6 +37,11 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     Logger.processInputs(getName(), inputs);
     Logger.recordOutput("Biscuit setPoint", setPoint);
     Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
+
+    if(inputs.position == BiscuitConstants.kCloseEnough && offset > 0) {
+      zero();
+      Logger.error("error");
+    }
   }
 
   @Override
