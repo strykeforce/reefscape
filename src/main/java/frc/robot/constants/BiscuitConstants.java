@@ -24,7 +24,7 @@ import edu.wpi.first.units.measure.Angle;
 
 public class BiscuitConstants {
 
-  public static final double kZero = .36;
+  public static final double kZero = .37;
   public static final double kTicksPerRot = 160;
   public static final int talonID = 25;
   public static final double kCloseEnough = 0.05;
