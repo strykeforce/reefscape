@@ -55,7 +55,7 @@ public class BiscuitIOFX implements BiscuitIO {
     velocity = talon.getVelocity();
     position = talon.getPosition();
     rawQuadrature = talon.getRawQuadraturePosition();
-    rawQuadrature.setUpdateFrequency(20);
+    rawQuadrature.setUpdateFrequency(200);
     rawPulseWidth = talon.getRawPulseWidthPosition();
     rawPulseWidth.setUpdateFrequency(20);
     zero();

@@ -15,8 +15,10 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorPhaseValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -113,6 +115,7 @@ public class DriveConstants {
     externalFeedbackConfigs.VelocityFilterTimeConstant = 0.02; // ?
     externalFeedbackConfigs.ExternalFeedbackSensorSource =
         ExternalFeedbackSensorSourceValue.Quadrature;
+    externalFeedbackConfigs.SensorPhase = SensorPhaseValue.Opposed;
     azimuthConfig.ExternalFeedback = externalFeedbackConfigs;
 
     // VoltageConfigs voltageConfig = new VoltageConfigs();
@@ -127,6 +130,7 @@ public class DriveConstants {
     MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
     // motorConfigs.DutyCycleNeutralDeadband = 0.04;
     motorConfigs.NeutralMode = NeutralModeValue.Coast;
+    motorConfigs.Inverted = InvertedValue.Clockwise_Positive;
     azimuthConfig.MotorOutput = motorConfigs;
 
     CommutationConfigs commutationConfigs = new CommutationConfigs();
@@ -137,8 +141,7 @@ public class DriveConstants {
     return azimuthConfig;
   }
 
-  public static TalonSRXConfiguration
-      getAzimuthTalonConfig() { 
+  public static TalonSRXConfiguration getAzimuthTalonConfig() {
     // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
     TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
 

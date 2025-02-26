@@ -19,7 +19,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
-import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.strykeforce.gyro.SF_AHRS;
@@ -62,7 +61,8 @@ public class SwerveFXS implements SwerveIO, Checkable {
             .driveGearRatio(DriveConstants.kDriveGearRatio)
             .wheelDiameterInches(DriveConstants.kWheelDiameterInches)
             .driveMaximumMetersPerSecond(DriveConstants.kMaxSpeedMetersPerSecond)
-            .latencyCompensation(true);
+            .latencyCompensation(true)
+            .encoderOpposed(false);
     swerveModules = new FXSwerveModule[4];
     Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
 
@@ -72,7 +72,7 @@ public class SwerveFXS implements SwerveIO, Checkable {
       configuratorFXS.apply(new TalonFXSConfiguration()); // factory default
       configuratorFXS.apply(DriveConstants.getAzimuthFXSConfig());
 
-      azimuthFXS.getRawPulseWidthPosition().setUpdateFrequency(20);
+      azimuthFXS.getRawPulseWidthPosition().setUpdateFrequency(200);
 
       azimuths[i] = azimuthFXS;
 
