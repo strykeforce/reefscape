@@ -1,20 +1,20 @@
-package frc.robot.subsystems.algae;
+package frc.robot.subsystems.funnel;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
 
-public interface algaeIO {
+public interface FunnelIO {
+
   @AutoLog
-  public static class IOInputs {
+  public static class FunnelIOInputs {
     public AngularVelocity velocity;
+    public boolean isRevBeamBroken = false;
   }
 
-  public default void updateInputs(IOInputs inputs) {}
+  public default void setPct(double percentOutput) {}
 
-  public default void setPosition(double position) {}
-
-  public default void zero() {}
+  public default void updateInputs(FunnelIOInputs inputs) {}
 
   public default void registerWith(TelemetryService telemetryService) {}
 }

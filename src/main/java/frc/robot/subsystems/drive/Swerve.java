@@ -20,12 +20,11 @@ import edu.wpi.first.math.numbers.N3;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
-import java.util.function.BooleanSupplier;
 import net.jafama.FastMath;
+import org.littletonrobotics.junction.Logger;
 import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.swerve.OdometryStrategy;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
 import org.strykeforce.swerve.SwerveDrive;
@@ -35,7 +34,7 @@ import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class Swerve implements SwerveIO, Checkable {
-  @HealthCheck private final SwerveDrive swerveDrive;
+  private final SwerveDrive swerveDrive;
 
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;
@@ -45,8 +44,6 @@ public class Swerve implements SwerveIO, Checkable {
   private Rotation2d navxOffset = new Rotation2d();
 
   private TalonFXConfigurator configurator;
-
-  private BooleanSupplier azimuth1FwdLimitSupplier = () -> false;
 
   private TalonSRX[] azimuths = new TalonSRX[4];
   private TalonFX[] drives = new TalonFX[4];
@@ -97,7 +94,7 @@ public class Swerve implements SwerveIO, Checkable {
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
 
-    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
+    pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "rio");
     pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
     navx = new SF_AHRS();
     swerveDrive = new SwerveDrive(false, 0.02, pigeon, swerveModules);
@@ -214,11 +211,13 @@ public class Swerve implements SwerveIO, Checkable {
 
   @Override
   public void addVisionMeasurement(Pose2d pose, double timestamp) {
+    Logger.recordOutput("Drive/VisionSampledPose", odometryStrategy.getSample(timestamp));
     odometryStrategy.addVisionMeasurement(pose, timestamp);
   }
 
   @Override
   public void addVisionMeasurement(Pose2d pose2d, double timestamp, Matrix<N3, N1> stdDevs) {
+    Logger.recordOutput("Drive/VisionSampledPose", odometryStrategy.getSample(timestamp));
     odometryStrategy.addVisionMeasurement(pose2d, timestamp, stdDevs);
   }
 
@@ -253,11 +252,12 @@ public class Swerve implements SwerveIO, Checkable {
 
     inputs.odometryX = swerveDrive.getPoseMeters().getX();
     inputs.odometryY = swerveDrive.getPoseMeters().getY();
+    inputs.swervePose = odometryStrategy.getPoseMeters();
     inputs.odometryRotation2D = swerveDrive.getPoseMeters().getRotation().getDegrees();
     inputs.gyroRotation2d = swerveDrive.getHeading();
     inputs.navxRotation2d = navx.getRotation2d().rotateBy(navxOffset);
     inputs.normalizedGyroRotation =
-        FastMath.toDegrees(FastMath.normalizeZeroTwoPi(swerveDrive.getHeading().getRadians()));
+        FastMath.normalizeMinusPiPi(swerveDrive.getHeading().getRadians());
     inputs.gyroPitch = pigeon.getPitch();
     inputs.gyroRoll = pigeon.getRoll();
     inputs.gyroRate = swerveDrive.getGyroRate();
@@ -270,7 +270,7 @@ public class Swerve implements SwerveIO, Checkable {
     }
     inputs.fieldRelSpeed = getFieldRelSpeed();
     inputs.fieldY = fieldY;
-    inputs.fieldX = fieldX; 
+    inputs.fieldX = fieldX;
   }
 
   @Override

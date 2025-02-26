@@ -6,7 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.constants.BuildConstants;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -18,12 +22,39 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
+  public void robotInit() {
+    if (isReal()) {
+      Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+      Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+      Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+      Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+      Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+      switch (BuildConstants.DIRTY) {
+        case 0:
+          Logger.recordMetadata("GitDirty", "All Changes Committed");
+          break;
+        case 1:
+          Logger.recordMetadata("GitDirty", "Uncommitted changes");
+          break;
+        default:
+          Logger.recordMetadata("GitDirty", "Unknown");
+          break;
+      }
+      Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
+      Logger.addDataReceiver(new NT4Publisher());
+    }
+    Logger.start();
+  }
+
+  @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.stopTagAlign();
+  }
 
   @Override
   public void disabledPeriodic() {}
