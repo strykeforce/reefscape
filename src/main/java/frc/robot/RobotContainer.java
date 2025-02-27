@@ -6,9 +6,11 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,6 +47,8 @@ import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
 import frc.robot.commands.robotState.ToggleAutoPlacingCommand;
 import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
+import frc.robot.commands.tagAlign.DriveTuningCommand;
+import frc.robot.commands.tagAlign.YawTuningCommand;
 import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
@@ -433,6 +437,25 @@ public class RobotContainer {
             new InstantCommand(
                 () -> ledSubsystem.setCurrentLimiting(!ledSubsystem.getCurrentLimiting())))
         .withPosition(2, 1)
+        .withSize(1, 1);
+
+    GenericEntry yawP =
+        Shuffleboard.getTab("Debug")
+            .add("Yaw kP", 0)
+            .withPosition(4, 2)
+            .withSize(1, 1)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+    Shuffleboard.getTab("Debug")
+        .add("Yaw Tuning", new YawTuningCommand(driveSubsystem, () -> yawP.getDouble(0)))
+        .withPosition(3, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Drive Tuning",
+            new DriveTuningCommand(driveSubsystem, () -> yawP.getDouble(0), tagAlignSubsystem))
+        .withPosition(4, 2)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")

@@ -19,9 +19,9 @@ public class TagServoingConstants {
   public static final double kRightCamDiagTarget = 985;
 
   // Constraints
-  public static final Constraints driveXConstraints = new Constraints(2, 2.0);
-  public static final Constraints driveYConstraints = new Constraints(2, 3.0);
-  public static final Constraints driveOmegaConstraints = new Constraints(1, 2.0);
+  public static final Constraints driveXConstraints = new Constraints(2000, 2000);
+  public static final Constraints driveYConstraints = new Constraints(2000, 3000);
+  public static final Constraints driveOmegaConstraints = new Constraints(1000, 2000);
 
   public static final Constraints alignXConstraints = new Constraints(1, 1.0);
   public static final Constraints alignYConstraints = new Constraints(1, 1.5);

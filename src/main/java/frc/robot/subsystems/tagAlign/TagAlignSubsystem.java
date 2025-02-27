@@ -52,17 +52,17 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     this.driveSubsystem = driveSubsystem;
     this.visionSubsystem = visionSubsystem;
 
-    this.driveX = new ProfiledPIDController(5, 0, 0, TagServoingConstants.driveXConstraints);
-    this.driveY = new ProfiledPIDController(5.5, 0, 0, TagServoingConstants.driveYConstraints);
+    this.driveX = new ProfiledPIDController(1.66, 0, 0, TagServoingConstants.driveXConstraints);
+    this.driveY = new ProfiledPIDController(1.66, 0, 0, TagServoingConstants.driveYConstraints);
     this.driveOmega =
-        new ProfiledPIDController(5.0, 0, 0, TagServoingConstants.driveOmegaConstraints);
+        new ProfiledPIDController(6.0, 0, 0, TagServoingConstants.driveOmegaConstraints);
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     this.alignX =
         new ProfiledPIDController(0.0017, 0, 0, TagServoingConstants.alignXConstraints); // 0.0015
     this.alignY = new ProfiledPIDController(0.00195, 0, 0, TagServoingConstants.alignYConstraints);
     this.alignOmega =
-        new ProfiledPIDController(5.5, 0, 0, TagServoingConstants.alignOmegaConstraints);
+        new ProfiledPIDController(6.0, 0, 0, TagServoingConstants.alignOmegaConstraints);
     this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     Logger.recordOutput("TagAlignSubsystem/TargetDiag", -1);
@@ -182,12 +182,18 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Pose2d current = driveSubsystem.getPoseMeters();
 
-    driveX.reset(current.getX());
-    driveY.reset(current.getY());
+    double vX = driveSubsystem.getFieldRelSpeed().vxMetersPerSecond;
+    double vY = driveSubsystem.getFieldRelSpeed().vyMetersPerSecond;
+
+    driveX.reset(current.getX(), vX);
+    driveY.reset(current.getY(), vY);
     driveOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
-    alignX.reset(0);
-    alignY.reset(0);
+    double robotVx = driveSubsystem.getRobotRelSpeed().vxMetersPerSecond;
+    double robotVy = driveSubsystem.getRobotRelSpeed().vyMetersPerSecond;
+
+    alignX.reset(0, robotVx);
+    alignY.reset(0, robotVy);
     alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
   }
 
@@ -232,8 +238,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   private void tagAlign() {
-    alignX.reset(0);
-    alignY.reset(0);
+    double robotVx = driveSubsystem.getRobotRelSpeed().vxMetersPerSecond;
+    double robotVy = driveSubsystem.getRobotRelSpeed().vyMetersPerSecond;
+
+    alignX.reset(0, robotVx);
+    alignY.reset(0, robotVy);
     alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
     curState = TagAlignStates.TAG_ALIGN;
@@ -276,14 +285,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double radius = getCurRadius(alliance);
         boolean ignoreX = radius < stopXRadius && !algae;
 
-        if (!algae || tagRelX > 0) {
-          tagRelX =
-              tagRelX < TagServoingConstants.kMinVelX ? TagServoingConstants.kMinVelX : tagRelX;
-        }
+        // if (!algae || tagRelX > 0) {
+        //   tagRelX =
+        //       tagRelX < TagServoingConstants.kMinVelX ? TagServoingConstants.kMinVelX : tagRelX;
+        // }
 
-        if (ignoreX) {
-          tagRelX = 0;
-        }
+        // if (ignoreX) {
+        //   tagRelX = 0;
+        // }
 
         Translation2d tagRelError =
             targetPose
@@ -296,19 +305,26 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
         Transform2d poseError = targetPose.minus(current);
 
-        if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
-            && (FastMath.hypot(poseError.getX(), poseError.getY()) < driveCloseEnough
-                || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough)) {
-
-          if (proceedToAlign || !algae) {
-            tagAlign();
-            break;
-          } else {
-            driveSubsystem.stopDriving();
-            curState = TagAlignStates.WAITING;
-            break;
-          }
+        if (FastMath.abs(tagRelError.getX()) < driveCloseEnough) {
+          terminate();
+          break;
         }
+
+        // if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
+        //     && (FastMath.hypot(poseError.getX(), poseError.getY()) < driveCloseEnough
+        //         || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough)) {
+
+        //   if (proceedToAlign || !algae) {
+        //     tagAlign();
+        //     break;
+        //   } else {
+        //     driveSubsystem.stopDriving();
+        //     curState = TagAlignStates.WAITING;
+        //     break;
+        //   }
+        // }
+
+        tagRelY = 0;
 
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vX", tagRelX);
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vY", tagRelY);
