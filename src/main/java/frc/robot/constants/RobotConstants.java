@@ -12,11 +12,18 @@ public class RobotConstants {
   public static final double kTriggerDeadband = 0.5;
   public static final double kTestingDeadband = 0.5;
 
+  public static double kZero = .36;
+
   public RobotConstants() {
     if (isComp) {
       // Fill with comp bot constants
     } else {
       // Fill with proto constants
+      kZero = ProtoConstants.kZero;
     }
+  }
+
+  public static class ProtoConstants {
+    public static final double kZero = 36;
   }
 }
