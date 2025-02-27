@@ -28,6 +28,8 @@ public class BiscuitConstants {
   public static final double kTicksPerRot = 160;
   public static final int talonID = 25;
   public static final double kCloseEnough = 0.05;
+  public static final double kRezeroVelocityCloseEnough = 0.1; // FIXME: find a real value
+  public static final double kRezeroErrorCloseEnough = 0.1; // FIXME: find a real value
   public static final double kSafeToStowUpper = 40;
   public static final double kSafeToStowLower = -5;
 

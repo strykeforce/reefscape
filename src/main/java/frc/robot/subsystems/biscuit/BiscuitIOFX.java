@@ -58,6 +58,7 @@ public class BiscuitIOFX implements BiscuitIO {
     rawQuadrature.setUpdateFrequency(20);
     rawPulseWidth = talon.getRawPulseWidthPosition();
     rawPulseWidth.setUpdateFrequency(20);
+
     zero();
   }
 
@@ -70,8 +71,10 @@ public class BiscuitIOFX implements BiscuitIO {
   public void updateInputs(BiscuitIOInputs inputs) {
     inputs.velocity = velocity.getValueAsDouble();
     inputs.position = position.getValueAsDouble();
+    inputs.rawPulseWidth = rawPulseWidth.getValueAsDouble();
     inputs.didZero = didZero;
-    BaseStatusSignal.refreshAll(velocity, position);
+
+    BaseStatusSignal.refreshAll(velocity, position, rawPulseWidth);
   }
 
   @Override
@@ -84,8 +87,9 @@ public class BiscuitIOFX implements BiscuitIO {
     didZero = false;
     double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
     double setPos = BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos);
+
     talon.setPosition(setPos);
-    logger.info("set Biscuit position to " + setPos);
+    logger.info("Set Biscuit position to " + setPos);
     didZero = true;
   }
 }

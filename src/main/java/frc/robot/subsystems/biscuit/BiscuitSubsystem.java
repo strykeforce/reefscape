@@ -5,23 +5,27 @@ package frc.robot.subsystems.biscuit;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
 
+  private org.slf4j.Logger logger;
   private BiscuitIO io;
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();
   private Angle setPoint = Rotations.of(0);
 
   public BiscuitSubsystem(BiscuitIO io) {
+    this.logger = LoggerFactory.getLogger(this.getClass());
     this.io = io;
   }
 
@@ -58,13 +62,21 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+
     Logger.processInputs(getName(), inputs);
     Logger.recordOutput("Biscuit setPoint", setPoint.in(Rotations));
     Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
 
-    if(inputs.position == BiscuitConstants.kCloseEnough && offset > 0) {
+    double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
+    double error =
+        Math.abs(BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos) - inputs.position);
+
+    if (setPoint == BiscuitConstants.kStowSetpoint
+        && isFinished()
+        && inputs.velocity < BiscuitConstants.kRezeroVelocityCloseEnough
+        && error >= BiscuitConstants.kRezeroErrorCloseEnough) {
+      logger.info("Rezeroing Biscuit");
       zero();
-      Logger.error("error");
     }
   }
 
