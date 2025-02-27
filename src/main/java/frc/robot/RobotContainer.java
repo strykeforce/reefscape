@@ -280,7 +280,7 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Match")
     .addBoolean("Has Coral", () -> robotStateSubsystem.hasCoral())
-    .withPosition(3, 1)
+    .withPosition(3, 2)
     .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
@@ -337,7 +337,7 @@ private void configurePitDashboard(){
 
         Shuffleboard.getTab("Pit")
         .add("Stop Azimuths", new StopAllAxisCommand(robotStateSubsystem))
-        .withPosition(9, 1)
+        .withPosition(5, 1)
         .withSize(1, 1);
 
         Shuffleboard.getTab("Pit")
