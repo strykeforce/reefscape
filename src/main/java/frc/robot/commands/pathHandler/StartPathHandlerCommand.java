@@ -19,6 +19,7 @@ public class StartPathHandlerCommand extends Command {
     pathHandler.setNodeLevels(NodeLevels);
     pathHandler.setStartNode(startNode);
     pathHandler.setMirrorToProcessor(mirrorToProcessor);
+    this.pathHandler = pathHandler;
   }
 
   public StartPathHandlerCommand(PathHandler pathHandler) {

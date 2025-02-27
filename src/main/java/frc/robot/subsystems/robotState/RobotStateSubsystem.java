@@ -29,7 +29,7 @@ import org.strykeforce.telemetry.measurable.Measure;
 public class RobotStateSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private Alliance allianceColor = Alliance.Blue;
+  private Alliance allianceColor = Alliance.Red;
 
   private AlgaeSubsystem algaeSubsystem;
   private BattMonSubsystem battMonSubsystem;

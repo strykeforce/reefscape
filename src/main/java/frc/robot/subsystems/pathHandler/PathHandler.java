@@ -12,6 +12,7 @@ import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,8 +30,8 @@ public class PathHandler extends MeasurableSubsystem {
   // parameters
   private String[][] pathNames =
       PathHandlerConstants.kShallowPathNames; // the array of paths, in string form
-  private List<Character> nodeNames; // the list of nodes, in order, to score on
-  private List<Integer> nodeLevels; // the list of levels, in order, to score on
+  private List<Character> nodeNames = new ArrayList<>(); // the list of nodes, in order, to score on
+  private List<Integer> nodeLevels = new ArrayList<>(); // the list of levels, in order, to score on
   private Character startNode = 'a'; // the node that the robot starts in front of
   private boolean mirrorToProcessor =
       false; // whether the robot starts and fetches on the processor side.
@@ -38,8 +39,8 @@ public class PathHandler extends MeasurableSubsystem {
   private PathStates curState = PathStates.DONE;
   private boolean isHandling = false;
   private Timer timer = new Timer();
-  private List<Trajectory<SwerveSample>> fetchPaths;
-  private List<Trajectory<SwerveSample>> placePaths;
+  private List<Trajectory<SwerveSample>> fetchPaths = new ArrayList<>();
+  private List<Trajectory<SwerveSample>> placePaths = new ArrayList<>();
   private Trajectory<SwerveSample> currPath;
   private String currPathString;
   private boolean runningPath = false;
@@ -53,7 +54,7 @@ public class PathHandler extends MeasurableSubsystem {
     this.driveSubsystem = driveSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
-    // reassignAlliance();
+    reassignAlliance();
   }
 
   public PathHandler(
@@ -118,16 +119,25 @@ public class PathHandler extends MeasurableSubsystem {
     Optional<Trajectory<SwerveSample>> temp;
     for (int i = 0; i < 12; i++) {
       logger.info(i + "");
-      temp = Choreo.loadTrajectory(pathNames[i][0]);
-      fetchPaths.add(temp.get());
-      temp = Choreo.loadTrajectory(pathNames[i][1]);
-      placePaths.add(temp.get());
+      temp = Choreo.loadTrajectory(pathNames[0][i]);
+      if (!temp.isEmpty()) {
+        fetchPaths.add(temp.get());
+      } else {
+        logger.error("path does not exist: {}", pathNames[0][i]);
+      }
+      temp = Choreo.loadTrajectory(pathNames[0][i]);
+      if (!temp.isEmpty()) {
+        placePaths.add(temp.get());
+      } else {
+        logger.error("path does not exist: {}", pathNames[0][i]);
+      }
     }
   }
 
   private void startPath(Trajectory<SwerveSample> path) {
     if (isHandling && path != null) {
       driveSubsystem.setAutoDebugMsg("Start " + currPathString);
+      logger.info("start Path:" + currPathString);
       currPath = path;
       runningPath = true;
       timer.stop();
@@ -154,6 +164,7 @@ public class PathHandler extends MeasurableSubsystem {
         timer.reset();
         driveSubsystem.calculateController(
             mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()));
+        driveSubsystem.drive(0, 0, 0);
         if (curState == PathStates.DRIVE_FETCH) {
           curState = PathStates.FETCH;
         } else if (curState == PathStates.DRIVE_PLACE) {
@@ -192,10 +203,12 @@ public class PathHandler extends MeasurableSubsystem {
   private Trajectory<SwerveSample> nextPath() {
     if (nodeNames.size() > 0) {
       if (curState == PathStates.DRIVE_FETCH) {
-        currPathString = pathNames[nodeNames.get(0) - 'a'][0];
+        logger.info("drfd:" + nodeNames.get(0));
+        logger.info("drfd:" + (nodeNames.get(0) - 'a'));
+        currPathString = pathNames[0][nodeNames.get(0) - 'a'];
         return fetchPaths.get(nodeNames.get(0) - 'a');
       } else if (curState == PathStates.DRIVE_PLACE) {
-        currPathString = pathNames[nodeNames.get(0) - 'a'][1];
+        currPathString = pathNames[1][nodeNames.get(0) - 'a'];
         return placePaths.get(nodeNames.get(0) - 'a');
       }
     } else {
@@ -258,10 +271,10 @@ public class PathHandler extends MeasurableSubsystem {
               DriveConstants.kFieldMaxY - sample.y,
               sample.heading * -1,
               sample.vx,
-              DriveConstants.kFieldMaxY - sample.vy,
+              sample.vy * -1,
               sample.omega * -1,
               sample.ax,
-              DriveConstants.kFieldMaxY - sample.ay,
+              sample.ay * -1,
               sample.alpha * -1,
               sample.moduleForcesX(),
               new double[] {
@@ -280,6 +293,8 @@ public class PathHandler extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    org.littletonrobotics.junction.Logger.recordOutput("PathHandler/State", curState);
+    org.littletonrobotics.junction.Logger.recordOutput("PathHandler/curPath", currPathString);
     switch (curState) {
       case DRIVE_FETCH -> {
         if (!runningPath) {

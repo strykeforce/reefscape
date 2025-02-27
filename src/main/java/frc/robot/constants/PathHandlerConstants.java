@@ -3,20 +3,6 @@ package frc.robot.constants;
 public class PathHandlerConstants {
   public static final String[][] kShallowPathNames = {
     {
-      "fetchToA",
-      "fetchToB",
-      "FiveMeterTestPath",
-      "FiveMeterTestPath",
-      "FiveMeterTestPath",
-      "fetchToF",
-      "fetchToG",
-      "fetchToH",
-      "fetchToI",
-      "fetchToJ",
-      "fetchToK",
-      "fetchToL"
-    },
-    {
       "ATofetch",
       "BTofetch",
       "FiveMeterTestPath",
@@ -29,6 +15,20 @@ public class PathHandlerConstants {
       "JTofetch",
       "KTofetch",
       "LTofetch"
+    },
+    {
+      "fetchToA",
+      "fetchToB",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchToF",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchToI",
+      "fetchToJ",
+      "fetchToK",
+      "fetchToL"
     }
   };
 }

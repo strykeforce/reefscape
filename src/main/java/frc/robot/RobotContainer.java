@@ -6,8 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import java.util.List;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -49,7 +47,6 @@ import frc.robot.commands.robotState.setScoreSideLeftCommand;
 import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
-import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
@@ -76,6 +73,8 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -469,9 +468,9 @@ public class RobotContainer {
                 elevatorSubsystem,
                 tagAlignSubsystem,
                 "startToJ",
-                List.of('K', 'L', 'M'),
-                List.of(4, 4, 4),
-                'J'))
+                new ArrayList<Character>(Arrays.asList('k', 'l', 'm')),
+                new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+                'j'))
         .withPosition(3, 0)
         .withSize(1, 1);
   }

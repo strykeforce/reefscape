@@ -124,7 +124,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
         holoContOutput.vxMetersPerSecond,
         holoContOutput.vyMetersPerSecond,
         holoContOutput.omegaRadiansPerSecond,
-        false);
+        true);
   }
 
   // Choreo Holonomic Controller

@@ -82,11 +82,13 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   }
 
   private Pose2d mirrorToProcessor(Pose2d pose) {
-    pose =
-        new Pose2d(
-            pose.getX(),
-            DriveConstants.kFieldMaxY - pose.getY(),
-            Rotation2d.fromDegrees(pose.getRotation().getDegrees() * -1));
+    if (mirrorToProcessor) {
+      pose =
+          new Pose2d(
+              pose.getX(),
+              DriveConstants.kFieldMaxY - pose.getY(),
+              Rotation2d.fromDegrees(pose.getRotation().getDegrees() * -1));
+    }
     return pose;
   }
 

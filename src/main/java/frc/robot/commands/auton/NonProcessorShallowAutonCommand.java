@@ -18,7 +18,8 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import java.util.List;
 
-public class NonProcessorShallowAutonCommand extends SequentialCommandGroup {
+public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
+    implements AutoCommandInterface {
 
   private PathHandler pathHandler;
   private DriveSubsystem driveSubsystem;
@@ -42,12 +43,14 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup {
     this.pathHandler = pathHandler;
     this.driveSubsystem = driveSubsystem;
 
-    startPath = new DriveAutonCommand(driveSubsystem, startPathName, false, true, false);
+    startPath = new DriveAutonCommand(driveSubsystem, startPathName, true, true, false);
 
     addCommands(
         new SequentialCommandGroup(
             new ParallelCommandGroup(
                 new ZeroElevatorCommand(elevatorSubsystem),
+                // new ResetOdometryCommand(
+                // driveSubsystem, new Pose2d(7.1008875, 5.0756788, new Rotation2d(180))),
                 new SequentialCommandGroup(
                     new ResetGyroCommand(driveSubsystem),
                     new SetGyroOffsetCommand(driveSubsystem, new Rotation2d(180)))),
@@ -61,6 +64,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup {
                 false)));
   }
 
+  @Override
   public void reassignAlliance() {
     startPath.reassignAlliance();
   }
