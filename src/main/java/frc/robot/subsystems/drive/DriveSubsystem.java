@@ -105,6 +105,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   // Choreo Holonomic Controller
   public void calculateController(SwerveSample desiredState) {
+    Logger.recordOutput("DriveSubsystem/desiredPose", desiredState.getPose());
     holoContInput = desiredState;
     double xFF = desiredState.vx;
     double yFF = desiredState.vy;

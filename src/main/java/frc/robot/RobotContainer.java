@@ -118,6 +118,8 @@ public class RobotContainer {
 
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
+  private NonProcessorShallowAutonCommand nonProcessorShallowAutonCommand;
+
   public RobotContainer() {
 
     algaeIO = new AlgaeIOFX();
@@ -166,6 +168,23 @@ public class RobotContainer {
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
     pathHandler = new PathHandler(driveSubsystem, tagAlignSubsystem, robotStateSubsystem);
+
+    nonProcessorShallowAutonCommand =
+        new NonProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            "startToJ",
+            new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
+            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            'j');
+
+    nonProcessorShallowAutonCommand.reassignAlliance();
 
     configureTelemetry();
     configureDriverBindings();
@@ -456,21 +475,7 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add(
-            "Start Auton",
-            new NonProcessorShallowAutonCommand(
-                driveSubsystem,
-                pathHandler,
-                robotStateSubsystem,
-                algaeSubsystem,
-                biscuitSubsystem,
-                coralSubsystem,
-                elevatorSubsystem,
-                tagAlignSubsystem,
-                "startToJ",
-                new ArrayList<Character>(Arrays.asList('k', 'l', 'm')),
-                new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
-                'j'))
+        .add("Start Auton", nonProcessorShallowAutonCommand)
         .withPosition(3, 0)
         .withSize(1, 1);
   }

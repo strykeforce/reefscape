@@ -38,7 +38,8 @@ public class PathHandler extends MeasurableSubsystem {
 
   private PathStates curState = PathStates.DONE;
   private boolean isHandling = false;
-  private Timer timer = new Timer();
+  private Timer pathTimer = new Timer();
+  private Timer waitingTimer = new Timer();
   private List<Trajectory<SwerveSample>> fetchPaths = new ArrayList<>();
   private List<Trajectory<SwerveSample>> placePaths = new ArrayList<>();
   private Trajectory<SwerveSample> currPath;
@@ -125,7 +126,7 @@ public class PathHandler extends MeasurableSubsystem {
       } else {
         logger.error("path does not exist: {}", pathNames[0][i]);
       }
-      temp = Choreo.loadTrajectory(pathNames[0][i]);
+      temp = Choreo.loadTrajectory(pathNames[1][i]);
       if (!temp.isEmpty()) {
         placePaths.add(temp.get());
       } else {
@@ -135,14 +136,16 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private void startPath(Trajectory<SwerveSample> path) {
+    waitingTimer.stop();
+    waitingTimer.reset();
     if (isHandling && path != null) {
       driveSubsystem.setAutoDebugMsg("Start " + currPathString);
       logger.info("start Path:" + currPathString);
       currPath = path;
       runningPath = true;
-      timer.stop();
-      timer.reset();
-      timer.start();
+      pathTimer.stop();
+      pathTimer.reset();
+      pathTimer.start();
       driveSubsystem.calculateController(
           mirrorToProcessor(currPath.getInitialSample(mirrorTrajectory).get()));
       if (curState == PathStates.PLACE) {
@@ -156,19 +159,21 @@ public class PathHandler extends MeasurableSubsystem {
   private void drivePath() {
     if (isHandling && runningPath && currPath != null) {
       driveSubsystem.calculateController(
-          mirrorToProcessor(currPath.sampleAt(timer.get(), mirrorTrajectory).get()));
-      if (timer.hasElapsed(currPath.getTotalTime())) {
+          mirrorToProcessor(currPath.sampleAt(pathTimer.get(), mirrorTrajectory).get()));
+      if (pathTimer.hasElapsed(currPath.getTotalTime())) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
-        timer.stop();
-        timer.reset();
+        pathTimer.stop();
+        pathTimer.reset();
         driveSubsystem.calculateController(
             mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()));
         driveSubsystem.drive(0, 0, 0);
         if (curState == PathStates.DRIVE_FETCH) {
           curState = PathStates.FETCH;
+          waitingTimer.start();
         } else if (curState == PathStates.DRIVE_PLACE) {
           curState = PathStates.PLACE;
+          waitingTimer.start();
         }
       } else if (shouldTransitionToServoing()) {
         curState = PathStates.DRIVE_PLACE_SERVO;
@@ -180,21 +185,23 @@ public class PathHandler extends MeasurableSubsystem {
   private void drivePathServo() {
     if (isHandling && runningPath && currPath != null && isServoing) {
       driveSubsystem.calculateControllerServo(
-          mirrorToProcessor(currPath.sampleAt(timer.get(), mirrorTrajectory).get()),
+          mirrorToProcessor(currPath.sampleAt(pathTimer.get(), mirrorTrajectory).get()),
           tagAlignSubsystem.calculateAlignY());
-      if (timer.hasElapsed(currPath.getTotalTime())) {
+      if (pathTimer.hasElapsed(currPath.getTotalTime())) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
-        timer.stop();
-        timer.reset();
+        pathTimer.stop();
+        pathTimer.reset();
         driveSubsystem.calculateControllerServo(
             mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()), 0.0);
         if (curState == PathStates.DRIVE_FETCH) {
           curState = PathStates.FETCH;
+          waitingTimer.start();
         } else if (curState == PathStates.DRIVE_PLACE_SERVO) {
           isServoing = false;
           robotStateSubsystem.toPrepCoral();
           curState = PathStates.PLACE;
+          waitingTimer.start();
         }
       }
     }
@@ -202,14 +209,20 @@ public class PathHandler extends MeasurableSubsystem {
 
   private Trajectory<SwerveSample> nextPath() {
     if (nodeNames.size() > 0) {
-      if (curState == PathStates.DRIVE_FETCH) {
-        logger.info("drfd:" + nodeNames.get(0));
-        logger.info("drfd:" + (nodeNames.get(0) - 'a'));
-        currPathString = pathNames[0][nodeNames.get(0) - 'a'];
-        return fetchPaths.get(nodeNames.get(0) - 'a');
-      } else if (curState == PathStates.DRIVE_PLACE) {
-        currPathString = pathNames[1][nodeNames.get(0) - 'a'];
-        return placePaths.get(nodeNames.get(0) - 'a');
+      int index;
+      char nextNode = nodeNames.get(0);
+      if (nextNode >= 97 && nextNode <= 108) {
+        index = nextNode - 'a';
+        if (curState == PathStates.DRIVE_FETCH) {
+          currPathString = pathNames[0][index];
+          return fetchPaths.get(index);
+        } else if (curState == PathStates.DRIVE_PLACE) {
+          currPathString = pathNames[1][index];
+          return placePaths.get(index);
+        }
+      } else {
+        logger.error("Bad node name! Check the node list for upper case and any letter past \"l\"");
+        killPathHandler();
       }
     } else {
       killPathHandler();
@@ -219,9 +232,9 @@ public class PathHandler extends MeasurableSubsystem {
 
   private void advanceNodes() {
     if (nodeNames.size() > 0) {
-      nodeNames.remove(0);
       tagAlignSubsystem.setup(
           mirrorTrajectory ? Alliance.Red : Alliance.Blue, (nodeNames.get(0) - 'a') % 2 == 0);
+      nodeNames.remove(0);
     }
   }
 
@@ -230,8 +243,8 @@ public class PathHandler extends MeasurableSubsystem {
     curState = PathStates.DONE;
     runningPath = false;
     robotStateSubsystem.setIsAutoPlacing(true);
-    timer.stop();
-    timer.reset();
+    pathTimer.stop();
+    pathTimer.reset();
   }
 
   public void killPathHandlerAfterPath() {
@@ -257,9 +270,10 @@ public class PathHandler extends MeasurableSubsystem {
           FastMath.abs(pos - goal) < FastMath.toRadians(TagServoingConstants.kAngleCloseEnough);
     }
     return curState == PathStates.DRIVE_PLACE
-        && timer.hasElapsed(currPath.getTotalTime() - 1.0)
+        && pathTimer.hasElapsed(currPath.getTotalTime() - 1.0)
         // && TagAlignSubsystem.canSeeTag(desiredTag)
-        && isCloseEnough;
+        && isCloseEnough
+        && false; // TODO remove, this is for testing
   }
 
   private SwerveSample mirrorToProcessor(SwerveSample sample) {
@@ -303,7 +317,10 @@ public class PathHandler extends MeasurableSubsystem {
         drivePath();
       }
       case FETCH -> {
-        if (robotStateSubsystem.hasCoral()) {
+        if (
+        // robotStateSubsystem.hasCoral() ||
+        // (robotStateSubsystem.hasCoralAuton() &&
+        waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)) {
           advanceNodes();
           curState = PathStates.DRIVE_PLACE;
         }
@@ -323,7 +340,9 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case PLACE -> {
-        if (!robotStateSubsystem.hasCoral()) {
+        if (
+        // !robotStateSubsystem.hasCoral() &&
+        waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)) {
           curState = PathStates.DRIVE_FETCH;
         }
       }

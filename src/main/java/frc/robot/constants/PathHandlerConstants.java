@@ -31,4 +31,5 @@ public class PathHandlerConstants {
       "fetchToL"
     }
   };
+  public static final double kWaitingTime = 2.0;
 }
