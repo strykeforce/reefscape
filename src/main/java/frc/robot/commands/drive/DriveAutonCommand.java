@@ -65,10 +65,10 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
               DriveConstants.kFieldMaxY - sample.y,
               sample.heading * -1,
               sample.vx,
-              DriveConstants.kFieldMaxY - sample.vy,
+              sample.vy * -1,
               sample.omega * -1,
               sample.ax,
-              DriveConstants.kFieldMaxY - sample.ay,
+              sample.ay * -1,
               sample.alpha * -1,
               sample.moduleForcesX(),
               new double[] {
