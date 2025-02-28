@@ -171,6 +171,16 @@ public class SwerveFXS implements SwerveIO, Checkable {
     return new ChassisSpeeds(fieldX, fieldY, roboRelSpeed.omegaRadiansPerSecond);
   }
 
+  public double getAvgDriveCurrent() {
+    double sum = 0;
+
+    for (int i = 0; i < 4; i++) {
+      sum += drives[i].getSupplyCurrent().getValueAsDouble();
+    }
+
+    return sum / 4.0;
+  }
+
   @Override
   public void setOdometry(OdometryStrategy odom) {
     swerveDrive.setOdometry(odom);
@@ -258,6 +268,7 @@ public class SwerveFXS implements SwerveIO, Checkable {
       inputs.azimuthVels[i] = azimuths[i].getVelocity().getValueAsDouble();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent().getValueAsDouble();
     }
+    inputs.avgDriveCurrent = getAvgDriveCurrent();
     inputs.robotRelSpeed = getRobotRelSpeed();
     inputs.fieldRelSpeed = getFieldRelSpeed(inputs.robotRelSpeed);
     inputs.fieldY = fieldY;

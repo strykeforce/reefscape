@@ -366,6 +366,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
         omegaController.getP(), omegaController.getI(), omegaController.getD());
   }
 
+  public double getAvgDriveCurrent() {
+    return inputs.avgDriveCurrent;
+  }
+
   public void setDriveMultiplier(double multiplier) {
     driveMultiplier = multiplier;
   }

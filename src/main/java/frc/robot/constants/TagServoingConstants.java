@@ -55,10 +55,15 @@ public class TagServoingConstants {
   public static final double kAlgaeAlignRadius = 1.27;
   public static final double kAlgaeStopXDriveRadius =
       kAlgaeInitialDriveRadius; // Should be closer to reef than target pose
+  // public static final double kMinVelX = 0.85;
+
+  // End conditions
   public static final double kInitialCloseEnough = 0.1;
   public static final double kCoralDriveCloseEnough = 0.015;
   public static final double kAlgaeDriveCloseEnough = 0.015;
-  public static final double kMinVelX = 0.85;
+
+  public static final double kEndDriveCurrentThreshold = 10;
+  public static final double kCurrentCountThreshold = 3;
 
   // Reef
   public static final Translation2d kBlueReefPose = new Translation2d(4.489323, 4.0259);

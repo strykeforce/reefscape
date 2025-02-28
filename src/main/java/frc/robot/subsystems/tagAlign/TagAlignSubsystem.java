@@ -28,6 +28,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private ProfiledPIDController alignY;
   // private ProfiledPIDController alignOmega;
 
+  // private ProfiledPIDController servoX;
+  // private ProfiledPIDController servoY;
+
   private TagAlignStates curState = TagAlignStates.DONE;
 
   // Set by start()
@@ -43,6 +46,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private double driveCloseEnough = TagServoingConstants.kCoralDriveCloseEnough;
   private boolean proceedToAlign = false;
   private boolean scoreLeft = true;
+  private int currentThresCount = 0;
 
   // private long startServoTime;
 
@@ -62,6 +66,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     // this.alignOmega =
     //     new ProfiledPIDController(6.0, 0, 0, TagServoingConstants.alignOmegaConstraints);
     // this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
+
+    // If we revisit tag servoing later...
+    // this.servoX =
+    //     new ProfiledPIDController(4, 0, 0, TagServoingConstants.alignXConstraints); 
+    // this.servoY = new ProfiledPIDController(4, 0, 0, TagServoingConstants.alignYConstraints);
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", -1);
   }
@@ -154,6 +163,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             : TagServoingConstants.kCoralInitialDriveRadius;
     this.algae = algae;
     this.driveCloseEnough = TagServoingConstants.kInitialCloseEnough;
+    this.currentThresCount = 0;
 
     targetPose = getTargetDrivePose(alliance, scoreLeft);
     // Inverted, scoring left coral means aligning right camera
@@ -294,6 +304,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             Logger.recordOutput("TagAlignSubsystem/DriveXError", alignX.getPositionError());
             Logger.recordOutput("TagAlignSubsystem/DriveYError", alignY.getPositionError());
           }
+          default -> {}
         }
 
         Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getPositionError());
@@ -349,9 +360,16 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               }
             }
             case TAG_ALIGN -> {
-              if (FastMath.hypot(poseError.getX(), poseError.getY()) < driveCloseEnough) {
-                terminate();
-                break;
+              if (FastMath.hypot(poseError.getX(), poseError.getY()) < driveCloseEnough
+                  || driveSubsystem.getAvgDriveCurrent()
+                      > TagServoingConstants.kEndDriveCurrentThreshold) {
+                currentThresCount++;
+                if (currentThresCount >= TagServoingConstants.kCurrentCountThreshold) {
+                  terminate();
+                  break;
+                }
+              } else {
+                currentThresCount = 0;
               }
             }
           }
