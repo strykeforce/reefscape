@@ -92,4 +92,24 @@ public class BiscuitIOFX implements BiscuitIO {
     logger.info("Set Biscuit position to " + setPos);
     didZero = true;
   }
+
+  @Override
+    public void hasAlgae(boolean enabled) {
+    talonfxs
+        .getConfigurator()
+        .apply(
+            BiscuitConstants.getFXSConfig()
+                .MotionMagicConfigs
+                .withMotionMagicAcceleration(BiscuitConstants.kHasAlgaeSpeed));
+  }
+
+  @Override
+    public void doesntHaveAlgae(boolean enabled) {
+    talonfxs
+        .getConfigurator()
+        .apply(
+            BiscuitConstants.getFXSConfig()
+                .MotionMagicConfigs
+                .withMotionMagicAcceleration(BiscuitConstants.kDoesntHaveAlgaeSpeed));
+  }
 }

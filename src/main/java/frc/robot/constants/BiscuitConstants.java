@@ -33,6 +33,9 @@ public class BiscuitConstants {
   public static final double kSafeToStowUpper = 40;
   public static final double kSafeToStowLower = -5;
 
+  // Speeds
+  public static final double kDosntHaveAlgaeSpeed = 500;
+
   // Setpoints
   // Idle
   public static final Angle kStowSetpoint = Rotations.of(1.862);
@@ -125,7 +128,7 @@ public class BiscuitConstants {
 
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs()
-            .withMotionMagicAcceleration(500)
+            .withMotionMagicAcceleration(kDosntHaveAlgaeSpeed)
             .withMotionMagicCruiseVelocity(100)
             .withMotionMagicExpo_kA(0)
             .withMotionMagicExpo_kV(0)
