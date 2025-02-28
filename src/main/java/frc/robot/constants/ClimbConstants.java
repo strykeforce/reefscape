@@ -17,75 +17,26 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
+//import edu.wpi.first.units.measure.AngularVelocity;
 
 public class ClimbConstants {
-  public static int kWheelFxId = 0;
-  public static int kArmFxId = 0;
+  public static int kPivotArmFrontFxId = 45;
+  public static int kPivotArmFollowFxId = 46;
+  public static int kCANcoderId = 47; 
+  public static int kDeployServoId = 1; //the servo to release the pin
+  public static int kRatchetServoId = 2; 
+  public static int kCageAlignedDIOId = 11;
 
-  public static final AngularVelocity kWheelCloseEnough = DegreesPerSecond.of(5.0);
-  public static final Angle kArmCloseEnough = Degrees.of(5.0);
+  public static final Angle kPivotArmCloseEnough = Degrees.of(5.0); //all of these arbitrary numbers
   public static final Angle kArmMaxFwd = Degrees.of(100);
   public static final Angle kArmMaxRev = Degrees.of(-100);
   public static final Angle kArmZeroTicks = Degrees.of(1530);
+  public static final Angle kPinDeployedPosition = Degrees.of(500);
+  public static final Angle kPinRetractedPosition = Degrees.of(0);
 
-  public static TalonFXConfiguration getWheelFXConfig() {
-    TalonFXConfiguration wheelFxConfig = new TalonFXConfiguration();
-
-    CurrentLimitsConfigs current =
-        new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(10)
-            .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20)
-            .withSupplyCurrentLimit(10)
-            .withSupplyCurrentLowerLimit(8)
-            .withSupplyCurrentLowerTime(0.02)
-            .withSupplyCurrentLimitEnable(true);
-    wheelFxConfig.CurrentLimits = current;
-
-    HardwareLimitSwitchConfigs hwLimit =
-        new HardwareLimitSwitchConfigs()
-            .withForwardLimitAutosetPositionEnable(false)
-            .withForwardLimitEnable(false)
-            .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen)
-            .withForwardLimitSource(ForwardLimitSourceValue.LimitSwitchPin)
-            .withReverseLimitAutosetPositionEnable(false)
-            .withReverseLimitEnable(false)
-            .withReverseLimitType(ReverseLimitTypeValue.NormallyOpen)
-            .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin);
-    wheelFxConfig.HardwareLimitSwitch = hwLimit;
-
-    Slot0Configs slot0 =
-        new Slot0Configs()
-            .withKP(0)
-            .withKI(0)
-            .withKD(0)
-            .withGravityType(GravityTypeValue.Elevator_Static)
-            .withKG(0)
-            .withKS(0)
-            .withKV(0)
-            .withKA(0);
-    wheelFxConfig.Slot0 = slot0;
-
-    MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(0)
-            .withMotionMagicCruiseVelocity(0)
-            .withMotionMagicExpo_kA(0)
-            .withMotionMagicExpo_kV(0)
-            .withMotionMagicJerk(0);
-    wheelFxConfig.MotionMagic = motionMagic;
-
-    MotorOutputConfigs motorOut =
-        new MotorOutputConfigs()
-            .withDutyCycleNeutralDeadband(0.01)
-            .withNeutralMode(NeutralModeValue.Coast);
-    wheelFxConfig.MotorOutput = motorOut;
-
-    return wheelFxConfig;
-  }
-
-  public static TalonFXConfiguration getArmFxConfig() {
+  //Climb positions
+  public static final Angle kClimbCagePos = Degrees.of(3);
+  public static TalonFXConfiguration getPivotArmFxConfig() {
     TalonFXConfiguration armFxConfig = new TalonFXConfiguration();
 
     CurrentLimitsConfigs current =
@@ -148,4 +99,15 @@ public class ClimbConstants {
 
     return armFxConfig;
   }
+
+  public static CurrentLimitsConfigs getZeroCurrentLimit() {
+    CurrentLimitsConfigs config = new CurrentLimitsConfigs();
+    return config;
+  }
+
+  public static CurrentLimitsConfigs getRunCurrentLimit() {
+    CurrentLimitsConfigs config = new CurrentLimitsConfigs();
+    return config;
+  }
+
 }
