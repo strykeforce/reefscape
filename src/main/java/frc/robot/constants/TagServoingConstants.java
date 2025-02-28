@@ -11,7 +11,7 @@ public class TagServoingConstants {
 
   // Offsets
   public static final double kLeftCamOffset = VisionConstants.kCam1Pose.getY();
-  public static final double kRightCamOffset = VisionConstants.kCam2Pose.getY();
+  public static final double kRightCamOffset = VisionConstants.kCam3Pose.getY();
 
   // Targets
   public static final double kHorizontalTarget = 800;
@@ -19,13 +19,13 @@ public class TagServoingConstants {
   public static final double kRightCamDiagTarget = 985;
 
   // Constraints
-  public static final Constraints driveXConstraints = new Constraints(2000, 2000);
-  public static final Constraints driveYConstraints = new Constraints(2000, 3000);
-  public static final Constraints driveOmegaConstraints = new Constraints(1000, 2000);
+  public static final Constraints driveXConstraints = new Constraints(2, 100000);
+  public static final Constraints driveYConstraints = new Constraints(2, 100000);
+  public static final Constraints driveOmegaConstraints = new Constraints(10000, 20000);
 
-  public static final Constraints alignXConstraints = new Constraints(1, 1.0);
-  public static final Constraints alignYConstraints = new Constraints(1, 1.5);
-  public static final Constraints alignOmegaConstraints = new Constraints(1, 1);
+  public static final Constraints alignXConstraints = new Constraints(2, 100000);
+  public static final Constraints alignYConstraints = new Constraints(2, 100000);
+  public static final Constraints alignOmegaConstraints = new Constraints(10000, 20000);
 
   public static final double[] kAngleTarget = {
     Units.degreesToRadians(0),
@@ -47,18 +47,21 @@ public class TagServoingConstants {
   public static final double kNoUpdateMicrosec = 500_000;
 
   // Drive
-  public static final double kCoralInitialDriveRadius = 1.7; // 1.5
-  public static final double kCoralStopXDriveRadius =
-      kCoralInitialDriveRadius; // Should be closer to reef than target pose
+  public static final double kCoralInitialDriveRadius = 1.7; // 0.36 away from reef wall
+  public static final double kCoralAlignRadius = 1.27;
+  // public static final double kCoralStopXDriveRadius =
+  //     kCoralInitialDriveRadius; // Should be closer to reef than target pose
   public static final double kAlgaeInitialDriveRadius = 1.6;
+  public static final double kAlgaeAlignRadius = 1.27;
   public static final double kAlgaeStopXDriveRadius =
       kAlgaeInitialDriveRadius; // Should be closer to reef than target pose
-  public static final double kCoralDriveCloseEnough = 0.1;
-  public static final double kAlgaeDriveCloseEnough = 0.1;
+  public static final double kInitialCloseEnough = 0.1;
+  public static final double kCoralDriveCloseEnough = 0.015;
+  public static final double kAlgaeDriveCloseEnough = 0.015;
   public static final double kMinVelX = 0.85;
 
   // Reef
-  public static final Translation2d kBlueReefPose = new Translation2d(4.524, 4.033);
+  public static final Translation2d kBlueReefPose = new Translation2d(4.489323, 4.0259);
 
-  public static final Translation2d kRedReefPose = new Translation2d(13.084, 4.033);
+  public static final Translation2d kRedReefPose = new Translation2d(13.058902, 4.0259);
 }

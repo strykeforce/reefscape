@@ -1,7 +1,5 @@
 package frc.robot.subsystems.tagAlign;
 
-import WallEye.Point;
-import WallEye.WallEyeTagResult;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,7 +7,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -29,47 +26,44 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   private ProfiledPIDController alignX;
   private ProfiledPIDController alignY;
-  private ProfiledPIDController alignOmega;
+  // private ProfiledPIDController alignOmega;
 
   private TagAlignStates curState = TagAlignStates.DONE;
 
   // Set by start()
   private Pose2d targetPose;
-  private int targetCamId;
-  private int targetTagId;
+  // private int targetCamId;
+  // private int targetTagId;
   private int fieldRelHexant;
   private Alliance alliance = Alliance.Blue;
-  private double goalTargetDiag;
-  private double stopXRadius = TagServoingConstants.kCoralStopXDriveRadius;
+  // private double goalTargetDiag;
+  // private double stopXRadius = TagServoingConstants.kCoralStopXDriveRadius;
   private double driveRadius = TagServoingConstants.kCoralInitialDriveRadius;
   private boolean algae = false;
   private double driveCloseEnough = TagServoingConstants.kCoralDriveCloseEnough;
   private boolean proceedToAlign = false;
+  private boolean scoreLeft = true;
 
-  private long startServoTime;
+  // private long startServoTime;
 
   public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.visionSubsystem = visionSubsystem;
 
-    this.driveX = new ProfiledPIDController(1.66, 0, 0, TagServoingConstants.driveXConstraints);
-    this.driveY = new ProfiledPIDController(1.66, 0, 0, TagServoingConstants.driveYConstraints);
+    this.driveX = new ProfiledPIDController(4, 0, 0, TagServoingConstants.driveXConstraints);
+    this.driveY = new ProfiledPIDController(4, 0, 0, TagServoingConstants.driveYConstraints);
     this.driveOmega =
         new ProfiledPIDController(6.0, 0, 0, TagServoingConstants.driveOmegaConstraints);
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     this.alignX =
-        new ProfiledPIDController(0.0017, 0, 0, TagServoingConstants.alignXConstraints); // 0.0015
-    this.alignY = new ProfiledPIDController(0.00195, 0, 0, TagServoingConstants.alignYConstraints);
-    this.alignOmega =
-        new ProfiledPIDController(6.0, 0, 0, TagServoingConstants.alignOmegaConstraints);
-    this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
+        new ProfiledPIDController(4, 0, 0, TagServoingConstants.alignXConstraints); // 0.0015
+    this.alignY = new ProfiledPIDController(4, 0, 0, TagServoingConstants.alignYConstraints);
+    // this.alignOmega =
+    //     new ProfiledPIDController(6.0, 0, 0, TagServoingConstants.alignOmegaConstraints);
+    // this.alignOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
-    Logger.recordOutput("TagAlignSubsystem/TargetDiag", -1);
-    Logger.recordOutput("TagAlignSubsystem/TargetTag", -1);
-    Logger.recordOutput("TagAlignSubsystem/TargetCenterX", -1);
     Logger.recordOutput("TagAlignSubsystem/Hexant", -1);
-    Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", -1);
   }
 
   public void setProceedToAlign(boolean proceed) {
@@ -143,40 +137,38 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public void setup(Alliance alliance, boolean scoreLeft, boolean algae) {
-    targetPose = getTargetDrivePose(alliance, scoreLeft);
     this.alliance = alliance;
-    this.goalTargetDiag =
-        scoreLeft
-            ? TagServoingConstants.kRightCamDiagTarget
-            : TagServoingConstants.kLeftCamDiagTarget;
+    this.scoreLeft = scoreLeft;
+    // this.goalTargetDiag =
+    //     scoreLeft
+    //         ? TagServoingConstants.kRightCamDiagTarget
+    //         : TagServoingConstants.kLeftCamDiagTarget;
 
-    this.stopXRadius =
-        algae
-            ? TagServoingConstants.kAlgaeStopXDriveRadius
-            : TagServoingConstants.kCoralStopXDriveRadius;
+    // this.stopXRadius =
+    //     algae
+    //         ? TagServoingConstants.kAlgaeStopXDriveRadius
+    //         : TagServoingConstants.kCoralStopXDriveRadius;
     this.driveRadius =
         algae
             ? TagServoingConstants.kAlgaeInitialDriveRadius
             : TagServoingConstants.kCoralInitialDriveRadius;
     this.algae = algae;
-    this.driveCloseEnough =
-        algae
-            ? TagServoingConstants.kAlgaeDriveCloseEnough
-            : TagServoingConstants.kCoralDriveCloseEnough;
+    this.driveCloseEnough = TagServoingConstants.kInitialCloseEnough;
 
+    targetPose = getTargetDrivePose(alliance, scoreLeft);
     // Inverted, scoring left coral means aligning right camera
-    targetCamId =
-        !scoreLeft ? TagServoingConstants.kLeftServoCam : TagServoingConstants.kRightServoCam;
-    targetTagId =
-        alliance == Alliance.Blue
-            ? TagServoingConstants.kBlueTargetTag[computeHexant(alliance)]
-            : TagServoingConstants.kRedTargetTag[computeHexant(alliance)];
+    // targetCamId =
+    //     !scoreLeft ? TagServoingConstants.kLeftServoCam : TagServoingConstants.kRightServoCam;
+    // targetTagId =
+    //     alliance == Alliance.Blue
+    //         ? TagServoingConstants.kBlueTargetTag[computeHexant(alliance)]
+    //         : TagServoingConstants.kRedTargetTag[computeHexant(alliance)];
 
     fieldRelHexant = computeFieldRelHexant(alliance);
     proceedToAlign = false;
 
-    Logger.recordOutput("TagAlignSubsystem/TargetTag", targetTagId);
-    Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", goalTargetDiag);
+    // Logger.recordOutput("TagAlignSubsystem/TargetTag", targetTagId);
+    // Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", goalTargetDiag);
     Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
     Logger.recordOutput("TagAlignSubsystem/GettingAlgae", algae);
 
@@ -189,46 +181,45 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     driveY.reset(current.getY(), vY);
     driveOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
-    double robotVx = driveSubsystem.getRobotRelSpeed().vxMetersPerSecond;
-    double robotVy = driveSubsystem.getRobotRelSpeed().vyMetersPerSecond;
-
-    alignX.reset(0, robotVx);
-    alignY.reset(0, robotVy);
-    alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
+    alignX.reset(current.getX(), vX);
+    alignY.reset(current.getY(), vY);
+    // alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
   }
 
   // CALL setup() first!! Do not use in internal state machine
   public double calculateAlignY() {
-    WallEyeTagResult result = visionSubsystem.getLastResult(targetCamId);
+    return 2767;
 
-    if (result == null) {
-      return 2767;
-    }
+    // WallEyeTagResult result = visionSubsystem.getLastResult(targetCamId);
 
-    int tagIndex = -1;
-    int[] tags = result.getTagIDs();
+    // if (result == null) {
+    //   return 2767;
+    // }
 
-    for (int i = 0; i < tags.length; i++) {
-      if (tags[i] == targetTagId) {
-        tagIndex = i;
-        break;
-      }
-    }
+    // int tagIndex = -1;
+    // int[] tags = result.getTagIDs();
 
-    if (tagIndex == -1) {
-      // Target tag not found
-      return 2767;
-    }
+    // for (int i = 0; i < tags.length; i++) {
+    //   if (tags[i] == targetTagId) {
+    //     tagIndex = i;
+    //     break;
+    //   }
+    // }
 
-    Point center = result.getTagCenters().get(tagIndex);
-    double diag = result.getTagDiags()[tagIndex];
+    // if (tagIndex == -1) {
+    //   // Target tag not found
+    //   return 2767;
+    // }
 
-    Logger.recordOutput("TagAlignSubsystem/TargetDiag", diag);
-    Logger.recordOutput("TagAlignSubsystem/TargetCenterX", center.x());
+    // Point center = result.getTagCenters().get(tagIndex);
+    // double diag = result.getTagDiags()[tagIndex];
 
-    double vY = -alignY.calculate(TagServoingConstants.kHorizontalTarget - center.x(), 0);
+    // Logger.recordOutput("TagAlignSubsystem/TargetDiag", diag);
+    // Logger.recordOutput("TagAlignSubsystem/TargetCenterX", center.x());
 
-    return vY;
+    // double vY = -alignY.calculate(TagServoingConstants.kHorizontalTarget - center.x(), 0);
+
+    // return vY;
   }
 
   public void start(Alliance alliance, boolean scoreLeft, boolean algae) {
@@ -238,15 +229,35 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   private void tagAlign() {
-    double robotVx = driveSubsystem.getRobotRelSpeed().vxMetersPerSecond;
-    double robotVy = driveSubsystem.getRobotRelSpeed().vyMetersPerSecond;
+    Pose2d current = driveSubsystem.getPoseMeters();
 
-    alignX.reset(0, robotVx);
-    alignY.reset(0, robotVy);
-    alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
+    double vX = driveSubsystem.getFieldRelSpeed().vxMetersPerSecond;
+    double vY = driveSubsystem.getFieldRelSpeed().vyMetersPerSecond;
+
+    alignX.reset(current.getX(), vX);
+    alignY.reset(current.getY(), vY);
+    // alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
     curState = TagAlignStates.TAG_ALIGN;
-    startServoTime = RobotController.getFPGATime();
+
+    this.driveCloseEnough =
+        algae
+            ? TagServoingConstants.kAlgaeDriveCloseEnough
+            : TagServoingConstants.kCoralDriveCloseEnough;
+
+    // this.goalTargetDiag =
+    //     scoreLeft
+    //         ? TagServoingConstants.kRightCamDiagTarget
+    //         : TagServoingConstants.kLeftCamDiagTarget;
+
+    // this.stopXRadius =
+    //     algae
+    //         ? TagServoingConstants.kAlgaeStopXDriveRadius
+    //         : TagServoingConstants.kCoralStopXDriveRadius;
+    this.driveRadius =
+        algae ? TagServoingConstants.kAlgaeAlignRadius : TagServoingConstants.kCoralAlignRadius;
+    targetPose = getTargetDrivePose(alliance, scoreLeft);
+    Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
   }
 
   public void terminate() {
@@ -261,14 +272,29 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     // Logger.recordOutput("TagAlignSubsystem/Hexant", computeHexant(alliance));
 
     switch (curState) {
-      case DRIVE -> {
+      case DRIVE, TAG_ALIGN -> {
         Pose2d current = driveSubsystem.getPoseMeters();
 
-        double vX = driveX.calculate(current.getX(), targetPose.getX());
-        double vY = driveY.calculate(current.getY(), targetPose.getY());
+        double vX = 0;
+        double vY = 0;
         double vOmega =
             driveOmega.calculate(
                 current.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+        switch (curState) {
+          case DRIVE -> {
+            vX = driveX.calculate(current.getX(), targetPose.getX());
+            vY = driveY.calculate(current.getY(), targetPose.getY());
+            Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getPositionError());
+            Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getPositionError());
+          }
+          case TAG_ALIGN -> {
+            vX = alignX.calculate(current.getX(), targetPose.getX());
+            vY = alignY.calculate(current.getY(), targetPose.getY());
+            Logger.recordOutput("TagAlignSubsystem/DriveXError", alignX.getPositionError());
+            Logger.recordOutput("TagAlignSubsystem/DriveYError", alignY.getPositionError());
+          }
+        }
 
         Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getPositionError());
         Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getPositionError());
@@ -282,8 +308,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double tagRelX = tagRelVel.getX();
         double tagRelY = tagRelVel.getY();
 
-        double radius = getCurRadius(alliance);
-        boolean ignoreX = radius < stopXRadius && !algae;
+        // double radius = getCurRadius(alliance);
+        boolean ignoreX = false; // radius < stopXRadius && !algae;
 
         // if (!algae || tagRelX > 0) {
         //   tagRelX =
@@ -301,30 +327,35 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                 .rotateBy(
                     Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
 
+        Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive X Error", tagRelError.getX());
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive Y Error", tagRelError.getY());
 
         Transform2d poseError = targetPose.minus(current);
 
-        if (FastMath.abs(tagRelError.getX()) < driveCloseEnough) {
-          terminate();
-          break;
+        if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough) {
+          switch (curState) {
+            case DRIVE -> {
+              if (FastMath.hypot(poseError.getX(), poseError.getY()) < driveCloseEnough
+                  // || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough
+                  || FastMath.abs(tagRelError.getY()) < driveCloseEnough) {
+                if (proceedToAlign || !algae) {
+                  tagAlign();
+                  break;
+                } else {
+                  driveSubsystem.stopDriving();
+                  curState = TagAlignStates.WAITING;
+                  break;
+                }
+              }
+            }
+            case TAG_ALIGN -> {
+              if (FastMath.hypot(poseError.getX(), poseError.getY()) < driveCloseEnough) {
+                terminate();
+                break;
+              }
+            }
+          }
         }
-
-        // if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough
-        //     && (FastMath.hypot(poseError.getX(), poseError.getY()) < driveCloseEnough
-        //         || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough)) {
-
-        //   if (proceedToAlign || !algae) {
-        //     tagAlign();
-        //     break;
-        //   } else {
-        //     driveSubsystem.stopDriving();
-        //     curState = TagAlignStates.WAITING;
-        //     break;
-        //   }
-        // }
-
-        tagRelY = 0;
 
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vX", tagRelX);
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vY", tagRelY);
@@ -341,70 +372,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         if (proceedToAlign || !algae) {
           tagAlign();
         }
-      }
-
-      case TAG_ALIGN -> {
-        WallEyeTagResult result = visionSubsystem.getLastResult(targetCamId);
-
-        if (result == null) {
-          return;
-        }
-
-        int tagIndex = -1;
-        int[] tags = result.getTagIDs();
-
-        for (int i = 0; i < tags.length; i++) {
-          if (tags[i] == targetTagId) {
-            tagIndex = i;
-            break;
-          }
-        }
-
-        if (tagIndex == -1) {
-          return;
-        }
-
-        Point center = result.getTagCenters().get(tagIndex);
-        double diag = result.getTagDiags()[tagIndex];
-
-        Logger.recordOutput("TagAlignSubsystem/TargetDiag", diag);
-        Logger.recordOutput("TagAlignSubsystem/TargetCenterX", center.x());
-
-        double vX = -alignX.calculate(goalTargetDiag - diag, 0);
-        double vY = -alignY.calculate(TagServoingConstants.kHorizontalTarget - center.x(), 0);
-
-        Logger.recordOutput("TagAlignSubsystem/Diag Error", alignX.getPositionError());
-        Logger.recordOutput("TagAlignSubsystem/Horizontal Error", alignY.getPositionError());
-        Logger.recordOutput(
-            "TagAlignSubsystem/Last result delay",
-            (RobotController.getFPGATime() - result.getTimeStamp()) / 1000);
-
-        if (RobotController.getFPGATime() - result.getTimeStamp()
-                > TagServoingConstants.kNoUpdateMicrosec
-            && RobotController.getFPGATime() - startServoTime
-                > TagServoingConstants.kNoUpdateMicrosec) {
-          terminate();
-          break;
-        }
-
-        if (FastMath.abs(goalTargetDiag - diag) < TagServoingConstants.kDiagCloseEnough
-            || diag > goalTargetDiag) {
-          vX = 0;
-
-          if (FastMath.abs(TagServoingConstants.kHorizontalTarget - center.x())
-              < TagServoingConstants.kHorizontalCloseEnough) {
-
-            terminate();
-            break;
-          }
-        }
-
-        double vOmega =
-            alignOmega.calculate(
-                driveSubsystem.getGyroRotation2d().getRadians(),
-                targetPose.getRotation().getRadians());
-
-        driveSubsystem.move(vX, vY, vOmega, false);
       }
 
       case DONE -> {}

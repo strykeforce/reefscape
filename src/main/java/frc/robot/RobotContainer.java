@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -33,11 +32,9 @@ import frc.robot.commands.elevator.HoldElevatorCommand;
 import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
-import frc.robot.commands.robotState.AutoReefCycleCommand;
 import frc.robot.commands.robotState.FloorAlgaeCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
-import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
@@ -228,25 +225,27 @@ public class RobotContainer {
         .onFalse(new ZeroElevatorCommand(elevatorSubsystem));
 
     // other stuff
-
     new JoystickButton(driveJoystick, Button.M_SWH.id)
-        .onTrue(
-            new ConditionalCommand(
-                new AutoReefCycleCommand(
-                    robotStateSubsystem,
-                    elevatorSubsystem,
-                    coralSubsystem,
-                    driveSubsystem,
-                    tagAlignSubsystem,
-                    biscuitSubsystem,
-                    algaeSubsystem),
-                new ReefCycleCommand(
-                    robotStateSubsystem,
-                    elevatorSubsystem,
-                    coralSubsystem,
-                    biscuitSubsystem,
-                    algaeSubsystem),
-                () -> robotStateSubsystem.getIsAutoPlacing()));
+        .onTrue(new DriveTuningCommand(driveSubsystem, null, tagAlignSubsystem));
+
+    // new JoystickButton(driveJoystick, Button.M_SWH.id)
+    //     .onTrue(
+    //         new ConditionalCommand(
+    //             new AutoReefCycleCommand(
+    //                 robotStateSubsystem,
+    //                 elevatorSubsystem,
+    //                 coralSubsystem,
+    //                 driveSubsystem,
+    //                 tagAlignSubsystem,
+    //                 biscuitSubsystem,
+    //                 algaeSubsystem),
+    //             new ReefCycleCommand(
+    //                 robotStateSubsystem,
+    //                 elevatorSubsystem,
+    //                 coralSubsystem,
+    //                 biscuitSubsystem,
+    //                 algaeSubsystem),
+    //             () -> robotStateSubsystem.getIsAutoPlacing()));
 
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(

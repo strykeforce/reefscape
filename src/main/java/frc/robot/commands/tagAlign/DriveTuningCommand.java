@@ -29,18 +29,19 @@ public class DriveTuningCommand extends Command {
   @Override
   public void initialize() {
     start = driveSubsystem.getPoseMeters();
-    driving = false;
-    driveSubsystem.move(0.5, 0, 0, false);
+    driving = true;
+    // driveSubsystem.move(0, 1.5, 0, false);
+    tagAlignSubsystem.start(Alliance.Blue, true, false);
   }
 
   @Override
   public void execute() {
-    if (!driving
-        && driveSubsystem.getPoseMeters().getTranslation().getDistance(start.getTranslation())
-            > 1) {
-      driving = true;
-      tagAlignSubsystem.start(Alliance.Blue, true, false);
-    }
+    // if (!driving
+    //     && driveSubsystem.getPoseMeters().getTranslation().getDistance(start.getTranslation())
+    //         > 1) {
+    //   driving = true;
+    //   tagAlignSubsystem.start(Alliance.Blue, true, false);
+    // }
   }
 
   @Override
