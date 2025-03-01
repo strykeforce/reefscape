@@ -276,14 +276,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   private void tagAlign() {
-    Pose2d current = driveSubsystem.getPoseMeters();
-
-    double vX = driveSubsystem.getFieldRelSpeed().vxMetersPerSecond;
-    double vY = driveSubsystem.getFieldRelSpeed().vyMetersPerSecond;
-
     alignX.reset();
     alignY.reset();
-    // alignOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
 
     curState = TagAlignStates.TAG_ALIGN;
 
@@ -349,14 +343,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
           case DRIVE -> {
             vX = driveX.calculate(rotated.getX(), rotatedTarget.getX());
             vY = driveY.calculate(rotated.getY(), rotatedTarget.getY());
-            Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getPositionError());
-            Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getPositionError());
+            Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getError());
+            Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getError());
           }
           case TAG_ALIGN -> {
             vX = alignX.calculate(rotated.getX(), rotatedTarget.getX());
             vY = alignY.calculate(rotated.getY(), rotatedTarget.getY());
-            Logger.recordOutput("TagAlignSubsystem/DriveXError", alignX.getPositionError());
-            Logger.recordOutput("TagAlignSubsystem/DriveYError", alignY.getPositionError());
+            Logger.recordOutput("TagAlignSubsystem/DriveXError", alignX.getError());
+            Logger.recordOutput("TagAlignSubsystem/DriveYError", alignY.getError());
           }
           default -> {}
         }
@@ -365,13 +359,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         if (vY > 2) vY = 2;
 
         Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", driveOmega.getPositionError());
-
-        Translation2d tagRelVel = new Translation2d(vX, vY);
-        // .rotateBy(
-        //     Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
-
-        double tagRelX = tagRelVel.getX();
-        double tagRelY = tagRelVel.getY();
 
         // double radius = getCurRadius(alliance);
         boolean ignoreX = false; // radius < stopXRadius && !algae;
@@ -385,22 +372,15 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         //   tagRelX = 0;
         // }
 
-        Translation2d tagRelError = targetPose.minus(current).getTranslation();
-        // .rotateBy(
-        //     Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
-
-        Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive X Error", tagRelError.getX());
-        Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive Y Error", tagRelError.getY());
-
         // Translation2d poseError = targetPose.getTranslation().minus(current.getTranslation());
 
         if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough) {
           switch (curState) {
             case DRIVE -> {
-              if (FastMath.abs(tagRelError.getX()) < driveXCloseEnough
-                      && FastMath.abs(tagRelError.getY()) < driveYCloseEnough
+              if (FastMath.abs(driveX.getError()) < driveXCloseEnough
+                      && FastMath.abs(driveY.getError()) < driveYCloseEnough
                   // || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough
-                  || FastMath.abs(tagRelError.getY()) < driveYCloseEnough) {
+                  || FastMath.abs(driveY.getError()) < driveYCloseEnough) {
                 if (proceedToAlign || !algae) {
                   tagAlign();
                   break;
@@ -412,8 +392,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               }
             }
             case TAG_ALIGN -> {
-              if (FastMath.abs(tagRelError.getX()) < driveXCloseEnough
-                  && FastMath.abs(tagRelError.getY()) < driveYCloseEnough) {
+              if (FastMath.abs(alignX.getError()) < driveXCloseEnough
+                  && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
                 finalDrive = true;
               }
               if (finalDrive
@@ -434,18 +414,18 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         }
 
         if (finalDrive) {
-          tagRelX = 0.25;
+          vX = 0.25;
         }
 
-        Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vX", tagRelX);
-        Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vY", tagRelY);
+        Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vX", vX);
+        Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vY", vY);
 
-        Translation2d adjusted =
-            new Translation2d(tagRelX, tagRelY)
+        Translation2d fieldRelV =
+            new Translation2d(vX, vY)
                 .rotateBy(
                     Rotation2d.fromRadians(TagServoingConstants.kAngleTarget[fieldRelHexant]));
 
-        driveSubsystem.move(adjusted.getX(), adjusted.getY(), vOmega, true);
+        driveSubsystem.move(fieldRelV.getX(), fieldRelV.getY(), vOmega, true);
       }
 
       case WAITING -> {
