@@ -179,6 +179,7 @@ public class RobotContainer {
             coralSubsystem,
             elevatorSubsystem,
             tagAlignSubsystem,
+            visionSubsystem,
             "startToJ",
             new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
             new ArrayList<Integer>(Arrays.asList(4, 4, 4)),

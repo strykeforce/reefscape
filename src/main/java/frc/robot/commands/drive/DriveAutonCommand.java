@@ -27,6 +27,8 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   private boolean resetOdometry;
   private boolean lastPath;
 
+  private SwerveSample desiredState;
+
   public DriveAutonCommand(
       DriveSubsystem driveSubsystem,
       String trajectoryName,
@@ -48,12 +50,9 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
       logger.error("Trajectory {} not found", trajectoryName);
       isTherePath = false;
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorToProcessor", mirrorToProcessor);
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorTrajectory", mirrorTrajectory);
     timer.start();
-  }
-
-  @Override
-  public void reassignAlliance() {
-    mirrorTrajectory = driveSubsystem.shouldFlip();
   }
 
   private SwerveSample mirrorToProcessor(SwerveSample sample) {
@@ -93,22 +92,39 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   }
 
   @Override
-  public void initialize() {
+  public void reassignAlliance() {
+    mirrorTrajectory = driveSubsystem.shouldFlip();
     if (isTherePath) {
-      driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
+
       Pose2d initialPose = new Pose2d();
       initialPose = mirrorToProcessor(trajectory.getInitialPose(mirrorTrajectory).get());
+      driveSubsystem.calculateController(trajectory.sampleAt(0, mirrorTrajectory).get());
       if (resetOdometry) {
         driveSubsystem.resetOdometry(initialPose);
+        driveSubsystem.resetHolonomicController(initialPose.getRotation().getRadians());
       }
+    }
+  }
+
+  @Override
+  public void initialize() {
+    // if (isTherePath) {
+    //   driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
+    //   Pose2d initialPose = new Pose2d();
+    //   initialPose = mirrorToProcessor(trajectory.getInitialPose(mirrorTrajectory).get());
+    //   if (resetOdometry) {
+    //     driveSubsystem.resetOdometry(initialPose);
+    // driveSubsystem.resetHolonomicController();
+    //   }
+    if (isTherePath) {
       driveSubsystem.setEnableHolo(true);
       // driveSubsystem.recordAutoTrajectory(trajectory);
-      driveSubsystem.resetHolonomicController();
+      driveSubsystem.setAutoDebugMsg("Initialize " + trajectoryName);
+
       driveSubsystem.grapherTrajectoryActive(true);
       timer.reset();
-      logger.info("Begin Trajectory: {}", trajectoryName);
-      SwerveSample desiredState =
-          mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
+      // logger.info("Begin Trajectory: {}", trajectoryName);
+      desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
       driveSubsystem.calculateController(desiredState);
     }
   }
@@ -116,16 +132,17 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   @Override
   public void execute() {
     if (isTherePath) {
-      SwerveSample desiredState =
-          mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
+      desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
       driveSubsystem.calculateController(desiredState);
     }
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorToProcessor", mirrorToProcessor);
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorTrajectory", mirrorTrajectory);
   }
 
   @Override
   public boolean isFinished() {
     if (!isTherePath) {
-      return false;
+      return true;
     }
     return timer.hasElapsed(trajectory.getTotalTime());
   }

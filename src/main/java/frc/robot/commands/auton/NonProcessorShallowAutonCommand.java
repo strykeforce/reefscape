@@ -7,7 +7,7 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
-import frc.robot.constants.PathHandlerConstants;
+import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -16,6 +16,7 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
 
 public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
@@ -34,6 +35,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       CoralSubsystem coralSubsystem,
       ElevatorSubsystem elevatorSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
+      VisionSubsystem visionSubsystem,
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
@@ -53,19 +55,21 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
                 // driveSubsystem, new Pose2d(7.1008875, 5.0756788, new Rotation2d(180))),
                 new SequentialCommandGroup(
                     new ResetGyroCommand(driveSubsystem),
-                    new SetGyroOffsetCommand(driveSubsystem, new Rotation2d(180)))),
-            startPath,
-            new frc.robot.commands.pathHandler.StartPathHandlerCommand(
-                pathHandler,
-                PathHandlerConstants.kShallowPathNames,
-                NodeNames,
-                NodeLevels,
-                startNode,
-                false)));
+                    new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180))),
+                new SetVisionUpdatesCommand(visionSubsystem, true)),
+            startPath)) /*,
+                        new frc.robot.commands.pathHandler.StartPathHandlerCommand(
+                            pathHandler,
+                            PathHandlerConstants.kShallowPathNames,
+                            NodeNames,
+                            NodeLevels,
+                            startNode,
+                            false)))*/;
   }
 
   @Override
   public void reassignAlliance() {
     startPath.reassignAlliance();
+    pathHandler.reassignAlliance();
   }
 }

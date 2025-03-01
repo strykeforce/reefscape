@@ -206,7 +206,7 @@ public class Swerve implements SwerveIO, Checkable {
   @Override
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
-    navx.reset();
+    // navx.reset();
   }
 
   @Override
