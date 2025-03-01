@@ -48,22 +48,25 @@ public class TagServoingConstants {
 
   // Drive
   public static final double kCoralInitialDriveRadius = 1.7; // 0.36 away from reef wall
-  public static final double kCoralAlignRadius = 1.27;
+  public static final double kCoralAlignRadius = 1.34; // 1.291 is perfectly against the reef
   // public static final double kCoralStopXDriveRadius =
   //     kCoralInitialDriveRadius; // Should be closer to reef than target pose
   public static final double kAlgaeInitialDriveRadius = 1.6;
-  public static final double kAlgaeAlignRadius = 1.27;
+  public static final double kAlgaeAlignRadius = 1.34;
   public static final double kAlgaeStopXDriveRadius =
       kAlgaeInitialDriveRadius; // Should be closer to reef than target pose
   // public static final double kMinVelX = 0.85;
 
   // End conditions
   public static final double kInitialCloseEnough = 0.1;
-  public static final double kCoralDriveCloseEnough = 0.015;
-  public static final double kAlgaeDriveCloseEnough = 0.015;
+  public static final double kCoralDriveXCloseEnough = 0.03;
+  public static final double kCoralDriveYCloseEnough = 0.015;
+  public static final double kAlgaeDriveXCloseEnough = 0.03;
+  public static final double kAlgaeDriveYCloseEnough = 0.015;
 
-  public static final double kEndDriveCurrentThreshold = 10;
-  public static final double kCurrentCountThreshold = 3;
+  public static final double kEndDriveCurrentThreshold = 25;
+  public static final double kEndCountThreshold = 1;
+  public static final double kEndVelThreshold = 1;
 
   // Reef
   public static final Translation2d kBlueReefPose = new Translation2d(4.489323, 4.0259);

@@ -370,6 +370,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return inputs.avgDriveCurrent;
   }
 
+  public double getAvgRearDriveVel() {
+    return inputs.avgRearDriveVel;
+  }
+
   public void setDriveMultiplier(double multiplier) {
     driveMultiplier = multiplier;
   }

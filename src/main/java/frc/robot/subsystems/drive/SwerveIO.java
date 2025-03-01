@@ -40,6 +40,7 @@ public interface SwerveIO {
     public double[] azimuthVels = {0, 0, 0, 0};
     public double[] azimuthCurrent = {0, 0, 0, 0};
     public double avgDriveCurrent = 0;
+    public double avgRearDriveVel = 0;
   }
 
   private SwerveModule[] getSwerveModules() {
