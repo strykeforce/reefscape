@@ -25,7 +25,7 @@ public class TagServoingConstants {
 
   public static final Constraints alignXConstraints = new Constraints(2, 100000);
   public static final Constraints alignYConstraints = new Constraints(2, 100000);
-  public static final Constraints alignOmegaConstraints = new Constraints(10000, 20000);
+  // public static final Constraints alignOmegaConstraints = new Constraints(10000, 20000);
 
   public static final double[] kAngleTarget = {
     Units.degreesToRadians(0),
@@ -48,7 +48,7 @@ public class TagServoingConstants {
 
   // Drive
   public static final double kCoralInitialDriveRadius = 1.7; // 0.36 away from reef wall
-  public static final double kCoralAlignRadius = 1.34; // 1.291 is perfectly against the reef
+  public static final double kCoralAlignRadius = 1.34; // 1.293823 is perfectly against the reef
   // public static final double kCoralStopXDriveRadius =
   //     kCoralInitialDriveRadius; // Should be closer to reef than target pose
   public static final double kAlgaeInitialDriveRadius = 1.6;
@@ -60,13 +60,13 @@ public class TagServoingConstants {
   // End conditions
   public static final double kInitialCloseEnough = 0.1;
   public static final double kCoralDriveXCloseEnough = 0.03;
-  public static final double kCoralDriveYCloseEnough = 0.015;
+  public static final double kCoralDriveYCloseEnough = 0.025;
   public static final double kAlgaeDriveXCloseEnough = 0.03;
-  public static final double kAlgaeDriveYCloseEnough = 0.015;
+  public static final double kAlgaeDriveYCloseEnough = 0.025;
 
   public static final double kEndDriveCurrentThreshold = 25;
-  public static final double kEndCountThreshold = 1;
-  public static final double kEndVelThreshold = 1;
+  public static final int kEndCountThreshold = 1;
+  public static final double kEndVelThreshold = 2;
 
   // Reef
   public static final Translation2d kBlueReefPose = new Translation2d(4.489323, 4.0259);

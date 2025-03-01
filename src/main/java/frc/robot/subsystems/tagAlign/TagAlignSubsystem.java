@@ -13,10 +13,12 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Set;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
 public class TagAlignSubsystem extends MeasurableSubsystem {
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
   private DriveSubsystem driveSubsystem;
   private VisionSubsystem visionSubsystem;
 
@@ -74,6 +76,20 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     // this.servoY = new ProfiledPIDController(4, 0, 0, TagServoingConstants.alignYConstraints);
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", -1);
+
+    // driveRadius = 1.253823;
+    // for (int i = 0; i < 6; i++) {
+    //   logger.info("Hexant {}, left and right", i);
+
+    //   logger.info(
+    //       "{}, {}",
+    //       getTargetDrivePose(Alliance.Blue, true, i).getX(),
+    //       getTargetDrivePose(Alliance.Blue, true, i).getY());
+    //   logger.info(
+    //       "{}, {}",
+    //       getTargetDrivePose(Alliance.Blue, false, i).getX(),
+    //       getTargetDrivePose(Alliance.Blue, false, i).getY());
+    // }
   }
 
   public void setProceedToAlign(boolean proceed) {
@@ -129,6 +145,24 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return new Pose2d(
         reefT.plus(offset).plus(sideOffset),
         Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
+  }
+
+  private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft, int hexant) {
+    Translation2d reefT =
+        color == Alliance.Blue
+            ? TagServoingConstants.kBlueReefPose
+            : TagServoingConstants.kRedReefPose;
+
+    logger.info("Using {}", driveRadius);
+    Translation2d offset =
+        new Translation2d(driveRadius, Rotation2d.fromDegrees(hexant * 60 + 180));
+
+    Translation2d sideOffset =
+        new Translation2d(
+            scoreLeft ? TagServoingConstants.kRightCamOffset : TagServoingConstants.kLeftCamOffset,
+            Rotation2d.fromDegrees(hexant * 60 + 180 + 90));
+
+    return new Pose2d(reefT.plus(offset).plus(sideOffset), Rotation2d.fromDegrees(hexant * 60));
   }
 
   public double getCurRadius(Alliance color) {
@@ -300,16 +334,27 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             driveOmega.calculate(
                 current.getRotation().getRadians(), targetPose.getRotation().getRadians());
 
+        Translation2d rotated =
+            current
+                .getTranslation()
+                .rotateBy(
+                    Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
+        Translation2d rotatedTarget =
+            targetPose
+                .getTranslation()
+                .rotateBy(
+                    Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
+
         switch (curState) {
           case DRIVE -> {
-            vX = driveX.calculate(current.getX(), targetPose.getX());
-            vY = driveY.calculate(current.getY(), targetPose.getY());
+            vX = driveX.calculate(rotated.getX(), rotatedTarget.getX());
+            vY = driveY.calculate(rotated.getY(), rotatedTarget.getY());
             Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getPositionError());
             Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getPositionError());
           }
           case TAG_ALIGN -> {
-            vX = alignX.calculate(current.getX(), targetPose.getX());
-            vY = alignY.calculate(current.getY(), targetPose.getY());
+            vX = alignX.calculate(rotated.getX(), rotatedTarget.getX());
+            vY = alignY.calculate(rotated.getY(), rotatedTarget.getY());
             Logger.recordOutput("TagAlignSubsystem/DriveXError", alignX.getPositionError());
             Logger.recordOutput("TagAlignSubsystem/DriveYError", alignY.getPositionError());
           }
@@ -321,10 +366,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
         Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", driveOmega.getPositionError());
 
-        Translation2d tagRelVel =
-            new Translation2d(vX, vY)
-                .rotateBy(
-                    Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
+        Translation2d tagRelVel = new Translation2d(vX, vY);
+        // .rotateBy(
+        //     Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
 
         double tagRelX = tagRelVel.getX();
         double tagRelY = tagRelVel.getY();
@@ -341,12 +385,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         //   tagRelX = 0;
         // }
 
-        Translation2d tagRelError =
-            targetPose
-                .minus(current)
-                .getTranslation()
-                .rotateBy(
-                    Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
+        Translation2d tagRelError = targetPose.minus(current).getTranslation();
+        // .rotateBy(
+        //     Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]));
 
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive X Error", tagRelError.getX());
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive Y Error", tagRelError.getY());
@@ -371,13 +412,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               }
             }
             case TAG_ALIGN -> {
-              if ((FastMath.abs(tagRelError.getX()) < driveXCloseEnough || finalDrive)
+              if (FastMath.abs(tagRelError.getX()) < driveXCloseEnough
                   && FastMath.abs(tagRelError.getY()) < driveYCloseEnough) {
                 finalDrive = true;
-
-                driveSubsystem.move(0.25, 0, vOmega, false);
               }
-
               if (finalDrive
                   && driveSubsystem.getAvgDriveCurrent()
                       > TagServoingConstants.kEndDriveCurrentThreshold
@@ -386,6 +424,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                 currentThresCount++;
                 if (currentThresCount >= TagServoingConstants.kEndCountThreshold) {
                   terminate();
+                  break;
                 }
               } else {
                 currentThresCount = 0;
@@ -395,7 +434,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         }
 
         if (finalDrive) {
-          break;
+          tagRelX = 0.25;
         }
 
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vX", tagRelX);
