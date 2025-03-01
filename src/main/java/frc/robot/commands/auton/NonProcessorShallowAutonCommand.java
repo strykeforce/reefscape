@@ -3,6 +3,7 @@ package frc.robot.commands.auton;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
@@ -55,8 +56,10 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
                 // driveSubsystem, new Pose2d(7.1008875, 5.0756788, new Rotation2d(180))),
                 new SequentialCommandGroup(
                     new ResetGyroCommand(driveSubsystem),
-                    new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180))),
-                new SetVisionUpdatesCommand(visionSubsystem, true)),
+                    new WaitCommand(0.025),
+                    new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)))),
+            new ParallelCommandGroup(
+                new WaitCommand(0.03), new SetVisionUpdatesCommand(visionSubsystem, true)),
             startPath)) /*,
                         new frc.robot.commands.pathHandler.StartPathHandlerCommand(
                             pathHandler,

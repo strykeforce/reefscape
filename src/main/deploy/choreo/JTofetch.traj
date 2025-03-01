@@ -14,7 +14,7 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"J.x", "val":5.197827024483464}, "y":{"exp":"J.y", "val":5.103551976119823}, "heading":{"exp":"J.heading", "val":-2.0943951023931953}, "intervals":19, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"J.x", "val":5.0902537}, "y":{"exp":"J.y", "val":5.1267426}, "heading":{"exp":"J.heading", "val":-2.0943951023931953}, "intervals":19, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"5.048037528991699 m", "val":5.048037528991699}, "y":{"exp":"5.385420322418213 m", "val":5.385420322418213}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":36, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
     {"x":{"exp":"fetch.x", "val":1.57141418}, "y":{"exp":"fetch.y", "val":7.41542078}, "heading":{"exp":"fetch.heading", "val":-0.9426766239853251}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[

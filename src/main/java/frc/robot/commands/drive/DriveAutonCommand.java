@@ -8,9 +8,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.auton.AutoCommandInterface;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.Optional;
+import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,8 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   private boolean lastPath;
 
   private SwerveSample desiredState;
+  private Pose2d finalPose;
+  private Pose2d initialPose = new Pose2d();
 
   public DriveAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -96,9 +100,9 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
     mirrorTrajectory = driveSubsystem.shouldFlip();
     if (isTherePath) {
 
-      Pose2d initialPose = new Pose2d();
       initialPose = mirrorToProcessor(trajectory.getInitialPose(mirrorTrajectory).get());
       driveSubsystem.calculateController(trajectory.sampleAt(0, mirrorTrajectory).get());
+      finalPose = mirrorToProcessor(trajectory.getFinalPose(mirrorTrajectory).get());
       if (resetOdometry) {
         driveSubsystem.resetOdometry(initialPose);
         driveSubsystem.resetHolonomicController(initialPose.getRotation().getRadians());
@@ -126,6 +130,9 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
       // logger.info("Begin Trajectory: {}", trajectoryName);
       desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
       driveSubsystem.calculateController(desiredState);
+      if (resetOdometry) {
+        driveSubsystem.resetOdometry(initialPose);
+      }
     }
   }
 
@@ -144,7 +151,14 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
     if (!isTherePath) {
       return true;
     }
-    return timer.hasElapsed(trajectory.getTotalTime());
+    return (timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
+        || (FastMath.sqrt(
+                    FastMath.pow(driveSubsystem.getPoseMeters().getX() - finalPose.getX(), 2)
+                        + FastMath.pow(
+                            (driveSubsystem.getPoseMeters().getY() - finalPose.getY()), 2))
+                < AutonConstants.kMaxPathErrorMeters)
+            && driveSubsystem.getHolonomicControllerYerrorRadians()
+                < AutonConstants.kMaxOmegaErrorRadians);
   }
 
   @Override

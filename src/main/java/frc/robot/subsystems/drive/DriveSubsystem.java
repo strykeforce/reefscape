@@ -61,7 +61,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxVelOmega, DriveConstants.kMaxAccelOmega));
+                DriveConstants.kMaxAutoOmega, DriveConstants.kMaxAccelOmega));
     omegaController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     xController =
@@ -99,6 +99,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("Swerve/Move Omega", vOmegaRadps);
 
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
+  }
+
+  public double getHolonomicControllerYerrorRadians() {
+    return omegaController.getPositionError();
   }
 
   // Choreo Holonomic Controller

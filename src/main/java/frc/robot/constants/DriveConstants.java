@@ -47,9 +47,10 @@ public class DriveConstants {
   public static final double kPOmega = 6.0;
   public static final double kIOmega = 0.0;
   public static final double kDOmega = 0.0;
+  public static final double kMaxAutoOmega = 10000;
   public static final double kMaxVelOmega =
       (kMaxSpeedMetersPerSecond / Math.hypot(kRobotWidth / 2.0, kRobotLength / 2.0)) / 2.0;
-  public static final double kMaxAccelOmega = 5.0;
+  public static final double kMaxAccelOmega = 100000; // was 5
 
   public static final double kPHolonomic = 4.0; // was 3
   public static final double kIHolonomic = 0.0000;
