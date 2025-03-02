@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.algae.IntakeAlgaeCommand;
@@ -466,18 +467,35 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add("Turn Off Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, false))
+        .add(
+            "Turn Off Vision Updates",
+            new SetVisionUpdatesCommand(visionSubsystem, false).ignoringDisable(true))
         .withPosition(0, 0)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add("Turn On Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, true))
+        .add(
+            "Turn On Vision Updates",
+            new SetVisionUpdatesCommand(visionSubsystem, true).ignoringDisable(true))
         .withPosition(1, 0)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
         .add("Start Auton", nonProcessorShallowAutonCommand)
         .withPosition(3, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "reAssign Alliance",
+            new InstantCommand(() -> nonProcessorShallowAutonCommand.reassignAlliance())
+                .ignoringDisable(true))
+        .withPosition(4, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Zero Wheels", new InstantCommand(() -> driveSubsystem.lockZero(), driveSubsystem))
+        .withPosition(5, 0)
         .withSize(1, 1);
   }
 

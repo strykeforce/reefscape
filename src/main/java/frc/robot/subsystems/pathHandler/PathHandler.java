@@ -3,12 +3,13 @@ package frc.robot.subsystems.pathHandler;
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PathHandlerConstants;
-import frc.robot.constants.RobotStateConstants;
-import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
@@ -44,6 +45,7 @@ public class PathHandler extends MeasurableSubsystem {
   private List<Trajectory<SwerveSample>> placePaths = new ArrayList<>();
   private Trajectory<SwerveSample> currPath;
   private String currPathString;
+  private Pose2d currPathFinalPose = new Pose2d();
   private boolean runningPath = false;
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
@@ -142,6 +144,7 @@ public class PathHandler extends MeasurableSubsystem {
       driveSubsystem.setAutoDebugMsg("Start " + currPathString);
       logger.info("start Path:" + currPathString);
       currPath = path;
+      currPathFinalPose = mirrorToProcessor(path.getFinalPose(mirrorTrajectory).get());
       runningPath = true;
       pathTimer.stop();
       pathTimer.reset();
@@ -160,13 +163,21 @@ public class PathHandler extends MeasurableSubsystem {
     if (isHandling && runningPath && currPath != null) {
       driveSubsystem.calculateController(
           mirrorToProcessor(currPath.sampleAt(pathTimer.get(), mirrorTrajectory).get()));
-      if (pathTimer.hasElapsed(currPath.getTotalTime())) {
+      if (pathTimer.hasElapsed(currPath.getTotalTime() + AutonConstants.kAutoTimeout)
+          || (FastMath.sqrt(
+                      FastMath.pow(
+                              driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
+                          + FastMath.pow(
+                              driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2))
+                  < AutonConstants.kMaxPathErrorMeters
+              && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
+                  < AutonConstants.kMaxOmegaErrorRadians)) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
         pathTimer.stop();
         pathTimer.reset();
-        driveSubsystem.calculateController(
-            mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()));
+        // driveSubsystem.calculateController(
+        //     mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()));
         driveSubsystem.drive(0, 0, 0);
         if (curState == PathStates.DRIVE_FETCH) {
           curState = PathStates.FETCH;
@@ -252,28 +263,29 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private boolean shouldTransitionToServoing() {
-    boolean isCloseEnough = false;
-    double preNormalizedAngle =
-        FastMath.toRadians(
-            RobotStateConstants.kNodeAngles[FastMath.floorToInt((nodeNames.get(0) - 'a') / 2)]);
-    double goal =
-        mirrorTrajectory
-            ? FastMath.normalizeMinusPiPi(preNormalizedAngle + Math.PI)
-            : preNormalizedAngle;
-    double pos = driveSubsystem.getGyroRotation2d().getRadians();
-    if (goal < -Math.PI / 2 || goal > Math.PI / 2) {
-      isCloseEnough =
-          FastMath.abs(FastMath.normalizeZeroTwoPi(pos) - FastMath.normalizeZeroTwoPi(goal))
-              < FastMath.toRadians(TagServoingConstants.kAngleCloseEnough);
-    } else {
-      isCloseEnough =
-          FastMath.abs(pos - goal) < FastMath.toRadians(TagServoingConstants.kAngleCloseEnough);
-    }
-    return curState == PathStates.DRIVE_PLACE
-        && pathTimer.hasElapsed(currPath.getTotalTime() - 1.0)
-        // && TagAlignSubsystem.canSeeTag(desiredTag)
-        && isCloseEnough
-        && false; // TODO remove, this is for testing
+    return false;
+    // boolean isCloseEnough = false;
+    // double preNormalizedAngle =
+    //     FastMath.toRadians(
+    //         RobotStateConstants.kNodeAngles[FastMath.floorToInt((nodeNames.get(0) - 'a') / 2)]);
+    // double goal =
+    //     mirrorTrajectory
+    //         ? FastMath.normalizeMinusPiPi(preNormalizedAngle + Math.PI)
+    //         : preNormalizedAngle;
+    // double pos = driveSubsystem.getGyroRotation2d().getRadians();
+    // if (goal < -Math.PI / 2 || goal > Math.PI / 2) {
+    //   isCloseEnough =
+    //       FastMath.abs(FastMath.normalizeZeroTwoPi(pos) - FastMath.normalizeZeroTwoPi(goal))
+    //           < FastMath.toRadians(TagServoingConstants.kAngleCloseEnough);
+    // } else {
+    //   isCloseEnough =
+    //       FastMath.abs(pos - goal) < FastMath.toRadians(TagServoingConstants.kAngleCloseEnough);
+    // }
+    // return curState == PathStates.DRIVE_PLACE
+    //     && pathTimer.hasElapsed(currPath.getTotalTime() - 1.0)
+    //     // && TagAlignSubsystem.canSeeTag(desiredTag)
+    //     && isCloseEnough
+    //     && false; // TODO remove, this is for testing
   }
 
   private SwerveSample mirrorToProcessor(SwerveSample sample) {
@@ -299,6 +311,17 @@ public class PathHandler extends MeasurableSubsystem {
               });
     }
     return sample;
+  }
+
+  private Pose2d mirrorToProcessor(Pose2d pose) {
+    if (mirrorToProcessor) {
+      pose =
+          new Pose2d(
+              pose.getX(),
+              DriveConstants.kFieldMaxY - pose.getY(),
+              Rotation2d.fromDegrees(pose.getRotation().getDegrees() * -1));
+    }
+    return pose;
   }
 
   public boolean isFinished() {

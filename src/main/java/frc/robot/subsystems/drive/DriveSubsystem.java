@@ -101,7 +101,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
-  public double getHolonomicControllerYerrorRadians() {
+  public double getHolonomicControllerOmegaErrorRadians() {
     return omegaController.getPositionError();
   }
 

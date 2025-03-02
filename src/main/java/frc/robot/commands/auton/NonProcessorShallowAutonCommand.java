@@ -5,10 +5,13 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
-import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
+import frc.robot.commands.pathHandler.StartPathHandlerCommand;
 import frc.robot.commands.vision.SetVisionUpdatesCommand;
+import frc.robot.constants.AutonConstants;
+import frc.robot.constants.PathHandlerConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -55,24 +58,25 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
                 // new ResetOdometryCommand(
                 // driveSubsystem, new Pose2d(7.1008875, 5.0756788, new Rotation2d(180))),
                 new SequentialCommandGroup(
-                    new ResetGyroCommand(driveSubsystem),
-                    new WaitCommand(0.025),
-                    new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)))),
+                    new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
+                    new ResetOdometryCommand(driveSubsystem, AutonConstants.kNonProcessorShallow))),
             new ParallelCommandGroup(
                 new WaitCommand(0.03), new SetVisionUpdatesCommand(visionSubsystem, true)),
-            startPath)) /*,
-                        new frc.robot.commands.pathHandler.StartPathHandlerCommand(
-                            pathHandler,
-                            PathHandlerConstants.kShallowPathNames,
-                            NodeNames,
-                            NodeLevels,
-                            startNode,
-                            false)))*/;
+            startPath,
+            new WaitCommand(2.0),
+            new StartPathHandlerCommand(
+                pathHandler,
+                PathHandlerConstants.kShallowPathNames,
+                NodeNames,
+                NodeLevels,
+                startNode,
+                false)));
   }
 
   @Override
   public void reassignAlliance() {
     startPath.reassignAlliance();
-    pathHandler.reassignAlliance();
+    driveSubsystem.teleResetGyro();
+    // pathHandler.reassignAlliance();
   }
 }

@@ -157,7 +157,7 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
                         + FastMath.pow(
                             (driveSubsystem.getPoseMeters().getY() - finalPose.getY()), 2))
                 < AutonConstants.kMaxPathErrorMeters)
-            && driveSubsystem.getHolonomicControllerYerrorRadians()
+            && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
                 < AutonConstants.kMaxOmegaErrorRadians);
   }
 
