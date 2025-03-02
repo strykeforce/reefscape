@@ -1,7 +1,6 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
@@ -17,25 +16,33 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.Angle;
-//import edu.wpi.first.units.measure.AngularVelocity;
+// import edu.wpi.first.units.measure.AngularVelocity;
 
 public class ClimbConstants {
   public static int kPivotArmFrontFxId = 45;
-  public static int kPivotArmFollowFxId = 46;
-  public static int kCANcoderId = 47; 
-  public static int kDeployServoId = 1; //the servo to release the pin
-  public static int kRatchetServoId = 2; 
+  // public static int kPivotArmFollowFxId = 46;
+  public static int kCANcoderId = 46;
+  public static int kDeployServoId = 1; // the servo to release the pin
+  public static int kRatchetServoId = 2;
   public static int kCageAlignedDIOId = 11;
 
-  public static final Angle kPivotArmCloseEnough = Degrees.of(5.0); //all of these arbitrary numbers
+  public static final Angle kPivotArmCloseEnough =
+      Degrees.of(5.0); // all of these arbitrary numbers
   public static final Angle kArmMaxFwd = Degrees.of(100);
   public static final Angle kArmMaxRev = Degrees.of(-100);
   public static final Angle kArmZeroTicks = Degrees.of(1530);
-  public static final Angle kPinDeployedPosition = Degrees.of(500);
-  public static final Angle kPinRetractedPosition = Degrees.of(0);
 
-  //Climb positions
+  // Deploy Servo
+  public static final double kPinDeployedPosition = 1.0;
+  public static final double kPinRetractedPosition = 0.0;
+
+  // Ratchet Servo
+  public static final double kRatchetEngatedPos = 1.0;
+  public static final double kRatchetDisengagedPos = 0.0;
+
+  // Climb positions
   public static final Angle kClimbCagePos = Degrees.of(3);
+
   public static TalonFXConfiguration getPivotArmFxConfig() {
     TalonFXConfiguration armFxConfig = new TalonFXConfiguration();
 
@@ -109,5 +116,4 @@ public class ClimbConstants {
     CurrentLimitsConfigs config = new CurrentLimitsConfigs();
     return config;
   }
-
 }
