@@ -60,6 +60,8 @@ import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitIOFX;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.climb.ClimbIO;
+import frc.robot.subsystems.climb.ClimbIOServoFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.coral.CoralIO;
 import frc.robot.subsystems.coral.CoralIOFX;
@@ -93,6 +95,7 @@ public class RobotContainer {
   private final BiscuitIOFX biscuitIO;
   private final BiscuitSubsystem biscuitSubsystem;
 
+  private final ClimbIO climbIO;
   private final ClimbSubsystem climbSubsystem;
 
   private final CoralIO coralIO;
@@ -132,7 +135,8 @@ public class RobotContainer {
     biscuitIO = new BiscuitIOFX();
     biscuitSubsystem = new BiscuitSubsystem(biscuitIO);
 
-    climbSubsystem = new ClimbSubsystem();
+    climbIO = new ClimbIOServoFX();
+    climbSubsystem = new ClimbSubsystem(climbIO);
 
     coralIO = new CoralIOFX();
     coralSubsystem = new CoralSubsystem(coralIO);
@@ -186,6 +190,7 @@ public class RobotContainer {
     funnelSubsystem.registerWith(telemetryService);
     biscuitSubsystem.registerWith(telemetryService);
     ledSubsystem.registerWith(telemetryService);
+    climbSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 
@@ -264,6 +269,10 @@ public class RobotContainer {
         .onFalse(
             new FloorAlgaeCommand(
                 robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+
+    // climb
+    new JoystickButton(driveJoystick, Button.SWA.id)
+        .onTrue(new InstantCommand(() -> robotStateSubsystem.toClimb()));
   }
 
   private void configureOperatorBindings() {
@@ -311,6 +320,10 @@ public class RobotContainer {
         .onTrue(new SetScoreSideRightCommand(robotStateSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
         .onTrue(new setScoreSideLeftCommand(robotStateSubsystem));
+
+    // Prep Climb
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(new InstantCommand(() -> robotStateSubsystem.toPrepClimb()));
   }
 
   private void configureTestOperatorBindings() {
@@ -471,6 +484,15 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Turn On Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, true))
         .withPosition(1, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Prep Climb", new InstantCommand(() -> robotStateSubsystem.toPrepClimb()))
+        .withPosition(3, 0)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Pit")
+        .add("Climb", new InstantCommand(() -> robotStateSubsystem.toClimb()))
+        .withPosition(4, 0)
         .withSize(1, 1);
 
     // Shuffleboard.getTab("Pit")

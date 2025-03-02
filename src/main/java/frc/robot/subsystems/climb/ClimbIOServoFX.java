@@ -7,19 +7,23 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Servo;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbIO.ClimbIOInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
 
 public class ClimbIOServoFX implements ClimbIO {
   // will prob need healthchecks eventually
   private Logger logger;
   private TalonFX talonFxPivotArmFront;
-  private TalonFX talonFxPivotArmBack;
+  private CANcoder canCoder;
   private Servo ratchetServo;
   private Servo pinServo;
 
@@ -28,9 +32,9 @@ public class ClimbIOServoFX implements ClimbIO {
   private Angle pivotArmSetpoint;
 
   TalonFXConfigurator configuratorFront;
-  TalonFXConfigurator configuratorBack;
   private MotionMagicDutyCycle positionRequestMain =
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
+  private VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(false);
 
   StatusSignal<Angle> currPosition;
 
@@ -38,16 +42,14 @@ public class ClimbIOServoFX implements ClimbIO {
     logger = LoggerFactory.getLogger(this.getClass());
     talonFxPivotArmFront = new TalonFX(ClimbConstants.kPivotArmFrontFxId);
     ratchetServo = new Servo(ClimbConstants.kRatchetServoId);
+    canCoder = new CANcoder(ClimbConstants.kCANcoderId);
     pinServo = new Servo(ClimbConstants.kDeployServoId);
 
     absPivotArmFrontSensorInitial =
         talonFxPivotArmFront.getPosition().getValue(); // only for logging
     configuratorFront = talonFxPivotArmFront.getConfigurator();
-    configuratorBack = talonFxPivotArmBack.getConfigurator();
     configuratorFront.apply(new TalonFXConfiguration());
     configuratorFront.apply(ClimbConstants.getPivotArmFxConfig());
-    configuratorBack.apply(new TalonFXConfiguration());
-    configuratorBack.apply(ClimbConstants.getPivotArmFxConfig());
 
     currPosition = talonFxPivotArmFront.getPosition();
   }
@@ -81,7 +83,7 @@ public class ClimbIOServoFX implements ClimbIO {
 
   @Override
   public void updateInputs(ClimbIOInputs inputs) {
-    inputs.position = currPosition.refresh().getValue();
+    inputs.position = currPosition.refresh().getValueAsDouble();
     inputs.ratchetServoPosition = ratchetServo.getPosition();
     inputs.pinServoPosition = pinServo.getPosition();
   }
@@ -99,7 +101,6 @@ public class ClimbIOServoFX implements ClimbIO {
 
     );
     */
-    talonFxPivotArmBack.setPosition(0.0);
     talonFxPivotArmFront.setPosition(0.0);
   }
 
@@ -117,8 +118,26 @@ public class ClimbIOServoFX implements ClimbIO {
   @Override
   public void setCurrentLimit(CurrentLimitsConfigs config) {
     configuratorFront.apply(config);
-    configuratorBack.apply(config);
+  }
+
+  @Override
+  public void setPercent(double percent) {
+    talonFxPivotArmFront.setControl(voltageRequest.withOutput(percent));
+  }
+
+  @Override
+  public void setCoastMode(boolean coast) {
+    configuratorFront.apply(
+        ClimbConstants.getPivotArmFxConfig()
+            .MotorOutput
+            .withNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake));
   }
 
   public void goToZero() {}
+
+  @Override
+  public void registerWith(TelemetryService telemetryService) {
+    telemetryService.register(talonFxPivotArmFront, false);
+    telemetryService.register(canCoder);
+  }
 }

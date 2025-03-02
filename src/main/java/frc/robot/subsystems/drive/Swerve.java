@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -207,6 +208,18 @@ public class Swerve implements SwerveIO, Checkable {
   public void setBothGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
     navxOffset = rotation;
+  }
+
+  @Override
+  public void setDriveCoast(boolean coast) {
+    for (int i = 0; i < 4; i++) {
+      drives[i]
+          .getConfigurator()
+          .apply(
+              DriveConstants.getDriveTalonConfig()
+                  .MotorOutput
+                  .withNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake));
+    }
   }
 
   @Override

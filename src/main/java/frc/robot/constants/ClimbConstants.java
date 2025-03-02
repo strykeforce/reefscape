@@ -1,14 +1,17 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -26,22 +29,24 @@ public class ClimbConstants {
   public static int kRatchetServoId = 2;
   public static int kCageAlignedDIOId = 11;
 
-  public static final Angle kPivotArmCloseEnough =
-      Degrees.of(5.0); // all of these arbitrary numbers
-  public static final Angle kArmMaxFwd = Degrees.of(100);
-  public static final Angle kArmMaxRev = Degrees.of(-100);
+  public static final double kPivotArmCloseEnough = 0.01; // FIXME
+  public static final double kArmMaxFwd = 0.260;
+  public static final double kArmMaxRev = 0.03;
   public static final Angle kArmZeroTicks = Degrees.of(1530);
 
   // Deploy Servo
-  public static final double kPinDeployedPosition = 1.0;
-  public static final double kPinRetractedPosition = 0.0;
+  public static final double kPinDeployedPosition = 0.75;
+  public static final double kPinRetractedPosition = 0.18;
 
   // Ratchet Servo
-  public static final double kRatchetEngatedPos = 1.0;
-  public static final double kRatchetDisengagedPos = 0.0;
+  public static final double kRatchetEngagedPos = 0.0;
+  public static final double kRatchetDisengagedPos = 1.0;
 
   // Climb positions
-  public static final Angle kClimbCagePos = Degrees.of(3);
+  public static final Angle kClimbCagePos = Rotations.of(4); // fixme
+  public static final Double kClimbRatchedEngage = 0.1;
+  public static final double kFullyClimbed = 0.260;
+  public static final double kClimbOpenLoopSpeed = 4.0;
 
   public static TalonFXConfiguration getPivotArmFxConfig() {
     TalonFXConfiguration armFxConfig = new TalonFXConfiguration();
@@ -50,10 +55,9 @@ public class ClimbConstants {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimit(10)
             .withStatorCurrentLimitEnable(false)
-            .withStatorCurrentLimit(20)
-            .withSupplyCurrentLimit(10)
-            .withSupplyCurrentLowerLimit(8)
-            .withSupplyCurrentLowerTime(0.02)
+            .withSupplyCurrentLimit(30)
+            .withSupplyCurrentLowerLimit(30)
+            .withSupplyCurrentLowerTime(1)
             .withSupplyCurrentLimitEnable(true);
     armFxConfig.CurrentLimits = current;
 
@@ -101,8 +105,14 @@ public class ClimbConstants {
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
             .withDutyCycleNeutralDeadband(0.01)
-            .withNeutralMode(NeutralModeValue.Coast);
+            .withNeutralMode(NeutralModeValue.Brake);
     armFxConfig.MotorOutput = motorOut;
+
+    FeedbackConfigs feedbackConfigs =
+        new FeedbackConfigs()
+            .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
+            .withFeedbackRemoteSensorID(kCANcoderId);
+    armFxConfig.Feedback = feedbackConfigs;
 
     return armFxConfig;
   }

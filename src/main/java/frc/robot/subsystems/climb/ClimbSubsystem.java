@@ -30,31 +30,31 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private int climbZeroStableCounts; // idk what this means
   // more
 
-  private Angle setpoints = Rotations.of(0.0);
+  private double setpoints = 0.0;
   private ClimbState curState = ClimbState.INIT;
   private Timer hangTimer = new Timer();
 
   public ClimbSubsystem(ClimbIO io) {
     this.io = io;
     enableRatchet(false);
+    deployClimb(false);
     zero();
   }
 
   @Override
   public Angle getPosition() {
-    return climbInputs.position;
+    return Rotations.of(climbInputs.position);
   }
 
   @Override
   public void setPosition(Angle position) {
     io.setPosition(position);
-    setpoints = position;
+    setpoints = position.in(Rotations);
   }
 
   @Override
   public boolean isFinished() {
-    return setpoints.minus(climbInputs.position).abs(Rotations)
-        <= ClimbConstants.kPivotArmCloseEnough.in(Rotations);
+    return (Math.abs(setpoints - climbInputs.position) < ClimbConstants.kPivotArmCloseEnough);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public void enableRatchet(boolean enable) {
     if (enable) {
-      io.setRatchetServoPosition(ClimbConstants.kRatchetEngatedPos); // fixme
+      io.setRatchetServoPosition(ClimbConstants.kRatchetEngagedPos); // fixme
       setClimbDebugMsg("Engaging Ratchet");
       isRatchetOn = true;
     } else {
@@ -82,7 +82,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     }
   }
 
-  public Angle getSetpoints() {
+  public double getSetpoints() {
     return setpoints;
   }
 
@@ -90,11 +90,21 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     return curState;
   }
 
-  public void prepClimb() {}
+  public void prepClimb() {
+    enableRatchet(false);
+    deployClimb(true);
+    setState(ClimbState.PREPPED);
+  }
 
-  public void climb() {}
+  public void climb() {
+    if (curState == ClimbState.PREPPED) {
+      // setPosition(ClimbConstants.kClimbCagePos);
+      io.setPercent(ClimbConstants.kClimbOpenLoopSpeed);
+      setState(ClimbState.CLIMBING);
+    }
+  }
 
-  public void deployPin(boolean enable) {
+  private void deployClimb(boolean enable) {
     if (enable) {
       io.setPinServoPosition(ClimbConstants.kPinDeployedPosition);
       setClimbDebugMsg("Deploying Pin");
@@ -107,16 +117,20 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   }
 
   public void toggleDeployState() {
-    deployPin(!isPinDeployed);
+    deployClimb(!isPinDeployed);
   }
 
   public boolean isClimbFinished() {
     return curState == ClimbState.CLIMBED;
   }
 
-  public void descend() {}
-
   public void stow() {}
+
+  private void setState(ClimbState state) {
+    setClimbDebugMsg(curState + "->" + state);
+    setpoints = ClimbConstants.kFullyClimbed;
+    curState = state;
+  }
 
   @Override
   public void periodic() {
@@ -129,13 +143,24 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     switch (curState) {
       case INIT:
         break;
+      case PREPPED:
+        break;
+      case CLIMBING:
+        if (climbInputs.position >= ClimbConstants.kClimbRatchedEngage && !isRatchetOn) {
+          enableRatchet(true);
+        }
+        if (isFinished()) {
+          io.setCoastMode(true);
+          setState(ClimbState.CLIMBED);
+        }
+        break;
       default:
         break;
     }
 
     // Log Outputs
-    Logger.recordOutput("Climb/curState", curState.ordinal()); // works not
-    Logger.recordOutput("Climb/setpoint", setpoints.in(Rotations));
+    Logger.recordOutput("Climb/curState", curState);
+    Logger.recordOutput("Climb/setpoint", setpoints);
   }
 
   @Override

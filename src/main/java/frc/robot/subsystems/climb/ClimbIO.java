@@ -1,7 +1,5 @@
 package frc.robot.subsystems.climb;
 
-import static edu.wpi.first.units.Units.Rotations;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
@@ -11,7 +9,7 @@ public interface ClimbIO {
 
   @AutoLog
   static class ClimbIOInputs {
-    public Angle position = Rotations.of(0.0);
+    public double position = 0.0;
     public double velocity = 0.0;
     public double ratchetServoPosition = 0.0;
     public double pinServoPosition = 0.0;
@@ -34,4 +32,8 @@ public interface ClimbIO {
   public default void setSoftLimitsEnabled(boolean enable) {}
 
   public default void setCurrentLimit(CurrentLimitsConfigs config) {}
+
+  public default void setPercent(double percent) {}
+
+  public default void setCoastMode(boolean coast) {}
 }

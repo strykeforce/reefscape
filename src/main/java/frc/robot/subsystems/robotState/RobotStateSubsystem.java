@@ -559,16 +559,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
 
     climbSubsystem.prepClimb();
+    driveSubsystem.prepClimb();
 
-    setState(RobotStates.PREP_CLIMB, true);
+    setState(RobotStates.PREP_CLIMB, false);
   }
 
   public void toClimb() {
     if (curState == RobotStates.PREP_CLIMB) {
 
       climbSubsystem.climb();
+      driveSubsystem.prepClimb();
 
-      setState(RobotStates.CLIMB, true);
+      setState(RobotStates.CLIMB, false);
     }
   }
 

@@ -279,6 +279,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("Holonomic Controller Enabled: {}", enabled);
   }
 
+  public void prepClimb() {
+    io.setDriveCoast(true);
+    io.setSwerveModuleAngles(
+        Rotation2d.fromDegrees(90),
+        Rotation2d.fromDegrees(90),
+        Rotation2d.fromDegrees(90),
+        Rotation2d.fromDegrees(90));
+  }
+
   public void teleResetGyro() {
     logger.info("Driver Joystick: Reset Gyro");
     double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
