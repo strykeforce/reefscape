@@ -13,6 +13,7 @@ import frc.robot.constants.PathHandlerConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -200,26 +201,12 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private void drivePathServo() {
-    if (isHandling && runningPath && currPath != null && isServoing) {
-      driveSubsystem.calculateControllerServo(
-          mirrorToProcessor(currPath.sampleAt(pathTimer.get(), mirrorTrajectory).get()),
-          tagAlignSubsystem.calculateAlignY());
-      if (pathTimer.hasElapsed(currPath.getTotalTime())) {
-        driveSubsystem.setAutoDebugMsg("End " + currPathString);
-        runningPath = false;
-        pathTimer.stop();
-        pathTimer.reset();
-        driveSubsystem.calculateControllerServo(
-            mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()), 0.0);
-        if (curState == PathStates.DRIVE_FETCH) {
-          curState = PathStates.FETCH;
-          waitingTimer.start();
-        } else if (curState == PathStates.DRIVE_PLACE_SERVO) {
-          isServoing = false;
-          robotStateSubsystem.toPrepCoral();
-          curState = PathStates.PLACE;
-          waitingTimer.start();
-        }
+    if (isHandling && isServoing) {
+      if (tagAlignSubsystem.getState() == TagAlignStates.DONE) {
+        isServoing = false;
+        robotStateSubsystem.toPrepCoral();
+        curState = PathStates.PLACE;
+        waitingTimer.start();
       }
     }
   }
@@ -250,7 +237,9 @@ public class PathHandler extends MeasurableSubsystem {
   private void advanceNodes() {
     if (nodeNames.size() > 0) {
       tagAlignSubsystem.setup(
-          mirrorTrajectory ? Alliance.Red : Alliance.Blue, (nodeNames.get(0) - 'a') % 2 == 0);
+          mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+          (nodeNames.get(0) - 'a') % 2 == 0,
+          false);
       nodeNames.remove(0);
     }
   }
@@ -269,7 +258,8 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private boolean shouldTransitionToServoing() {
-    return false;
+    return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+        < PathHandlerConstants.kServoRadius;
     // boolean isCloseEnough = false;
     // double preNormalizedAngle =
     //     FastMath.toRadians(
@@ -363,9 +353,6 @@ public class PathHandler extends MeasurableSubsystem {
       }
       case DRIVE_PLACE_SERVO -> {
         if (runningPath && isServoing) {
-          tagAlignSubsystem.setup(
-              robotStateSubsystem.getAllianceColor(),
-              robotStateSubsystem.getScoreSide() == RobotStateSubsystem.ScoreSide.LEFT);
           drivePathServo();
         }
       }

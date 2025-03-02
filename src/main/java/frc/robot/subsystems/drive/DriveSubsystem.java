@@ -81,6 +81,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
     setAutoDebugMsg("Nothing");
   }
 
+  public void stopDriving() {
+    this.move(0, 0, 0, false);
+    io.drive(0, 0, 0, false);
+  }
+
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
     if (!ignoreSticks) {
@@ -181,6 +186,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setIgnoreSticks(boolean ignore) {
     this.ignoreSticks = ignore;
+  }
+
+  public double getAvgDriveCurrent() {
+    return inputs.avgDriveCurrent;
+  }
+
+  public double getAvgRearDriveVel() {
+    return inputs.avgRearDriveVel;
   }
 
   public Trajectory<SwerveSample> getAutoTrajectory() {

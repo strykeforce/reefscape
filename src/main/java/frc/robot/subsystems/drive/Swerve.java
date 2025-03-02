@@ -252,6 +252,26 @@ public class Swerve implements SwerveIO, Checkable {
     }
   }
 
+  public double getAvgDriveCurrent() {
+    double sum = 0;
+
+    for (int i = 0; i < 4; i++) {
+      sum += drives[i].getStatorCurrent().getValueAsDouble();
+    }
+
+    return sum / 4.0;
+  }
+
+  public double getRearDriveAvgVel() {
+    double sum = 0;
+
+    for (int i = 2; i < 4; i++) {
+      sum += FastMath.abs(drives[i].getVelocity().getValueAsDouble());
+    }
+
+    return sum / 2.0;
+  }
+
   @Override
   public void updateInputs(SwerveIOInputs inputs) {
     swerveDrive.updateInputs(); // Call before swerveDrive.periodic()

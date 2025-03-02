@@ -32,4 +32,5 @@ public class PathHandlerConstants {
     }
   };
   public static final double kWaitingTime = 2.0;
+  public static final double kServoRadius = 1.4;
 }
