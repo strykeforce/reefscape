@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class BiscuitIOFX implements BiscuitIO {
+public class BiscuitIOFXS implements BiscuitIO {
 
   private Logger logger;
   private TalonFXS talon;
@@ -33,12 +33,13 @@ public class BiscuitIOFX implements BiscuitIO {
   private boolean fwdLimitSwitchOpen;
   private Angle offset;
   private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
+  private Boolean lastHadAlgae = false;
 
   TalonFXSConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0);
 
-  public BiscuitIOFX() {
+  public BiscuitIOFXS() {
     // Logger initialization with class name
     logger = LoggerFactory.getLogger(this.getClass());
     // Moter initialization with ID from constants
@@ -63,7 +64,15 @@ public class BiscuitIOFX implements BiscuitIO {
   }
 
   @Override
-  public void setPosition(Angle position) {
+  public void setPosition(Angle position, boolean hasAlgae) {
+    if (hasAlgae != lastHadAlgae) {
+      if (hasAlgae) {
+        configurator.apply(BiscuitConstants.getAlgaeMotionConfig());
+      } else {
+        configurator.apply(BiscuitConstants.getNoAlgaeMotionConfig());
+      }
+      lastHadAlgae = hasAlgae;
+    }
     talon.setControl(positionRequest.withPosition(position));
   }
 
@@ -91,25 +100,5 @@ public class BiscuitIOFX implements BiscuitIO {
     talon.setPosition(setPos);
     logger.info("Set Biscuit position to " + setPos);
     didZero = true;
-  }
-
-  @Override
-    public void hasAlgae(boolean enabled) {
-    talonfxs
-        .getConfigurator()
-        .apply(
-            BiscuitConstants.getFXSConfig()
-                .MotionMagicConfigs
-                .withMotionMagicAcceleration(BiscuitConstants.kHasAlgaeSpeed));
-  }
-
-  @Override
-    public void doesntHaveAlgae(boolean enabled) {
-    talonfxs
-        .getConfigurator()
-        .apply(
-            BiscuitConstants.getFXSConfig()
-                .MotionMagicConfigs
-                .withMotionMagicAcceleration(BiscuitConstants.kDoesntHaveAlgaeSpeed));
   }
 }

@@ -3,7 +3,6 @@ package frc.robot.subsystems.biscuit;
 import edu.wpi.first.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.telemetry.TelemetryService;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 
 public interface BiscuitIO {
 
@@ -16,11 +15,7 @@ public interface BiscuitIO {
     public boolean didZero;
   }
 
-  public default void hasAlgae(boolean enabled) {}
-
-  public default void doesntHaveAlgae(boolean enabled) {}
-
-  public default void setPosition(Angle position) {}
+  public default void setPosition(Angle position, boolean hasAlgae) {}
 
   public default void updateInputs(BiscuitIOInputs inputs) {}
 

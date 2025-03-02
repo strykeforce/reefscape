@@ -9,7 +9,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
-import frc.robot.standards.ClosedLoopPosSubsystem;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,7 @@ import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
-public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopPosSubsystem {
+public class BiscuitSubsystem extends MeasurableSubsystem {
 
   private org.slf4j.Logger logger;
   private BiscuitIO io;
@@ -29,13 +28,11 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
     this.io = io;
   }
 
-  @Override
-  public void setPosition(Angle position) {
-    io.setPosition(position);
+  public void setPosition(Angle position, boolean hasAlgae) {
+    io.setPosition(position, hasAlgae);
     setPoint = position;
   }
 
-  @Override
   public Angle getPosition() {
     return Rotations.of(inputs.position);
   }
@@ -44,12 +41,10 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
     return RotationsPerSecond.of(inputs.velocity);
   }
 
-  @Override
   public void zero() {
     io.zero();
   }
 
-  @Override
   public boolean isFinished() {
     return Math.abs(getPosition().minus(setPoint).in(Rotations)) < BiscuitConstants.kCloseEnough;
   }

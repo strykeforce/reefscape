@@ -50,7 +50,7 @@ import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.algae.AlgaeIOFX;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
-import frc.robot.subsystems.biscuit.BiscuitIOFX;
+import frc.robot.subsystems.biscuit.BiscuitIOFXS;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.coral.CoralIO;
@@ -80,7 +80,7 @@ public class RobotContainer {
 
   private final BattMonSubsystem battMonSubsystem;
 
-  private final BiscuitIOFX biscuitIO;
+  private final BiscuitIOFXS biscuitIO;
   private final BiscuitSubsystem biscuitSubsystem;
 
   private final ClimbSubsystem climbSubsystem;
@@ -117,7 +117,7 @@ public class RobotContainer {
 
     battMonSubsystem = new BattMonSubsystem();
 
-    biscuitIO = new BiscuitIOFX();
+    biscuitIO = new BiscuitIOFXS();
     biscuitSubsystem = new BiscuitSubsystem(biscuitIO);
 
     climbSubsystem = new ClimbSubsystem();

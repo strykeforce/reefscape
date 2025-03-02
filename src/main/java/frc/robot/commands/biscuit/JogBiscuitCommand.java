@@ -17,12 +17,12 @@ public class JogBiscuitCommand extends Command {
 
   @Override
   public void initialize() {
-    biscuitSubsystem.setPosition(biscuitSubsystem.getPosition().plus(positionChange));
+    biscuitSubsystem.setPosition(biscuitSubsystem.getPosition().plus(positionChange), false);
   }
 
   @Override
   public void execute() {
-    biscuitSubsystem.setPosition(biscuitSubsystem.getPosition().plus(positionChange));
+    biscuitSubsystem.setPosition(biscuitSubsystem.getPosition().plus(positionChange), false);
   }
 
   @Override
