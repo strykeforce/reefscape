@@ -1,5 +1,12 @@
 package frc.robot.subsystems.tagAlign;
 
+import java.util.Set;
+
+import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,12 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.Set;
 import net.jafama.FastMath;
-import org.littletonrobotics.junction.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
 
 public class TagAlignSubsystem extends MeasurableSubsystem {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
@@ -77,19 +79,19 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", -1);
 
-    // driveRadius = 1.253823;
-    // for (int i = 0; i < 6; i++) {
-    //   logger.info("Hexant {}, left and right", i);
+    driveRadius = 1.223823;
+    for (int i = 0; i < 6; i++) {
+      logger.info("Hexant {}, left and right", i);
 
-    //   logger.info(
-    //       "{}, {}",
-    //       getTargetDrivePose(Alliance.Blue, true, i).getX(),
-    //       getTargetDrivePose(Alliance.Blue, true, i).getY());
-    //   logger.info(
-    //       "{}, {}",
-    //       getTargetDrivePose(Alliance.Blue, false, i).getX(),
-    //       getTargetDrivePose(Alliance.Blue, false, i).getY());
-    // }
+      logger.info(
+          "{}, {}",
+          getTargetDrivePose(Alliance.Blue, true, i).getX(),
+          getTargetDrivePose(Alliance.Blue, true, i).getY());
+      logger.info(
+          "{}, {}",
+          getTargetDrivePose(Alliance.Blue, false, i).getX(),
+          getTargetDrivePose(Alliance.Blue, false, i).getY());
+    }
   }
 
   public void setProceedToAlign(boolean proceed) {
@@ -153,7 +155,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             ? TagServoingConstants.kBlueReefPose
             : TagServoingConstants.kRedReefPose;
 
-    logger.info("Using {}", driveRadius);
     Translation2d offset =
         new Translation2d(driveRadius, Rotation2d.fromDegrees(hexant * 60 + 180));
 
@@ -218,7 +219,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     // Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", goalTargetDiag);
     Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
     Logger.recordOutput("TagAlignSubsystem/GettingAlgae", algae);
-
 
     driveX.reset();
     driveY.reset();
