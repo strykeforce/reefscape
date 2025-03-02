@@ -219,10 +219,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
     Logger.recordOutput("TagAlignSubsystem/GettingAlgae", algae);
 
-    Pose2d current = driveSubsystem.getPoseMeters();
-
-    double vX = driveSubsystem.getFieldRelSpeed().vxMetersPerSecond;
-    double vY = driveSubsystem.getFieldRelSpeed().vyMetersPerSecond;
 
     driveX.reset();
     driveY.reset();
