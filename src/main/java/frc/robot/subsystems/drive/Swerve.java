@@ -204,6 +204,13 @@ public class Swerve implements SwerveIO, Checkable {
   }
 
   @Override
+  public void prepForAuto(Pose2d pose2d, double offsetDegrees) {
+    resetGyro();
+    setBothGyroOffset(Rotation2d.fromDegrees(offsetDegrees));
+    resetOdometry(pose2d);
+  }
+
+  @Override
   public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
     // navx.reset();

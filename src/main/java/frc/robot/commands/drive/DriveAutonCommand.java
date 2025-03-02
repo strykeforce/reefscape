@@ -101,10 +101,11 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
     if (isTherePath) {
 
       initialPose = mirrorToProcessor(trajectory.getInitialPose(mirrorTrajectory).get());
-      driveSubsystem.calculateController(trajectory.sampleAt(0, mirrorTrajectory).get());
+      // driveSubsystem.calculateController(trajectory.sampleAt(0, mirrorTrajectory).get());
       finalPose = mirrorToProcessor(trajectory.getFinalPose(mirrorTrajectory).get());
       if (resetOdometry) {
-        driveSubsystem.resetOdometry(initialPose);
+        driveSubsystem.prepForAuto(initialPose, initialPose.getRotation().getDegrees());
+        // driveSubsystem.resetOdometry(initialPose);
         driveSubsystem.resetHolonomicController(initialPose.getRotation().getRadians());
       }
     }

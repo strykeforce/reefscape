@@ -22,6 +22,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -40,6 +41,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       ElevatorSubsystem elevatorSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
       VisionSubsystem visionSubsystem,
+      BooleanSupplier button,
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
@@ -63,7 +65,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
             new ParallelCommandGroup(
                 new WaitCommand(0.03), new SetVisionUpdatesCommand(visionSubsystem, true)),
             startPath,
-            new WaitCommand(2.0),
+            new WaitForButtonPressCommand(button),
             new StartPathHandlerCommand(
                 pathHandler,
                 PathHandlerConstants.kShallowPathNames,

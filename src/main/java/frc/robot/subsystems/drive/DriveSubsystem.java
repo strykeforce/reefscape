@@ -214,6 +214,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.addVisionMeasurement(pose, timestamp, stdDevvs);
   }
 
+  public void prepForAuto(Pose2d pose, double offsetDegrees) {
+    io.prepForAuto(pose, robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0);
+  }
+
   public void resetHolonomicController(double yaw) {
     xController.reset();
     yController.reset();

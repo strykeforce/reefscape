@@ -181,6 +181,7 @@ public class RobotContainer {
             elevatorSubsystem,
             tagAlignSubsystem,
             visionSubsystem,
+            () -> xboxController.getRawButton(XboxController.Button.kStart.value),
             "startToJ",
             new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
             new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
@@ -496,6 +497,11 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Zero Wheels", new InstantCommand(() -> driveSubsystem.lockZero(), driveSubsystem))
         .withPosition(5, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Start Next Path", new InstantCommand(() -> pathHandler.setProceedToNext(true)))
+        .withPosition(6, 0)
         .withSize(1, 1);
   }
 

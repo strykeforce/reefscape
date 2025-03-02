@@ -49,6 +49,7 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean runningPath = false;
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
+  private boolean proceedToNext = false;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -110,6 +111,10 @@ public class PathHandler extends MeasurableSubsystem {
     }
   }
 
+  public void setProceedToNext(boolean proceed) {
+    this.proceedToNext = proceed;
+  }
+
   public void startPathHandler() {
     nodeNames.add(0, startNode);
     isHandling = true;
@@ -138,6 +143,7 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private void startPath(Trajectory<SwerveSample> path) {
+    proceedToNext = false;
     waitingTimer.stop();
     waitingTimer.reset();
     if (isHandling && path != null) {
@@ -343,7 +349,8 @@ public class PathHandler extends MeasurableSubsystem {
         if (
         // robotStateSubsystem.hasCoral() ||
         // (robotStateSubsystem.hasCoralAuton() &&
-        waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)) {
+        // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
+        proceedToNext) {
           advanceNodes();
           curState = PathStates.DRIVE_PLACE;
         }
@@ -365,7 +372,8 @@ public class PathHandler extends MeasurableSubsystem {
       case PLACE -> {
         if (
         // !robotStateSubsystem.hasCoral() &&
-        waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)) {
+        // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
+        proceedToNext) {
           curState = PathStates.DRIVE_FETCH;
         }
       }

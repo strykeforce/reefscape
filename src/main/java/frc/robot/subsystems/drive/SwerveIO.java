@@ -96,4 +96,6 @@ public interface SwerveIO {
   public default BooleanSupplier getAzimuth1FwdLimitSwitch() {
     return () -> false;
   }
+
+  public default void prepForAuto(Pose2d pose2d, double offsetDegrees) {}
 }
