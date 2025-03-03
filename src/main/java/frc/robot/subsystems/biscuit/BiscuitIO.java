@@ -20,5 +20,5 @@ public interface BiscuitIO {
 
   public default void registerWith(TelemetryService telemetry) {}
 
-  public default void zero() {}
+  public default boolean zero() { return false;}
 }

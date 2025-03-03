@@ -196,6 +196,14 @@ public class RobotContainer {
     configurePitDashboard();
   }
 
+  public boolean hasBiscuitZeroed() {
+    return biscuitSubsystem.hasZeroed();
+  }
+
+  public void zeroBiscuit() {
+    biscuitSubsystem.zero();
+  }
+
   private void configureTelemetry() {
     driveSubsystem.registerWith(telemetryService);
     coralSubsystem.registerWith(telemetryService);

@@ -20,9 +20,15 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
   private BiscuitIO io;
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();
   private Angle setPoint = Rotations.of(0);
+  private Boolean hasZeroed = false;
 
   public BiscuitSubsystem(BiscuitIO io) {
     this.io = io;
+    hasZeroed = io.zero();
+  }
+
+  public boolean hasZeroed() {
+    return hasZeroed();
   }
 
   @Override
@@ -42,7 +48,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
 
   @Override
   public void zero() {
-    io.zero();
+    boolean success = io.zero();
   }
 
   @Override
