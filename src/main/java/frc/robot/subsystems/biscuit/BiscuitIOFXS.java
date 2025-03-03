@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class BiscuitIOFX implements BiscuitIO {
+public class BiscuitIOFXS implements BiscuitIO {
 
   private Logger logger;
   private TalonFXS talon;
@@ -39,7 +39,7 @@ public class BiscuitIOFX implements BiscuitIO {
   private MotionMagicDutyCycle positionRequest =
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0);
 
-  public BiscuitIOFX() {
+  public BiscuitIOFXS() {
     // Logger initialization with class name
     logger = LoggerFactory.getLogger(this.getClass());
     // Moter initialization with ID from constants
