@@ -398,10 +398,9 @@ public class RobotContainer {
 
     // Elevator setpoint testing
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .onTrue(
-            new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kFunnelSetpoint));
+        .onTrue(new SetElevatorPositionCommand(elevatorSubsystem, RobotConstants.kFunnelSetpoint));
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .onTrue(new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kStowSetpoint));
+        .onTrue(new SetElevatorPositionCommand(elevatorSubsystem, RobotConstants.kStowSetpoint));
     (new Trigger(() -> xboxController.getPOV() == 0))
         .onTrue(
             new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL1CoralSetpoint));

@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
@@ -244,7 +245,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toStow() {
     if (biscuitSubsystem.isSafeToStow()) {
       biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
-      elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
+      elevatorSubsystem.setPosition(RobotConstants.kStowSetpoint);
       driveSubsystem.removeDriveMultiplier();
       driveSubsystem.setIgnoreSticks(false);
       algaeSubsystem.hold();
@@ -276,7 +277,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private void toFunnelLoad() {
     biscuitSubsystem.setPosition(BiscuitConstants.kFunnelSetpoint);
     coralSubsystem.intake();
-    elevatorSubsystem.setPosition(ElevatorConstants.kFunnelSetpoint);
+    elevatorSubsystem.setPosition(RobotConstants.kFunnelSetpoint);
 
     setState(RobotStates.FUNNEL_LOAD, true);
   }
@@ -537,14 +538,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_STOW_SAFE -> {
         if (biscuitSubsystem.isSafeToStow()) {
-          elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
+          elevatorSubsystem.setPosition(RobotConstants.kStowSetpoint);
           setState(RobotStates.TO_STOW);
         }
       }
 
       case TO_STOW_SEQUENTIAL -> {
         if (biscuitSubsystem.isFinished()) {
-          elevatorSubsystem.setPosition(ElevatorConstants.kStowSetpoint);
+          elevatorSubsystem.setPosition(RobotConstants.kStowSetpoint);
           setState(RobotStates.TO_STOW);
         }
       }

@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.constants.BiscuitConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.biscuit.BiscuitIO.BiscuitIOInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +84,7 @@ public class BiscuitIOFX implements BiscuitIO {
   public void zero() {
     didZero = false;
     double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
-    double setPos = BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos);
+    double setPos = BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos);
     talon.setPosition(setPos);
     logger.info("set Biscuit position to " + setPos);
     didZero = true;
