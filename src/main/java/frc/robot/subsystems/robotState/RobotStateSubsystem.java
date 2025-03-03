@@ -309,7 +309,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPlaceCoralAuto() {
     isAutoReadyForEject = true;
-    if(elevatorSubsystem.isFinished()) toPlaceCoral();
+    if (elevatorSubsystem.isFinished()) toPlaceCoral();
     else toReefAlign(getAlgaeOnCycle, isAutoPlacing);
   }
 
