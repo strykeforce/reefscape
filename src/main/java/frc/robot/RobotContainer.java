@@ -194,6 +194,14 @@ public class RobotContainer {
     telemetryService.start();
   }
 
+  public boolean hasSwerveZeroed() {
+    return driveSubsystem.hasZeroed();
+  }
+
+  public void zeroSwerve() {
+    driveSubsystem.zeroModules();
+  }
+
   private void configureDriverBindings() {
     driveSubsystem.setDefaultCommand(
         new DriveTeleopCommand(

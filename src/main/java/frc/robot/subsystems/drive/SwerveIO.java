@@ -41,6 +41,7 @@ public interface SwerveIO {
     public double[] azimuthCurrent = {0, 0, 0, 0};
     public double avgDriveCurrent = 0;
     public double avgRearDriveVel = 0;
+    public boolean didZero = false;
   }
 
   private SwerveModule[] getSwerveModules() {
@@ -101,4 +102,6 @@ public interface SwerveIO {
   public default BooleanSupplier getAzimuth1FwdLimitSwitch() {
     return () -> false;
   }
+
+  public default void zeroModules() {}
 }

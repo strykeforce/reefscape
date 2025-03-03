@@ -83,6 +83,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holonomicController.setEnabled(true);
   }
 
+  public boolean hasZeroed() {
+    return inputs.didZero;
+  }
+
+  public void zeroModules() {
+    io.zeroModules();
+  }
+
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
     if (!ignoreSticks) {

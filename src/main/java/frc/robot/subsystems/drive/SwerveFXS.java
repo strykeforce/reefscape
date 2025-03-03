@@ -53,6 +53,7 @@ public class SwerveFXS implements SwerveIO, Checkable {
   private SwerveDriveKinematics kinematics;
   private double fieldY = 0.0;
   private double fieldX = 0.0;
+  private boolean didZero = false;
 
   public SwerveFXS() {
 
@@ -65,7 +66,7 @@ public class SwerveFXS implements SwerveIO, Checkable {
             .encoderOpposed(false);
     swerveModules = new FXSwerveModule[4];
     Translation2d[] wheelLocations = DriveConstants.getWheelLocationMeters();
-
+    didZero = true;
     for (int i = 0; i < 4; i++) {
       var azimuthFXS = new TalonFXS(i, "*");
       configuratorFXS = azimuthFXS.getConfigurator();
@@ -89,7 +90,8 @@ public class SwerveFXS implements SwerveIO, Checkable {
               .wheelLocationMeters(wheelLocations[i])
               .closedLoopUnits(ClosedLoopUnits.VOLTAGE)
               .build();
-      swerveModules[i].loadAndSetAzimuthZeroReference();
+      boolean zeroCheck = swerveModules[i].zeroAndCheck();
+      didZero = zeroCheck && didZero;
     }
 
     pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "*");
@@ -118,6 +120,15 @@ public class SwerveFXS implements SwerveIO, Checkable {
   @Override
   public String getName() {
     return "Swerve";
+  }
+
+  @Override
+  public void zeroModules() {
+    didZero = true;
+    for (int i = 0; i < 4; i++) {
+      boolean zeroCheck = swerveModules[i].zeroAndCheck();
+      didZero = zeroCheck && didZero;
+    }
   }
 
   private SwerveModule[] getSwerveModules() {
@@ -284,6 +295,7 @@ public class SwerveFXS implements SwerveIO, Checkable {
     inputs.fieldRelSpeed = getFieldRelSpeed(inputs.robotRelSpeed);
     inputs.fieldY = fieldY;
     inputs.fieldX = fieldX;
+    inputs.didZero = didZero;
   }
 
   @Override

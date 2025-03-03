@@ -53,6 +53,7 @@ public class Swerve implements SwerveIO, Checkable {
   private SwerveDriveKinematics kinematics;
   private double fieldY = 0.0;
   private double fieldX = 0.0;
+  private boolean didZero = false;
 
   public Swerve() {
 
@@ -94,6 +95,7 @@ public class Swerve implements SwerveIO, Checkable {
               .build();
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
+    didZero = true;
 
     pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "rio");
     pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
@@ -271,6 +273,13 @@ public class Swerve implements SwerveIO, Checkable {
   }
 
   @Override
+  public void zeroModules() {
+    for (int i = 0; i < 4; i++) {
+      swerveModules[i].loadAndSetAzimuthZeroReference();
+    }
+  }
+
+  @Override
   public void updateInputs(SwerveIOInputs inputs) {
     swerveDrive.updateInputs(); // Call before swerveDrive.periodic()
     swerveDrive.periodic();
@@ -299,6 +308,7 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.fieldRelSpeed = getFieldRelSpeed(inputs.robotRelSpeed);
     inputs.fieldY = fieldY;
     inputs.fieldX = fieldX;
+    inputs.didZero = didZero;
   }
 
   @Override
