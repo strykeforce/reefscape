@@ -58,7 +58,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if(!m_robotContainer.hasBiscuitZeroed()) m_robotContainer.zeroBiscuit();
+    if (!m_robotContainer.hasBiscuitZeroed()) m_robotContainer.zeroBiscuit();
   }
 
   @Override
