@@ -269,6 +269,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     curState = TagAlignStates.DRIVE;
   }
 
+  public void startAuto(Alliance alliance, boolean scoreLeft, boolean algae) {
+    setup(alliance, scoreLeft, algae);
+    tagAlign();
+  }
+
   private void tagAlign() {
     alignX.reset();
     alignY.reset();

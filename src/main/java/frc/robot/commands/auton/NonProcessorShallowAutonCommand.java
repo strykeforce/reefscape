@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.drive.DriveAutonServoCommand;
 import frc.robot.commands.drive.ResetOdometryCommand;
 import frc.robot.commands.drive.SetGyroOffsetCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
@@ -29,7 +29,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
 
   private PathHandler pathHandler;
   private DriveSubsystem driveSubsystem;
-  private DriveAutonCommand startPath;
+  private DriveAutonServoCommand startPath;
 
   public NonProcessorShallowAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -51,7 +51,9 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     this.pathHandler = pathHandler;
     this.driveSubsystem = driveSubsystem;
 
-    startPath = new DriveAutonCommand(driveSubsystem, startPathName, true, true, false);
+    startPath =
+        new DriveAutonServoCommand(
+            driveSubsystem, tagAlignSubsystem, startPathName, true, true, false, false);
 
     addCommands(
         new SequentialCommandGroup(

@@ -3,6 +3,8 @@ package frc.robot.subsystems.drive;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -17,6 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
@@ -52,6 +56,13 @@ public class Swerve implements SwerveIO, Checkable {
   private SwerveDriveKinematics kinematics;
   private double fieldY = 0.0;
   private double fieldX = 0.0;
+
+  private StatusSignal<Current> drive10StatorCurrent;
+  private StatusSignal<Current> drive11StatorCurrent;
+  private StatusSignal<Current> drive12StatorCurrent;
+  private StatusSignal<Current> drive13StatorCurrent;
+  private StatusSignal<AngularVelocity> drive12Velocity;
+  private StatusSignal<AngularVelocity> drive13Velocity;
 
   public Swerve() {
 
@@ -93,6 +104,13 @@ public class Swerve implements SwerveIO, Checkable {
               .build();
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
+
+    drive10StatorCurrent = drives[0].getStatorCurrent();
+    drive11StatorCurrent = drives[1].getStatorCurrent();
+    drive12StatorCurrent = drives[2].getStatorCurrent();
+    drive13StatorCurrent = drives[3].getStatorCurrent();
+    drive12Velocity = drives[2].getVelocity();
+    drive13Velocity = drives[3].getVelocity();
 
     pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "rio");
     pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
@@ -295,9 +313,24 @@ public class Swerve implements SwerveIO, Checkable {
       inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
     }
+    BaseStatusSignal.refreshAll(
+        drive10StatorCurrent,
+        drive11StatorCurrent,
+        drive12StatorCurrent,
+        drive13StatorCurrent,
+        drive12Velocity,
+        drive13Velocity);
     inputs.fieldRelSpeed = getFieldRelSpeed();
     inputs.fieldY = fieldY;
     inputs.fieldX = fieldX;
+    inputs.avgDriveCurrent =
+        (drive10StatorCurrent.getValueAsDouble()
+                + drive11StatorCurrent.getValueAsDouble()
+                + drive12StatorCurrent.getValueAsDouble()
+                + drive13StatorCurrent.getValueAsDouble())
+            / 4;
+    inputs.avgRearDriveVel =
+        (drive12Velocity.getValueAsDouble() + drive13Velocity.getValueAsDouble()) / 2;
   }
 
   @Override

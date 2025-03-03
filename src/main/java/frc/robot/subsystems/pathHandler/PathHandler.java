@@ -194,6 +194,11 @@ public class PathHandler extends MeasurableSubsystem {
           waitingTimer.start();
         }
       } else if (shouldTransitionToServoing()) {
+        tagAlignSubsystem.startAuto(
+            mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+            (nodeNames.get(0) - 'a') % 2 == 0,
+            false);
+        driveSubsystem.setAutoDebugMsg("Servo Start");
         curState = PathStates.DRIVE_PLACE_SERVO;
         isServoing = true;
       }
@@ -204,8 +209,9 @@ public class PathHandler extends MeasurableSubsystem {
     if (isHandling && isServoing) {
       if (tagAlignSubsystem.getState() == TagAlignStates.DONE) {
         isServoing = false;
-        robotStateSubsystem.toPrepCoral();
+        // robotStateSubsystem.toPrepCoral();
         curState = PathStates.PLACE;
+        driveSubsystem.stopDriving();
         waitingTimer.start();
       }
     }
@@ -259,7 +265,8 @@ public class PathHandler extends MeasurableSubsystem {
 
   private boolean shouldTransitionToServoing() {
     return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
-        < PathHandlerConstants.kServoRadius;
+            < PathHandlerConstants.kServoRadius
+        && curState == PathStates.DRIVE_PLACE;
     // boolean isCloseEnough = false;
     // double preNormalizedAngle =
     //     FastMath.toRadians(
@@ -328,6 +335,9 @@ public class PathHandler extends MeasurableSubsystem {
   public void periodic() {
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/State", curState);
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/curPath", currPathString);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "PathHandler/curRadius",
+        tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor()));
     switch (curState) {
       case DRIVE_FETCH -> {
         if (!runningPath) {
