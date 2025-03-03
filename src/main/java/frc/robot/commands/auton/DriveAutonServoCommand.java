@@ -1,4 +1,4 @@
-package frc.robot.commands.drive;
+package frc.robot.commands.auton;
 
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
@@ -8,11 +8,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.auton.AutoCommandInterface;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PathHandlerConstants;
+import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.Optional;
@@ -22,6 +26,8 @@ import org.slf4j.LoggerFactory;
 public class DriveAutonServoCommand extends Command implements AutoCommandInterface {
   private final DriveSubsystem driveSubsystem;
   private final TagAlignSubsystem tagAlignSubsystem;
+  private final ElevatorSubsystem elevatorSubsystem;
+  private final RobotStateSubsystem robotStateSubsystem;
 
   private Trajectory<SwerveSample> trajectory;
   private final Timer timer = new Timer();
@@ -35,6 +41,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   private boolean resetOdometry;
   private boolean lastPath;
   private boolean scoreLeft;
+  private boolean hasStaged = false;
 
   private SwerveSample desiredState;
   private Pose2d finalPose;
@@ -43,15 +50,20 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   public DriveAutonServoCommand(
       DriveSubsystem driveSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      BiscuitSubsystem biscuitSubsystem,
+      RobotStateSubsystem robotStateSubsystem,
       String trajectoryName,
       boolean lastPath,
       boolean resetOdometry,
       boolean mirrorToProcessor,
       boolean scoreLeft) {
 
-    addRequirements(driveSubsystem);
+    addRequirements(driveSubsystem, elevatorSubsystem, biscuitSubsystem);
     this.driveSubsystem = driveSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
+    this.elevatorSubsystem = elevatorSubsystem;
+    this.robotStateSubsystem = robotStateSubsystem;
 
     this.resetOdometry = resetOdometry;
     this.lastPath = lastPath;
@@ -133,7 +145,10 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     //     driveSubsystem.resetOdometry(initialPose);
     // driveSubsystem.resetHolonomicController();
     //   }
+    elevatorSubsystem.zero();
     isServoing = false;
+    hasStaged = false;
+
     if (isTherePath) {
       driveSubsystem.setEnableHolo(true);
       // driveSubsystem.recordAutoTrajectory(trajectory);
@@ -152,6 +167,10 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
   @Override
   public void execute() {
+    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED && !hasStaged) {
+      hasStaged = true;
+      robotStateSubsystem.toAutonPrestage();
+    }
     if (isTherePath) {
       if (!isServoing) {
         desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
@@ -159,6 +178,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
         if (shouldTransitionToServoing()) {
           isServoing = true;
+          robotStateSubsystem.toPrepCoral();
           tagAlignSubsystem.startAuto(
               mirrorTrajectory ? Alliance.Red : Alliance.Blue, scoreLeft, false);
         }
@@ -178,8 +198,9 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     if (!isTherePath) {
       return true;
     }
-    return (timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
-        || tagAlignSubsystem.getState() == TagAlignStates.DONE && isServoing);
+    return ((timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
+            || tagAlignSubsystem.getState() == TagAlignStates.DONE && isServoing))
+        && elevatorSubsystem.isFinished();
     // || (FastMath.sqrt(
     //             FastMath.pow(driveSubsystem.getPoseMeters().getX() - finalPose.getX(), 2)
     //                 + FastMath.pow(
@@ -202,6 +223,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
       driveSubsystem.drive(0, 0, 0);
     }
     isServoing = false;
+    tagAlignSubsystem.terminate();
 
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory {}: {}", trajectoryName, timer.get());

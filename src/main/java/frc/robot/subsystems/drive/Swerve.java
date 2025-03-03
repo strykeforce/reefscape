@@ -330,7 +330,9 @@ public class Swerve implements SwerveIO, Checkable {
                 + drive13StatorCurrent.getValueAsDouble())
             / 4;
     inputs.avgRearDriveVel =
-        (drive12Velocity.getValueAsDouble() + drive13Velocity.getValueAsDouble()) / 2;
+        (Math.abs(drive12Velocity.getValueAsDouble())
+                + Math.abs(drive13Velocity.getValueAsDouble()))
+            / 2;
   }
 
   @Override

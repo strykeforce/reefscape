@@ -193,6 +193,15 @@ public class PathHandler extends MeasurableSubsystem {
           curState = PathStates.PLACE;
           waitingTimer.start();
         }
+      } else if (robotStateSubsystem.hasCoralAuton() && curState == PathStates.DRIVE_FETCH) {
+        driveSubsystem.setAutoDebugMsg("End " + currPathString);
+        runningPath = false;
+        pathTimer.stop();
+        pathTimer.reset();
+        driveSubsystem.drive(0, 0, 0);
+        advanceNodes();
+        curState = PathStates.DRIVE_PLACE;
+
       } else if (shouldTransitionToServoing()) {
         tagAlignSubsystem.startAuto(
             mirrorTrajectory ? Alliance.Red : Alliance.Blue,
@@ -200,6 +209,7 @@ public class PathHandler extends MeasurableSubsystem {
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
         curState = PathStates.DRIVE_PLACE_SERVO;
+        robotStateSubsystem.toPrepCoral();
         isServoing = true;
       }
     }
@@ -209,7 +219,11 @@ public class PathHandler extends MeasurableSubsystem {
     if (isHandling && isServoing) {
       if (tagAlignSubsystem.getState() == TagAlignStates.DONE) {
         isServoing = false;
-        // robotStateSubsystem.toPrepCoral();
+        driveSubsystem.setAutoDebugMsg("End " + currPathString);
+        runningPath = false;
+        pathTimer.stop();
+        pathTimer.reset();
+        robotStateSubsystem.toPlaceCoralAuto();
         curState = PathStates.PLACE;
         driveSubsystem.stopDriving();
         waitingTimer.start();
@@ -346,11 +360,9 @@ public class PathHandler extends MeasurableSubsystem {
         drivePath();
       }
       case FETCH -> {
-        if (
-        // robotStateSubsystem.hasCoral() ||
-        // (robotStateSubsystem.hasCoralAuton() &&
-        // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
-        proceedToNext) {
+        if (robotStateSubsystem.hasCoral() || (robotStateSubsystem.hasCoralAuton())) {
+          // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
+          // proceedToNext) {
           advanceNodes();
           curState = PathStates.DRIVE_PLACE;
         }
@@ -367,10 +379,10 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case PLACE -> {
-        if (
-        // !robotStateSubsystem.hasCoral() &&
-        // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
-        proceedToNext) {
+        if (!robotStateSubsystem.hasCoral()) {
+          // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
+          // proceedToNext) {
+          robotStateSubsystem.toFunnelLoad();
           curState = PathStates.DRIVE_FETCH;
         }
       }
