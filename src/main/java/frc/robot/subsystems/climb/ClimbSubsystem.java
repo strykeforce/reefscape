@@ -152,6 +152,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         if (isFinished()) {
           io.setCoastMode(true);
           setState(ClimbState.CLIMBED);
+          io.setPercent(0.0);
         }
         break;
       default:
