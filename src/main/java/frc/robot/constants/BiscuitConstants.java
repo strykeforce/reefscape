@@ -27,8 +27,13 @@ public class BiscuitConstants {
   public static final double kTicksPerRot = 160;
   public static final int talonID = 25;
   public static final double kCloseEnough = 0.05;
+  public static final double kRezeroVelocityCloseEnough = 0.1; // FIXME: find a real value
+  public static final double kRezeroErrorCloseEnough = 0.1; // FIXME: find a real value
   public static final double kSafeToStowUpper = 40;
   public static final double kSafeToStowLower = -5;
+
+  // Speeds
+  public static final double kDosntHaveAlgaeSpeed = 500;
 
   // Setpoints
   // Idle
@@ -120,14 +125,7 @@ public class BiscuitConstants {
             .withKA(0);
     fxsConfig.Slot0 = slot0;
 
-    MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(500)
-            .withMotionMagicCruiseVelocity(100)
-            .withMotionMagicExpo_kA(0)
-            .withMotionMagicExpo_kV(0)
-            .withMotionMagicJerk(1000);
-    fxsConfig.MotionMagic = motionMagic;
+    fxsConfig.MotionMagic = getNoAlgaeMotionConfig();
 
     MotorOutputConfigs motorOut =
         new MotorOutputConfigs()
@@ -145,5 +143,27 @@ public class BiscuitConstants {
     fxsConfig.ExternalFeedback = feedBack;
 
     return fxsConfig;
+  }
+
+  public static MotionMagicConfigs getAlgaeMotionConfig() {
+    MotionMagicConfigs algaeConfig =
+        new MotionMagicConfigs()
+            .withMotionMagicAcceleration(500)
+            .withMotionMagicCruiseVelocity(100)
+            .withMotionMagicExpo_kA(0)
+            .withMotionMagicExpo_kV(0)
+            .withMotionMagicJerk(1000);
+    return algaeConfig;
+  }
+
+  public static MotionMagicConfigs getNoAlgaeMotionConfig() {
+    MotionMagicConfigs algaeConfig =
+        new MotionMagicConfigs()
+            .withMotionMagicAcceleration(500)
+            .withMotionMagicCruiseVelocity(100)
+            .withMotionMagicExpo_kA(0)
+            .withMotionMagicExpo_kV(0)
+            .withMotionMagicJerk(1000);
+    return algaeConfig;
   }
 }

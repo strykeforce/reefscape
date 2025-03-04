@@ -13,6 +13,6 @@ public class HoldBiscuitCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    biscuitSubsystem.setPosition(biscuitSubsystem.getPosition());
+    biscuitSubsystem.setPosition(biscuitSubsystem.getPosition(), false);
   }
 }
