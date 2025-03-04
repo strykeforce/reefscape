@@ -303,7 +303,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toPrestage() {
-    biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
+    biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint, hasAlgae());
 
     prestagingForAlgae = getAlgaeOnCycle;
 
@@ -353,7 +353,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     if (wantAlgae && !algaeSafe) {
       algaeSubsystem.intake();
-      biscuitSubsystem.setPosition(BiscuitConstants.kPrestageAlgaeSetpoint);
+      biscuitSubsystem.setPosition(BiscuitConstants.kPrestageAlgaeSetpoint, hasAlgae());
 
       switch (getAlgaeLevel()) {
         case L2 -> {

@@ -27,7 +27,7 @@ public class RobotConstants {
   private Logger logger;
 
   public static final String protoSerial = "032243F2";
-  public static final boolean isComp = !RobotController.getSerialNumber().equals(protoSerial); 
+  public static final boolean isComp = !RobotController.getSerialNumber().equals(protoSerial);
   public static final int kTalonConfigTimeout = 10; // ms
 
   public static final double kJoystickDeadband = 0.1;
