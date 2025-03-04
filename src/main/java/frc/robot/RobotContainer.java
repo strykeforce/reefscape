@@ -67,6 +67,7 @@ import frc.robot.subsystems.coral.CoralIO;
 import frc.robot.subsystems.coral.CoralIOFX;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.drive.SwerveFXS;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOFX;
@@ -102,7 +103,8 @@ public class RobotContainer {
   private final CoralIO coralIO;
   private final CoralSubsystem coralSubsystem;
 
-  private final SwerveFXS swerve;
+  private Swerve protoSwerve;
+  private SwerveFXS swerve;
   private final DriveSubsystem driveSubsystem;
 
   private final ElevatorIO elevatorIO;
@@ -144,8 +146,13 @@ public class RobotContainer {
     coralIO = new CoralIOFX();
     coralSubsystem = new CoralSubsystem(coralIO);
 
-    swerve = new SwerveFXS();
-    driveSubsystem = new DriveSubsystem(swerve);
+    if (RobotConstants.isComp) {
+      swerve = new SwerveFXS();
+      driveSubsystem = new DriveSubsystem(swerve);
+    } else {
+      protoSwerve = new Swerve();
+      driveSubsystem = new DriveSubsystem(protoSwerve);
+    }
 
     elevatorIO = new ElevatorIOFX();
     elevatorSubsystem = new ElevatorSubsystem(elevatorIO);
