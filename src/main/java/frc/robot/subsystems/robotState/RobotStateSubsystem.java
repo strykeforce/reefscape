@@ -1,6 +1,7 @@
 package frc.robot.subsystems.robotState;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
@@ -495,6 +496,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
     }
+  }
+
+  public void stopAxis() {
+    coralSubsystem.setSpeed(RotationsPerSecond.of(0));
+    funnelSubsystem.setPercent(0);
   }
 
   public void releaseAlgae() {

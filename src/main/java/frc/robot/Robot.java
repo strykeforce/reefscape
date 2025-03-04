@@ -4,8 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.constants.BuildConstants;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -44,6 +46,11 @@ public class Robot extends LoggedRobot {
       Logger.addDataReceiver(new NT4Publisher());
     }
     Logger.start();
+
+    Shuffleboard.getTab("Match")
+        .add(new ToggleAllianceColorCommand(m_robotContainer))
+        .withSize(1, 1)
+        .withPosition(2, 0);
   }
 
   @Override

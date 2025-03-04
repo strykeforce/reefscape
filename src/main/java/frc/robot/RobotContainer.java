@@ -6,31 +6,30 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.algae.IntakeAlgaeCommand;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
-import frc.robot.commands.algae.ToggleHasAlgaeCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.climb.ClimbCommand;
 import frc.robot.commands.climb.ClimbPrepCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
-import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
+import frc.robot.commands.drive.SpinUpWheelsCommand;
 import frc.robot.commands.elevator.HoldElevatorCommand;
 import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
@@ -44,14 +43,13 @@ import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
+import frc.robot.commands.robotState.StopAllAxisCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
 import frc.robot.commands.robotState.ToggleAutoPlacingCommand;
 import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
+import frc.robot.commands.robotState.lockwheelscommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
-import frc.robot.commands.tagAlign.DriveTuningCommand;
-import frc.robot.commands.tagAlign.YawTuningCommand;
-import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -83,6 +81,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.Map;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
@@ -127,8 +126,10 @@ public class RobotContainer {
 
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
-  public RobotContainer() {
+  private Alliance alliance = Alliance.Blue;
+  private SuppliedValueWidget<Boolean> allianceColor;
 
+  public RobotContainer() {
     algaeIO = new AlgaeIOFX();
     algaeSubsystem = new AlgaeSubsystem(algaeIO);
 
@@ -180,8 +181,9 @@ public class RobotContainer {
     configureTelemetry();
     configureDriverBindings();
     configureOperatorBindings();
-    // configureTestOperatorBindings();
+    configureMatchDashboard();
     configurePitDashboard();
+    robotStateSubsystem.setAllianceColor(Alliance.Blue);
   }
 
   private void configureTelemetry() {
@@ -202,6 +204,21 @@ public class RobotContainer {
 
   public void zeroSwerve() {
     driveSubsystem.zeroModules();
+  }
+
+  public Alliance getAllianceColor() {
+    return alliance;
+  }
+
+  public void setAllianceColor(Alliance alliance) {
+    this.alliance = alliance;
+    allianceColor.withProperties(Map.of("colorWhenTrue", "red", "colorWhenFalse", "blue"));
+    robotStateSubsystem.setAllianceColor(alliance);
+
+    // Auto Switch Stuff here -> reassign alliance
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Red)
+      driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(180));
+    else driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
   }
 
   private void configureDriverBindings() {
@@ -435,11 +452,56 @@ public class RobotContainer {
             new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL4CoralSetpoint));
   }
 
-  public void configurePitDashboard() {
+  private void configureMatchDashboard() {
+    allianceColor =
+        Shuffleboard.getTab("Match")
+            .addBoolean("AllianceColor", () -> alliance != Alliance.Blue)
+            .withProperties(Map.of("colorWhenFalse", "blue", "colorWhenTrue", "red"))
+            .withSize(2, 2)
+            .withPosition(0, 0);
 
-    Shuffleboard.getTab("Pit")
-        .add("Toggle Has Algae", new ToggleHasAlgaeCommand(algaeSubsystem))
+    Shuffleboard.getTab("Match")
+        .addString("Score Side", () -> robotStateSubsystem.getScoreSide().name())
+        .withPosition(4, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Auto vs. Manual", () -> robotStateSubsystem.getIsAuto())
+        .withPosition(3, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Has Coral", () -> robotStateSubsystem.hasCoral())
         .withPosition(3, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addString("Coral Location", () -> robotStateSubsystem.getCoralLoc().name())
+        .withPosition(2, 3)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Has Algae", () -> robotStateSubsystem.hasAlgae())
+        .withPosition(3, 3)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addString("Coral Level", () -> robotStateSubsystem.getAlgaeLevel().name())
+        .withPosition(4, 3)
+        .withSize(1, 1);
+
+    // Shuffleboard.getTab("Match")
+    // .addBoolean(
+    // "Cams Connected",
+    // () -> visionSubsystem.isCameraConnected(0) && visionSubsystem.isCameraConnected(1))
+    // .withSize(1, 1)
+    // .withPosition(4, 0);
+  }
+
+  private void configurePitDashboard() {
+    Shuffleboard.getTab("Pit")
+        .add("Stop All Moving Parts", new StopAllAxisCommand(robotStateSubsystem))
+        .withPosition(1, 1)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
@@ -447,84 +509,40 @@ public class RobotContainer {
         .withPosition(2, 1)
         .withSize(1, 1);
 
-    Shuffleboard.getTab("Debug")
-        .add(
-            "Toggle LED autoplacing",
-            new InstantCommand(() -> ledSubsystem.setAutoPlacing(!ledSubsystem.getAutoPlacing())))
-        .withPosition(1, 1)
-        .withSize(1, 1);
-    Shuffleboard.getTab("Debug")
-        .add(
-            "Toggle LED Current Limiting",
-            new InstantCommand(
-                () -> ledSubsystem.setCurrentLimiting(!ledSubsystem.getCurrentLimiting())))
-        .withPosition(2, 1)
+    Shuffleboard.getTab("Pit")
+        .add("Lock Wheels", new lockwheelscommand(driveSubsystem))
+        .withPosition(3, 1)
         .withSize(1, 1);
 
-    GenericEntry yawP =
-        Shuffleboard.getTab("Debug")
-            .add("Yaw kP", 0)
-            .withPosition(4, 2)
-            .withSize(1, 1)
-            .withWidget(BuiltInWidgets.kTextView)
-            .getEntry();
-    Shuffleboard.getTab("Debug")
-        .add("Yaw Tuning", new YawTuningCommand(driveSubsystem, () -> yawP.getDouble(0)))
-        .withPosition(3, 2)
+    Shuffleboard.getTab("Pit")
+        .add("Set Azmuth Velocity 20%", new SpinUpWheelsCommand(driveSubsystem))
+        .withPosition(4, 1)
         .withSize(1, 1);
 
-    Shuffleboard.getTab("Debug")
-        .add(
-            "Drive Tuning",
-            new DriveTuningCommand(driveSubsystem, () -> yawP.getDouble(0), tagAlignSubsystem))
-        .withPosition(4, 2)
+    Shuffleboard.getTab("Pit")
+        .add("Stop Azimuths", new StopAllAxisCommand(robotStateSubsystem))
+        .withPosition(5, 1)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
         .add(
-            "Five Meter Path",
-            new DriveAutonCommand(driveSubsystem, "FiveMeterTestPath", true, true, false))
-        .withPosition(2, 0)
+            "Raise Elevator",
+            new SetElevatorPositionCommand(
+                elevatorSubsystem, Rotations.of(ElevatorConstants.kElevatorLiftHeight)))
+        .withPosition(1, 2)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add("Turn Off Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, false))
-        .withPosition(0, 0)
-        .withSize(1, 1);
-
-    Shuffleboard.getTab("Pit")
-        .add("Turn On Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, true))
-        .withPosition(1, 0)
-        .withSize(1, 1);
-
-    Shuffleboard.getTab("Pit")
-        .add("Prep Climb", new InstantCommand(() -> robotStateSubsystem.toPrepClimb()))
-        .withPosition(3, 0)
-        .withSize(1, 1);
-    Shuffleboard.getTab("Pit")
-        .add("Climb", new InstantCommand(() -> robotStateSubsystem.toClimb()))
-        .withPosition(4, 0)
-        .withSize(1, 1);
-
-    // Shuffleboard.getTab("Pit")
-    //     .add(
-    //         "Start Auton",
-    //         new NonProcessorShallowAutonCommand(
-    //             driveSubsystem,
-    //             pathHandler,
-    //             robotStateSubsystem,
-    //             algaeSubsystem,
-    //             biscuitSubsystem,
-    //             coralSubsystem,
-    //             elevatorSubsystem,
-    //             tagAlignSubsystem,
-    //             "startToJ",
-    //             PathHandlerConstants.kpathNames,
-    //             List.of('K', 'L', 'M'),
-    //             List.of(4, 4, 4),
-    //             'J'))
-    //     .withPosition(3, 0)
-    //     .withSize(1, 1);
+        .add(
+            "Stow",
+            new StowCommand(
+                robotStateSubsystem,
+                elevatorSubsystem,
+                coralSubsystem,
+                biscuitSubsystem,
+                algaeSubsystem))
+        .withSize(1, 1)
+        .withPosition(2, 2);
   }
 
   public Command getAutonomousCommand() {
