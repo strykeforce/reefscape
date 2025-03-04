@@ -24,6 +24,8 @@ import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.algae.ToggleHasAlgaeCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
+import frc.robot.commands.climb.ClimbCommand;
+import frc.robot.commands.climb.ClimbPrepCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
@@ -280,7 +282,7 @@ public class RobotContainer {
 
     // climb
     new JoystickButton(driveJoystick, Button.SWA.id)
-        .onTrue(new InstantCommand(() -> robotStateSubsystem.toClimb()));
+        .onTrue(new ClimbCommand(robotStateSubsystem, climbSubsystem));
   }
 
   private void configureOperatorBindings() {
@@ -331,7 +333,9 @@ public class RobotContainer {
 
     // Prep Climb
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .onTrue(new InstantCommand(() -> robotStateSubsystem.toPrepClimb()));
+        .onTrue(
+            new ClimbPrepCommand(
+                robotStateSubsystem, climbSubsystem, elevatorSubsystem, biscuitSubsystem));
   }
 
   private void configureTestOperatorBindings() {

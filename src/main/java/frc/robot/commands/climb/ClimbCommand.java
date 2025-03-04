@@ -1,4 +1,4 @@
-package frc.robot.commands.robotState;
+package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -9,7 +9,7 @@ public class ClimbCommand extends Command {
   ClimbSubsystem climbSubsystem;
 
   public ClimbCommand(RobotStateSubsystem robotState, ClimbSubsystem climbSubsystem) {
-    addRequirements(robotState, climbSubsystem);
+    addRequirements(climbSubsystem);
     this.robotState = robotState;
   }
 
