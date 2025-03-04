@@ -334,6 +334,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private void toReefAlign(boolean getAlgae, boolean drive) {
     boolean wantAlgae = getAlgae || !coralSubsystem.hasCoral();
+    if ((hasAlgae() && scoreSide == ScoreSide.RIGHT && drive) || (hasAlgae() && !hasCoral())) {
+      setState(RobotStates.STOW);
+    }
     if (drive) {
       tagAlignSubsystem.start(
           allianceColor,
