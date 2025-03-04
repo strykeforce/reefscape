@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +53,7 @@ public class Swerve implements SwerveIO, Checkable {
   private SwerveDriveKinematics kinematics;
   private double fieldY = 0.0;
   private double fieldX = 0.0;
+  private boolean didZero = false;
 
   public Swerve() {
 
@@ -93,6 +95,7 @@ public class Swerve implements SwerveIO, Checkable {
               .build();
       swerveModules[i].loadAndSetAzimuthZeroReference();
     }
+    didZero = true;
 
     pigeon = new SF_PIGEON2(DriveConstants.kPigeonCanID, "rio");
     pigeon.applyConfig(DriveConstants.getPigeon2Configuration());
@@ -161,15 +164,7 @@ public class Swerve implements SwerveIO, Checkable {
     return kinematics.toChassisSpeeds(swerveModuleStates);
   }
 
-  private ChassisSpeeds getFieldRelSpeed() {
-    // SwerveDriveKinematics kinematics = swerveDrive.getKinematics();
-    // SwerveModule[] swerveModules = swerveDrive.getSwerveModules();
-    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
-    for (int i = 0; i < 4; ++i) {
-      swerveModuleStates[i] = swerveModules[i].getState();
-    }
-    ChassisSpeeds roboRelSpeed = kinematics.toChassisSpeeds(swerveModuleStates);
-
+  private ChassisSpeeds getFieldRelSpeed(ChassisSpeeds roboRelSpeed) {
     Rotation2d heading = swerveDrive.getHeading().unaryMinus();
     fieldX =
         roboRelSpeed.vxMetersPerSecond * heading.getCos()
@@ -179,6 +174,26 @@ public class Swerve implements SwerveIO, Checkable {
             + roboRelSpeed.vyMetersPerSecond * heading.getCos();
 
     return new ChassisSpeeds(fieldX, fieldY, roboRelSpeed.omegaRadiansPerSecond);
+  }
+
+  public double getAvgDriveCurrent() {
+    double sum = 0;
+
+    for (int i = 0; i < 4; i++) {
+      sum += drives[i].getStatorCurrent().getValueAsDouble();
+    }
+
+    return sum / 4.0;
+  }
+
+  public double getRearDriveAvgVel() {
+    double sum = 0;
+
+    for (int i = 2; i < 4; i++) {
+      sum += FastMath.abs(drives[i].getVelocity().getValueAsDouble());
+    }
+
+    return sum / 2.0;
   }
 
   @Override
@@ -195,6 +210,18 @@ public class Swerve implements SwerveIO, Checkable {
   public void setBothGyroOffset(Rotation2d rotation) {
     swerveDrive.setGyroOffset(rotation);
     navxOffset = rotation;
+  }
+
+  @Override
+  public void setDriveCoast(boolean coast) {
+    for (int i = 0; i < 4; i++) {
+      drives[i]
+          .getConfigurator()
+          .apply(
+              DriveConstants.getDriveTalonConfig()
+                  .MotorOutput
+                  .withNeutralMode(coast ? NeutralModeValue.Coast : NeutralModeValue.Brake));
+    }
   }
 
   @Override
@@ -246,6 +273,13 @@ public class Swerve implements SwerveIO, Checkable {
   }
 
   @Override
+  public void zeroModules() {
+    for (int i = 0; i < 4; i++) {
+      swerveModules[i].loadAndSetAzimuthZeroReference();
+    }
+  }
+
+  @Override
   public void updateInputs(SwerveIOInputs inputs) {
     swerveDrive.updateInputs(); // Call before swerveDrive.periodic()
     swerveDrive.periodic();
@@ -268,9 +302,13 @@ public class Swerve implements SwerveIO, Checkable {
       inputs.azimuthVels[i] = azimuths[i].getSelectedSensorVelocity();
       inputs.azimuthCurrent[i] = azimuths[i].getSupplyCurrent();
     }
-    inputs.fieldRelSpeed = getFieldRelSpeed();
+    inputs.avgDriveCurrent = getAvgDriveCurrent();
+    inputs.avgRearDriveVel = getRearDriveAvgVel();
+    inputs.robotRelSpeed = getRobotRelSpeed();
+    inputs.fieldRelSpeed = getFieldRelSpeed(inputs.robotRelSpeed);
     inputs.fieldY = fieldY;
     inputs.fieldX = fieldX;
+    inputs.didZero = didZero;
   }
 
   @Override

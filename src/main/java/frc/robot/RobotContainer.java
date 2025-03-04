@@ -6,13 +6,16 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.algae.IntakeAlgaeCommand;
@@ -23,6 +26,7 @@ import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
 import frc.robot.commands.coral.OpenLoopCoralCommand;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.DriveTeleopCommand;
 import frc.robot.commands.drive.ResetGyroCommand;
 import frc.robot.commands.elevator.HoldElevatorCommand;
@@ -35,13 +39,17 @@ import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
+import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
-import frc.robot.commands.robotState.ToggleAutoCommand;
+import frc.robot.commands.robotState.ToggleAutoPlacingCommand;
 import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
+import frc.robot.commands.tagAlign.DriveTuningCommand;
+import frc.robot.commands.tagAlign.YawTuningCommand;
+import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -52,12 +60,14 @@ import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitIOFXS;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.climb.ClimbIO;
+import frc.robot.subsystems.climb.ClimbIOServoFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.coral.CoralIO;
 import frc.robot.subsystems.coral.CoralIOFX;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.drive.Swerve;
+import frc.robot.subsystems.drive.SwerveFXS;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOFX;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -65,7 +75,9 @@ import frc.robot.subsystems.funnel.FunnelIOFXS;
 import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDIO;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -83,12 +95,13 @@ public class RobotContainer {
   private final BiscuitIOFXS biscuitIO;
   private final BiscuitSubsystem biscuitSubsystem;
 
+  private final ClimbIO climbIO;
   private final ClimbSubsystem climbSubsystem;
 
   private final CoralIO coralIO;
   private final CoralSubsystem coralSubsystem;
 
-  private final Swerve swerve;
+  private final SwerveFXS swerve;
   private final DriveSubsystem driveSubsystem;
 
   private final ElevatorIO elevatorIO;
@@ -103,6 +116,8 @@ public class RobotContainer {
   private final TagAlignSubsystem tagAlignSubsystem;
 
   private final VisionSubsystem visionSubsystem;
+
+  private final PathHandler pathHandler;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -120,12 +135,13 @@ public class RobotContainer {
     biscuitIO = new BiscuitIOFXS();
     biscuitSubsystem = new BiscuitSubsystem(biscuitIO);
 
-    climbSubsystem = new ClimbSubsystem();
+    climbIO = new ClimbIOServoFX();
+    climbSubsystem = new ClimbSubsystem(climbIO);
 
     coralIO = new CoralIOFX();
     coralSubsystem = new CoralSubsystem(coralIO);
 
-    swerve = new Swerve();
+    swerve = new SwerveFXS();
     driveSubsystem = new DriveSubsystem(swerve);
 
     elevatorIO = new ElevatorIOFX();
@@ -135,7 +151,7 @@ public class RobotContainer {
     funnelSubsystem = new FunnelSubsystem(funnelIO);
 
     ledIO = new LEDIO();
-    ledSubsystem = new LEDSubsystem();
+    ledSubsystem = new LEDSubsystem(ledIO);
 
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
@@ -157,6 +173,8 @@ public class RobotContainer {
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
+    pathHandler = new PathHandler(driveSubsystem, tagAlignSubsystem, robotStateSubsystem);
+
     configureTelemetry();
     configureDriverBindings();
     configureOperatorBindings();
@@ -171,7 +189,17 @@ public class RobotContainer {
     elevatorSubsystem.registerWith(telemetryService);
     funnelSubsystem.registerWith(telemetryService);
     biscuitSubsystem.registerWith(telemetryService);
+    ledSubsystem.registerWith(telemetryService);
+    climbSubsystem.registerWith(telemetryService);
     telemetryService.start();
+  }
+
+  public boolean hasSwerveZeroed() {
+    return driveSubsystem.hasZeroed();
+  }
+
+  public void zeroSwerve() {
+    driveSubsystem.zeroModules();
   }
 
   private void configureDriverBindings() {
@@ -196,17 +224,21 @@ public class RobotContainer {
                 coralSubsystem,
                 biscuitSubsystem,
                 algaeSubsystem));
-    new JoystickButton(driveJoystick, Button.SWA.id)
+
+    // Interupt
+    new JoystickButton(driveJoystick, Button.SWG_UP.id)
         .onTrue(new InterruptAutoCommand(robotStateSubsystem))
         .onFalse(new InterruptAutoCommand(robotStateSubsystem));
+    new JoystickButton(driveJoystick, Button.SWG_DWN.id)
+        .onTrue(new InterruptAutoCommand(robotStateSubsystem))
+        .onFalse(new InterruptAutoCommand(robotStateSubsystem));
+
     new JoystickButton(driveJoystick, Button.SWB_UP.id)
         .onTrue(new ZeroElevatorCommand(elevatorSubsystem))
         .onFalse(new ZeroElevatorCommand(elevatorSubsystem));
     new JoystickButton(driveJoystick, Button.SWB_DWN.id)
         .onTrue(new ZeroElevatorCommand(elevatorSubsystem))
         .onFalse(new ZeroElevatorCommand(elevatorSubsystem));
-
-    // other stuff
 
     new JoystickButton(driveJoystick, Button.M_SWH.id)
         .onTrue(
@@ -245,6 +277,10 @@ public class RobotContainer {
         .onFalse(
             new FloorAlgaeCommand(
                 robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+
+    // climb
+    new JoystickButton(driveJoystick, Button.SWA.id)
+        .onTrue(new InstantCommand(() -> robotStateSubsystem.toClimb()));
   }
 
   private void configureOperatorBindings() {
@@ -259,34 +295,10 @@ public class RobotContainer {
         .onTrue(new SetScoringLevelCommand(robotStateSubsystem, ScoringLevel.L4));
 
     // Set scoring side
-    // new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
-    //     .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.LEFT));
-    // new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
-    //     .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.RIGHT));
-
-    // Move biscuit
-    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogBiscuitCommand(
-                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
-        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
-    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogBiscuitCommand(
-                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
-        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
-
-    // Move elevator
-    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
-    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
+        .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.LEFT));
+    new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
+        .onTrue(new SetScoreSideCommand(robotStateSubsystem, ScoreSide.RIGHT));
 
     // Stow
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
@@ -310,12 +322,16 @@ public class RobotContainer {
 
     // Scoring
     new JoystickButton(xboxController, XboxController.Button.kA.value)
-        .onTrue(new ToggleAutoCommand(robotStateSubsystem));
+        .onTrue(new ToggleAutoPlacingCommand(robotStateSubsystem));
 
     new JoystickButton(xboxController, XboxController.Button.kRightStick.value)
         .onTrue(new SetScoreSideRightCommand(robotStateSubsystem));
     new JoystickButton(xboxController, XboxController.Button.kLeftStick.value)
         .onTrue(new setScoreSideLeftCommand(robotStateSubsystem));
+
+    // Prep Climb
+    new JoystickButton(xboxController, XboxController.Button.kStart.value)
+        .onTrue(new InstantCommand(() -> robotStateSubsystem.toPrepClimb()));
   }
 
   private void configureTestOperatorBindings() {
@@ -426,6 +442,85 @@ public class RobotContainer {
         .add("Zero Elevator", new ZeroElevatorCommand(elevatorSubsystem))
         .withPosition(2, 1)
         .withSize(1, 1);
+
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Toggle LED autoplacing",
+            new InstantCommand(() -> ledSubsystem.setAutoPlacing(!ledSubsystem.getAutoPlacing())))
+        .withPosition(1, 1)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Toggle LED Current Limiting",
+            new InstantCommand(
+                () -> ledSubsystem.setCurrentLimiting(!ledSubsystem.getCurrentLimiting())))
+        .withPosition(2, 1)
+        .withSize(1, 1);
+
+    GenericEntry yawP =
+        Shuffleboard.getTab("Debug")
+            .add("Yaw kP", 0)
+            .withPosition(4, 2)
+            .withSize(1, 1)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+    Shuffleboard.getTab("Debug")
+        .add("Yaw Tuning", new YawTuningCommand(driveSubsystem, () -> yawP.getDouble(0)))
+        .withPosition(3, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Debug")
+        .add(
+            "Drive Tuning",
+            new DriveTuningCommand(driveSubsystem, () -> yawP.getDouble(0), tagAlignSubsystem))
+        .withPosition(4, 2)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Five Meter Path",
+            new DriveAutonCommand(driveSubsystem, "FiveMeterTestPath", true, true, false))
+        .withPosition(2, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Turn Off Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, false))
+        .withPosition(0, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Turn On Vision Updates", new SetVisionUpdatesCommand(visionSubsystem, true))
+        .withPosition(1, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Prep Climb", new InstantCommand(() -> robotStateSubsystem.toPrepClimb()))
+        .withPosition(3, 0)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Pit")
+        .add("Climb", new InstantCommand(() -> robotStateSubsystem.toClimb()))
+        .withPosition(4, 0)
+        .withSize(1, 1);
+
+    // Shuffleboard.getTab("Pit")
+    //     .add(
+    //         "Start Auton",
+    //         new NonProcessorShallowAutonCommand(
+    //             driveSubsystem,
+    //             pathHandler,
+    //             robotStateSubsystem,
+    //             algaeSubsystem,
+    //             biscuitSubsystem,
+    //             coralSubsystem,
+    //             elevatorSubsystem,
+    //             tagAlignSubsystem,
+    //             "startToJ",
+    //             PathHandlerConstants.kpathNames,
+    //             List.of('K', 'L', 'M'),
+    //             List.of(4, 4, 4),
+    //             'J'))
+    //     .withPosition(3, 0)
+    //     .withSize(1, 1);
   }
 
   public Command getAutonomousCommand() {

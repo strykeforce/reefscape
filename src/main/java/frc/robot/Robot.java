@@ -57,7 +57,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (!m_robotContainer.hasSwerveZeroed()) m_robotContainer.zeroSwerve();
+  }
 
   @Override
   public void disabledExit() {}

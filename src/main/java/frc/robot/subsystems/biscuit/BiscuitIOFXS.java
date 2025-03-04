@@ -59,8 +59,7 @@ public class BiscuitIOFXS implements BiscuitIO {
     rawQuadrature = talon.getRawQuadraturePosition();
     rawQuadrature.setUpdateFrequency(20);
     rawPulseWidth = talon.getRawPulseWidthPosition();
-    rawPulseWidth.setUpdateFrequency(20);
-
+    rawPulseWidth.setUpdateFrequency(200);
     zero();
   }
 
@@ -99,7 +98,7 @@ public class BiscuitIOFXS implements BiscuitIO {
     double setPos = BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos);
 
     talon.setPosition(setPos);
-    logger.info("Set Biscuit position to " + setPos);
+    logger.info("set Biscuit position to " + setPos + " abs pos: " + pos);
     didZero = true;
   }
 }

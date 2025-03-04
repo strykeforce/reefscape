@@ -35,9 +35,13 @@ public interface SwerveIO {
     public double pigeonTemp = 0;
     public double fieldX = 0;
     public double fieldY = 0;
+    public ChassisSpeeds robotRelSpeed = new ChassisSpeeds();
     public ChassisSpeeds fieldRelSpeed = new ChassisSpeeds();
     public double[] azimuthVels = {0, 0, 0, 0};
     public double[] azimuthCurrent = {0, 0, 0, 0};
+    public double avgDriveCurrent = 0;
+    public double avgRearDriveVel = 0;
+    public boolean didZero = false;
   }
 
   private SwerveModule[] getSwerveModules() {
@@ -62,6 +66,8 @@ public interface SwerveIO {
   public default SwerveDriveKinematics getKinematics() {
     return null;
   }
+
+  public default void setDriveCoast(boolean coast) {}
 
   public default void setOdometry(OdometryStrategy Odom) {}
 
@@ -96,4 +102,6 @@ public interface SwerveIO {
   public default BooleanSupplier getAzimuth1FwdLimitSwitch() {
     return () -> false;
   }
+
+  public default void zeroModules() {}
 }

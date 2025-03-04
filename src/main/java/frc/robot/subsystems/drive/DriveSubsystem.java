@@ -83,11 +83,24 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holonomicController.setEnabled(true);
   }
 
+  public boolean hasZeroed() {
+    return inputs.didZero;
+  }
+
+  public void zeroModules() {
+    io.zeroModules();
+  }
+
   // Open-Loop Swerve Movements
   public void drive(double vXmps, double vYmps, double vOmegaRadps) {
     if (!ignoreSticks) {
       io.drive(vXmps * driveMultiplier, vYmps * driveMultiplier, vOmegaRadps, true);
     }
+  }
+
+  public void stopDriving() {
+    this.move(0, 0, 0, false);
+    io.drive(0, 0, 0, false);
   }
 
   public void setAzimuthVel(double vel) {
@@ -108,7 +121,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holoContInput = desiredState;
     double xFF = desiredState.vx;
     double yFF = desiredState.vy;
-    double rotationFF = desiredState.heading;
+    double rotationFF = desiredState.omega;
 
     Pose2d pose = inputs.poseMeters;
     double xFeedback = xController.calculate(pose.getX(), desiredState.x);
@@ -167,6 +180,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void setIgnoreSticks(boolean ignore) {
+    org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Ignoring Sticks", ignore);
     this.ignoreSticks = ignore;
   }
 
@@ -234,6 +248,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     return inputs.fieldRelSpeed;
   }
 
+  public ChassisSpeeds getRobotRelSpeed() {
+    return inputs.robotRelSpeed;
+  }
+
   public void setDriveState(DriveStates state) {
     currDriveState = state;
   }
@@ -267,6 +285,15 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public void setEnableHolo(boolean enabled) {
     holonomicController.setEnabled(enabled);
     logger.info("Holonomic Controller Enabled: {}", enabled);
+  }
+
+  public void prepClimb() {
+    io.setDriveCoast(true);
+    io.setSwerveModuleAngles(
+        Rotation2d.fromDegrees(90),
+        Rotation2d.fromDegrees(90),
+        Rotation2d.fromDegrees(90),
+        Rotation2d.fromDegrees(90));
   }
 
   public void teleResetGyro() {
@@ -354,6 +381,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
   public PIDController getomegaControllerNonProfiled() {
     return new PIDController(
         omegaController.getP(), omegaController.getI(), omegaController.getD());
+  }
+
+  public double getAvgDriveCurrent() {
+    return inputs.avgDriveCurrent;
+  }
+
+  public double getAvgRearDriveVel() {
+    return inputs.avgRearDriveVel;
   }
 
   public void setDriveMultiplier(double multiplier) {

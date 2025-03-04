@@ -4,6 +4,7 @@ import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import net.jafama.FastMath;
+import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -20,6 +22,7 @@ public class PathHandler extends MeasurableSubsystem {
   private DriveSubsystem driveSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
   private TagAlignSubsystem tagAlignSubsystem;
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PathHandler.class);
 
   private PathStates curState = PathStates.DONE;
   private boolean isHandling = false;
@@ -34,6 +37,7 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean runningPath = false;
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
+  private boolean mirrorToProcessor = false;
   private Character startNode = 'a';
 
   public PathHandler(
@@ -43,7 +47,7 @@ public class PathHandler extends MeasurableSubsystem {
     this.driveSubsystem = driveSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
-    reassignAlliance();
+    // reassignAlliance();
   }
 
   public PathHandler(
@@ -51,9 +55,10 @@ public class PathHandler extends MeasurableSubsystem {
       TagAlignSubsystem tagAlignSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       String[][] pathNames,
-      List<Character> nodeNames,
-      List<Integer> nodeLevels,
-      Character startNode) {
+      List<Character> NodeNames,
+      List<Integer> NodeLevels,
+      Character startNode,
+      boolean mirrorToProcessor) {
     this.driveSubsystem = driveSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
@@ -61,6 +66,7 @@ public class PathHandler extends MeasurableSubsystem {
     this.nodeNames = nodeNames;
     this.nodeLevels = nodeLevels;
     this.startNode = startNode;
+    this.mirrorToProcessor = mirrorToProcessor;
   }
 
   public void setPathNames(String[][] pathNames) {
@@ -87,6 +93,12 @@ public class PathHandler extends MeasurableSubsystem {
     }
   }
 
+  public void setMirrorToProcessor(boolean mirrorToProcessor) {
+    if (!isHandling) {
+      this.mirrorToProcessor = mirrorToProcessor;
+    }
+  }
+
   public void startPathHandler() {
     nodeNames.add(0, startNode);
     isHandling = true;
@@ -96,8 +108,10 @@ public class PathHandler extends MeasurableSubsystem {
 
   public void reassignAlliance() {
     mirrorTrajectory = driveSubsystem.shouldFlip();
+    Optional<Trajectory<SwerveSample>> temp;
     for (int i = 0; i < 12; i++) {
-      Optional<Trajectory<SwerveSample>> temp = Choreo.loadTrajectory(pathNames[i][0]);
+      logger.info(i + "");
+      temp = Choreo.loadTrajectory(pathNames[i][0]);
       fetchPaths.add(temp.get());
       temp = Choreo.loadTrajectory(pathNames[i][1]);
       placePaths.add(temp.get());
@@ -112,7 +126,8 @@ public class PathHandler extends MeasurableSubsystem {
       timer.stop();
       timer.reset();
       timer.start();
-      driveSubsystem.calculateController(currPath.getInitialSample(mirrorTrajectory).get());
+      driveSubsystem.calculateController(
+          mirrorToProcessor(currPath.getInitialSample(mirrorTrajectory).get()));
       if (curState == PathStates.PLACE) {
         curState = PathStates.DRIVE_FETCH;
       } else if (curState == PathStates.FETCH) {
@@ -123,13 +138,15 @@ public class PathHandler extends MeasurableSubsystem {
 
   private void drivePath() {
     if (isHandling && runningPath && currPath != null) {
-      driveSubsystem.calculateController(currPath.sampleAt(timer.get(), mirrorTrajectory).get());
+      driveSubsystem.calculateController(
+          mirrorToProcessor(currPath.sampleAt(timer.get(), mirrorTrajectory).get()));
       if (timer.hasElapsed(currPath.getTotalTime())) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
         timer.stop();
         timer.reset();
-        driveSubsystem.calculateController(currPath.getFinalSample(mirrorTrajectory).get());
+        driveSubsystem.calculateController(
+            mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()));
         if (curState == PathStates.DRIVE_FETCH) {
           curState = PathStates.FETCH;
         } else if (curState == PathStates.DRIVE_PLACE) {
@@ -145,15 +162,15 @@ public class PathHandler extends MeasurableSubsystem {
   private void drivePathServo() {
     if (isHandling && runningPath && currPath != null && isServoing) {
       driveSubsystem.calculateControllerServo(
-          currPath.sampleAt(timer.get(), mirrorTrajectory).get(),
-          tagAlignSubsystem.calculateAlignY());
+          mirrorToProcessor(currPath.sampleAt(timer.get(), mirrorTrajectory).get()),
+          0.0); // TODO: use tag servoing here when ready
       if (timer.hasElapsed(currPath.getTotalTime())) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
         timer.stop();
         timer.reset();
         driveSubsystem.calculateControllerServo(
-            currPath.getFinalSample(mirrorTrajectory).get(), 0.0);
+            mirrorToProcessor(currPath.getFinalSample(mirrorTrajectory).get()), 0.0);
         if (curState == PathStates.DRIVE_FETCH) {
           curState = PathStates.FETCH;
         } else if (curState == PathStates.DRIVE_PLACE_SERVO) {
@@ -219,7 +236,37 @@ public class PathHandler extends MeasurableSubsystem {
     }
     return curState == PathStates.DRIVE_PLACE
         && timer.hasElapsed(currPath.getTotalTime() - 1.0)
+        // && TagAlignSubsystem.canSeeTag(desiredTag)
         && isCloseEnough;
+  }
+
+  private SwerveSample mirrorToProcessor(SwerveSample sample) {
+    if (mirrorToProcessor) {
+      sample =
+          new SwerveSample(
+              sample.t,
+              sample.x,
+              DriveConstants.kFieldMaxY - sample.y,
+              sample.heading * -1,
+              sample.vx,
+              DriveConstants.kFieldMaxY - sample.vy,
+              sample.omega * -1,
+              sample.ax,
+              DriveConstants.kFieldMaxY - sample.ay,
+              sample.alpha * -1,
+              sample.moduleForcesX(),
+              new double[] {
+                sample.moduleForcesY()[0] * -1,
+                sample.moduleForcesY()[1] * -1,
+                sample.moduleForcesY()[2] * -1,
+                sample.moduleForcesY()[3] * -1
+              });
+    }
+    return sample;
+  }
+
+  public boolean isFinished() {
+    return !isHandling;
   }
 
   @Override
@@ -247,7 +294,8 @@ public class PathHandler extends MeasurableSubsystem {
         if (runningPath && isServoing) {
           tagAlignSubsystem.setup(
               robotStateSubsystem.getAllianceColor(),
-              robotStateSubsystem.getScoreSide() == RobotStateSubsystem.ScoreSide.LEFT);
+              robotStateSubsystem.getScoreSide() == RobotStateSubsystem.ScoreSide.LEFT,
+              false);
           drivePathServo();
         }
       }

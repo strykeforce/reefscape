@@ -4,12 +4,21 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorPhaseValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -31,15 +40,15 @@ public class DriveConstants {
   public static final double kDriveGearRatio =
       (kDriveMotorOutputGear / kDriveInputGear) * (kBevelInputGear / kBevelOutputGear);
 
-  public static final double kWheelDiameterInches = 4.0;
-  public static final double kMaxSpeedMetersPerSecond = 3.384;
+  public static final double kWheelDiameterInches = 3.375;
+  public static final double kMaxSpeedMetersPerSecond = 3.782;
   public static final double kSpeedStillThreshold = 0.1; // meters per second
   public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
   public static final double kGyroDifferentThreshold = 5.0; // 5 degrees
   public static final int kGyroDifferentCount = 3;
 
-  public static final double kRobotLength = 0.6223;
-  public static final double kRobotWidth = 0.6223;
+  public static final double kRobotLength = 0.61595;
+  public static final double kRobotWidth = 0.61595;
   public static final double kFieldMaxX = 17.526;
   public static final double kCenterLineX = 8.763;
 
@@ -53,6 +62,7 @@ public class DriveConstants {
   public static final double kPHolonomic = 3.0; // was 3
   public static final double kIHolonomic = 0.0000;
   public static final double kDHolonomic = 0.00; // kPHolonomic/100
+  public static double kFieldMaxY;
 
   public static Translation2d[] getWheelLocationMeters() {
     final double x = kRobotLength / 2.0; // front-back, was ROBOT_LENGTH
@@ -74,62 +84,64 @@ public class DriveConstants {
   public static final Pose2d kResetOdomPose =
       new Pose2d(new Translation2d(0.5, 3.62), Rotation2d.fromDegrees(67));
 
-  // public static TalonFXSConfiguration
-  //     getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
-  //   // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
-  //   TalonFXSConfiguration azimuthConfig = new TalonFXSConfiguration();
+  public static TalonFXSConfiguration getAzimuthFXSConfig() {
+    // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
+    TalonFXSConfiguration azimuthConfig = new TalonFXSConfiguration();
 
-  //   HardwareLimitSwitchConfigs hardwareLimitSwitchConfigs = new HardwareLimitSwitchConfigs();
-  //   hardwareLimitSwitchConfigs.ForwardLimitEnable = false;
-  //   hardwareLimitSwitchConfigs.ReverseLimitEnable = false;
-  //   azimuthConfig.HardwareLimitSwitch = hardwareLimitSwitchConfigs;
+    HardwareLimitSwitchConfigs hardwareLimitSwitchConfigs = new HardwareLimitSwitchConfigs();
+    hardwareLimitSwitchConfigs.ForwardLimitEnable = false;
+    hardwareLimitSwitchConfigs.ReverseLimitEnable = false;
+    azimuthConfig.HardwareLimitSwitch = hardwareLimitSwitchConfigs;
 
-  //   CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
-  //   currentConfig.SupplyCurrentLowerTime = 0;
-  //   currentConfig.SupplyCurrentLowerLimit = 0;
+    CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
+    currentConfig.SupplyCurrentLimit = 20;
+    currentConfig.SupplyCurrentLowerTime = 20;
+    currentConfig.SupplyCurrentLowerLimit = 1;
 
-  //   currentConfig.SupplyCurrentLimit = 10;
-  //   currentConfig.SupplyCurrentLimitEnable = true;
+    currentConfig.SupplyCurrentLimitEnable = true;
+    currentConfig.StatorCurrentLimitEnable = false;
 
-  //   azimuthConfig.CurrentLimits = currentConfig;
+    azimuthConfig.CurrentLimits = currentConfig;
 
-  //   Slot0Configs slot0Config = new Slot0Configs();
-  //   slot0Config.kP = 360.35;
-  //   slot0Config.kI = 0.0;
-  //   slot0Config.kD = 3.604;
+    Slot0Configs slot0Config = new Slot0Configs();
+    slot0Config.kP = 300;
+    slot0Config.kI = 0.0;
+    slot0Config.kD = 3;
+    slot0Config.kV = 4.3;
 
-  //   azimuthConfig.Slot0 = slot0Config;
+    azimuthConfig.Slot0 = slot0Config;
 
-  //   ExternalFeedbackConfigs externalFeedbackConfigs = new ExternalFeedbackConfigs();
-  //   externalFeedbackConfigs.VelocityFilterTimeConstant = 0.1;
-  //   externalFeedbackConfigs.ExternalFeedbackSensorSource =
-  //       ExternalFeedbackSensorSourceValue.PulseWidth;
-  //   azimuthConfig.ExternalFeedback = externalFeedbackConfigs;
+    ExternalFeedbackConfigs externalFeedbackConfigs = new ExternalFeedbackConfigs();
+    externalFeedbackConfigs.VelocityFilterTimeConstant = 0.02; // ?
+    externalFeedbackConfigs.ExternalFeedbackSensorSource =
+        ExternalFeedbackSensorSourceValue.Quadrature;
+    externalFeedbackConfigs.SensorPhase = SensorPhaseValue.Opposed;
+    azimuthConfig.ExternalFeedback = externalFeedbackConfigs;
 
-  //   VoltageConfigs voltageConfig = new VoltageConfigs();
-  //   voltageConfig.SupplyVoltageTimeConstant = 3.2; // FIXME, seems very long
-  //   azimuthConfig.Voltage = voltageConfig;
+    // VoltageConfigs voltageConfig = new VoltageConfigs();
+    // voltageConfig.SupplyVoltageTimeConstant = 3.2; // FIXME, seems very long
+    // azimuthConfig.Voltage = voltageConfig;
 
-  //   MotionMagicConfigs motionConfig = new MotionMagicConfigs();
-  //   motionConfig.MotionMagicCruiseVelocity = 800;
-  //   motionConfig.MotionMagicAcceleration = 10_000;
-  //   azimuthConfig.MotionMagic = motionConfig;
+    MotionMagicConfigs motionConfig = new MotionMagicConfigs();
+    motionConfig.MotionMagicCruiseVelocity = 2;
+    motionConfig.MotionMagicAcceleration = 20;
+    azimuthConfig.MotionMagic = motionConfig;
 
-  //   MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
-  //   motorConfigs.DutyCycleNeutralDeadband = 0.04;
-  //   motorConfigs.NeutralMode = NeutralModeValue.Coast;
-  //   azimuthConfig.MotorOutput = motorConfigs;
+    MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
+    // motorConfigs.DutyCycleNeutralDeadband = 0.04;
+    motorConfigs.NeutralMode = NeutralModeValue.Coast;
+    motorConfigs.Inverted = InvertedValue.Clockwise_Positive;
+    azimuthConfig.MotorOutput = motorConfigs;
 
-  //   CommutationConfigs commutationConfigs = new CommutationConfigs();
-  //   commutationConfigs.MotorArrangement = MotorArrangementValue.Minion_JST;
+    CommutationConfigs commutationConfigs = new CommutationConfigs();
+    commutationConfigs.MotorArrangement = MotorArrangementValue.Minion_JST;
 
-  //   azimuthConfig.Commutation = commutationConfigs;
+    azimuthConfig.Commutation = commutationConfigs;
 
-  //   return azimuthConfig;
-  // }
+    return azimuthConfig;
+  }
 
-  public static TalonSRXConfiguration
-      getAzimuthTalonConfig() { // will be changed to a TalonFXConfiguration
+  public static TalonSRXConfiguration getAzimuthTalonConfig() {
     // constructor sets encoder to Quad/CTRE_MagEncoder_Relative
     TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
 
@@ -166,7 +178,8 @@ public class DriveConstants {
 
     CurrentLimitsConfigs currentConfig = new CurrentLimitsConfigs();
     currentConfig.SupplyCurrentLimit = 60;
-
+    currentConfig.SupplyCurrentLowerLimit = 60;
+    currentConfig.SupplyCurrentLowerTime = 1.0;
     currentConfig.StatorCurrentLimit = 140;
 
     currentConfig.SupplyCurrentLimitEnable = true;
@@ -175,10 +188,13 @@ public class DriveConstants {
     driveConfig.CurrentLimits = currentConfig;
 
     Slot0Configs slot0Config = new Slot0Configs();
-    slot0Config.kP = 0.5; // 0.16 using phoenix 6 migrate
-    slot0Config.kI = 0.5; // 0.0002 using phoenix 6 migrate
+    slot0Config.kP = 0.2;
+    slot0Config.kI = 0.0;
     slot0Config.kD = 0.0;
-    slot0Config.kV = 0.12; // 0.047 using phoenix 6 migrate
+    slot0Config.kV = 0.117;
+    slot0Config.kS = 0.0;
+    slot0Config.kA = 0.0;
+    slot0Config.kG = 0.0;
     driveConfig.Slot0 = slot0Config;
 
     MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
@@ -198,9 +214,9 @@ public class DriveConstants {
     config.MountPose.MountPoseRoll = 0.0;
     config.MountPose.MountPosePitch = 0.0;
 
-    config.GyroTrim.GyroScalarX = 0.0;
-    config.GyroTrim.GyroScalarY = 0.0;
-    config.GyroTrim.GyroScalarZ = -4.55;
+    config.GyroTrim.GyroScalarX = -1.2;
+    config.GyroTrim.GyroScalarY = 4.8;
+    config.GyroTrim.GyroScalarZ = -2.9;
 
     return config;
   }
