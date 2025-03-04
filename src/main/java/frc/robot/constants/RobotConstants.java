@@ -21,11 +21,13 @@ import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotConstants {
-  public static final String protoSerial = "032243F2";
-  public static final boolean isComp = !RobotController.getSerialNumber().equals(protoSerial);
+  private Logger logger;
 
+  public static final String protoSerial = "032243F2";
+  public static final boolean isComp = !RobotController.getSerialNumber().equals(protoSerial); 
   public static final int kTalonConfigTimeout = 10; // ms
 
   public static final double kJoystickDeadband = 0.1;
@@ -49,6 +51,7 @@ public class RobotConstants {
   public static final Angle kBargeBackwardSetpoint = Rotations.of(-12.3489);
 
   public RobotConstants() {
+    logger.recordOutput("RobotConstants/Using Comp Constants", isComp);
     if (isComp) {
       // Comp bot constants
       kZero = CompConstants.kZero;
