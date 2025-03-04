@@ -559,10 +559,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       return;
     }
 
+    biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint, hasAlgae());
+    elevatorSubsystem.setPosition(RobotConstants.kStowSetpoint);
+
     climbSubsystem.prepClimb();
     driveSubsystem.prepClimb();
 
-    setState(RobotStates.PREP_CLIMB, false);
+    setState(RobotStates.PREP_CLIMB, true);
   }
 
   public void toClimb() {
@@ -571,7 +574,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       climbSubsystem.climb();
       driveSubsystem.prepClimb();
 
-      setState(RobotStates.CLIMB, false);
+      setState(RobotStates.CLIMB, true);
     }
   }
 

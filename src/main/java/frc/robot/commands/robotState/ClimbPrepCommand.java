@@ -7,6 +7,7 @@ public class ClimbPrepCommand extends InstantCommand {
   RobotStateSubsystem robotState;
 
   public ClimbPrepCommand(RobotStateSubsystem robotState) {
+    addRequirements(robotState);
     this.robotState = robotState;
   }
 
