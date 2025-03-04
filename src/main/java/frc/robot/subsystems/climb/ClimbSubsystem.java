@@ -1,5 +1,3 @@
-// still have a non-negligible amount of stuff to do on the state machine
-
 package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.Rotations;
