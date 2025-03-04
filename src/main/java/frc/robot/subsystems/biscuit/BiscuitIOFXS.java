@@ -51,7 +51,7 @@ public class BiscuitIOFXS implements BiscuitIO {
     // Reset and configure motor settings
     configurator = talon.getConfigurator();
     configurator.apply(new TalonFXSConfiguration());
-    configurator.apply(BiscuitConstants.getFXSConfig());
+    configurator.apply(RobotConstants.talonFXSConfig);
 
     // Set our variables
     velocity = talon.getVelocity();
@@ -68,9 +68,9 @@ public class BiscuitIOFXS implements BiscuitIO {
   public void setPosition(Angle position, boolean hasAlgae) {
     if (hasAlgae != lastHadAlgae) {
       if (hasAlgae) {
-        configurator.apply(BiscuitConstants.getAlgaeMotionConfig());
+        configurator.apply(RobotConstants.alageMotionConfig);
       } else {
-        configurator.apply(BiscuitConstants.getNoAlgaeMotionConfig());
+        configurator.apply(RobotConstants.noAlageMotionConfig);
       }
       lastHadAlgae = hasAlgae;
     }
