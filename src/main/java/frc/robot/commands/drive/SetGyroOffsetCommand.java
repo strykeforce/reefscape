@@ -16,6 +16,8 @@ public class SetGyroOffsetCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    driveSubsystem.setGyroOffset(offset);
+    if (driveSubsystem.shouldFlip())
+      driveSubsystem.setGyroOffset(new Rotation2d(-offset.getCos(), offset.getSin()));
+    else driveSubsystem.setGyroOffset(offset);
   }
 }

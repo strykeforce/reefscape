@@ -1,8 +1,9 @@
 package frc.robot.commands.auton;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.drive.SetGyroOffsetCommand;
+import frc.robot.commands.drive.PrepOdomForAutoCommand;
 import frc.robot.commands.pathHandler.StartPathHandlerCommand;
 import frc.robot.constants.PathHandlerConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
@@ -43,7 +44,9 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
-      char startNode) {
+      char startNode,
+      Boolean startScoreLeft,
+      Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
     this.pathHandler = pathHandler;
@@ -63,11 +66,12 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
             true,
             true,
             false,
-            false);
+            startScoreLeft);
 
     addCommands(
         new SequentialCommandGroup(
-            new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
+            new PrepOdomForAutoCommand(driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
+            // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath,
             new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),
 

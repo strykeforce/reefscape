@@ -54,6 +54,7 @@ import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
 import frc.robot.commands.robotState.lockwheelscommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
 import frc.robot.commands.vision.SetVisionUpdatesCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -210,7 +211,9 @@ public class RobotContainer {
             "startToJ",
             new ArrayList<Character>(Arrays.asList('k', 'l')),
             new ArrayList<Integer>(Arrays.asList(4, 4)),
-            'j');
+            'j',
+            false,
+            AutonConstants.kNonProcessorShallow);
 
     nonProcessorShallowAutonCommand.reassignAlliance();
 
@@ -230,7 +233,8 @@ public class RobotContainer {
             new ArrayList<Character>(Arrays.asList('d', 'c')),
             new ArrayList<Integer>(Arrays.asList(4, 4)),
             'e',
-            true);
+            true,
+            AutonConstants.kNonProcessorShallow);
 
     processorShallowAutonCommand.reassignAlliance();
 
