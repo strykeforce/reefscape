@@ -6,7 +6,7 @@ import edu.wpi.first.math.util.Units;
 
 public class AutonConstants {
   public static final double kAutoTimeout = 0.5;
-  public static final double kMaxPathErrorMeters = 0.015;
+  public static final double kMaxPathErrorMeters = 0.05;
   public static final double kMaxOmegaErrorDegrees = 0.5;
   public static final double kMaxOmegaErrorRadians = Units.degreesToRadians(kMaxOmegaErrorDegrees);
 

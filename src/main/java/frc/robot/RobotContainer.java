@@ -21,6 +21,7 @@ import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.algae.ToggleHasAlgaeCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
+import frc.robot.commands.auton.ProcessorShallowAutonCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
@@ -120,6 +121,7 @@ public class RobotContainer {
   private final TelemetryService telemetryService = new TelemetryService(TelemetryController::new);
 
   private NonProcessorShallowAutonCommand nonProcessorShallowAutonCommand;
+  private ProcessorShallowAutonCommand processorShallowAutonCommand;
 
   public RobotContainer() {
 
@@ -183,11 +185,30 @@ public class RobotContainer {
             visionSubsystem,
             () -> xboxController.getRawButton(XboxController.Button.kStart.value),
             "startToJ",
-            new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
-            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            new ArrayList<Character>(Arrays.asList('k', 'l')),
+            new ArrayList<Integer>(Arrays.asList(4, 4)),
             'j');
 
     nonProcessorShallowAutonCommand.reassignAlliance();
+
+    processorShallowAutonCommand =
+        new ProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            () -> xboxController.getRawButton(XboxController.Button.kStart.value),
+            "startPToE",
+            new ArrayList<Character>(Arrays.asList('d', 'c')),
+            new ArrayList<Integer>(Arrays.asList(4, 4)),
+            'e');
+
+    processorShallowAutonCommand.reassignAlliance();
 
     configureTelemetry();
     configureDriverBindings();
@@ -490,14 +511,14 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add("Start Auton", nonProcessorShallowAutonCommand)
+        .add("Start Auton", processorShallowAutonCommand)
         .withPosition(3, 0)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
         .add(
             "reAssign Alliance",
-            new InstantCommand(() -> nonProcessorShallowAutonCommand.reassignAlliance())
+            new InstantCommand(() -> processorShallowAutonCommand.reassignAlliance())
                 .ignoringDisable(true))
         .withPosition(4, 0)
         .withSize(1, 1);

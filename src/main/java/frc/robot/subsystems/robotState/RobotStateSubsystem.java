@@ -282,7 +282,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toAutonPrestage() {
     coralLoc = CoralLoc.CORAL;
     biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
-    elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
+    elevatorSubsystem.setPosition(ElevatorConstants.kAutoPrestageSetpoint);
     funnelSubsystem.stopMotor();
 
     setState(RobotStates.PRESTAGE, true);
@@ -663,7 +663,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (coralSubsystem.hasCoral()) {
           coralLoc = CoralLoc.CORAL;
           biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
-          elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
+          if (isAuto) {
+            elevatorSubsystem.setPosition(ElevatorConstants.kAutoPrestageSetpoint);
+          } else {
+            elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
+          }
           funnelSubsystem.stopMotor();
 
           setState(RobotStates.PRESTAGE, true);

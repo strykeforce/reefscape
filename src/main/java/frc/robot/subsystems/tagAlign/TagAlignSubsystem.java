@@ -373,7 +373,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
         // Translation2d poseError = targetPose.getTranslation().minus(current.getTranslation());
 
-        if (FastMath.abs(driveOmega.getPositionError()) < TagServoingConstants.kAngleCloseEnough) {
+        if (finalDrive
+            || FastMath.abs(driveOmega.getPositionError())
+                < TagServoingConstants.kAngleCloseEnough) {
           switch (curState) {
             case DRIVE -> {
               if (FastMath.abs(driveX.getError()) < driveXCloseEnough

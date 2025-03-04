@@ -28,7 +28,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
   }
 
   public boolean hasZeroed() {
-    return hasZeroed();
+    return hasZeroed;
   }
 
   @Override
@@ -48,7 +48,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem implements ClosedLoopP
 
   @Override
   public void zero() {
-    boolean success = io.zero();
+    hasZeroed = io.zero();
   }
 
   @Override

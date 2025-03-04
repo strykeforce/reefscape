@@ -169,7 +169,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   public void execute() {
     if (elevatorSubsystem.getState() == ElevatorStates.ZEROED && !hasStaged) {
       hasStaged = true;
-      robotStateSubsystem.toAutonPrestage();
+      // robotStateSubsystem.toAutonPrestage();
     }
     if (isTherePath) {
       if (!isServoing) {
@@ -178,9 +178,11 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
         if (shouldTransitionToServoing()) {
           isServoing = true;
-          robotStateSubsystem.toPrepCoral();
+          // robotStateSubsystem.toPrepCoral();
           tagAlignSubsystem.startAuto(
-              mirrorTrajectory ? Alliance.Red : Alliance.Blue, scoreLeft, false);
+              mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+              mirrorToProcessor ? !scoreLeft : scoreLeft,
+              false);
         }
       }
     }
@@ -199,8 +201,8 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
       return true;
     }
     return ((timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
-            || tagAlignSubsystem.getState() == TagAlignStates.DONE && isServoing))
-        && elevatorSubsystem.isFinished();
+        || tagAlignSubsystem.getState() == TagAlignStates.DONE && isServoing))
+    /*  && elevatorSubsystem.isFinished()*/ ;
     // || (FastMath.sqrt(
     //             FastMath.pow(driveSubsystem.getPoseMeters().getX() - finalPose.getX(), 2)
     //                 + FastMath.pow(

@@ -31,6 +31,37 @@ public class PathHandlerConstants {
       "fetchToL"
     }
   };
+
+  public static final String[][] kProcessorShallowPathNames = {
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "CTofetchP",
+      "DTofetchP",
+      "ETofetchP",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    },
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchPToC",
+      "fetchPToD",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    }
+  };
   public static final double kWaitingTime = 2.0;
   public static final double kServoRadius = 1.4;
 }

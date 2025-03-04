@@ -209,7 +209,7 @@ public class PathHandler extends MeasurableSubsystem {
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
         curState = PathStates.DRIVE_PLACE_SERVO;
-        robotStateSubsystem.toPrepCoral();
+        // robotStateSubsystem.toPrepCoral();
         isServoing = true;
       }
     }
@@ -223,7 +223,7 @@ public class PathHandler extends MeasurableSubsystem {
         runningPath = false;
         pathTimer.stop();
         pathTimer.reset();
-        robotStateSubsystem.toPlaceCoralAuto();
+        // robotStateSubsystem.toPlaceCoralAuto();
         curState = PathStates.PLACE;
         driveSubsystem.stopDriving();
         waitingTimer.start();
@@ -258,7 +258,7 @@ public class PathHandler extends MeasurableSubsystem {
     if (nodeNames.size() > 0) {
       tagAlignSubsystem.setup(
           mirrorTrajectory ? Alliance.Red : Alliance.Blue,
-          (nodeNames.get(0) - 'a') % 2 == 0,
+          (nodeNames.get(0) - 'a') % 2 == (mirrorToProcessor ? 1 : 0),
           false);
       nodeNames.remove(0);
     }
@@ -382,7 +382,7 @@ public class PathHandler extends MeasurableSubsystem {
         if (!robotStateSubsystem.hasCoral()) {
           // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
           // proceedToNext) {
-          robotStateSubsystem.toFunnelLoad();
+          // robotStateSubsystem.toFunnelLoad();
           curState = PathStates.DRIVE_FETCH;
         }
       }

@@ -18,7 +18,7 @@ public class PlaceCoralAutonCommand extends Command {
 
   @Override
   public void initialize() {
-    robotStateSubsystem.toPrepCoral();
+    robotStateSubsystem.toPlaceCoralAuto();
   }
 
   @Override
