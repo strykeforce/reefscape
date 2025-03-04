@@ -70,7 +70,7 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
         new SequentialCommandGroup(
             new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath,
-            // new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem)
+            new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),
 
             // new ParallelCommandGroup(
             //     new ZeroElevatorCommand(elevatorSubsystem),

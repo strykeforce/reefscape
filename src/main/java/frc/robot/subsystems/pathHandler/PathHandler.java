@@ -211,7 +211,7 @@ public class PathHandler extends MeasurableSubsystem {
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
         curState = PathStates.DRIVE_PLACE_SERVO;
-        // robotStateSubsystem.toPrepCoral();
+        robotStateSubsystem.toPrepCoral();
         isServoing = true;
       }
     }
@@ -225,7 +225,7 @@ public class PathHandler extends MeasurableSubsystem {
         runningPath = false;
         pathTimer.stop();
         pathTimer.reset();
-        // robotStateSubsystem.toPlaceCoralAuto();
+        robotStateSubsystem.toPlaceCoralAuto();
         curState = PathStates.PLACE;
         driveSubsystem.stopDriving();
         waitingTimer.start();
@@ -381,13 +381,12 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case PLACE -> {
-        curState = PathStates.DRIVE_FETCH;
-        // if (!robotStateSubsystem.hasCoral()) {
-        //   // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
-        //   // proceedToNext) {
-        //   // robotStateSubsystem.toFunnelLoad();
-        //   curState = PathStates.DRIVE_FETCH;
-        // }
+        if (!robotStateSubsystem.hasCoral()) {
+          // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
+          // proceedToNext) {
+          robotStateSubsystem.toFunnelLoad();
+          curState = PathStates.DRIVE_FETCH;
+        }
       }
       case DONE -> isHandling = false;
       default -> {}
