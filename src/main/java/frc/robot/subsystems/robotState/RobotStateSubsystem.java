@@ -20,6 +20,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
 import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem.LEDStates;
@@ -70,6 +71,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean isAuto = false;
   private boolean isEjectingAlgae = false;
   private boolean isBargeSafe = true;
+  private boolean isAutoReadyForEject = false;
   private boolean prestagingForAlgae = false;
 
   private Timer scoringTimer = new Timer();
@@ -147,8 +149,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return coralSubsystem.hasCoral();
   }
 
+  public boolean hasCoralAuton() {
+    return funnelSubsystem.hasCoral();
+  }
+
   public boolean hasAlgae() {
     return algaeSubsystem.hasAlgae();
+  }
+
+  public void startupSequence() {
+    if (curState == RobotStates.IDLE) {
+      elevatorSubsystem.zero();
+      setState(RobotStates.STARTUP);
+    }
   }
 
   private void setState(RobotStates robotState, boolean transfer) {
@@ -217,6 +230,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
+    isAutoReadyForEject = false;
   }
 
   public void setAutoPlacingLed(boolean isAutoPlacing) {
@@ -295,7 +309,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setState(RobotStates.TO_STOW_SEQUENTIAL);
   }
 
-  private void toFunnelLoad() {
+  public void toAutonPrestage() {
+    coralLoc = CoralLoc.CORAL;
+    biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint, hasAlgae());
+    elevatorSubsystem.setPosition(ElevatorConstants.kAutoPrestageSetpoint);
+    funnelSubsystem.stopMotor();
+
+    setState(RobotStates.PRESTAGE, true);
+  }
+
+  public void toFunnelLoad() {
     biscuitSubsystem.setPosition(BiscuitConstants.kFunnelSetpoint, hasAlgae());
     coralSubsystem.intake();
     elevatorSubsystem.setPosition(RobotConstants.kFunnelSetpoint);
@@ -321,12 +344,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPrepCoral() {
     if (curState == RobotStates.REEF_ALIGN_CORAL) {
+      if (isAuto) isAutoReadyForEject = true;
       if (elevatorSubsystem.isFinished()) {
         toPlaceCoral();
       }
     } else {
       toReefAlign(getAlgaeOnCycle, isAutoPlacing);
     }
+  }
+
+  public void toPlaceCoralAuto() {
+    isAutoReadyForEject = true;
+    if (elevatorSubsystem.isFinished()) toPlaceCoral();
+    else toReefAlign(getAlgaeOnCycle, isAutoPlacing);
   }
 
   public void toReefAlign() {
@@ -429,6 +459,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toPlaceCoral() {
     coralSubsystem.eject();
     funnelSubsystem.clearCoral();
+    isAutoReadyForEject = false;
     scoringTimer.stop();
     scoringTimer.reset();
     scoringTimer.start();
@@ -601,6 +632,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("RobotState/isAuto", isAuto);
     Logger.recordOutput("RobotState/currentLimiting", isCurrentLimiting);
     Logger.recordOutput("RobotState/isEjectingAlgae", isEjectingAlgae);
+    Logger.recordOutput("RobotState/isAutoReadyForEject", isAutoReadyForEject);
     Logger.recordOutput("RobotState/coralLoc", coralLoc);
 
     switch (curState) {
@@ -680,10 +712,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (currentLevel != scoringLevel) {
           toReefAlign(false, false);
         }
-        if (isAutoPlacing
-            && tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE
-            && elevatorSubsystem.isFinished()) {
+        if ((isAutoPlacing
+                && tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE
+                && elevatorSubsystem.isFinished())
+            || (isAuto && isAutoReadyForEject)) {
           toPlaceCoral();
+          isAutoReadyForEject = false;
         }
       }
       case REMOVE_ALGAE -> {
@@ -724,7 +758,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case LOADING_CORAL -> {
         if (coralSubsystem.hasCoral()) {
           coralLoc = CoralLoc.CORAL;
-          toPrestage();
+          // biscuitSubsystem.setPosition(BiscuitConstants.kPrestageSetpoint);
+          if (isAuto) {
+            toAutonPrestage();
+            // elevatorSubsystem.setPosition(ElevatorConstants.kAutoPrestageSetpoint);
+            break;
+          } else {
+            toPrestage();
+            // elevatorSubsystem.setPosition(ElevatorConstants.kPrestageSetpoint);
+            break;
+          }
+          // funnelSubsystem.stopMotor();
+
+          // setState(RobotStates.PRESTAGE, true);
         }
       }
       case PRESTAGE -> {
@@ -803,6 +849,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case CLIMB -> {}
       case INTERRUPTED -> {}
       case IDLE -> {}
+      case STARTUP -> {
+        if (elevatorSubsystem.getState() == ElevatorStates.ZEROED) toStow();
+      }
       default -> logger.error("Unhandled state: {}", curState);
     }
     ledSubsystem.setCoralLights(coralLoc);
@@ -842,7 +891,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     CLIMB,
     INTERRUPTED,
     TRANSFER,
-    IDLE
+    IDLE,
+    STARTUP
   }
 
   public enum ScoringLevel {

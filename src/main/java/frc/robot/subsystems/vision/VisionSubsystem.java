@@ -374,6 +374,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    Logger.recordOutput("Vision/Vision Updates On", visionUpdating);
     double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
     gyroBuffer.addFirst(gyroData);
 

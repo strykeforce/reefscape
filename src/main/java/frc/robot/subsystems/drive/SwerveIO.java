@@ -104,4 +104,6 @@ public interface SwerveIO {
   }
 
   public default void zeroModules() {}
+
+  public default void prepForAuto(Pose2d pose2d, double offsetDegrees) {}
 }

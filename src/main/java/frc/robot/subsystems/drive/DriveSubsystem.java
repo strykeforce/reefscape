@@ -53,10 +53,6 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private RobotStateSubsystem robotStateSubsystem;
 
   public DriveSubsystem(SwerveIO io) {
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/YVelSpeed", 0.0);
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/UsingDeadEye", false);
-    org.littletonrobotics.junction.Logger.recordOutput("Swerve/Auto Drive Info", "Nothing");
-
     this.io = io;
     // Setup Holonomic Controller
     omegaController =
@@ -65,7 +61,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
             DriveConstants.kIOmega,
             DriveConstants.kDOmega,
             new TrapezoidProfile.Constraints(
-                DriveConstants.kMaxVelOmega, DriveConstants.kMaxAccelOmega));
+                DriveConstants.kMaxAutoOmega, DriveConstants.kMaxAccelOmega));
     omegaController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     xController =
@@ -81,6 +77,8 @@ public class DriveSubsystem extends MeasurableSubsystem {
     // trajectory output (no
     // closing the loop on x,y,theta errors)
     holonomicController.setEnabled(true);
+
+    setAutoDebugMsg("Nothing");
   }
 
   public boolean hasZeroed() {
@@ -116,8 +114,13 @@ public class DriveSubsystem extends MeasurableSubsystem {
     io.move(vXmps, vYmps, vOmegaRadps, isFieldOriented);
   }
 
+  public double getHolonomicControllerOmegaErrorRadians() {
+    return omegaController.getPositionError();
+  }
+
   // Choreo Holonomic Controller
   public void calculateController(SwerveSample desiredState) {
+    Logger.recordOutput("DriveSubsystem/desiredPose", desiredState.getPose());
     holoContInput = desiredState;
     double xFF = desiredState.vx;
     double yFF = desiredState.vy;
@@ -132,12 +135,22 @@ public class DriveSubsystem extends MeasurableSubsystem {
     holoContOutput.vxMetersPerSecond = xFF + xFeedback;
     holoContOutput.vyMetersPerSecond = yFF + yFeedback;
     holoContOutput.omegaRadiansPerSecond = rotationFF + rotationFeedback;
+    Logger.recordOutput("DriveSubsystem/HoloCont/InputVx", holoContInput.vx);
+    Logger.recordOutput("DriveSubsystem/HoloCont/InputVy", holoContInput.vy);
+    Logger.recordOutput("DriveSubsystem/HoloCont/InputVomega", holoContInput.omega);
+    Logger.recordOutput("DriveSubsystem/HoloCont/OutputVx", holoContOutput.vxMetersPerSecond);
+    Logger.recordOutput("DriveSubsystem/HoloCont/OutputVy", holoContOutput.vyMetersPerSecond);
+    Logger.recordOutput(
+        "DriveSubsystem/HoloCont/OutputVomega", holoContOutput.omegaRadiansPerSecond);
+    Logger.recordOutput("DriveSubsystem/HoloCont/Xerr", xController.getError());
+    Logger.recordOutput("DriveSubsystem/HoloCont/Yerr", yController.getError());
+    Logger.recordOutput("DriveSubsystem/HoloCont/OmegaErr", omegaController.getPositionError());
 
-    io.move(
+    move(
         holoContOutput.vxMetersPerSecond,
         holoContOutput.vyMetersPerSecond,
         holoContOutput.omegaRadiansPerSecond,
-        false);
+        true);
   }
 
   // Choreo Holonomic Controller
@@ -213,6 +226,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("DriveSubsystem/Result Seconds", timestamp);
 
     io.addVisionMeasurement(pose, timestamp, stdDevvs);
+  }
+
+  public void prepForAuto(Pose2d pose, double offsetDegrees) {
+    io.prepForAuto(pose, robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0);
   }
 
   public void resetHolonomicController(double yaw) {
@@ -297,6 +314,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void teleResetGyro() {
+    setAutoDebugMsg("Reset Gyro");
     logger.info("Driver Joystick: Reset Gyro");
     double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));

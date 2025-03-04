@@ -19,7 +19,7 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
+public class ProcessorShallowAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
 
   private PathHandler pathHandler;
@@ -29,7 +29,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
 
-  public NonProcessorShallowAutonCommand(
+  public ProcessorShallowAutonCommand(
       DriveSubsystem driveSubsystem,
       PathHandler pathHandler,
       RobotStateSubsystem robotStateSubsystem,
@@ -43,7 +43,8 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
-      char startNode) {
+      char startNode,
+      boolean startScoreLeft) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
     this.pathHandler = pathHandler;
@@ -63,7 +64,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
             true,
             true,
             false,
-            false);
+            startScoreLeft);
 
     addCommands(
         new SequentialCommandGroup(
@@ -84,7 +85,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
             // new WaitForButtonPressCommand(button),
             new StartPathHandlerCommand(
                 pathHandler,
-                PathHandlerConstants.kShallowPathNames,
+                PathHandlerConstants.kProcessorShallowPathNames,
                 NodeNames,
                 NodeLevels,
                 startNode,
@@ -102,6 +103,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     robotStateSubsystem.setIsAuto(true);
     robotStateSubsystem.setScoreSide(ScoreSide.RIGHT);
     visionSubsystem.setVisionUpdating(true);
+    pathHandler.setPathNames(PathHandlerConstants.kProcessorShallowPathNames);
     // pathHandler.reassignAlliance();
   }
 }

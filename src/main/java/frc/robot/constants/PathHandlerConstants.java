@@ -1,21 +1,7 @@
 package frc.robot.constants;
 
 public class PathHandlerConstants {
-  public static final String[][] kpathNames = {
-    {
-      "fetchToA",
-      "fetchToB",
-      "FiveMeterTestPath",
-      "FiveMeterTestPath",
-      "FiveMeterTestPath",
-      "fetchToF",
-      "fetchToG",
-      "fetchToH",
-      "fetchToI",
-      "fetchToJ",
-      "fetchToK",
-      "fetchToL"
-    },
+  public static final String[][] kShallowPathNames = {
     {
       "ATofetch",
       "BTofetch",
@@ -29,6 +15,53 @@ public class PathHandlerConstants {
       "JTofetch",
       "KTofetch",
       "LTofetch"
+    },
+    {
+      "fetchToA",
+      "fetchToB",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchToF",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchToI",
+      "fetchToJ",
+      "fetchToK",
+      "fetchToL"
     }
   };
+
+  public static final String[][] kProcessorShallowPathNames = {
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "CTofetchP",
+      "DTofetchP",
+      "ETofetchP",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    },
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchPToC",
+      "fetchPToD",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    }
+  };
+  public static final double kWaitingTime = 2.0;
+  public static final double kServoRadius = 1.4;
 }

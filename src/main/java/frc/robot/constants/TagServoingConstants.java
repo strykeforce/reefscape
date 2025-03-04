@@ -66,7 +66,7 @@ public class TagServoingConstants {
 
   public static final double kEndDriveCurrentThreshold = 25;
   public static final int kEndCountThreshold = 1;
-  public static final double kEndVelThreshold = 2;
+  public static final double kEndVelThreshold = 5;
 
   // Reef
   public static final Translation2d kBlueReefPose = new Translation2d(4.489323, 4.0259);

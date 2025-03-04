@@ -65,6 +65,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
+    if (!m_robotContainer.hasBiscuitZeroed()) m_robotContainer.zeroBiscuit();
+
     if (!m_robotContainer.hasSwerveZeroed()) m_robotContainer.zeroSwerve();
   }
 
@@ -91,6 +93,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    if (!m_robotContainer.hasElevatorZeroed()) m_robotContainer.zeroElevator();
   }
 
   @Override

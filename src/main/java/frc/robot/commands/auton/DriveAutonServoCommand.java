@@ -1,23 +1,34 @@
-package frc.robot.commands.drive;
+package frc.robot.commands.auton;
 
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.auton.AutoCommandInterface;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.PathHandlerConstants;
+import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.Optional;
-import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DriveAutonCommand extends Command implements AutoCommandInterface {
+public class DriveAutonServoCommand extends Command implements AutoCommandInterface {
   private final DriveSubsystem driveSubsystem;
+  private final TagAlignSubsystem tagAlignSubsystem;
+  private final ElevatorSubsystem elevatorSubsystem;
+  private final RobotStateSubsystem robotStateSubsystem;
+
   private Trajectory<SwerveSample> trajectory;
   private final Timer timer = new Timer();
   private static final Logger logger = LoggerFactory.getLogger(DriveAutonCommand.class);
@@ -25,27 +36,40 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
   private String trajectoryName;
   private boolean mirrorTrajectory = false;
   private boolean mirrorToProcessor = false;
+  private boolean isServoing = false;
 
   private boolean resetOdometry;
   private boolean lastPath;
+  private boolean scoreLeft;
+  private boolean hasStaged = false;
 
   private SwerveSample desiredState;
   private Pose2d finalPose;
   private Pose2d initialPose = new Pose2d();
 
-  public DriveAutonCommand(
+  public DriveAutonServoCommand(
       DriveSubsystem driveSubsystem,
+      TagAlignSubsystem tagAlignSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      BiscuitSubsystem biscuitSubsystem,
+      RobotStateSubsystem robotStateSubsystem,
       String trajectoryName,
       boolean lastPath,
       boolean resetOdometry,
-      boolean mirrorToProcessor) {
+      boolean mirrorToProcessor,
+      boolean scoreLeft) {
 
-    addRequirements(driveSubsystem);
+    addRequirements(driveSubsystem, elevatorSubsystem, biscuitSubsystem);
     this.driveSubsystem = driveSubsystem;
+    this.tagAlignSubsystem = tagAlignSubsystem;
+    this.elevatorSubsystem = elevatorSubsystem;
+    this.robotStateSubsystem = robotStateSubsystem;
+
     this.resetOdometry = resetOdometry;
     this.lastPath = lastPath;
     this.trajectoryName = trajectoryName;
     this.mirrorToProcessor = mirrorToProcessor;
+    this.scoreLeft = scoreLeft;
     Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
     if (tempTrajectory.isPresent()) {
       trajectory = tempTrajectory.get();
@@ -121,6 +145,10 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
     //     driveSubsystem.resetOdometry(initialPose);
     // driveSubsystem.resetHolonomicController();
     //   }
+    elevatorSubsystem.zero();
+    isServoing = false;
+    hasStaged = false;
+
     if (isTherePath) {
       driveSubsystem.setEnableHolo(true);
       // driveSubsystem.recordAutoTrajectory(trajectory);
@@ -139,12 +167,32 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
 
   @Override
   public void execute() {
+    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED && !hasStaged) {
+      hasStaged = true;
+      robotStateSubsystem.toAutonPrestage();
+    }
     if (isTherePath) {
-      desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
-      driveSubsystem.calculateController(desiredState);
+      if (!isServoing) {
+        desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
+        driveSubsystem.calculateController(desiredState);
+
+        if (shouldTransitionToServoing()) {
+          isServoing = true;
+          robotStateSubsystem.toPrepCoral();
+          tagAlignSubsystem.startAuto(
+              mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+              mirrorToProcessor ? !scoreLeft : scoreLeft,
+              false);
+        }
+      }
     }
     org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorToProcessor", mirrorToProcessor);
     org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorTrajectory", mirrorTrajectory);
+  }
+
+  private boolean shouldTransitionToServoing() {
+    return tagAlignSubsystem.getCurRadius(mirrorTrajectory ? Alliance.Red : Alliance.Blue)
+        < PathHandlerConstants.kServoRadius;
   }
 
   @Override
@@ -152,14 +200,16 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
     if (!isTherePath) {
       return true;
     }
-    return (timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
-        || (FastMath.sqrt(
-                    FastMath.pow(driveSubsystem.getPoseMeters().getX() - finalPose.getX(), 2)
-                        + FastMath.pow(
-                            (driveSubsystem.getPoseMeters().getY() - finalPose.getY()), 2))
-                < AutonConstants.kMaxPathErrorMeters)
-            && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
-                < AutonConstants.kMaxOmegaErrorRadians);
+    return ((timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
+            || tagAlignSubsystem.getState() == TagAlignStates.DONE && isServoing))
+        && elevatorSubsystem.isFinished();
+    // || (FastMath.sqrt(
+    //             FastMath.pow(driveSubsystem.getPoseMeters().getX() - finalPose.getX(), 2)
+    //                 + FastMath.pow(
+    //                     (driveSubsystem.getPoseMeters().getY() - finalPose.getY()), 2))
+    //         < AutonConstants.kMaxPathErrorMeters)
+    //     && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
+    //         < AutonConstants.kMaxOmegaErrorRadians);
   }
 
   @Override
@@ -174,6 +224,8 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
     } else {
       driveSubsystem.drive(0, 0, 0);
     }
+    isServoing = false;
+    tagAlignSubsystem.terminate();
 
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory {}: {}", trajectoryName, timer.get());

@@ -23,10 +23,16 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   private BiscuitIO io;
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();
   private Angle setPoint = Rotations.of(0);
+  private Boolean hasZeroed = false;
 
   public BiscuitSubsystem(BiscuitIO io) {
     this.logger = LoggerFactory.getLogger(this.getClass());
     this.io = io;
+    hasZeroed = io.zero();
+  }
+
+  public boolean hasZeroed() {
+    return hasZeroed;
   }
 
   public void setPosition(Angle position, boolean hasAlgae) {
@@ -43,7 +49,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   }
 
   public void zero() {
-    io.zero();
+    hasZeroed = io.zero();
   }
 
   public boolean isFinished() {
