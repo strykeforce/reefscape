@@ -25,13 +25,13 @@ public class ClimbConstants {
   public static int kPivotArmFrontFxId = 45;
   // public static int kPivotArmFollowFxId = 46;
   public static int kCANcoderId = 46;
-  public static int kDeployServoId = 1; // the servo to release the pin
+  public static int kDeployServoId = 1;
   public static int kRatchetServoId = 2;
   public static int kCageAlignedDIOId = 11;
 
-  public static final double kPivotArmCloseEnough = 0.01; // FIXME
-  public static final double kArmMaxFwd = 0.12;
-  public static final double kArmMaxRev = -0.14;
+  public static final double kPivotArmCloseEnough = 0.01; // fixme
+  public static final double kArmMaxFwd = 0;
+  public static final double kArmMaxRev = -0.29;
   public static final Angle kArmZeroTicks = Degrees.of(1530);
 
   // Deploy Servo
@@ -43,8 +43,8 @@ public class ClimbConstants {
   public static final double kRatchetDisengagedPos = 1.0;
 
   // Climb positions
-  public static final Angle kClimbCagePos = Rotations.of(4); // fixme
-  public static final Double kClimbRatchedEngage = 0.0;
+  //public static final Angle kClimbCagePos = Rotations.of(); // will test
+  public static final Double kClimbRatchedEngage = -0.12;
   public static final double kFullyClimbed = kArmMaxFwd;
   public static final double kClimbOpenLoopSpeed = 4.0;
 
