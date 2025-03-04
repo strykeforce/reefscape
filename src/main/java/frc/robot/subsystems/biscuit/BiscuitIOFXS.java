@@ -34,6 +34,7 @@ public class BiscuitIOFXS implements BiscuitIO {
   private boolean fwdLimitSwitchOpen;
   private Angle offset;
   private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
+  private Boolean lastHadAlgae = false;
 
   TalonFXSConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
@@ -59,11 +60,20 @@ public class BiscuitIOFXS implements BiscuitIO {
     rawQuadrature.setUpdateFrequency(20);
     rawPulseWidth = talon.getRawPulseWidthPosition();
     rawPulseWidth.setUpdateFrequency(20);
+
     zero();
   }
 
   @Override
-  public void setPosition(Angle position) {
+  public void setPosition(Angle position, boolean hasAlgae) {
+    if (hasAlgae != lastHadAlgae) {
+      if (hasAlgae) {
+        configurator.apply(BiscuitConstants.getAlgaeMotionConfig());
+      } else {
+        configurator.apply(BiscuitConstants.getNoAlgaeMotionConfig());
+      }
+      lastHadAlgae = hasAlgae;
+    }
     talon.setControl(positionRequest.withPosition(position));
   }
 
@@ -71,8 +81,10 @@ public class BiscuitIOFXS implements BiscuitIO {
   public void updateInputs(BiscuitIOInputs inputs) {
     inputs.velocity = velocity.getValueAsDouble();
     inputs.position = position.getValueAsDouble();
+    inputs.rawPulseWidth = rawPulseWidth.getValueAsDouble();
     inputs.didZero = didZero;
-    BaseStatusSignal.refreshAll(velocity, position);
+
+    BaseStatusSignal.refreshAll(velocity, position, rawPulseWidth);
   }
 
   @Override
@@ -85,8 +97,9 @@ public class BiscuitIOFXS implements BiscuitIO {
     didZero = false;
     double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
     double setPos = BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos);
+
     talon.setPosition(setPos);
-    logger.info("set Biscuit position to " + setPos);
+    logger.info("Set Biscuit position to " + setPos);
     didZero = true;
   }
 }

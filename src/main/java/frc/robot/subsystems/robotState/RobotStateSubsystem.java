@@ -244,7 +244,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStow() {
     if (biscuitSubsystem.isSafeToStow()) {
-      biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint);
+      biscuitSubsystem.setPosition(BiscuitConstants.kStowSetpoint, hasAlgae());
       elevatorSubsystem.setPosition(RobotConstants.kStowSetpoint);
       driveSubsystem.removeDriveMultiplier();
       driveSubsystem.setIgnoreSticks(false);

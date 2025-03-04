@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
+import frc.robot.constants.RobotConstants;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
 
     double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
     double error =
-        Math.abs(BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos) - inputs.position);
+        Math.abs(BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos) - inputs.position);
 
     if (setPoint == BiscuitConstants.kStowSetpoint
         && isFinished()
