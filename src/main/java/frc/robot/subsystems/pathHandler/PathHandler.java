@@ -124,6 +124,8 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   public void reassignAlliance() {
+    fetchPaths.clear();
+    placePaths.clear();
     mirrorTrajectory = driveSubsystem.shouldFlip();
     Optional<Trajectory<SwerveSample>> temp;
     for (int i = 0; i < 12; i++) {
@@ -379,12 +381,13 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case PLACE -> {
-        if (!robotStateSubsystem.hasCoral()) {
-          // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
-          // proceedToNext) {
-          // robotStateSubsystem.toFunnelLoad();
-          curState = PathStates.DRIVE_FETCH;
-        }
+        curState = PathStates.DRIVE_FETCH;
+        // if (!robotStateSubsystem.hasCoral()) {
+        //   // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
+        //   // proceedToNext) {
+        //   // robotStateSubsystem.toFunnelLoad();
+        //   curState = PathStates.DRIVE_FETCH;
+        // }
       }
       case DONE -> isHandling = false;
       default -> {}

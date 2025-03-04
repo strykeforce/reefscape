@@ -206,7 +206,8 @@ public class RobotContainer {
             "startPToE",
             new ArrayList<Character>(Arrays.asList('d', 'c')),
             new ArrayList<Integer>(Arrays.asList(4, 4)),
-            'e');
+            'e',
+            true);
 
     processorShallowAutonCommand.reassignAlliance();
 

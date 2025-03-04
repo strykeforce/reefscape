@@ -43,7 +43,8 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
-      char startNode) {
+      char startNode,
+      boolean startScoreLeft) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
     this.pathHandler = pathHandler;
@@ -62,8 +63,8 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
             startPathName,
             true,
             true,
-            true,
-            false);
+            false,
+            startScoreLeft);
 
     addCommands(
         new SequentialCommandGroup(
@@ -84,7 +85,7 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
             // new WaitForButtonPressCommand(button),
             new StartPathHandlerCommand(
                 pathHandler,
-                PathHandlerConstants.kShallowPathNames,
+                PathHandlerConstants.kProcessorShallowPathNames,
                 NodeNames,
                 NodeLevels,
                 startNode,
