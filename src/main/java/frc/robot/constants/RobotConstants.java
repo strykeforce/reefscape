@@ -49,6 +49,9 @@ public class RobotConstants {
   public static final Angle kProcessorSetpoint = Rotations.of(41.193);
   public static final Angle kBargeSetpoint = Rotations.of(12.3489);
   public static final Angle kBargeBackwardSetpoint = Rotations.of(-12.3489);
+  
+  public static final int kMinAutoSwitchID = 4;
+  public static final int kMaxAutoSwitchID = 9;
 
   public RobotConstants() {
     logger.recordOutput("RobotConstants/Using Comp Constants", isComp);

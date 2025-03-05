@@ -9,6 +9,7 @@ public class AutonConstants {
   public static final double kMaxPathErrorMeters = 0.05;
   public static final double kMaxOmegaErrorDegrees = 0.5;
   public static final double kMaxOmegaErrorRadians = Units.degreesToRadians(kMaxOmegaErrorDegrees);
+  public static final int kSwitchStableCounts = 3;
 
   // Start Poses
   public static final Pose2d kNonProcessorShallow =
