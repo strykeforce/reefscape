@@ -5,7 +5,6 @@ package frc.robot.subsystems.biscuit;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
@@ -57,8 +56,8 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   }
 
   public boolean isSafeToStow() {
-    return getPosition().in(Rotations) < BiscuitConstants.kSafeToStowUpper
-        && getPosition().in(Rotations) > BiscuitConstants.kSafeToStowLower;
+    return getPosition().in(Rotations) < RobotConstants.kSafeToStowUpper
+        && getPosition().in(Rotations) > RobotConstants.kSafeToStowLower;
   }
 
   @Override
@@ -69,17 +68,17 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("Biscuit setPoint", setPoint.in(Rotations));
     Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
 
-    double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
-    double error =
-        Math.abs(BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos) - inputs.position);
+    // double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
+    // double error =
+    //     Math.abs(BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos) - inputs.position);
 
-    if (setPoint == BiscuitConstants.kStowSetpoint
-        && isFinished()
-        && inputs.velocity < BiscuitConstants.kRezeroVelocityCloseEnough
-        && error >= BiscuitConstants.kRezeroErrorCloseEnough) {
-      logger.info("Rezeroing Biscuit");
-      zero();
-    }
+    // if (setPoint == BiscuitConstants.kStowSetpoint
+    //     && isFinished()
+    //     && inputs.velocity < BiscuitConstants.kRezeroVelocityCloseEnough
+    //     && error >= BiscuitConstants.kRezeroErrorCloseEnough) {
+    //   logger.info("Rezeroing Biscuit");
+    //   zero();
+    // }
   }
 
   @Override
