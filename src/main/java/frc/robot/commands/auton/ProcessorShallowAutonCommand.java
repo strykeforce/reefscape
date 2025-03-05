@@ -18,7 +18,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 public class ProcessorShallowAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -40,7 +39,6 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
       ElevatorSubsystem elevatorSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
       VisionSubsystem visionSubsystem,
-      BooleanSupplier button,
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,

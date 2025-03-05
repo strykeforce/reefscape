@@ -19,6 +19,9 @@ public class PrepOdomForAutoCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    driveSubsystem.prepForAuto(startPose, offset.getDegrees());
+    if (driveSubsystem.shouldFlip())
+      driveSubsystem.prepForAuto(
+          startPose, new Rotation2d(-offset.getCos(), offset.getSin()).getDegrees());
+    else driveSubsystem.prepForAuto(startPose, offset.getDegrees());
   }
 }

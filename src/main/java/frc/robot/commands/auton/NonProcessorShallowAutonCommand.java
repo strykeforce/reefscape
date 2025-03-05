@@ -20,7 +20,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -42,7 +41,6 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       ElevatorSubsystem elevatorSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
       VisionSubsystem visionSubsystem,
-      BooleanSupplier button,
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
@@ -73,9 +71,9 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     addCommands(
         new SequentialCommandGroup(
             new ParallelCommandGroup(
-                new PrepOdomForAutoCommand(driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
-                new ZeroElevatorCommand(elevatorSubsystem)
-            ),
+                new PrepOdomForAutoCommand(
+                    driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
+                new ZeroElevatorCommand(elevatorSubsystem)),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath,
             new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),

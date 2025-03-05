@@ -1,7 +1,15 @@
 package frc.robot.subsystems.auto;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
-import frc.robot.commands.drive.DriveAutonCommand;
+import frc.robot.commands.auton.DefaultAutonCommand;
+import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
+import frc.robot.commands.auton.ProcessorShallowAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
@@ -13,23 +21,18 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 import org.strykeforce.thirdcoast.util.AutonSwitch;
-
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AutoSwitch extends MeasurableSubsystem {
   public Logger logger = LoggerFactory.getLogger(AutoSwitch.class);
@@ -46,7 +49,8 @@ public class AutoSwitch extends MeasurableSubsystem {
   private LEDSubsystem ledSubsystem;
   private TagAlignSubsystem tagAlignSubsystem;
   private VisionSubsystem visionSubsystem;
-  
+  private PathHandler pathHandler;
+
   public boolean useVirtualSwitch;
   private static SendableChooser<Integer> sendableChooser = new SendableChooser<>();
   private AutoCommandInterface defaultCommand;
@@ -69,7 +73,8 @@ public class AutoSwitch extends MeasurableSubsystem {
       FunnelSubsystem funnelSubsystem,
       LEDSubsystem ledSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
-      VisionSubsystem visionSubsystem) {
+      VisionSubsystem visionSubsystem,
+      PathHandler pathHandler) {
     this.robotStateSubsystem = robotStateSubsystem;
     this.algaeSubsystem = algaeSubsystem;
     this.battMonSubsystem = battMonSubsystem;
@@ -82,104 +87,137 @@ public class AutoSwitch extends MeasurableSubsystem {
     this.ledSubsystem = ledSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.visionSubsystem = visionSubsystem;
-  
-      for (int i = RobotConstants.kMinAutoSwitchID; i <= RobotConstants.kMaxAutoSwitchID; i++) {
-        switchInputs.add(new DigitalInput(i));
-      }
-      autoSwitch = new AutonSwitch(switchInputs);
-  
-      configSendableChooser();
-  
-      defaultCommand =
-          new DriveAutonCommand(
-              driveSubsystem,
-              "defaultAuton",
-              true,
-              true, false);
+    this.pathHandler = pathHandler;
+
+    for (int i = RobotConstants.kMinAutoSwitchID; i <= RobotConstants.kMaxAutoSwitchID; i++) {
+      switchInputs.add(new DigitalInput(i));
     }
-  
-    public void checkSwitch() {
-      if (hasSwitchChanged()) {
-        logger.info("Initializing Auto Switch Position: {}", String.format("%02X", curAutoSwitchPos));
-        autoCommand = getAutoCommand(curAutoSwitchPos);
-        autoCommand.reassignAlliance();;
-      }
-    }
-  
-    public void resetSwitchPos() {
-      if (curAutoSwitchPos == -1) {
-        logger.info("Reset Auto Switch");
-      }
-      curAutoSwitchPos = -1;
-    }
-  
-    public AutoCommandInterface getAutoCommand() {
-      if (autoCommand == null) {
-        return defaultCommand;
-      } else return this.autoCommand;
-    }
-  
-    private boolean hasSwitchChanged() {
-      boolean changed = false;
-      int switchPos = useVirtualSwitch ? sendableChooser.getSelected() : autoSwitch.position();
-  
-      if (switchPos != newAutoSwitchPos) {
-        autoSwitchStableCounts = 0;
-        newAutoSwitchPos = switchPos;
-      } else autoSwitchStableCounts++;
-  
-      if (autoSwitchStableCounts > AutonConstants.kSwitchStableCounts
-          && curAutoSwitchPos != newAutoSwitchPos) {
-        changed = true;
-        curAutoSwitchPos = newAutoSwitchPos;
-      }
-  
-      return changed;
-    }
-  
-    private AutoCommandInterface getAutoCommand(int switchPos) {
-      switch (switchPos) {
-        default:
-          String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);
-          DriverStation.reportWarning(msg, false);
-          return defaultCommand;
-      }
-    }
-  
-    private void configSendableChooser() {
-      sendableChooser.addOption("00 Amp Interfering 4 piece", 0x00);
-      sendableChooser.setDefaultOption("01 Amp 4 piece avoid", 0x01);
-      sendableChooser.setDefaultOption("10 Mid 5 piece", 0x10);
-      sendableChooser.setDefaultOption("20 NonAmp 2 Piece Mid(5 & 4)", 0x20);
-      sendableChooser.setDefaultOption("21 NonAmp 2 Piece Mid(5 & 3)", 0x21);
-      sendableChooser.setDefaultOption("30 Do Nothing", 0x30);
-      SmartDashboard.putData("Auto Mode", sendableChooser);
-    }
-  
-    public void toggleVirtualSwitch() {
-      logger.info("toggledSwitch:function");
-      if (useVirtualSwitch) {
-        useVirtualSwitch = false;
-      } else {
-        useVirtualSwitch = true;
-      }
-      // useVirtualSwitch = useVirtualSwitch ? false : true;
-    }
-  
-    public SendableChooser<Integer> getSendableChooser() {
-      return sendableChooser;
-    }
-  
-    public boolean isUseVirtualSwitch() {
-      return useVirtualSwitch;
-    }
-  
-    public String getSwitchPos() {
-      return Integer.toHexString(curAutoSwitchPos);
-    }
-  
-    @Override
-    public Set<Measure> getMeasures() {
-      return Set.of(new Measure("usingVirtualSwitch", () -> this.useVirtualSwitch ? 1.0 : 0.0));
+    autoSwitch = new AutonSwitch(switchInputs);
+
+    configSendableChooser();
+
+    defaultCommand =
+        new DefaultAutonCommand(
+            driveSubsystem,
+            elevatorSubsystem,
+            "defaultAuton",
+            new Pose2d(7.1008875, 7.2570308, Rotation2d.fromDegrees(180)));
+  }
+
+  public void checkSwitch() {
+    if (hasSwitchChanged()) {
+      logger.info("Initializing Auto Switch Position: {}", String.format("%02X", curAutoSwitchPos));
+      autoCommand = getAutoCommand(curAutoSwitchPos);
+      autoCommand.reassignAlliance();
+      ;
     }
   }
+
+  public void resetSwitchPos() {
+    if (curAutoSwitchPos == -1) {
+      logger.info("Reset Auto Switch");
+    }
+    curAutoSwitchPos = -1;
+  }
+
+  public AutoCommandInterface getAutoCommand() {
+    if (autoCommand == null) {
+      return defaultCommand;
+    } else return this.autoCommand;
+  }
+
+  private boolean hasSwitchChanged() {
+    boolean changed = false;
+    int switchPos = useVirtualSwitch ? sendableChooser.getSelected() : autoSwitch.position();
+
+    if (switchPos != newAutoSwitchPos) {
+      autoSwitchStableCounts = 0;
+      newAutoSwitchPos = switchPos;
+    } else autoSwitchStableCounts++;
+
+    if (autoSwitchStableCounts > AutonConstants.kSwitchStableCounts
+        && curAutoSwitchPos != newAutoSwitchPos) {
+      changed = true;
+      curAutoSwitchPos = newAutoSwitchPos;
+    }
+
+    return changed;
+  }
+
+  private AutoCommandInterface getAutoCommand(int switchPos) {
+    switch (switchPos) {
+      case 0x00:
+        return new NonProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startToJ",
+            new ArrayList<Character>(Arrays.asList('k', 'l')),
+            new ArrayList<Integer>(Arrays.asList(4, 4)),
+            'j',
+            false,
+            AutonConstants.kNonProcessorShallow);
+      case 0x20:
+        return new ProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startPToE",
+            new ArrayList<Character>(Arrays.asList('d', 'c')),
+            new ArrayList<Integer>(Arrays.asList(4, 4)),
+            'e',
+            true,
+            AutonConstants.kNonProcessorShallow);
+      default:
+        String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);
+        DriverStation.reportWarning(msg, false);
+        return defaultCommand;
+    }
+  }
+
+  private void configSendableChooser() {
+    sendableChooser.addOption("00 nonProcessor side, on j,k,l", 0x00);
+    sendableChooser.setDefaultOption("20 Processor side, on e,d,c", 0x20);
+    sendableChooser.setDefaultOption("30 Do Nothing", 0x30);
+    SmartDashboard.putData("Auto Mode", sendableChooser);
+  }
+
+  public void toggleVirtualSwitch() {
+    logger.info("toggledSwitch:function");
+    if (useVirtualSwitch) {
+      useVirtualSwitch = false;
+    } else {
+      useVirtualSwitch = true;
+    }
+    // useVirtualSwitch = useVirtualSwitch ? false : true;
+  }
+
+  public SendableChooser<Integer> getSendableChooser() {
+    return sendableChooser;
+  }
+
+  public boolean isUseVirtualSwitch() {
+    return useVirtualSwitch;
+  }
+
+  public String getSwitchPos() {
+    return Integer.toHexString(curAutoSwitchPos);
+  }
+
+  @Override
+  public Set<Measure> getMeasures() {
+    return Set.of(new Measure("usingVirtualSwitch", () -> this.useVirtualSwitch ? 1.0 : 0.0));
+  }
+}

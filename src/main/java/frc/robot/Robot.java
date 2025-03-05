@@ -68,6 +68,8 @@ public class Robot extends LoggedRobot {
     if (!m_robotContainer.hasBiscuitZeroed()) m_robotContainer.zeroBiscuit();
 
     if (!m_robotContainer.hasSwerveZeroed()) m_robotContainer.zeroSwerve();
+
+    m_robotContainer.getAutoSwitch().checkSwitch();
   }
 
   @Override

@@ -10,33 +10,30 @@ import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
-public class DefaultAutonCommand extends SequentialCommandGroup
-    implements AutoCommandInterface {
+public class DefaultAutonCommand extends SequentialCommandGroup implements AutoCommandInterface {
 
-    private DriveSubsystem driveSubsystem;
-    private DriveAutonCommand path;
+  private DriveSubsystem driveSubsystem;
+  private DriveAutonCommand path;
 
-    public DefaultAutonCommand(DriveSubsystem driveSubsystem, ElevatorSubsystem elevatorSubsystem, String pathName, Pose2d startPose) {
-        path = 
-        new DriveAutonCommand(
-            driveSubsystem,
-            "defaultAuton",
-            true,
-            true, false);
-        
-        addCommands(new SequentialCommandGroup(
+  public DefaultAutonCommand(
+      DriveSubsystem driveSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      String pathName,
+      Pose2d startPose) {
+    path = new DriveAutonCommand(driveSubsystem, "defaultAuton", true, true, false);
+
+    addCommands(
+        new SequentialCommandGroup(
             new ParallelCommandGroup(
-                new PrepOdomForAutoCommand(driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
-                new ZeroElevatorCommand(elevatorSubsystem)
-            ),
-            path
-        ));
-    }
+                new PrepOdomForAutoCommand(
+                    driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
+                new ZeroElevatorCommand(elevatorSubsystem)),
+            path));
+  }
 
-    @Override
-    public void reassignAlliance() {
+  @Override
+  public void reassignAlliance() {
     path.reassignAlliance();
     driveSubsystem.teleResetGyro();
-    }
-    
+  }
 }
