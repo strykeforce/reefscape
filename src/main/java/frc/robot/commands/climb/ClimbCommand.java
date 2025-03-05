@@ -11,6 +11,7 @@ public class ClimbCommand extends Command {
   public ClimbCommand(RobotStateSubsystem robotState, ClimbSubsystem climbSubsystem) {
     addRequirements(climbSubsystem);
     this.robotState = robotState;
+    this.climbSubsystem = climbSubsystem;
   }
 
   @Override

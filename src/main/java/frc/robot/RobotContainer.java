@@ -304,7 +304,11 @@ public class RobotContainer {
   private void configureDriverBindings() {
     driveSubsystem.setDefaultCommand(
         new DriveTeleopCommand(
-            () -> flysky.getFwd(), () -> flysky.getStr(), () -> flysky.getYaw(), driveSubsystem));
+            () -> flysky.getFwd(),
+            () -> flysky.getStr(),
+            () -> flysky.getYaw(),
+            driveSubsystem,
+            robotStateSubsystem));
 
     // Reset Gyro Command, stow, interrupt Auton, and zero elev
     new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
@@ -624,14 +628,14 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
-        .add("Start Auton", processorShallowAutonCommand)
+        .add("Start Auton", nonProcessorShallowAutonCommand)
         .withPosition(3, 0)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
         .add(
             "reAssign Alliance",
-            new InstantCommand(() -> processorShallowAutonCommand.reassignAlliance())
+            new InstantCommand(() -> nonProcessorShallowAutonCommand.reassignAlliance())
                 .ignoringDisable(true))
         .withPosition(4, 0)
         .withSize(1, 1);
@@ -644,6 +648,11 @@ public class RobotContainer {
     Shuffleboard.getTab("Test")
         .add("Start Next Path", new InstantCommand(() -> pathHandler.setProceedToNext(true)))
         .withPosition(6, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Test")
+        .add("Set isAuto True", new InstantCommand(() -> robotStateSubsystem.setIsAuto(true)))
+        .withPosition(7, 0)
         .withSize(1, 1);
   }
 

@@ -237,9 +237,19 @@ public class DriveSubsystem extends MeasurableSubsystem {
               new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
     }
 
+    Rotation2d offsetDeg = Rotation2d.fromDegrees(offsetDegrees);
+    Rotation2d corrected =
+        robotStateSubsystem.getAllianceColor() == Alliance.Blue
+            ? offsetDeg
+            : new Rotation2d(-offsetDeg.getCos(), offsetDeg.getSin());
+
     io.prepForAuto(
         pose,
-        offsetDegrees - (robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0));
+        corrected.getDegrees()
+        /*offsetDegrees - (robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0)*/ ,
+        robotStateSubsystem.getAllianceColor());
+
+    Logger.recordOutput("DriveSubsystem/gyroOffset", corrected);
   }
 
   public void resetHolonomicController(double yaw) {
@@ -307,6 +317,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setGyroOffset(Rotation2d rotation) {
     io.setBothGyroOffset(apply(rotation));
+    Logger.recordOutput("DriveSubsystem/gyroOffset", rotation);
   }
 
   public void setEnableHolo(boolean enabled) {
@@ -328,6 +339,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     logger.info("Driver Joystick: Reset Gyro");
     double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
+    Logger.recordOutput("DriveSubsystem/gyroOffset", Rotation2d.fromDegrees(gyroResetDegs));
     io.resetGyro();
     io.resetOdometry(
         new Pose2d(inputs.poseMeters.getTranslation(), Rotation2d.fromDegrees(gyroResetDegs)));

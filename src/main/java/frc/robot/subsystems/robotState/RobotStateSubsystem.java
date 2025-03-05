@@ -633,6 +633,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("RobotState/isEjectingAlgae", isEjectingAlgae);
     Logger.recordOutput("RobotState/isAutoReadyForEject", isAutoReadyForEject);
     Logger.recordOutput("RobotState/coralLoc", coralLoc);
+    Logger.recordOutput("RobotState/alliance", allianceColor);
 
     switch (curState) {
       case TRANSFER -> {

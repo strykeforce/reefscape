@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.VisionConstants;
 import net.jafama.FastMath;
@@ -268,6 +269,15 @@ public class SwerveFXS implements SwerveIO, Checkable {
     for (int i = 0; i < 4; i++) {
       drives[i].getConfigurator().apply(config);
     }
+  }
+
+  @Override
+  public void prepForAuto(Pose2d pose2d, double offsetDegrees, Alliance alliance) {
+    double gyroResetDegs = alliance == Alliance.Blue ? 0.0 : 180.0;
+    setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
+    resetGyro();
+    setBothGyroOffset(Rotation2d.fromDegrees(offsetDegrees));
+    resetOdometry(pose2d);
   }
 
   @Override

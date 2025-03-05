@@ -22,6 +22,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
@@ -233,7 +234,9 @@ public class Swerve implements SwerveIO, Checkable {
   }
 
   @Override
-  public void prepForAuto(Pose2d pose2d, double offsetDegrees) {
+  public void prepForAuto(Pose2d pose2d, double offsetDegrees, Alliance alliance) {
+    double gyroResetDegs = alliance == Alliance.Blue ? 0.0 : 180.0;
+    setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     resetGyro();
     setBothGyroOffset(Rotation2d.fromDegrees(offsetDegrees));
     resetOdometry(pose2d);
