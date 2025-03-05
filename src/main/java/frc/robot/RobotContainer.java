@@ -178,7 +178,7 @@ public class RobotContainer {
     configureTelemetry();
     configureDriverBindings();
     configureOperatorBindings();
-    // configureTestOperatorBindings();
+    configureTestOperatorBindings();
     configurePitDashboard();
   }
 

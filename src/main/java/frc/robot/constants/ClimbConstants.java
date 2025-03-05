@@ -42,7 +42,7 @@ public class ClimbConstants {
   public static final double kRatchetDisengagedPos = 1.0;
 
   // Climb positions
-  // public static final Angle kClimbCagePos = Rotations.of(); // will test
+  // public static final Angle kClimbCagePos = Rotations.of();
   public static final Double kClimbRatchedEngage = -0.12;
   public static final double kFullyClimbed = kArmMaxFwd;
   public static final double kClimbOpenLoopSpeed = 4.0;
