@@ -189,7 +189,7 @@ public class AutoSwitch extends MeasurableSubsystem {
 
   private void configSendableChooser() {
     sendableChooser.addOption("00 nonProcessor side, on j,k,l", 0x00);
-    sendableChooser.setDefaultOption("20 Processor side, on e,d,c", 0x20);
+    sendableChooser.addOption("20 Processor side, on e,d,c", 0x20);
     sendableChooser.setDefaultOption("30 Do Nothing", 0x30);
     SmartDashboard.putData("Auto Mode", sendableChooser);
   }

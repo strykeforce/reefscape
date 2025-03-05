@@ -20,6 +20,7 @@ public class DefaultAutonCommand extends SequentialCommandGroup implements AutoC
       ElevatorSubsystem elevatorSubsystem,
       String pathName,
       Pose2d startPose) {
+    this.driveSubsystem = driveSubsystem;
     path = new DriveAutonCommand(driveSubsystem, "defaultAuton", true, true, false);
 
     addCommands(

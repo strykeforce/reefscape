@@ -617,19 +617,6 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
-        .add("Start Auton", processorShallowAutonCommand)
-        .withPosition(3, 0)
-        .withSize(1, 1);
-
-    Shuffleboard.getTab("Test")
-        .add(
-            "reAssign Alliance",
-            new InstantCommand(() -> processorShallowAutonCommand.reassignAlliance())
-                .ignoringDisable(true))
-        .withPosition(4, 0)
-        .withSize(1, 1);
-
-    Shuffleboard.getTab("Test")
         .add("Zero Wheels", new InstantCommand(() -> driveSubsystem.lockZero(), driveSubsystem))
         .withPosition(5, 0)
         .withSize(1, 1);

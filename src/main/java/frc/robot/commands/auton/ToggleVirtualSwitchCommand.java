@@ -14,4 +14,9 @@ public class ToggleVirtualSwitchCommand extends InstantCommand {
   public void initialize() {
     autoSwitch.toggleVirtualSwitch();
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+      return true;
+  }
 }
