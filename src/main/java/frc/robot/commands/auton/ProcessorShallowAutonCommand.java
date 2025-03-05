@@ -29,6 +29,9 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
   private CoralSubsystem coralSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
+  private List<Character> NodeNames;
+  private List<Integer> NodeLevels;
+  private char startNode;
 
   public ProcessorShallowAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -54,6 +57,10 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
     this.coralSubsystem = coralSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
     this.visionSubsystem = visionSubsystem;
+
+    this.NodeNames = NodeNames;
+    this.NodeLevels = NodeLevels;
+    this.startNode = startNode;
 
     startPath =
         new DriveAutonServoCommand(
@@ -107,6 +114,9 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
     robotStateSubsystem.setScoreSide(ScoreSide.RIGHT);
     visionSubsystem.setVisionUpdating(true);
     pathHandler.setPathNames(PathHandlerConstants.kProcessorShallowPathNames);
+    pathHandler.setNodeNames(NodeNames);
+    pathHandler.setNodeLevels(NodeLevels);
+    pathHandler.setStartNode(startNode);
     // pathHandler.reassignAlliance();
   }
 }
