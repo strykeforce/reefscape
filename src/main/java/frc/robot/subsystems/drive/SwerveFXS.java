@@ -218,6 +218,10 @@ public class SwerveFXS implements SwerveIO, Checkable {
     navxOffset = rotation;
   }
 
+  public void disableNoMotionCal() {
+    pigeon.applyConfig(DriveConstants.getPigeon2NoMotionDisabledConfiguration());
+  }
+
   @Override
   public void resetGyro() {
     swerveDrive.resetGyro();

@@ -229,7 +229,17 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public void prepForAuto(Pose2d pose, double offsetDegrees) {
-    io.prepForAuto(pose, robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0);
+    if (robotStateSubsystem.getAllianceColor() == Alliance.Red) {
+      pose =
+          new Pose2d(
+              DriveConstants.kFieldMaxX - pose.getX(),
+              pose.getY(),
+              new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
+    }
+
+    io.prepForAuto(
+        pose,
+        offsetDegrees - (robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0));
   }
 
   public void resetHolonomicController(double yaw) {

@@ -222,6 +222,10 @@ public class Swerve implements SwerveIO, Checkable {
     }
   }
 
+  public void disableNoMotionCal() {
+    pigeon.applyConfig(DriveConstants.getPigeon2NoMotionDisabledConfiguration());
+  }
+
   @Override
   public void resetGyro() {
     swerveDrive.resetGyro();

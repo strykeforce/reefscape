@@ -41,7 +41,7 @@ public class ElevatorConstants {
   // Idle
 
   // Algae removal
-  public static final Angle kL2AlgaeSetpoint = Rotations.of(3.486);
+  public static final Angle kL2AlgaeSetpoint = Rotations.of(6.308);
   public static final Angle kL3AlgaeSetpoint = Rotations.of(17.513);
 
   public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;
@@ -64,7 +64,7 @@ public class ElevatorConstants {
 
   // Algae scoring
   public static final Angle kProcessorSetpoint = Rotations.of(4.297);
-  public static final Angle kBargeSetpoint = Rotations.of(41.936); // 40.913
+  public static final Angle kBargeSetpoint = Rotations.of(44.943); // 41.936
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 
   public static TalonFXConfiguration getBothFXConfig() {

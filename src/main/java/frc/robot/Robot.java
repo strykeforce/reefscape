@@ -96,6 +96,7 @@ public class Robot extends LoggedRobot {
     if (!m_robotContainer.hasElevatorZeroed()) m_robotContainer.zeroElevator();
 
     m_robotContainer.setIsAuto(false);
+    m_robotContainer.disableNoMotionCal();
   }
 
   @Override

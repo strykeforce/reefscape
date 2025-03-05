@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.configs.Pigeon2FeaturesConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -218,6 +219,15 @@ public class DriveConstants {
     config.GyroTrim.GyroScalarX = -1.2;
     config.GyroTrim.GyroScalarY = 4.8;
     config.GyroTrim.GyroScalarZ = -2.9;
+
+    return config;
+  }
+
+  public static Pigeon2Configuration getPigeon2NoMotionDisabledConfiguration() {
+    Pigeon2FeaturesConfigs featureConfigs =
+        new Pigeon2FeaturesConfigs().withDisableNoMotionCalibration(true);
+    Pigeon2Configuration config = getPigeon2Configuration();
+    config.withPigeon2Features(featureConfigs);
 
     return config;
   }

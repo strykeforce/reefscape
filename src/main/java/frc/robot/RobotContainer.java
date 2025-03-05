@@ -326,11 +326,11 @@ public class RobotContainer {
 
     // Interupt
     new JoystickButton(driveJoystick, Button.SWG_UP.id)
-        .onTrue(new InterruptAutoCommand(robotStateSubsystem))
-        .onFalse(new InterruptAutoCommand(robotStateSubsystem));
+        .onTrue(new InterruptAutoCommand(robotStateSubsystem, coralSubsystem))
+        .onFalse(new InterruptAutoCommand(robotStateSubsystem, coralSubsystem));
     new JoystickButton(driveJoystick, Button.SWG_DWN.id)
-        .onTrue(new InterruptAutoCommand(robotStateSubsystem))
-        .onFalse(new InterruptAutoCommand(robotStateSubsystem));
+        .onTrue(new InterruptAutoCommand(robotStateSubsystem, coralSubsystem))
+        .onFalse(new InterruptAutoCommand(robotStateSubsystem, coralSubsystem));
 
     new JoystickButton(driveJoystick, Button.SWB_UP.id)
         .onTrue(new ZeroElevatorCommand(elevatorSubsystem))
@@ -657,5 +657,13 @@ public class RobotContainer {
 
   public void setIsAuto(boolean isAuto) {
     robotStateSubsystem.setIsAuto(isAuto);
+  }
+
+  public void disableNoMotionCal() {
+    if (RobotConstants.isComp) {
+      swerve.disableNoMotionCal();
+    } else {
+      protoSwerve.disableNoMotionCal();
+    }
   }
 }
