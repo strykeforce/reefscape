@@ -95,6 +95,7 @@ import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
+  private final RobotConstants robotConstants;
   private final RobotStateSubsystem robotStateSubsystem;
 
   private final AlgaeIOFX algaeIO;
@@ -143,6 +144,8 @@ public class RobotContainer {
   private SuppliedValueWidget<Boolean> allianceColor;
 
   public RobotContainer() {
+    robotConstants = new RobotConstants();
+
     algaeIO = new AlgaeIOFX();
     algaeSubsystem = new AlgaeSubsystem(algaeIO);
 
@@ -215,7 +218,7 @@ public class RobotContainer {
             false,
             AutonConstants.kNonProcessorShallow);
 
-    nonProcessorShallowAutonCommand.reassignAlliance();
+    // nonProcessorShallowAutonCommand.reassignAlliance();
 
     processorShallowAutonCommand =
         new ProcessorShallowAutonCommand(
@@ -236,7 +239,7 @@ public class RobotContainer {
             true,
             AutonConstants.kNonProcessorShallow);
 
-    processorShallowAutonCommand.reassignAlliance();
+    // processorShallowAutonCommand.reassignAlliance();
 
     configureTelemetry();
     configureDriverBindings();
@@ -512,9 +515,13 @@ public class RobotContainer {
 
     // Elevator setpoint testing
     new JoystickButton(xboxController, XboxController.Button.kStart.value)
-        .onTrue(new SetElevatorPositionCommand(elevatorSubsystem, RobotConstants.kFunnelSetpoint));
+        .onTrue(
+            new SetElevatorPositionCommand(
+                elevatorSubsystem, RobotConstants.kElevatorFunnelSetpoint));
     new JoystickButton(xboxController, XboxController.Button.kBack.value)
-        .onTrue(new SetElevatorPositionCommand(elevatorSubsystem, RobotConstants.kStowSetpoint));
+        .onTrue(
+            new SetElevatorPositionCommand(
+                elevatorSubsystem, RobotConstants.kElevatorStowSetpoint));
     (new Trigger(() -> xboxController.getPOV() == 0))
         .onTrue(
             new SetElevatorPositionCommand(elevatorSubsystem, ElevatorConstants.kL1CoralSetpoint));
@@ -646,5 +653,9 @@ public class RobotContainer {
 
   public void stopTagAlign() {
     tagAlignSubsystem.terminate();
+  }
+
+  public void setIsAuto(boolean isAuto) {
+    robotStateSubsystem.setIsAuto(isAuto);
   }
 }
