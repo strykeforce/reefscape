@@ -522,7 +522,7 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Match")
         .addString("Score Side", () -> robotStateSubsystem.getScoreSide().name())
-        .withPosition(4, 2)
+        .withPosition(5, 1)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
@@ -532,22 +532,22 @@ public class RobotContainer {
 
     Shuffleboard.getTab("Match")
         .addBoolean("Has Coral", () -> robotStateSubsystem.hasCoral())
-        .withPosition(3, 2)
+        .withPosition(4, 1)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
         .addString("Coral Location", () -> robotStateSubsystem.getCoralLoc().name())
-        .withPosition(2, 3)
+        .withPosition(6, 1)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
         .addBoolean("Has Algae", () -> robotStateSubsystem.hasAlgae())
-        .withPosition(3, 3)
+        .withPosition(7, 1)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
         .addString("Coral Level", () -> robotStateSubsystem.getCoralLevel().name())
-        .withPosition(4, 3)
+        .withPosition(5, 1)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
@@ -575,7 +575,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Match")
         .add("Zero Biscuit", new ZeroBiscuitCommand(biscuitSubsystem))
         .withSize(1, 1)
-        .withPosition(10, 0);
+        .withPosition(8, 0);
 
     // Shuffleboard.getTab("Match")
     // .addBoolean(
