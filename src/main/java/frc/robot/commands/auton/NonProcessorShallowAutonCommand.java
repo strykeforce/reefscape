@@ -2,8 +2,10 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
+import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.pathHandler.StartPathHandlerCommand;
 import frc.robot.constants.PathHandlerConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
@@ -18,7 +20,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -43,7 +44,6 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       ElevatorSubsystem elevatorSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
       VisionSubsystem visionSubsystem,
-      BooleanSupplier button,
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
@@ -77,7 +77,10 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
 
     addCommands(
         new SequentialCommandGroup(
-            new PrepOdomForAutoCommand(driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
+            new ParallelCommandGroup(
+                new PrepOdomForAutoCommand(
+                    robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
+                new ZeroElevatorCommand(elevatorSubsystem)),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath,
             new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),
@@ -110,7 +113,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     robotStateSubsystem.setIsAutoPlacing(false);
     robotStateSubsystem.setScoringLevel(ScoringLevel.L4);
     robotStateSubsystem.setGetAlgaeOnCycle(false);
-    robotStateSubsystem.setIsAuto(true);
+    // robotStateSubsystem.setIsAuto(true);
     robotStateSubsystem.setScoreSide(ScoreSide.RIGHT);
     visionSubsystem.setVisionUpdating(true);
     pathHandler.setPathNames(PathHandlerConstants.kShallowPathNames);

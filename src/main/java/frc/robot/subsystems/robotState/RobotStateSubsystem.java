@@ -124,8 +124,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         : ScoringLevel.L2;
   }
 
+  public ScoringLevel getCoralLevel() {
+    return scoringLevel;
+  }
+
   public ScoreSide getScoreSide() {
     return scoreSide;
+  }
+
+  public AlgaeHeight getAlgaeHeight() {
+    return algaeHeight;
   }
 
   public boolean getIsBargeSafe() {

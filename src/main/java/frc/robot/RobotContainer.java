@@ -24,8 +24,10 @@ import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
+import frc.robot.commands.auton.ToggleVirtualSwitchCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
+import frc.robot.commands.biscuit.ZeroBiscuitCommand;
 import frc.robot.commands.climb.ClimbCommand;
 import frc.robot.commands.climb.ClimbPrepCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
@@ -54,7 +56,6 @@ import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
 import frc.robot.commands.robotState.lockwheelscommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
 import frc.robot.commands.vision.SetVisionUpdatesCommand;
-import frc.robot.constants.AutonConstants;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -62,6 +63,7 @@ import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.algae.AlgaeIOFX;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.auto.AutoSwitch;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitIOFXS;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
@@ -88,8 +90,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import org.strykeforce.telemetry.TelemetryController;
 import org.strykeforce.telemetry.TelemetryService;
@@ -130,6 +130,8 @@ public class RobotContainer {
   private final VisionSubsystem visionSubsystem;
 
   private final PathHandler pathHandler;
+
+  private final AutoSwitch autoSwitch;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -199,47 +201,21 @@ public class RobotContainer {
 
     pathHandler = new PathHandler(driveSubsystem, tagAlignSubsystem, robotStateSubsystem);
 
-    nonProcessorShallowAutonCommand =
-        new NonProcessorShallowAutonCommand(
-            driveSubsystem,
-            pathHandler,
+    autoSwitch =
+        new AutoSwitch(
             robotStateSubsystem,
             algaeSubsystem,
+            battMonSubsystem,
             biscuitSubsystem,
+            climbSubsystem,
             coralSubsystem,
-            elevatorSubsystem,
-            tagAlignSubsystem,
-            visionSubsystem,
-            () -> xboxController.getRawButton(XboxController.Button.kStart.value),
-            "startToJ",
-            new ArrayList<Character>(Arrays.asList('k', 'l')),
-            new ArrayList<Integer>(Arrays.asList(4, 4)),
-            'j',
-            false,
-            AutonConstants.kNonProcessorShallow);
-
-    // nonProcessorShallowAutonCommand.reassignAlliance();
-
-    processorShallowAutonCommand =
-        new ProcessorShallowAutonCommand(
             driveSubsystem,
-            pathHandler,
-            robotStateSubsystem,
-            algaeSubsystem,
-            biscuitSubsystem,
-            coralSubsystem,
             elevatorSubsystem,
+            funnelSubsystem,
+            ledSubsystem,
             tagAlignSubsystem,
             visionSubsystem,
-            () -> xboxController.getRawButton(XboxController.Button.kStart.value),
-            "startPToE",
-            new ArrayList<Character>(Arrays.asList('d', 'c')),
-            new ArrayList<Integer>(Arrays.asList(4, 4)),
-            'e',
-            true,
-            AutonConstants.kNonProcessorShallow);
-
-    // processorShallowAutonCommand.reassignAlliance();
+            pathHandler);
 
     configureTelemetry();
     configureDriverBindings();
@@ -295,7 +271,8 @@ public class RobotContainer {
     allianceColor.withProperties(Map.of("colorWhenTrue", "red", "colorWhenFalse", "blue"));
     robotStateSubsystem.setAllianceColor(alliance);
 
-    // Auto Switch Stuff here -> reassign alliance
+    autoSwitch.getAutoCommand().reassignAlliance();
+
     if (robotStateSubsystem.getAllianceColor() == Alliance.Red)
       driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(180));
     else driveSubsystem.setGyroOffset(Rotation2d.fromDegrees(0));
@@ -554,7 +531,7 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
-        .addBoolean("Auto vs. Manual", () -> robotStateSubsystem.getIsAuto())
+        .addBoolean("Auto vs. Manual", () -> robotStateSubsystem.getIsAutoPlacing())
         .withPosition(3, 1)
         .withSize(1, 1);
 
@@ -574,9 +551,36 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Match")
-        .addString("Coral Level", () -> robotStateSubsystem.getAlgaeLevel().name())
+        .addString("Coral Level", () -> robotStateSubsystem.getCoralLevel().name())
         .withPosition(4, 3)
         .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addString("Algae Level", () -> robotStateSubsystem.getAlgaeHeight().name())
+        .withPosition(2, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Match")
+        .addString("AutoSwitchPos", () -> autoSwitch.getSwitchPos())
+        .withSize(1, 1)
+        .withPosition(3, 0);
+    Shuffleboard.getTab("Match")
+        .add("ToggleVirtualSwitch", new ToggleVirtualSwitchCommand(autoSwitch))
+        .withSize(1, 1)
+        .withPosition(4, 0);
+    Shuffleboard.getTab("Match")
+        .addBoolean("Is VirtualSwitch Used", () -> autoSwitch.isUseVirtualSwitch())
+        .withSize(1, 1)
+        .withPosition(5, 0);
+    Shuffleboard.getTab("Match")
+        .add("VirtualAutoSwitch", autoSwitch.getSendableChooser())
+        .withSize(2, 1)
+        .withPosition(6, 0);
+
+    Shuffleboard.getTab("Match")
+        .add("Zero Biscuit", new ZeroBiscuitCommand(biscuitSubsystem))
+        .withSize(1, 1)
+        .withPosition(10, 0);
 
     // Shuffleboard.getTab("Match")
     // .addBoolean(
@@ -627,18 +631,18 @@ public class RobotContainer {
         .withPosition(1, 0)
         .withSize(1, 1);
 
-    Shuffleboard.getTab("Test")
-        .add("Start Auton", nonProcessorShallowAutonCommand)
-        .withPosition(3, 0)
-        .withSize(1, 1);
+    // Shuffleboard.getTab("Test")
+    //     .add("Start Auton", nonProcessorShallowAutonCommand)
+    //     .withPosition(3, 0)
+    //     .withSize(1, 1);
 
-    Shuffleboard.getTab("Test")
-        .add(
-            "reAssign Alliance",
-            new InstantCommand(() -> nonProcessorShallowAutonCommand.reassignAlliance())
-                .ignoringDisable(true))
-        .withPosition(4, 0)
-        .withSize(1, 1);
+    // Shuffleboard.getTab("Test")
+    //     .add(
+    //         "reAssign Alliance",
+    //         new InstantCommand(() -> nonProcessorShallowAutonCommand.reassignAlliance())
+    //             .ignoringDisable(true))
+    //     .withPosition(4, 0)
+    //     .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
         .add("Zero Wheels", new InstantCommand(() -> driveSubsystem.lockZero(), driveSubsystem))
@@ -666,6 +670,22 @@ public class RobotContainer {
 
   public void setIsAuto(boolean isAuto) {
     robotStateSubsystem.setIsAuto(isAuto);
+  }
+
+  public void setIsAutoPlacing(boolean isAutoPlacing) {
+    robotStateSubsystem.setIsAutoPlacing(isAutoPlacing);
+  }
+
+  public void setScoringSide(ScoreSide side) {
+    robotStateSubsystem.setScoreSide(side);
+  }
+
+  public void stow() {
+    robotStateSubsystem.toStow();
+  }
+
+  public AutoSwitch getAutoSwitch() {
+    return this.autoSwitch;
   }
 
   public void disableNoMotionCal() {

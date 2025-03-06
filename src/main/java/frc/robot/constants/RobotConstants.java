@@ -83,6 +83,9 @@ public class RobotConstants {
 
   public static double kTagAlignThreshold;
 
+  public static final int kMinAutoSwitchID = 4;
+  public static final int kMaxAutoSwitchID = 9;
+
   public RobotConstants() {
     if (isComp) {
       // Comp bot constants

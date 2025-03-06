@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.constants.BuildConstants;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -68,6 +69,8 @@ public class Robot extends LoggedRobot {
     // if (!m_robotContainer.hasBiscuitZeroed()) m_robotContainer.zeroBiscuit();
 
     // if (!m_robotContainer.hasSwerveZeroed()) m_robotContainer.zeroSwerve();
+
+    m_robotContainer.getAutoSwitch().checkSwitch();
   }
 
   @Override
@@ -75,10 +78,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    m_robotContainer.setIsAuto(true);
+    if (m_robotContainer.getAutoSwitch().getAutoCommand() != null) {
+      m_robotContainer.getAutoSwitch().getAutoCommand().schedule();
     }
   }
 
@@ -96,7 +98,10 @@ public class Robot extends LoggedRobot {
     if (!m_robotContainer.hasElevatorZeroed()) m_robotContainer.zeroElevator();
 
     m_robotContainer.setIsAuto(false);
+    m_robotContainer.setIsAutoPlacing(true);
+    m_robotContainer.setScoringSide(ScoreSide.LEFT);
     m_robotContainer.disableNoMotionCal();
+    m_robotContainer.stow();
   }
 
   @Override

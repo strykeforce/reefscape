@@ -22,8 +22,8 @@
     {"x":{"exp":"H.x", "val":5.713146}, "y":{"exp":"H.y", "val":4.0509}, "heading":{"exp":"H.heading", "val":3.141592653589793}, "intervals":68, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"5.946532726287842 m", "val":5.946532726287842}, "y":{"exp":"4.711103439331055 m", "val":4.711103439331055}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":34, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
     {"x":{"exp":"4.651655197143555 m", "val":4.651655197143555}, "y":{"exp":"5.771848201751709 m", "val":5.771848201751709}, "heading":{"exp":"-1.773711057838377 rad", "val":-1.773711057838377}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
-    {"x":{"exp":"toFetch.x", "val":1.780285358428955}, "y":{"exp":"toFetch.y", "val":7.00705099105835}, "heading":{"exp":"toFetch.heading", "val":-0.9225007574586108}, "intervals":11, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"fetch.x", "val":1.744809627532959}, "y":{"exp":"fetch.y", "val":7.167456150054932}, "heading":{"exp":"fetch.heading", "val":-0.9426523290021374}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"toFetch.x", "val":1.780285358428955}, "y":{"exp":"toFetch.y", "val":7.00705099105835}, "heading":{"exp":"toFetch.heading", "val":-0.9225007574586108}, "intervals":10, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"fetch.x", "val":1.69577419757843}, "y":{"exp":"fetch.y", "val":7.228199481964111}, "heading":{"exp":"fetch.heading", "val":-0.942477796076938}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},

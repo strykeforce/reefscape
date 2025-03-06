@@ -417,6 +417,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         if (finalDrive) {
           vX = 0.25;
         }
+        if (curState == TagAlignStates.WAITING) {
+          break;
+        }
 
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vX", vX);
         Logger.recordOutput("TagAlignSubsystem/Tag Rel Drive vY", vY);

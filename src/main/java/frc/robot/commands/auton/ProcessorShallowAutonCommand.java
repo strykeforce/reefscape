@@ -18,7 +18,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 public class ProcessorShallowAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -43,7 +42,6 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
       ElevatorSubsystem elevatorSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
       VisionSubsystem visionSubsystem,
-      BooleanSupplier button,
       String startPathName,
       List<Character> NodeNames,
       List<Integer> NodeLevels,
@@ -77,7 +75,8 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
 
     addCommands(
         new SequentialCommandGroup(
-            new PrepOdomForAutoCommand(driveSubsystem, Rotation2d.fromDegrees(180), startPose),
+            new PrepOdomForAutoCommand(
+                robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180), startPose),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath,
             new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),
@@ -110,7 +109,7 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
     robotStateSubsystem.setIsAutoPlacing(false);
     robotStateSubsystem.setScoringLevel(ScoringLevel.L4);
     robotStateSubsystem.setGetAlgaeOnCycle(false);
-    robotStateSubsystem.setIsAuto(true);
+    // robotStateSubsystem.setIsAuto(true);
     robotStateSubsystem.setScoreSide(ScoreSide.RIGHT);
     visionSubsystem.setVisionUpdating(true);
     pathHandler.setPathNames(PathHandlerConstants.kProcessorShallowPathNames);
