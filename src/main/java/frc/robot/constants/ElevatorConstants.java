@@ -23,6 +23,7 @@ public class ElevatorConstants {
   public static final double kCloseEnoughRotations = 0.1;
   public static final double kMaxFwd = 53;
   public static final double kMaxRev = 2;
+  public static final double kElevatorLiftHeight = 1; // for pit command
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
   public static final double kZeroSpeed = -0.05;
@@ -38,8 +39,6 @@ public class ElevatorConstants {
 
   // Setpoints
   // Idle
-  public static final Angle kFunnelSetpoint = Rotations.of(2.03125); // was 2.40430
-  public static final Angle kStowSetpoint = kFunnelSetpoint;
 
   // Algae removal
   public static final Angle kL2AlgaeSetpoint = Rotations.of(6.308);
@@ -49,13 +48,14 @@ public class ElevatorConstants {
   public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
 
   // Coral score
-  public static final Angle kL1CoralSetpoint = Rotations.of(13.04053);
+  public static final Angle kL1CoralSetpoint = Rotations.of(15.2); // 13.04053
   public static final Angle kL2CoralSetpoint = Rotations.of(21.0786); // 19.62793 -> 21.0786
   public static final Angle kL3CoralSetpoint =
       Rotations.of(31.0901); // was 30.42969 -> 31.7505 -> 31.0901
   public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);
 
   public static final Angle kPrestageSetpoint = kL2CoralSetpoint;
+  public static final Angle kAutoPrestageSetpoint = kL4CoralSetpoint;
 
   // Algae obtaining
   public static final Angle kFloorAlgaeSetpoint = Rotations.of(6.66);
@@ -63,8 +63,8 @@ public class ElevatorConstants {
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(4.297);
-  public static final Angle kBargeSetpoint = Rotations.of(41.936); // 40.913
+  public static final Angle kProcessorSetpoint = Rotations.of(6.3215); // was 4.297 -> 5.964
+  public static final Angle kBargeSetpoint = Rotations.of(44.943); // 41.936
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 
   public static TalonFXConfiguration getBothFXConfig() {

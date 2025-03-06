@@ -13,12 +13,13 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.constants.BiscuitConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.biscuit.BiscuitIO.BiscuitIOInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class BiscuitIOFX implements BiscuitIO {
+public class BiscuitIOFXS implements BiscuitIO {
 
   private Logger logger;
   private TalonFXS talon;
@@ -33,12 +34,13 @@ public class BiscuitIOFX implements BiscuitIO {
   private boolean fwdLimitSwitchOpen;
   private Angle offset;
   private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
+  private Boolean lastHadAlgae = false;
 
   TalonFXSConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0);
 
-  public BiscuitIOFX() {
+  public BiscuitIOFXS() {
     // Logger initialization with class name
     logger = LoggerFactory.getLogger(this.getClass());
     // Moter initialization with ID from constants
@@ -49,7 +51,7 @@ public class BiscuitIOFX implements BiscuitIO {
     // Reset and configure motor settings
     configurator = talon.getConfigurator();
     configurator.apply(new TalonFXSConfiguration());
-    configurator.apply(BiscuitConstants.getFXSConfig());
+    configurator.apply(RobotConstants.talonFXSConfig);
 
     // Set our variables
     velocity = talon.getVelocity();
@@ -57,12 +59,20 @@ public class BiscuitIOFX implements BiscuitIO {
     rawQuadrature = talon.getRawQuadraturePosition();
     rawQuadrature.setUpdateFrequency(20);
     rawPulseWidth = talon.getRawPulseWidthPosition();
-    rawPulseWidth.setUpdateFrequency(20);
+    rawPulseWidth.setUpdateFrequency(200);
     zero();
   }
 
   @Override
-  public void setPosition(Angle position) {
+  public void setPosition(Angle position, boolean hasAlgae) {
+    if (hasAlgae != lastHadAlgae) {
+      if (hasAlgae) {
+        configurator.apply(RobotConstants.alageMotionConfig);
+      } else {
+        configurator.apply(RobotConstants.noAlageMotionConfig);
+      }
+      lastHadAlgae = hasAlgae;
+    }
     talon.setControl(positionRequest.withPosition(position));
   }
 
@@ -70,8 +80,10 @@ public class BiscuitIOFX implements BiscuitIO {
   public void updateInputs(BiscuitIOInputs inputs) {
     inputs.velocity = velocity.getValueAsDouble();
     inputs.position = position.getValueAsDouble();
+    inputs.rawPulseWidth = rawPulseWidth.getValueAsDouble();
     inputs.didZero = didZero;
-    BaseStatusSignal.refreshAll(velocity, position);
+
+    BaseStatusSignal.refreshAll(velocity, position, rawPulseWidth);
   }
 
   @Override
@@ -80,12 +92,25 @@ public class BiscuitIOFX implements BiscuitIO {
   }
 
   @Override
-  public void zero() {
+  public boolean zero() {
     didZero = false;
-    double pos = MathUtil.inputModulus(rawPulseWidth.getValueAsDouble(), 0, 1);
-    double setPos = BiscuitConstants.kTicksPerRot * (BiscuitConstants.kZero - pos);
-    talon.setPosition(setPos);
-    logger.info("set Biscuit position to " + setPos);
-    didZero = true;
+    double pos = MathUtil.inputModulus(rawPulseWidth.refresh().getValueAsDouble(), 0, 1);
+    double pos2 = MathUtil.inputModulus(rawPulseWidth.refresh().getValueAsDouble(), 0, 1);
+    double pos3 = MathUtil.inputModulus(rawPulseWidth.refresh().getValueAsDouble(), 0, 1);
+    if (pos3 != 1.0) {
+      double setPos = RobotConstants.kTicksPerRot * (RobotConstants.kBiscuitZero - pos3);
+      talon.setPosition(setPos);
+      logger.info(
+          "set Biscuit position to "
+              + setPos
+              + ", Abs Pos 1: "
+              + pos
+              + ", Abs Pos 2: "
+              + pos2
+              + "Abs Pos 3: "
+              + pos3);
+      didZero = true;
+    }
+    return didZero;
   }
 }

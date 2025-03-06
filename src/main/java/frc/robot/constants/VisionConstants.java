@@ -61,8 +61,9 @@ public final class VisionConstants {
   public static final double FOV75YUYVSingleTagCoeff = 22.0 / 100.0;
   public static final double FOV75YUYVBaseTrust = 3.0;
 
-  // Gyro error scaling
-  public static final double kYawErrorThreshold = Units.degreesToRadians(45);
+  // Gyro error
+  public static final double kYawErrorThreshold = Units.degreesToRadians(30);
+  public static final double kCamErrorZThreshold = 0.3;
 
   // Constants for cameras
   public static final int kNumCams = 5;
@@ -94,22 +95,21 @@ public final class VisionConstants {
   public static final int kCircularBufferSize = 1000;
   // Poses
   public static final Pose3d kCam1Pose =
-      new Pose3d(new Translation3d(0.28, 0.02, 0.30), new Rotation3d());
-
+      new Pose3d(new Translation3d(0.305, 0.025, 0.311), new Rotation3d());
   public static final Pose3d kCam2Pose =
       new Pose3d(
-          new Translation3d(-0.21, -0.31, 0.44),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(0.0)));
+          new Translation3d(0.236, 0.108, 0.932),
+          new Rotation3d(0, Units.degreesToRadians(10), Units.degreesToRadians(22.5)));
   public static final Pose3d kCam3Pose =
-      new Pose3d(new Translation3d(0.09, -0.31, 0.36), new Rotation3d());
+      new Pose3d(new Translation3d(0.133, -0.305, 0.311), new Rotation3d());
   public static final Pose3d kCam4Pose =
       new Pose3d(
-          new Translation3d(-0.22, -0.335, 0.50),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
+          new Translation3d(0.236, -.038, 0.932),
+          new Rotation3d(0, Units.degreesToRadians(10), Units.degreesToRadians(-22.5)));
   public static final Pose3d kCam5Pose =
       new Pose3d(
-          new Translation3d(-0.22, -0.335, 0.50),
-          new Rotation3d(0, Units.degreesToRadians(20.0), Units.degreesToRadians(138.0)));
+          new Translation3d(-0.229, 0.073, 0.934),
+          new Rotation3d(0, Units.degreesToRadians(10), Units.degreesToRadians(180)));
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
   public static Matrix<N1, N1> kLocalMeasurementStdDevs =

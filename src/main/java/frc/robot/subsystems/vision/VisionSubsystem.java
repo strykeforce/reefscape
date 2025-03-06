@@ -43,6 +43,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
     VisionConstants.kCam5Pose.getTranslation()
   };
 
+  private double[] camHeights = {
+    camPositions[0].getZ(),
+    camPositions[1].getZ(),
+    camPositions[2].getZ(),
+    camPositions[3].getZ(),
+    camPositions[4].getZ()
+  };
+
   // Array of camera rotations
   private Rotation3d[] camRotations = {
     VisionConstants.kCam1Pose.getRotation(),
@@ -292,24 +300,39 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Pose3d getCloserPose(Pose3d pose1, Pose3d pose2, double rotation) {
     /*Which pose rotation is closer to our gyro. We subtract the absolute value of the gyro
     from the rotation of the pose and compare the two*/
-    double pose1Error =
-        FastMath.abs(
-            Rotation2d.fromRadians(rotation)
-                .minus(pose1.getRotation().toRotation2d())
-                .getRadians());
-    double pose2Error =
-        FastMath.abs(
-            Rotation2d.fromRadians(rotation)
-                .minus(pose2.getRotation().toRotation2d())
-                .getRadians());
 
+    double pose1Error = 2767;
+    double pose2Error = 2767;
+    if (pose1 != null) {
+      pose1Error =
+          FastMath.abs(
+              Rotation2d.fromRadians(rotation)
+                  .minus(pose1.getRotation().toRotation2d())
+                  .getRadians());
+    }
+    if (pose2 != null) {
+      pose2Error =
+          FastMath.abs(
+              Rotation2d.fromRadians(rotation)
+                  .minus(pose2.getRotation().toRotation2d())
+                  .getRadians());
+    }
     Logger.recordOutput("Vision/Pose 1 Yaw Error", pose1Error);
     Logger.recordOutput("Vision/Pose 2 Yaw Error", pose2Error);
     Logger.recordOutput("Vision/Historical yaw", rotation);
 
-    if (pose1Error < pose2Error) {
-      if (pose1Error > VisionConstants.kYawErrorThreshold) {}
+    if (pose1Error > VisionConstants.kYawErrorThreshold) {
+      pose1 = null;
+    }
+    if (pose2Error > VisionConstants.kYawErrorThreshold) {
+      pose2 = null;
+    }
 
+    if (pose1 == null && pose2 == null) {
+      return null;
+    }
+
+    if (pose1Error < pose2Error) {
       return pose1;
     } else {
       return pose2;
@@ -317,17 +340,25 @@ public class VisionSubsystem extends MeasurableSubsystem {
   }
 
   private Pose3d getCorrectPose(Pose3d pose1, Pose3d pose2, double time, int camIndex) {
-    // double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
-    // double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
+    double dist1 = Math.abs(camHeights[camIndex] - pose1.getZ());
+    double dist2 = Math.abs(camHeights[camIndex] - pose2.getZ());
+
     // // This filters out results by seeing if they are close to the right height
-    // if (dist1 < dist2 && dist1 < 0.5) {
-    //   return pose1;
-    // }
-    // if (dist2 < dist1 && dist2 < 0.5) {
-    //   return pose2;
-    // }
+    if (dist1 > VisionConstants.kCamErrorZThreshold) {
+      pose1 = null;
+    }
+    if (dist2 > VisionConstants.kCamErrorZThreshold) {
+      pose2 = null;
+    }
+
     // If we don't have enough data in the gyro buffer we default to returning a pose
-    if (gyroBuffer.size() < VisionConstants.kCircularBufferSize) return pose1;
+    if (gyroBuffer.size() < VisionConstants.kCircularBufferSize) {
+      if (pose1 != null) {
+        return pose1;
+      } else {
+        return pose2;
+      }
+    }
 
     // See what pose is closer the the gyro at the time of the photo's capture.
     double rotation =
@@ -343,6 +374,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    Logger.recordOutput("Vision/Vision Updates On", visionUpdating);
     double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
     gyroBuffer.addFirst(gyroData);
 
@@ -437,12 +469,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
           Logger.recordOutput("Vision/Raw Camera 2 " + camNames[idx], cam2Pose);
 
           cameraPose = getCorrectPose(cam1Pose, cam2Pose, result.getTimeStamp(), idx);
+
+          if (cameraPose == null) {
+            continue;
+          }
+
+          cameraRotation = cameraPose.getRotation();
           robotTranslation =
               cameraPose
                   .getTranslation()
-                  .minus(camPositions[idx].rotateBy(cameraPose.getRotation()))
+                  .minus(camPositions[idx].rotateBy(cameraRotation))
                   .rotateBy(camRotations[idx]);
-          cameraRotation = cameraPose.getRotation();
         }
         Pose2d robotPose =
             new Pose2d(robotTranslation.toTranslation2d(), cameraRotation.toRotation2d());

@@ -27,8 +27,8 @@ public class ExampleIOFX implements ExampleIO {
   TalonFXConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
-  StatusSignal<Angle> currPosition;
-  StatusSignal<AngularVelocity> currVelocity;
+  StatusSignal<Angle> curPosition;
+  StatusSignal<AngularVelocity> curVelocity;
 
   public ExampleIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -42,8 +42,8 @@ public class ExampleIOFX implements ExampleIO {
     configurator.apply(ExampleConstants.getFXConfig());
 
     // Attach status signals
-    currPosition = talonFx.getPosition();
-    currVelocity = talonFx.getVelocity();
+    curPosition = talonFx.getPosition();
+    curVelocity = talonFx.getVelocity();
   }
 
   @Override
@@ -64,9 +64,9 @@ public class ExampleIOFX implements ExampleIO {
 
   @Override
   public void updateInputs(ExampleIOInputs inputs) {
-    BaseStatusSignal.refreshAll(currVelocity, currPosition);
-    inputs.velocity = currVelocity.getValue();
-    inputs.position = currPosition.getValue().minus(relSetpointOffset);
+    BaseStatusSignal.refreshAll(curVelocity, curPosition);
+    inputs.velocity = curVelocity.getValue();
+    inputs.position = curPosition.getValue().minus(relSetpointOffset);
   }
 
   @Override
