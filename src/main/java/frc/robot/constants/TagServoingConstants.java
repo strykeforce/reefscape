@@ -47,11 +47,11 @@ public class TagServoingConstants {
   public static final double kNoUpdateMicrosec = 500_000;
 
   // Drive
-  public static final double kCoralInitialDriveRadius = 1.75; // 0.36 away from reef wall
+  public static final double kCoralInitialDriveRadius = 1.7; // 0.36 away from reef wall
   public static final double kCoralAlignRadius = 1.32; // 1.293823 is perfectly against the reef
   // public static final double kCoralStopXDriveRadius =
   //     kCoralInitialDriveRadius; // Should be closer to reef than target pose
-  public static final double kAlgaeInitialDriveRadius = 1.;
+  public static final double kAlgaeInitialDriveRadius = 1.75;
   public static final double kAlgaeAlignRadius = 1.34; // was 1.34
   public static final double kAlgaeStopXDriveRadius =
       kAlgaeInitialDriveRadius; // Should be closer to reef than target pose

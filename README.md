@@ -46,14 +46,15 @@
 | --------------- | ------- | ------- | --- |
 | Pigeon 2        | 12      | 0.5     | 4   |
 | Ethernet Switch | 12      | 2       |     |
-|                 |         |         |     |
+| Headlights      | 12      | 0.5     |     |
 
 ## Beam Breaks
 | Subsystem | Talon   | ID  | Fwd/Rev | Purpose            |
 | --------- | ------- | --- | ------- | ------------------ |
-| Funnel    | rollers | 40  |         | Coral Presence     |
-| Coral     | wheels  | 30  |         | Coral partially in |
-| Coral     | wheels  | 30  |         | Coral fully in     |
+| Funnel    | rollers | 40  | REV     | Coral Presence     |
+| Coral     | wheels  | 35  | REV     | Coral partially in |
+| Coral     | wheels  | 35  | FWD     | Coral fully in     |
+| Algae     | algae   | 30  | FWD     | Algae in claw      |
 
 
 ## Roborio
@@ -62,38 +63,38 @@
 | n/a       | USB       | CANivore |
 
 ## DIO
-| Subsystem  | name        | ID  |
-| ---------- | ----------- | --- |
-| BattMon    | Batt I      | 0   |
-| BattMon    | PDP V       | 1   |
-| BattMon    | Breaker T   | 2   |
-| Climb      | cageAligned | 3   |
-| AutoSwitch | switch      | 4   |
-| AutoSwitch | switch      | 5   |
-| AutoSwitch | switch      | 6   |
-| AutoSwitch | switch      | 7   |
-| AutoSwitch | switch      | 8   |
-| AutoSwitch | switch      | 9   |
+| Subsystem  | name             | ID  |
+| ---------- | ---------------- | --- |
+| BattMon    | Batt I           | 0   |
+| BattMon    | PDP V            | 1   |
+| BattMon    | Breaker T        | 2   |
+| TagServo   | Headlight Enable | 3   |
+| AutoSwitch | switch           | 4   |
+| AutoSwitch | switch           | 5   |
+| AutoSwitch | switch           | 6   |
+| AutoSwitch | switch           | 7   |
+| AutoSwitch | switch           | 8   |
+| AutoSwitch | switch           | 9   |
 
 ## MXP
-| Subsystem | name        | ID  |
-| --------- | ----------- | --- |
-| TagServo  | wallSense   | 10  |
-| TagServo  | headLights  | 11  |
-|           |             | 12  |
-|           |             | 13  |
-|           |             | 14  |
-|           |             | 15  |
-|           |             | 16  |
-|           |             | 17  |
-|           |             | 18  |
-|           |             | 19  |
-|           |             | 20  |
-|           |             | 21  |
-|           |             | 22  |
-|           |             | 23  |
-|           |             | 24  |
-|           |             | 25  |
+| Subsystem | name | ID  |
+| --------- | ---- | --- |
+|           |      | 10  |
+|           |      | 11  |
+|           |      | 12  |
+|           |      | 13  |
+|           |      | 14  |
+|           |      | 15  |
+|           |      | 16  |
+|           |      | 17  |
+|           |      | 18  |
+|           |      | 19  |
+|           |      | 20  |
+|           |      | 21  |
+|           |      | 22  |
+|           |      | 23  |
+|           |      | 24  |
+|           |      | 25  |
 
 
 ## PWM
@@ -111,18 +112,18 @@
 |           |              | 9   |    
 
 ## Analog
-| Subsystem | name   | ID  |
-| --------- | ------ | --- |
-| Elevator  | height | 0   |
-|           |        | 1   |
-|           |        | 2   |
-|           |        | 3   |
-|           |        | 4   |
-|           |        | 5   |
-|           |        | 6   |
-|           |        | 7   |
-|           |        | 8   |
-|           |        | 9   |
+| Subsystem | name | ID  |
+| --------- | ---- | --- |
+|           |      | 0   |
+|           |      | 1   |
+|           |      | 2   |
+|           |      | 3   |
+|           |      | 4   |
+|           |      | 5   |
+|           |      | 6   |
+|           |      | 7   |
+|           |      | 8   |
+|           |      | 9   |
 
 ## Cameras
 | Camera      | IP Address  | Type    |
