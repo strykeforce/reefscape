@@ -41,6 +41,7 @@ import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoReefCycleCommand;
 import frc.robot.commands.robotState.FloorAlgaeCommand;
+import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
@@ -289,21 +290,15 @@ public class RobotContainer {
 
     // Reset Gyro Command, stow, interrupt Auton, and zero elev
     new JoystickButton(driveJoystick, Button.M_SWC.id).onTrue(new ResetGyroCommand(driveSubsystem));
+
+    // Force Processor
     new JoystickButton(driveJoystick, Button.SWD.id)
         .onTrue(
-            new StowCommand(
-                robotStateSubsystem,
-                elevatorSubsystem,
-                coralSubsystem,
-                biscuitSubsystem,
-                algaeSubsystem))
+            new ForceProcessorCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
         .onFalse(
-            new StowCommand(
-                robotStateSubsystem,
-                elevatorSubsystem,
-                coralSubsystem,
-                biscuitSubsystem,
-                algaeSubsystem));
+            new ForceProcessorCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
 
     // Interupt
     new JoystickButton(driveJoystick, Button.SWG_UP.id)
