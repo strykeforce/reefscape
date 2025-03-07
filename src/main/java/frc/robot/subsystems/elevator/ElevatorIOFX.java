@@ -10,11 +10,9 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.ElevatorConstants;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.healthcheck.AfterHealthCheck;
@@ -31,8 +29,7 @@ public class ElevatorIOFX implements ElevatorIO, Checkable {
   @HealthCheck
   @Position(
       percentOutput = {-0.1, 0.1},
-      encoderChange = 0.13
-      )
+      encoderChange = 10)
   private TalonFX talonFxFront;
 
   @HealthCheck

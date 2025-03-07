@@ -25,6 +25,7 @@ import org.littletonrobotics.junction.Logger;
 import org.strykeforce.gyro.SF_AHRS;
 import org.strykeforce.gyro.SF_PIGEON2;
 import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.swerve.FXSwerveModule;
 import org.strykeforce.swerve.OdometryStrategy;
 import org.strykeforce.swerve.PoseEstimatorOdometryStrategy;
@@ -34,12 +35,8 @@ import org.strykeforce.swerve.V6TalonSwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
 
-
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
-
 public class SwerveFXS implements SwerveIO, Checkable {
-   @HealthCheck private final SwerveDrive swerveDrive;
+  @HealthCheck private final SwerveDrive swerveDrive;
 
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;

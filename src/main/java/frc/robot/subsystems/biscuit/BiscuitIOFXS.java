@@ -1,5 +1,7 @@
 package frc.robot.subsystems.biscuit;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -17,11 +19,21 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.biscuit.BiscuitIO.BiscuitIOInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.AfterHealthCheck;
+import org.strykeforce.healthcheck.BeforeHealthCheck;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class BiscuitIOFXS implements BiscuitIO {
+public class BiscuitIOFXS implements BiscuitIO, Checkable {
 
   private Logger logger;
+
+  @HealthCheck
+  @Position(
+      percentOutput = {-0.1, 0.1},
+      encoderChange = 40)
   private TalonFXS talon;
 
   private final Angle sensorInitial;
@@ -34,7 +46,7 @@ public class BiscuitIOFXS implements BiscuitIO {
   private boolean fwdLimitSwitchOpen;
   private Angle offset;
   private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
-  private Boolean lastHadAlgae = false;
+  private boolean lastHadAlgae = false;
 
   TalonFXSConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
@@ -112,5 +124,16 @@ public class BiscuitIOFXS implements BiscuitIO {
       didZero = true;
     }
     return didZero;
+  }
+
+  @Override
+  public String getName() {
+    return "Biscuit";
+  }
+
+  @BeforeHealthCheck
+  @AfterHealthCheck
+  public void healthCheckPos() {
+    setPosition(Rotations.of(0), false);
   }
 }
