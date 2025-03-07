@@ -38,7 +38,9 @@ public class ElevatorConstants {
   public static final double kJogAmountDown = -1.5;
 
   // Setpoints
+  public static final Angle kHealthCheck = Rotations.of(24);
   // Idle
+
 
   // Algae removal
   public static final Angle kL2AlgaeSetpoint = Rotations.of(6.308);

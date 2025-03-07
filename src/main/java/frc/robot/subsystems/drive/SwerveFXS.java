@@ -34,8 +34,12 @@ import org.strykeforce.swerve.V6TalonSwerveModule;
 import org.strykeforce.swerve.V6TalonSwerveModule.ClosedLoopUnits;
 import org.strykeforce.telemetry.TelemetryService;
 
+
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
+
 public class SwerveFXS implements SwerveIO, Checkable {
-  private final SwerveDrive swerveDrive;
+   @HealthCheck private final SwerveDrive swerveDrive;
 
   // Grapher stuff
   private PoseEstimatorOdometryStrategy odometryStrategy;

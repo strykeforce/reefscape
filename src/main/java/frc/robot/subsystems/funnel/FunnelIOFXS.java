@@ -11,11 +11,15 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.FunnelConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.HealthCheck;
 import org.strykeforce.telemetry.TelemetryService;
 
 public class FunnelIOFXS implements FunnelIO {
   // Private Objects
   private Logger logger;
+
+  @HealthCheck
+  @Timed(percentOutput=0.1, duration=2)
   private TalonFXS talonfxs;
 
   // FX Acces Objects
