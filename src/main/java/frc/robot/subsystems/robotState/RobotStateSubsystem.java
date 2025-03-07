@@ -613,7 +613,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.prepClimb();
 
     setState(RobotStates.PREP_CLIMB, true);
-  }
+  } // -0.30
 
   public void toClimb() {
     if (curState == RobotStates.PREP_CLIMB) {
@@ -646,6 +646,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     switch (curState) {
       case TRANSFER -> {
         if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()
+            || ((nextState == RobotStates.PREP_CLIMB || nextState == RobotStates.CLIMB)
+                && elevatorSubsystem.getPosition().in(Rotations)
+                    < RobotStateConstants.kElevatorClimbMax)
         // && climbSubsystem.isFinished()
         ) {
           setState(nextState);
@@ -853,7 +856,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toAlgaeFloorPickup();
         }
       }
-      case PREP_CLIMB -> {}
+      case PREP_CLIMB -> {
+        double climbPos = climbSubsystem.getPosition().in(Rotations);
+        if (climbPos < RobotStateConstants.kClimbAngleSmall) {
+          ledSubsystem.setState(LEDStates.TOO_CLOSE);
+        } else if (climbPos > RobotStateConstants.kClimbAngleBig) {
+          ledSubsystem.setState(LEDStates.TOO_FAR);
+        } else {
+          ledSubsystem.setState(LEDStates.GOOD);
+        }
+      }
       case CLIMB -> {}
       case INTERRUPTED -> {}
       case IDLE -> {}

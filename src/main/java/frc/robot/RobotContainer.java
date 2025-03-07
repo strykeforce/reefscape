@@ -577,6 +577,11 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(8, 0);
 
+    Shuffleboard.getTab("Match")
+        .addDouble("Climb Pos", () -> climbSubsystem.getPosition().in(Rotations))
+        .withSize(1, 1)
+        .withPosition(9, 1);
+
     // Shuffleboard.getTab("Match")
     // .addBoolean(
     // "Cams Connected",
