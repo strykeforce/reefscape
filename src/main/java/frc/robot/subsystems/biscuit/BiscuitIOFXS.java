@@ -32,8 +32,8 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
 
   @HealthCheck
   @Position(
-      percentOutput = {-0.1, 0.1},
-      encoderChange = 40)
+      percentOutput = {0.05, -0.10},
+      encoderChange = 20)
   private TalonFXS talon;
 
   private final Angle sensorInitial;
@@ -48,7 +48,7 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
   private boolean lastHadAlgae = false;
 
-  TalonFXSConfigurator configurator;
+  private TalonFXSConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0);
 
@@ -133,7 +133,8 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
 
   @BeforeHealthCheck
   @AfterHealthCheck
-  public void healthCheckPos() {
+  public boolean healthCheckPos() {
     setPosition(Rotations.of(0), false);
+    return Math.abs(position.refresh().getValueAsDouble()) < BiscuitConstants.kCloseEnough;
   }
 }

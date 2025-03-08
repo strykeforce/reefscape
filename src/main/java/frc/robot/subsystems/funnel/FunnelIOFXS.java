@@ -21,7 +21,9 @@ public class FunnelIOFXS implements FunnelIO, Checkable {
   private Logger logger;
 
   @HealthCheck
-  @Timed(percentOutput = 0.1, duration = 2)
+  @Timed(
+      percentOutput = {0.1, 0.75},
+      duration = 2)
   private TalonFXS talonfxs;
 
   // FX Acces Objects

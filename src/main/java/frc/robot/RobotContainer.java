@@ -52,6 +52,7 @@ import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StopAllAxisCommand;
+import frc.robot.commands.robotState.StopOpenLoopCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
 import frc.robot.commands.robotState.ToggleAutoPlacingCommand;
@@ -619,6 +620,7 @@ public class RobotContainer {
         .add(
             "Health Check",
             new DepthChargeHealthCheckCommand(
+                robotStateSubsystem,
                 swerve,
                 driveSubsystem,
                 funnelIO,
@@ -632,6 +634,13 @@ public class RobotContainer {
                 biscuitIO,
                 biscuitSubsystem))
         .withPosition(6, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Stop Open Loop",
+            new StopOpenLoopCommand(robotStateSubsystem, coralSubsystem, funnelIO, algaeIO))
+        .withPosition(7, 1)
         .withSize(1, 1);
   }
 

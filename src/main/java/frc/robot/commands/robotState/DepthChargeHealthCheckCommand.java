@@ -1,5 +1,6 @@
 package frc.robot.commands.robotState;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.algae.AlgaeIOFX;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
@@ -13,6 +14,8 @@ import frc.robot.subsystems.elevator.ElevatorIOFX;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.funnel.FunnelIOFXS;
 import frc.robot.subsystems.funnel.FunnelSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import java.util.List;
 import org.strykeforce.healthcheck.IOHealthCheckCommand;
 
@@ -31,6 +34,7 @@ public class DepthChargeHealthCheckCommand extends SequentialCommandGroup {
   private BiscuitSubsystem biscuitSubsystem;
 
   public DepthChargeHealthCheckCommand(
+      RobotStateSubsystem robotStateSubsystem,
       SwerveFXS swerve,
       DriveSubsystem driveSubsystem,
       FunnelIOFXS funnelIOFXS,
@@ -59,6 +63,10 @@ public class DepthChargeHealthCheckCommand extends SequentialCommandGroup {
 
     addCommands(
         new ResetCaseHealthCheckCommand(),
+        new InstantCommand(() -> robotStateSubsystem.setState(RobotStates.IDLE, false)),
+        new InstantCommand(() -> coralSubsystem.healthCheck()),
+        new InstantCommand(() -> funnelIOFXS.setPct(0)),
+        new InstantCommand(() -> algaeIOFXS.setPct(0)),
         new IOHealthCheckCommand(
             List.of(
                 driveSubsystem,
@@ -73,6 +81,12 @@ public class DepthChargeHealthCheckCommand extends SequentialCommandGroup {
             algaeIOFXS,
             elevatorIOFX,
             biscuitIOFXS),
-        new LockWheelsCommand(driveSubsystem));
+        new LockWheelsCommand(driveSubsystem),
+        new StowCommand(
+            robotStateSubsystem,
+            elevatorSubsystem,
+            coralSubsystem,
+            biscuitSubsystem,
+            algaeSubsystem));
   }
 }

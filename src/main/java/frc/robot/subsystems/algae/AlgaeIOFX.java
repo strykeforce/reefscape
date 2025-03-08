@@ -23,7 +23,7 @@ public class AlgaeIOFX implements AlgaeIO, Checkable {
 
   @HealthCheck
   @Timed(
-      percentOutput = {-0.1, -1},
+      percentOutput = {0.5, 0.04, -1},
       duration = 2)
   private TalonFXS talonFXS;
 

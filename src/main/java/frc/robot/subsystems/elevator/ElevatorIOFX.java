@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -28,7 +30,7 @@ public class ElevatorIOFX implements ElevatorIO, Checkable {
 
   @HealthCheck
   @Position(
-      percentOutput = {-0.1, 0.1},
+      percentOutput = {-0.05, 0.1},
       encoderChange = 10)
   private TalonFX talonFxFront;
 
@@ -118,8 +120,12 @@ public class ElevatorIOFX implements ElevatorIO, Checkable {
 
   @BeforeHealthCheck
   @AfterHealthCheck
-  public void healthCheckPos() {
+  public boolean healthCheckPos() {
     setPosition(ElevatorConstants.kHealthCheck);
+    return Math.abs(
+            currPosition.refresh().getValueAsDouble()
+                - ElevatorConstants.kHealthCheck.in(Rotations))
+        < ElevatorConstants.kCloseEnoughRotations;
   }
 
   @Override

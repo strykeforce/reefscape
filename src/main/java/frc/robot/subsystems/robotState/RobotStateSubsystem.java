@@ -16,6 +16,7 @@ import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -171,7 +172,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
-  private void setState(RobotStates robotState, boolean transfer) {
+  public void setState(RobotStates robotState, boolean transfer) {
     if (curState != robotState) {
       if (transfer) {
         logger.info("TRANSFER ({} -> {})", curState, robotState);
@@ -464,7 +465,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toPlaceCoral() {
-    coralSubsystem.eject();
+    coralSubsystem.eject(scoringLevel);
     funnelSubsystem.clearCoral();
     isAutoReadyForEject = false;
     scoringTimer.stop();
@@ -616,7 +617,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   } // -0.30
 
   public void toClimb() {
-    if (curState == RobotStates.PREP_CLIMB) {
+    if (curState == RobotStates.PREP_CLIMB || climbSubsystem.getState() == ClimbState.PREPPED) {
 
       climbSubsystem.climb();
       driveSubsystem.prepClimb();
