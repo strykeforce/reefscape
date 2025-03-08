@@ -619,6 +619,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toClimb() {
     if (curState == RobotStates.PREP_CLIMB || climbSubsystem.getState() == ClimbState.PREPPED) {
 
+      biscuitSubsystem.setPosition(RobotConstants.kHpAlgaeSetpoint, hasAlgae());
+      elevatorSubsystem.setPosition(ElevatorConstants.kHpAlgaeSetpoint);
+
       climbSubsystem.climb();
       driveSubsystem.prepClimb();
 
@@ -657,7 +660,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case TO_STOW -> {
-        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+        if (biscuitSubsystem.isFinished()
+            && (elevatorSubsystem.isFinished()
+                || elevatorSubsystem.getPosition().in(Rotations)
+                    < ElevatorConstants.kStowThresholdDone)) {
           setState(RobotStates.STOW);
         }
       }

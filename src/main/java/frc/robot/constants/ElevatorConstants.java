@@ -21,6 +21,7 @@ import edu.wpi.first.units.measure.Angle;
 public class ElevatorConstants {
 
   public static final double kCloseEnoughRotations = 0.1;
+  public static final double kStowThresholdDone = 0.3676757 + 0.5;
   public static final double kMaxFwd = 53;
   public static final double kMaxRev = 2;
   public static final double kElevatorLiftHeight = 1; // for pit command
@@ -50,7 +51,7 @@ public class ElevatorConstants {
 
   // Coral score
   public static final Angle kL1CoralSetpoint = Rotations.of(15.2); // 13.04053
-  public static final Angle kL2CoralSetpoint = Rotations.of(21.0786); // 19.62793 -> 21.0786
+  public static final Angle kL2CoralSetpoint = Rotations.of(19.62793); // 19.62793 -> 21.0786 ->
   public static final Angle kL3CoralSetpoint =
       Rotations.of(31.0901); // was 30.42969 -> 31.7505 -> 31.0901
   public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);
