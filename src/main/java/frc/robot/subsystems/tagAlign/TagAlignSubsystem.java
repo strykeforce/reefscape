@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Set;
 import net.jafama.FastMath;
@@ -48,9 +49,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private double driveXCloseEnough = TagServoingConstants.kCoralDriveXCloseEnough;
   private double driveYCloseEnough = TagServoingConstants.kCoralDriveYCloseEnough;
   private boolean proceedToAlign = false;
-  private boolean scoreLeft = true;
+  // private boolean scoreLeft = true;
   private int currentThresCount = 0;
   private boolean finalDrive = false;
+  private ScoreSide scoreSide;
 
   // private long startServoTime;
 
@@ -83,12 +85,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
       logger.info(
           "{}, {}",
-          getTargetDrivePose(Alliance.Blue, true, i).getX(),
-          getTargetDrivePose(Alliance.Blue, true, i).getY());
+          getTargetDrivePose(Alliance.Blue, scoreSide.LEFT, i).getX(),
+          getTargetDrivePose(Alliance.Blue, scoreSide.LEFT, i).getY());
       logger.info(
           "{}, {}",
-          getTargetDrivePose(Alliance.Blue, false, i).getX(),
-          getTargetDrivePose(Alliance.Blue, false, i).getY());
+          getTargetDrivePose(Alliance.Blue, scoreSide.RIGHT, i).getX(),
+          getTargetDrivePose(Alliance.Blue, scoreSide.RIGHT, i).getY());
     }
   }
 
@@ -127,7 +129,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return (computeHexant(color) + (color == Alliance.Blue ? 0 : 3)) % 6;
   }
 
-  private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft) {
+  private Pose2d getTargetDrivePose(Alliance color, ScoreSide scoreSide) {
     Translation2d reefT =
         color == Alliance.Blue
             ? TagServoingConstants.kBlueReefPose
@@ -139,7 +141,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Translation2d sideOffset =
         new Translation2d(
-            scoreLeft ? TagServoingConstants.kRightCamOffset : TagServoingConstants.kLeftCamOffset,
+            (scoreSide == scoreSide.LEFT)
+                ? TagServoingConstants.kRightCamOffset
+                : TagServoingConstants.kLeftCamOffset,
             Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180 + 90));
 
     return new Pose2d(
@@ -147,7 +151,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
   }
 
-  private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft, int hexant) {
+  private Pose2d getTargetDrivePose(Alliance color, ScoreSide scoreSide, int hexant) {
     Translation2d reefT =
         color == Alliance.Blue
             ? TagServoingConstants.kBlueReefPose
@@ -158,7 +162,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Translation2d sideOffset =
         new Translation2d(
-            scoreLeft ? TagServoingConstants.kRightCamOffset : TagServoingConstants.kLeftCamOffset,
+            (scoreSide == scoreSide.LEFT)
+                ? TagServoingConstants.kRightCamOffset
+                : TagServoingConstants.kLeftCamOffset,
             Rotation2d.fromDegrees(hexant * 60 + 180 + 90));
 
     return new Pose2d(reefT.plus(offset).plus(sideOffset), Rotation2d.fromDegrees(hexant * 60));
@@ -179,9 +185,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return curState;
   }
 
-  public void setup(Alliance alliance, boolean scoreLeft, boolean algae) {
+  public void setup(Alliance alliance, ScoreSide scoreSide, boolean algae) {
     this.alliance = alliance;
-    this.scoreLeft = scoreLeft;
+    this.scoreSide = scoreSide;
     this.finalDrive = false;
     // this.goalTargetDiag =
     //     scoreLeft
@@ -201,7 +207,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     this.driveYCloseEnough = TagServoingConstants.kInitialCloseEnough;
     this.currentThresCount = 0;
 
-    targetPose = getTargetDrivePose(alliance, scoreLeft);
+    targetPose = getTargetDrivePose(alliance, scoreSide);
     // Inverted, scoring left coral means aligning right camera
     // targetCamId =
     //     !scoreLeft ? TagServoingConstants.kLeftServoCam : TagServoingConstants.kRightServoCam;
@@ -263,14 +269,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     // return vY;
   }
 
-  public void start(Alliance alliance, boolean scoreLeft, boolean algae) {
-    setup(alliance, scoreLeft, algae);
+  public void start(Alliance alliance, ScoreSide scoreSide, boolean algae) {
+    setup(alliance, scoreSide, algae);
 
     curState = TagAlignStates.DRIVE;
   }
 
-  public void startAuto(Alliance alliance, boolean scoreLeft, boolean algae) {
-    setup(alliance, scoreLeft, algae);
+  public void startAuto(Alliance alliance, ScoreSide scoreSide, boolean algae) {
+    setup(alliance, scoreSide, algae);
     tagAlign();
   }
 
@@ -301,13 +307,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     //         : TagServoingConstants.kCoralStopXDriveRadius;
     this.driveRadius =
         algae ? TagServoingConstants.kAlgaeAlignRadius : TagServoingConstants.kCoralAlignRadius;
-    targetPose = getTargetDrivePose(alliance, scoreLeft);
+    targetPose = getTargetDrivePose(alliance, scoreSide);
     Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
   }
 
   public void terminate() {
     driveSubsystem.setIgnoreSticks(false);
     driveSubsystem.stopDriving();
+    visionSubsystem.setTagServoing(false);
     curState = TagAlignStates.DONE;
   }
 
@@ -319,6 +326,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     switch (curState) {
       case DRIVE, TAG_ALIGN -> {
+        // Variables to turn off updates from other cams when tag servoing
+        visionSubsystem.setTagServoing(true);
+        visionSubsystem.setExclusiveCam(scoreSide);
+
         Pose2d current = driveSubsystem.getPoseMeters();
 
         double vX = 0;

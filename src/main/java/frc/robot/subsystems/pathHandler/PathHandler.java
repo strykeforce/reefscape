@@ -12,6 +12,7 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PathHandlerConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
   private boolean proceedToNext = false;
+  private ScoreSide scoreSide;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -205,10 +207,14 @@ public class PathHandler extends MeasurableSubsystem {
         curState = PathStates.DRIVE_PLACE;
 
       } else if (shouldTransitionToServoing()) {
+        if ((nodeNames.get(0) - 'a') % 2 == 0) {
+          scoreSide = scoreSide.LEFT;
+        } else {
+          scoreSide = scoreSide.RIGHT;
+        }
+
         tagAlignSubsystem.startAuto(
-            mirrorTrajectory ? Alliance.Red : Alliance.Blue,
-            (nodeNames.get(0) - 'a') % 2 == 0,
-            false);
+            mirrorTrajectory ? Alliance.Red : Alliance.Blue, scoreSide, false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
         curState = PathStates.DRIVE_PLACE_SERVO;
         robotStateSubsystem.toPrepCoral();
@@ -258,10 +264,13 @@ public class PathHandler extends MeasurableSubsystem {
 
   private void advanceNodes() {
     if (nodeNames.size() > 0) {
-      tagAlignSubsystem.setup(
-          mirrorTrajectory ? Alliance.Red : Alliance.Blue,
-          (nodeNames.get(0) - 'a') % 2 == (mirrorToProcessor ? 1 : 0),
-          false);
+      if ((nodeNames.get(0) - 'a') % 2 == (mirrorToProcessor ? 1 : 0)) {
+        scoreSide = scoreSide.LEFT;
+      } else {
+        scoreSide = scoreSide.RIGHT;
+      }
+
+      tagAlignSubsystem.setup(mirrorTrajectory ? Alliance.Red : Alliance.Blue, scoreSide, false);
       nodeNames.remove(0);
     }
   }

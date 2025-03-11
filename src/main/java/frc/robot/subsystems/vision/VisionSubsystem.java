@@ -19,6 +19,7 @@ import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
@@ -104,6 +105,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private WallEyeTagResult[] lastResult = new WallEyeTagResult[VisionConstants.kNumCams];
   private Matrix<N3, N1> adativeMatrix;
   private Matrix<N3, N1> stdMatrix;
+  private boolean isTagServoing;
+  private WallEyeCam exclusiveCam;
+  private ScoreSide scoreSide;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -138,6 +142,18 @@ public class VisionSubsystem extends MeasurableSubsystem {
   public void setMinTags(int minTags) {
     this.minTags = minTags;
   }
+
+  public void setTagServoing(boolean isTagServoing) {
+    this.isTagServoing = isTagServoing;
+  }
+
+  public void setExclusiveCam(ScoreSide scoreSide) {
+    if (scoreSide == scoreSide.LEFT) {
+      exclusiveCam = cams[2];
+    } else {
+      exclusiveCam = cams[0];
+    }
+  } // TODO Set isTagServoing as a graphable boolean
   // Getter Methods
   public boolean isVisionUpdating() {
     return visionUpdating;
@@ -393,8 +409,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
       if (cams[i].hasNewUpdate()) {
         timeSinceLastUpdate = getSeconds();
-        validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
-        lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+        if (isTagServoing) {
+          if (cams[i].getCameraIndex() == exclusiveCam.getCameraIndex()) {
+            validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
+            lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+          }
+        } else {
+          validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
+          lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+        }
       }
     }
 

@@ -377,12 +377,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       setState(RobotStates.STOW);
     }
     if (drive) {
-      tagAlignSubsystem.start(
-          allianceColor,
-          scoreSide == ScoreSide.LEFT
-              || !coralSubsystem.hasCoral()
-              || (wantAlgae && getAlgaeOnCycle),
-          wantAlgae);
+      if (scoreSide == ScoreSide.LEFT
+          || !coralSubsystem.hasCoral()
+          || (wantAlgae && getAlgaeOnCycle)) {
+        scoreSide = ScoreSide.LEFT;
+      } else {
+        scoreSide = ScoreSide.RIGHT;
+      }
+      tagAlignSubsystem.start(allianceColor, scoreSide, wantAlgae);
       setAutoPlacingLed(true);
       setState(RobotStates.REEF_ALIGN);
     }
