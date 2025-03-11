@@ -30,7 +30,7 @@ public final class VisionConstants {
   public static final double kOffsetOnVelFilter = 0.10;
   public static final double kSquaredCoeffOnVelFilter = 0.1;
 
-  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, 0);
+  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, 0.001);
 
   public static final double kTimeStampOffset = 0.0;
 
@@ -120,4 +120,7 @@ public final class VisionConstants {
   // Vision Odometry Standard devs
   public static Matrix<N3, N1> kVisionMeasurementStdDevs =
       VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(360));
+
+  public static double kIgnoreYawStdDev = Units.degreesToRadians(500 * 360);
+  public static double kTrustYawStdDev = 0.0005;
 }

@@ -658,6 +658,11 @@ public class RobotContainer {
         .withPosition(1, 0)
         .withSize(1, 1);
 
+    Shuffleboard.getTab("Test")
+        .addDouble("Yaw Camera Idx", () -> visionSubsystem.getYawUpdateCamera())
+        .withPosition(1, 1)
+        .withSize(1, 1);
+
     // Shuffleboard.getTab("Test")
     //     .add("Start Auton", nonProcessorShallowAutonCommand)
     //     .withPosition(3, 0)
