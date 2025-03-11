@@ -17,6 +17,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   private SwerveSample desiredState;
   private Pose2d finalPose;
   private Pose2d initialPose = new Pose2d();
+  private ScoreSide scoreSide;
 
   public DriveAutonServoCommand(
       DriveSubsystem driveSubsystem,
@@ -181,7 +183,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
           robotStateSubsystem.toPrepCoral();
           tagAlignSubsystem.startAuto(
               mirrorTrajectory ? Alliance.Red : Alliance.Blue,
-              mirrorToProcessor ? !scoreLeft : scoreLeft,
+              mirrorToProcessor ? scoreSide.RIGHT : scoreSide.LEFT,
               false);
         }
       }

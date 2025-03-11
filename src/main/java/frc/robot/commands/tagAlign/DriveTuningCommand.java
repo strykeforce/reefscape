@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.function.DoubleSupplier;
@@ -14,6 +15,7 @@ public class DriveTuningCommand extends Command {
   private Pose2d start;
   private boolean driving = false;
   private DoubleSupplier pSupplier;
+  private ScoreSide scoreSide;
 
   public DriveTuningCommand(
       DriveSubsystem driveSubsystem,
@@ -31,7 +33,7 @@ public class DriveTuningCommand extends Command {
     start = driveSubsystem.getPoseMeters();
     driving = true;
     // driveSubsystem.move(0, 1.5, 0, false);
-    tagAlignSubsystem.start(Alliance.Blue, true, false);
+    tagAlignSubsystem.start(Alliance.Blue, scoreSide.LEFT, false);
   }
 
   @Override
