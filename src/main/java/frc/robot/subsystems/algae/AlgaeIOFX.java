@@ -13,11 +13,20 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.AlgaeConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.healthcheck.Timed;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class AlgaeIOFX implements AlgaeIO {
+public class AlgaeIOFX implements AlgaeIO, Checkable {
   private Logger logger;
+
+  @HealthCheck
+  @Timed(
+      percentOutput = {0.5, 0.04, -1},
+      duration = 2)
   private TalonFXS talonFXS;
+
   private AlgaeIOInputs inputs;
 
   private TalonFXSConfigurator configurator;
@@ -62,5 +71,10 @@ public class AlgaeIOFX implements AlgaeIO {
   @Override
   public void registerWith(TelemetryService telemetryService) {
     telemetryService.register(talonFXS, true);
+  }
+
+  @Override
+  public String getName() {
+    return "Algae";
   }
 }

@@ -16,6 +16,7 @@ import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -171,7 +172,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
-  private void setState(RobotStates robotState, boolean transfer) {
+  public void setState(RobotStates robotState, boolean transfer) {
     if (curState != robotState) {
       if (transfer) {
         logger.info("TRANSFER ({} -> {})", curState, robotState);
@@ -464,7 +465,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toPlaceCoral() {
-    coralSubsystem.eject();
+    coralSubsystem.eject(scoringLevel);
     funnelSubsystem.clearCoral();
     isAutoReadyForEject = false;
     scoringTimer.stop();
@@ -613,10 +614,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.prepClimb();
 
     setState(RobotStates.PREP_CLIMB, true);
-  }
+  } // -0.30
 
   public void toClimb() {
-    if (curState == RobotStates.PREP_CLIMB) {
+    if (curState == RobotStates.PREP_CLIMB || climbSubsystem.getState() == ClimbState.PREPPED) {
+
+      biscuitSubsystem.setPosition(RobotConstants.kHpAlgaeSetpoint, hasAlgae());
+      elevatorSubsystem.setPosition(ElevatorConstants.kHpAlgaeSetpoint);
 
       climbSubsystem.climb();
       driveSubsystem.prepClimb();
@@ -646,6 +650,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     switch (curState) {
       case TRANSFER -> {
         if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()
+            || ((nextState == RobotStates.PREP_CLIMB || nextState == RobotStates.CLIMB)
+                && elevatorSubsystem.getPosition().in(Rotations)
+                    < RobotStateConstants.kElevatorClimbMax)
         // && climbSubsystem.isFinished()
         ) {
           setState(nextState);
@@ -653,7 +660,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case TO_STOW -> {
-        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+        if (biscuitSubsystem.isFinished()
+            && (elevatorSubsystem.isFinished()
+                || elevatorSubsystem.getPosition().in(Rotations)
+                    < ElevatorConstants.kStowThresholdDone)) {
           setState(RobotStates.STOW);
         }
       }
@@ -853,7 +863,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toAlgaeFloorPickup();
         }
       }
-      case PREP_CLIMB -> {}
+      case PREP_CLIMB -> {
+        double climbPos = climbSubsystem.getPosition().in(Rotations);
+        if (climbPos < RobotStateConstants.kClimbAngleSmall) {
+          ledSubsystem.setState(LEDStates.TOO_CLOSE);
+        } else if (climbPos > RobotStateConstants.kClimbAngleBig) {
+          ledSubsystem.setState(LEDStates.TOO_FAR);
+        } else {
+          ledSubsystem.setState(LEDStates.GOOD);
+        }
+      }
       case CLIMB -> {}
       case INTERRUPTED -> {}
       case IDLE -> {}

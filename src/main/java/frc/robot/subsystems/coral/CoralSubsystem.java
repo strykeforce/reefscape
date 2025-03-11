@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.CoralConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,10 +100,14 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     setState(CoralState.INTAKING);
   }
 
-  public void eject() {
+  public void eject(ScoringLevel level) {
     io.enableFwdLimitSwitch(false);
     // setSpeed(CoralConstants.kEjectingSpeed);
-    setPct(1);
+
+    switch (level) {
+      case L1, L2, L3 -> setPct(0.8);
+      case L4 -> setPct(1);
+    }
     setState(CoralState.EJECTING);
   }
 
@@ -150,6 +155,11 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   @Override
   public Set<Measure> getMeasures() {
     return Set.of(new Measure("State", () -> curState.ordinal()));
+  }
+
+  public void healthCheck() {
+    setState(CoralState.IDLE);
+    setPct(0);
   }
 
   public enum CoralState {

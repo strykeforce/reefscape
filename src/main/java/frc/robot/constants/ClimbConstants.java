@@ -29,7 +29,7 @@ public class ClimbConstants {
   public static int kCageAlignedDIOId = 11;
 
   public static final double kPivotArmCloseEnough = 0.01; // fixme
-  public static final double kArmMaxFwd = 0;
+  public static final double kArmMaxFwd = 0.01;
   public static final double kArmMaxRev = -0.29;
   public static final Angle kArmZeroTicks = Degrees.of(1530);
 

@@ -68,9 +68,9 @@ public class LEDSubsystem extends MeasurableSubsystem {
     switch (currState) {
       case OFF -> io.setOff();
       case NORMAL -> buildBase();
-      case CLIMB_EMPTY -> io.setStrip(LEDConstants.kWaitingForCage);
-      case CLIMB_FULL -> io.setStrip(LEDConstants.kHasCage);
-      case CLIMB_UP -> io.setStrip(LEDConstants.kClimbed);
+      case TOO_FAR -> io.setStrip(LEDConstants.kTooFar);
+      case GOOD -> io.setStrip(LEDConstants.kGood);
+      case TOO_CLOSE -> io.setStrip(LEDConstants.kTooClose);
       default -> {}
     }
   }
@@ -281,12 +281,13 @@ public class LEDSubsystem extends MeasurableSubsystem {
       case NORMAL -> {
         io.setStrip(base);
       }
-      case CLIMB_EMPTY -> {}
-      case CLIMB_FULL -> {}
-      case CLIMB_UP -> {
-        advanceUnits();
-        displayUnits();
-      }
+        // case CLIMB_EMPTY -> {}
+        // case CLIMB_FULL -> {}
+        // case CLIMB_UP -> {
+        //   advanceUnits();
+        //   displayUnits();
+        // }
+      default -> {}
     }
     io.updateLEDs();
   }
@@ -327,9 +328,9 @@ public class LEDSubsystem extends MeasurableSubsystem {
   public enum LEDStates {
     OFF,
     NORMAL,
-    CLIMB_EMPTY,
-    CLIMB_FULL,
-    CLIMB_UP
+    TOO_CLOSE,
+    GOOD,
+    TOO_FAR
   }
 
   public enum PlaceStates {

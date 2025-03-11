@@ -48,9 +48,10 @@ public class LEDConstants {
   public static final Color kAutoPlacing = invertRedGreen(Color.kBlue);
 
   // Climb LED Colors
-  public static final Color kWaitingForCage = invertRedGreen(Color.kRed);
-  public static final Color kHasCage = invertRedGreen(Color.kGreen);
-  public static final Color kClimbed = invertRedGreen(Color.kGoldenrod);
+  public static final Color kTooFar = invertRedGreen(Color.kRed);
+  public static final Color kGood = invertRedGreen(Color.kGreen);
+  public static final Color kTooClose = invertRedGreen(Color.kBlue);
+
   public static final Color[] kGameColors = {
     invertRedGreen(Color.kBlack), // a dummy color
     invertRedGreen(Color.kDarkRed),

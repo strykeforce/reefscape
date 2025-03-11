@@ -40,21 +40,23 @@ import frc.robot.commands.elevator.JogElevatorCommand;
 import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoReefCycleCommand;
+import frc.robot.commands.robotState.DepthChargeHealthCheckCommand;
 import frc.robot.commands.robotState.FloorAlgaeCommand;
 import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
+import frc.robot.commands.robotState.LockWheelsCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
 import frc.robot.commands.robotState.StopAllAxisCommand;
+import frc.robot.commands.robotState.StopOpenLoopCommand;
 import frc.robot.commands.robotState.StowCommand;
 import frc.robot.commands.robotState.ToggleAlgaeHeightCommand;
 import frc.robot.commands.robotState.ToggleAutoPlacingCommand;
 import frc.robot.commands.robotState.ToggleGetAlgaeCommand;
-import frc.robot.commands.robotState.lockwheelscommand;
 import frc.robot.commands.robotState.setScoreSideLeftCommand;
 import frc.robot.commands.vision.SetVisionUpdatesCommand;
 import frc.robot.constants.BiscuitConstants;
@@ -71,13 +73,11 @@ import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbIOServoFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
-import frc.robot.subsystems.coral.CoralIO;
 import frc.robot.subsystems.coral.CoralIOFX;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.Swerve;
 import frc.robot.subsystems.drive.SwerveFXS;
-import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorIOFX;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
@@ -110,14 +110,14 @@ public class RobotContainer {
   private final ClimbIO climbIO;
   private final ClimbSubsystem climbSubsystem;
 
-  private final CoralIO coralIO;
+  private final CoralIOFX coralIO;
   private final CoralSubsystem coralSubsystem;
 
   private Swerve protoSwerve;
   private SwerveFXS swerve;
   private final DriveSubsystem driveSubsystem;
 
-  private final ElevatorIO elevatorIO;
+  private final ElevatorIOFX elevatorIO;
   private final ElevatorSubsystem elevatorSubsystem;
 
   private final FunnelIOFXS funnelIO;
@@ -577,6 +577,11 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(8, 0);
 
+    Shuffleboard.getTab("Match")
+        .addDouble("Climb Pos", () -> climbSubsystem.getPosition().in(Rotations))
+        .withSize(1, 1)
+        .withPosition(9, 1);
+
     // Shuffleboard.getTab("Match")
     // .addBoolean(
     // "Cams Connected",
@@ -597,7 +602,7 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Pit")
-        .add("Lock Wheels", new lockwheelscommand(driveSubsystem))
+        .add("Lock Wheels", new LockWheelsCommand(driveSubsystem))
         .withPosition(3, 1)
         .withSize(1, 1);
 
@@ -609,6 +614,33 @@ public class RobotContainer {
     Shuffleboard.getTab("Pit")
         .add("Stop Azimuths", new StopAllAxisCommand(robotStateSubsystem).ignoringDisable(true))
         .withPosition(5, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Health Check",
+            new DepthChargeHealthCheckCommand(
+                robotStateSubsystem,
+                swerve,
+                driveSubsystem,
+                funnelIO,
+                funnelSubsystem,
+                coralIO,
+                coralSubsystem,
+                algaeIO,
+                algaeSubsystem,
+                elevatorIO,
+                elevatorSubsystem,
+                biscuitIO,
+                biscuitSubsystem))
+        .withPosition(6, 1)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add(
+            "Stop Open Loop",
+            new StopOpenLoopCommand(robotStateSubsystem, coralSubsystem, funnelIO, algaeIO))
+        .withPosition(7, 1)
         .withSize(1, 1);
   }
 

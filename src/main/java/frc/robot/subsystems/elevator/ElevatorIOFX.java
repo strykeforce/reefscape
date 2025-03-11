@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -15,11 +17,25 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.ElevatorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.AfterHealthCheck;
+import org.strykeforce.healthcheck.BeforeHealthCheck;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.Follow;
+import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.healthcheck.Position;
 import org.strykeforce.telemetry.TelemetryService;
 
-public class ElevatorIOFX implements ElevatorIO {
+public class ElevatorIOFX implements ElevatorIO, Checkable {
   private Logger logger;
+
+  @HealthCheck
+  @Position(
+      percentOutput = {-0.05, 0.1},
+      encoderChange = 10)
   private TalonFX talonFxFront;
+
+  @HealthCheck
+  @Follow(leader = ElevatorConstants.kFxIDMain)
   private TalonFX talonFxBack;
 
   private Angle setpoints;
@@ -100,5 +116,20 @@ public class ElevatorIOFX implements ElevatorIO {
     talonFxFront.setPosition(0.0);
     talonFxBack.setPosition(0.0);
     setVelocityOpenLoop(0.0);
+  }
+
+  @BeforeHealthCheck
+  @AfterHealthCheck
+  public boolean healthCheckPos() {
+    setPosition(ElevatorConstants.kHealthCheck);
+    return Math.abs(
+            currPosition.refresh().getValueAsDouble()
+                - ElevatorConstants.kHealthCheck.in(Rotations))
+        < ElevatorConstants.kCloseEnoughRotations;
+  }
+
+  @Override
+  public String getName() {
+    return "Elevator";
   }
 }
