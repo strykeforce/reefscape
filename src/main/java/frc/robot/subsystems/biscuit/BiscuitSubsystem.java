@@ -24,10 +24,16 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   private Angle setPoint = Rotations.of(0);
   private boolean hasZeroed = false;
 
+  public BiscuitState curState = new BiscitState.Normal;
+
   public BiscuitSubsystem(BiscuitIO io) {
     this.logger = LoggerFactory.getLogger(this.getClass());
     this.io = io;
     hasZeroed = io.zero();
+  }
+
+  public BiscitState getState() {
+    return curState;
   }
 
   public boolean hasZeroed() {
@@ -64,9 +70,17 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
 
+    switch (curState) {
+      case Normal:
+        break;
+      case Zeroing:
+        break;
+    }
+
     Logger.processInputs(getName(), inputs);
     Logger.recordOutput("Biscuit setPoint", setPoint.in(Rotations));
     Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
+    Logger.recordOutput("Biscuit/curState", curState);
 
     // double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
     // double error =
@@ -92,5 +106,10 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     return Set.of(
         new Measure("Is Biscuit Finished", () -> isFinished() ? 1.0 : 0.0),
         new Measure("Biscuit Set Point", () -> setPoint.in(Rotations)));
+  }
+
+  public enum BiscitState {
+    Normal,
+    Zeroing
   }
 }
