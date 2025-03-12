@@ -77,10 +77,8 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
 
     addCommands(
         new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                new PrepOdomForAutoCommand(
-                    robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
-                new ZeroElevatorCommand(elevatorSubsystem)),
+            new PrepOdomForAutoCommand(
+                robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath,
             new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),

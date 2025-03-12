@@ -22,7 +22,12 @@ public class PlaceCoralAutonCommand extends Command {
   }
 
   @Override
+  public void end(boolean interrupted) {
+    robotStateSubsystem.toFunnelLoad();
+  }
+
+  @Override
   public boolean isFinished() {
-    return robotStateSubsystem.getState() != RobotStates.PLACE_CORAL && !coralSubsystem.hasCoral();
+    return !coralSubsystem.hasCoral();
   }
 }

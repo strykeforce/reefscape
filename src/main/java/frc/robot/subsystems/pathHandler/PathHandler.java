@@ -51,6 +51,7 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
   private boolean proceedToNext = false;
+  private boolean teleop = false;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -94,6 +95,11 @@ public class PathHandler extends MeasurableSubsystem {
     }
   }
 
+  public void addNode(Character nodeName, int nodeLevel) {
+    nodeNames.add(nodeName);
+    nodeLevels.add(nodeLevel);
+  }
+
   public void setNodeLevels(List<Integer> nodeLevels) {
     if (!isHandling) {
       this.nodeLevels = nodeLevels;
@@ -117,6 +123,7 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   public void startPathHandler() {
+    teleop = false;
     nodeNames.add(0, startNode);
     isHandling = true;
     robotStateSubsystem.setIsAutoPlacing(false);
@@ -211,7 +218,6 @@ public class PathHandler extends MeasurableSubsystem {
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
         curState = PathStates.DRIVE_PLACE_SERVO;
-        robotStateSubsystem.toPrepCoral();
         isServoing = true;
       }
     }
@@ -219,13 +225,14 @@ public class PathHandler extends MeasurableSubsystem {
 
   private void drivePathServo() {
     if (isHandling && isServoing) {
+      robotStateSubsystem.toPrepCoral();
       if (tagAlignSubsystem.getState() == TagAlignStates.DONE) {
         isServoing = false;
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
         pathTimer.stop();
         pathTimer.reset();
-        robotStateSubsystem.toPlaceCoralAuto();
+        robotStateSubsystem.toPrepCoral();
         curState = PathStates.PLACE;
         driveSubsystem.stopDriving();
         waitingTimer.start();
@@ -381,6 +388,9 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case PLACE -> {
+        if (robotStateSubsystem.isElevatorFinished()) {
+          robotStateSubsystem.toPlaceCoralAuto();
+        }
         if (!robotStateSubsystem.hasCoral()) {
           // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
           // proceedToNext) {

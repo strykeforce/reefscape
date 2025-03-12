@@ -364,7 +364,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toPlaceCoralAuto() {
     isAutoReadyForEject = true;
     if (elevatorSubsystem.isFinished()) toPlaceCoral();
-    else toReefAlign(getAlgaeOnCycle, isAutoPlacing);
+    else toReefAlign(getAlgaeOnCycle, false);
   }
 
   public void toReefAlign() {
@@ -627,6 +627,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       setState(RobotStates.CLIMB, true);
     }
+  }
+
+  public boolean isElevatorFinished() {
+    return elevatorSubsystem.isFinished();
   }
 
   @Override
