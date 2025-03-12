@@ -105,7 +105,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private WallEyeTagResult[] lastResult = new WallEyeTagResult[VisionConstants.kNumCams];
   private Matrix<N3, N1> adativeMatrix;
   private Matrix<N3, N1> stdMatrix;
-  private boolean isTagServoing;
+  private boolean isTagServoing = false;
   private WallEyeCam exclusiveCam;
   private ScoreSide scoreSide;
 
@@ -165,6 +165,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   private double getSeconds() {
     return RobotController.getFPGATime() / 1_000_000;
+  }
+
+  private boolean getIsTagServoing() {
+    return isTagServoing;
   }
 
   private double minTagDistance(WallEyePoseResult result) {
@@ -391,6 +395,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   @Override
   public void periodic() {
     Logger.recordOutput("Vision/Vision Updates On", visionUpdating);
+    Logger.recordOutput("VisionSubsystem/isTagServoing", isTagServoing);
     double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
     gyroBuffer.addFirst(gyroData);
 
