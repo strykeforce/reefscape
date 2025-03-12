@@ -497,11 +497,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
           // However we do have to be accepting the poses to use them
           if (visionUpdating) {
             if (idx == trustedCameraYawIdx) {
-              stdMatrix.set(3, 0, VisionConstants.kTrustYawStdDev);
+              stdMatrix.set(2, 0, VisionConstants.kTrustYawStdDev);
             }
+
             driveSubsystem.addVisionMeasurement(
                 robotPose, result.getTimeStamp() / 1_000_000.0, stdMatrix);
-            stdMatrix.set(3, 0, VisionConstants.kIgnoreYawStdDev);
+            stdMatrix.set(2, 0, VisionConstants.kIgnoreYawStdDev);
           }
         } else {
           Logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);
