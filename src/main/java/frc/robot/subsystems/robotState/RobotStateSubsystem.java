@@ -15,6 +15,7 @@ import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.climb.ClimbAlignSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -45,6 +46,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private BattMonSubsystem battMonSubsystem;
   private BiscuitSubsystem biscuitSubsystem;
   private ClimbSubsystem climbSubsystem;
+  private ClimbAlignSubsystem climbAlignSubsystem;
   private CoralSubsystem coralSubsystem;
   private DriveSubsystem driveSubsystem;
   private ElevatorSubsystem elevatorSubsystem;
@@ -81,6 +83,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       BattMonSubsystem battMonSubsystem,
       BiscuitSubsystem biscuitSubsystem,
       ClimbSubsystem climbSubsystem,
+      ClimbAlignSubsystem climbAlignSubsystem,
       CoralSubsystem coralSubsystem,
       DriveSubsystem driveSubsystem,
       ElevatorSubsystem elevatorSubsystem,
@@ -92,6 +95,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.battMonSubsystem = battMonSubsystem;
     this.biscuitSubsystem = biscuitSubsystem;
     this.climbSubsystem = climbSubsystem;
+    this.climbAlignSubsystem = climbAlignSubsystem;
     this.coralSubsystem = coralSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
@@ -593,6 +597,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
       tagAlignSubsystem.terminate();
       setAutoPlacingLed(false);
+      driveSubsystem.setIgnoreSticks(false);
+    }
+
+    if (climbAlignSubsystem.getState() != ClimbAlignSubsystem.ClimbAlignStates.DONE) {
+      climbAlignSubsystem.terminate();
       driveSubsystem.setIgnoreSticks(false);
     }
 
