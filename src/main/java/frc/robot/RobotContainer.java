@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -24,6 +25,7 @@ import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
+import frc.robot.commands.auton.TestAutonCommand;
 import frc.robot.commands.auton.ToggleVirtualSwitchCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
@@ -142,6 +144,7 @@ public class RobotContainer {
 
   private NonProcessorShallowAutonCommand nonProcessorShallowAutonCommand;
   private ProcessorShallowAutonCommand processorShallowAutonCommand;
+  private TestAutonCommand testAutonCommand;
 
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
@@ -217,6 +220,12 @@ public class RobotContainer {
             tagAlignSubsystem,
             visionSubsystem,
             pathHandler);
+
+    testAutonCommand =
+        new TestAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            new Pose2d(3.85576086490539, 5.073261807735684, Rotation2d.fromDegrees(300.0)));
 
     configureTelemetry();
     configureDriverBindings();
@@ -663,13 +672,12 @@ public class RobotContainer {
     //     .withPosition(3, 0)
     //     .withSize(1, 1);
 
-    // Shuffleboard.getTab("Test")
-    //     .add(
-    //         "reAssign Alliance",
-    //         new InstantCommand(() -> nonProcessorShallowAutonCommand.reassignAlliance())
-    //             .ignoringDisable(true))
-    //     .withPosition(4, 0)
-    //     .withSize(1, 1);
+    Shuffleboard.getTab("Test")
+        .add(
+            "reAssign Alliance",
+            new InstantCommand(() -> testAutonCommand.reassignAlliance()).ignoringDisable(true))
+        .withPosition(4, 0)
+        .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
         .add("Zero Wheels", new InstantCommand(() -> driveSubsystem.lockZero(), driveSubsystem))
@@ -684,6 +692,11 @@ public class RobotContainer {
     Shuffleboard.getTab("Test")
         .add("Set isAuto True", new InstantCommand(() -> robotStateSubsystem.setIsAuto(true)))
         .withPosition(7, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Test")
+        .add("run Auton", testAutonCommand)
+        .withPosition(2, 0)
         .withSize(1, 1);
   }
 

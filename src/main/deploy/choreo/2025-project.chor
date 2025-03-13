@@ -10,6 +10,13 @@
      "exp":"9.408839",
      "val":9.408839
     }
+   },
+   "maxAccel":{
+    "dimension":"LinAcc",
+    "var":{
+     "exp":"5 m / s ^ 2",
+     "val":5.0
+    }
    }
   },
   "poses":{
