@@ -55,7 +55,7 @@ public class ClimbConstants {
 
   public static final double kClimbRobotOffset = 0.0075;
 
-  public static final double kFinalDriveVx = 0.1;
+  public static final double kFinalDriveVx = 0.25;
   public static final double kMaxDistX = 3;
   // Align end conditions
   public static final double kCloseEnoughX = 0.1;

@@ -70,22 +70,22 @@ public class VisionSubsystem extends MeasurableSubsystem {
   };
 
   // Array of orange pi names
-  private String[] piNames = {
-    VisionConstants.kPi1Name,
-    VisionConstants.kPi1Name,
-    VisionConstants.kPi2Name,
-    VisionConstants.kPi2Name,
-    VisionConstants.kPi3Name
-  };
+  // private String[] piNames = {
+  //   VisionConstants.kPi1Name,
+  //   VisionConstants.kPi1Name,
+  //   VisionConstants.kPi2Name,
+  //   VisionConstants.kPi2Name,
+  //   VisionConstants.kPi3Name
+  // };
 
   // Array of camera indexs
-  private int[] camIndex = {
-    VisionConstants.kCam1Idx,
-    VisionConstants.kCam2Idx,
-    VisionConstants.kCam3Idx,
-    VisionConstants.kCam4Idx,
-    VisionConstants.kCam5Idx
-  };
+  // private int[] camIndex = {
+  //   VisionConstants.kCam1Idx,
+  //   VisionConstants.kCam2Idx,
+  //   VisionConstants.kCam3Idx,
+  //   VisionConstants.kCam4Idx,
+  //   VisionConstants.kCam5Idx
+  // };
 
   private DriveSubsystem driveSubsystem;
   /*Because we use two seperate loggers we can import one and then define the
@@ -123,12 +123,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
     // Fill our camera array
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
-      cams[i] = new WallEyeCam(piNames[i], camIndex[i], -1);
+      cams[i] = new WallEyeCam(camNames[i], -1);
     }
     // Initialize our udpSubscribers
-    udpSubscriber[0] = new UdpSubscriber(5802, cams[0], cams[1]);
-    udpSubscriber[1] = new UdpSubscriber(5803, cams[2], cams[3]);
-    udpSubscriber[2] = new UdpSubscriber(5804, cams[4]);
+    udpSubscriber[0] = new UdpSubscriber(5802, cams[0]);
+    udpSubscriber[1] = new UdpSubscriber(5803, cams[2]);
+    udpSubscriber[2] = new UdpSubscriber(5804, cams[1], cams[3], cams[4]);
   }
   // Setter Methods
   public void setVisionUpdating(boolean updating) {
@@ -297,7 +297,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
   }
 
-  private Pose3d getCloserPose(Pose3d pose1, Pose3d pose2, double rotation) {
+  private Pose3d getCloserPose(Pose3d pose1, Pose3d pose2, double rotation, int idx) {
     /*Which pose rotation is closer to our gyro. We subtract the absolute value of the gyro
     from the rotation of the pose and compare the two*/
 
@@ -307,14 +307,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
       pose1Error =
           FastMath.abs(
               Rotation2d.fromRadians(rotation)
-                  .minus(pose1.getRotation().toRotation2d())
+                  .minus(pose1.getRotation().rotateBy(camRotations[idx].times(-1)).toRotation2d())
                   .getRadians());
     }
     if (pose2 != null) {
       pose2Error =
           FastMath.abs(
               Rotation2d.fromRadians(rotation)
-                  .minus(pose2.getRotation().toRotation2d())
+                  .minus(pose2.getRotation().rotateBy(camRotations[idx].times(-1)).toRotation2d())
                   .getRadians());
     }
     Logger.recordOutput("Vision/Pose 1 Yaw Error", pose1Error);
@@ -323,9 +323,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     if (pose1Error > VisionConstants.kYawErrorThreshold) {
       pose1 = null;
+      textLogger.info("Reject 1 due to yaw");
     }
     if (pose2Error > VisionConstants.kYawErrorThreshold) {
       pose2 = null;
+      textLogger.info("Reject 2 due to yaw");
     }
 
     if (pose1 == null && pose2 == null) {
@@ -333,8 +335,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     if (pose1Error < pose2Error) {
+      textLogger.info("Accept 1");
       return pose1;
     } else {
+      textLogger.info("Accept 2");
       return pose2;
     }
   }
@@ -345,10 +349,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // // This filters out results by seeing if they are close to the right height
     if (dist1 > VisionConstants.kCamErrorZThreshold) {
+      textLogger.info("Reject 1 due to z");
       pose1 = null;
     }
     if (dist2 > VisionConstants.kCamErrorZThreshold) {
       pose2 = null;
+      textLogger.info("Reject 2 due to z");
     }
 
     // If we don't have enough data in the gyro buffer we default to returning a pose
@@ -369,7 +375,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     Logger.recordOutput(
         "Vision/Gyro Queried Loop Count",
         FastMath.floorToInt(((time / 1_000_000.0) / VisionConstants.kLoopTime)));
-    return getCloserPose(pose1, pose2, rotation);
+    return getCloserPose(pose1, pose2, rotation, camIndex);
   }
 
   @Override
@@ -448,9 +454,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
               cameraPose
                   .getTranslation()
                   .minus(
-                      camPositions[idx]
-                          .rotateBy(cameraPose.getRotation())
-                          .rotateBy(camRotations[idx]));
+                      camPositions[idx].rotateBy(
+                          cameraPose.getRotation().rotateBy(camRotations[idx])));
 
           cameraRotation = cameraPose.getRotation().rotateBy(camRotations[idx]);
         } else {
@@ -458,28 +463,20 @@ public class VisionSubsystem extends MeasurableSubsystem {
           Pose3d cam1Pose = result.getFirstPose();
           Pose3d cam2Pose = result.getSecondPose();
 
-          cam1Pose =
-              new Pose3d(
-                  cam1Pose.getTranslation(), cam1Pose.getRotation().rotateBy(camRotations[idx]));
-          cam2Pose =
-              new Pose3d(
-                  cam2Pose.getTranslation(), cam2Pose.getRotation().rotateBy(camRotations[idx]));
-
           Logger.recordOutput("Vision/Raw Camera 1 " + camNames[idx], cam1Pose);
           Logger.recordOutput("Vision/Raw Camera 2 " + camNames[idx], cam2Pose);
 
+          textLogger.info("Processing camera {}", camNames[idx]);
           cameraPose = getCorrectPose(cam1Pose, cam2Pose, result.getTimeStamp(), idx);
 
           if (cameraPose == null) {
+            textLogger.info("Both poses rejected!");
             continue;
           }
 
-          cameraRotation = cameraPose.getRotation();
+          cameraRotation = cameraPose.getRotation().rotateBy(camRotations[idx]);
           robotTranslation =
-              cameraPose
-                  .getTranslation()
-                  .minus(camPositions[idx].rotateBy(cameraRotation))
-                  .rotateBy(camRotations[idx]);
+              cameraPose.getTranslation().minus(camPositions[idx].rotateBy(cameraRotation));
         }
         Pose2d robotPose =
             new Pose2d(robotTranslation.toTranslation2d(), cameraRotation.toRotation2d());

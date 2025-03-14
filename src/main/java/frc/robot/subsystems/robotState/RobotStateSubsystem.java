@@ -627,10 +627,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toClimb() {
     if (curState == RobotStates.PREP_CLIMB || climbSubsystem.getState() == ClimbState.PREPPED) {
-
-      biscuitSubsystem.setPosition(RobotConstants.kHpAlgaeSetpoint, hasAlgae());
-      elevatorSubsystem.setPosition(ElevatorConstants.kHpAlgaeSetpoint);
-
       climbSubsystem.climb();
       driveSubsystem.prepClimb();
 
