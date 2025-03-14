@@ -4,9 +4,13 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Rotations;
+import java.util.Map;
+
+import org.strykeforce.telemetry.TelemetryController;
+import org.strykeforce.telemetry.TelemetryService;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
@@ -93,9 +97,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.Map;
-import org.strykeforce.telemetry.TelemetryController;
-import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
   private final RobotConstants robotConstants;
@@ -414,6 +415,32 @@ public class RobotContainer {
         .onTrue(
             new ClimbPrepCommand(
                 robotStateSubsystem, climbSubsystem, elevatorSubsystem, biscuitSubsystem));
+
+
+    // Move biscuit
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+
   }
 
   private void configureTestOperatorBindings() {

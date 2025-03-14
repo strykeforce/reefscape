@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.Rotations;
+import org.slf4j.LoggerFactory;
 
 import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -19,9 +19,10 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
+
+import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
-import org.slf4j.LoggerFactory;
 
 public class RobotConstants {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(RobotConstants.class);
@@ -108,7 +109,7 @@ public class RobotConstants {
       kStowSetpoint = CompConstants.kBiscuitStowSetpoint;
       kFunnelSetpoint = CompConstants.kFunnelSetpoint;
       kPrestageSetpoint = CompConstants.kPrestageSetpoint;
-      kPrestageAlgaeSetpoint = CompConstants.kPrestageAlgaeSetpoint;
+      kPrestageAlgaeSetpoint = CompConstants.kBiscuitStowSetpoint;
 
       // Algae removal
       kL2AlgaeSetpoint = CompConstants.kL2AlgaeSetpoint;
@@ -343,12 +344,12 @@ public class RobotConstants {
     // Idle
     public static Angle kBiscuitStowSetpoint = Rotations.of(1.862 / 2);
     public static Angle kFunnelSetpoint = kBiscuitStowSetpoint;
-    public static Angle kPrestageSetpoint = kBiscuitStowSetpoint;
-    public static Angle kPrestageAlgaeSetpoint = Rotations.of(9.089 / 2);
+    public static Angle kPrestageSetpoint = Rotations.of(-4.5095);
+    public static Angle kPrestageAlgaeSetpoint = kBiscuitStowSetpoint;
 
     // Algae removal
-    public static Angle kL2AlgaeSetpoint = Rotations.of(24.104 / 2);
-    public static Angle kL3AlgaeSetpoint = Rotations.of(24.562 / 2);
+    public static Angle kL2AlgaeSetpoint = Rotations.of(6.513916);
+    public static Angle kL3AlgaeSetpoint = Rotations.of(6.513916);
 
     public static Angle kL2AlgaeRemovalSetpoint = kBiscuitStowSetpoint;
     public static Angle kL3AlgaeRemovalSetpoint = kBiscuitStowSetpoint;
@@ -362,12 +363,12 @@ public class RobotConstants {
     public static Angle kL4CoralSetpoint = kBiscuitStowSetpoint;
 
     // Algae obtaining
-    public static Angle kFloorAlgaeSetpoint = Rotations.of(49.627 / 2);
-    public static Angle kMicAlgaeSetpoint = Rotations.of(51.61872 / 2);
-    public static Angle kHpAlgaeSetpoint = Rotations.of(16.97559 / 2);
+    public static Angle kFloorAlgaeSetpoint = Rotations.of(19.98999);
+    public static Angle kMicAlgaeSetpoint = Rotations.of(12.87085);
+    public static Angle kHpAlgaeSetpoint = kBiscuitStowSetpoint;
 
     // Algae scoring
-    public static Angle kProcessorSetpoint = Rotations.of(41.193 / 2);
+    public static Angle kProcessorSetpoint = Rotations.of(15.0139);
     public static Angle kBargeSetpoint = Rotations.of(12.3489 / 2);
     public static Angle kBargeBackwardSetpoint = Rotations.of(-12.3489 / 2); // 9.089
 
