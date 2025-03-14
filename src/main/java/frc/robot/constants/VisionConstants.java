@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import net.jafama.FastMath;
 
 public final class VisionConstants {
   public static final double kMaxTimeNoVision = 20;
@@ -30,7 +31,7 @@ public final class VisionConstants {
   public static final double kOffsetOnVelFilter = 0.10;
   public static final double kSquaredCoeffOnVelFilter = 0.1;
 
-  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, 0);
+  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, 0.001);
 
   public static final double kTimeStampOffset = 0.0;
 
@@ -116,12 +117,14 @@ public final class VisionConstants {
           new Rotation3d(0, Units.degreesToRadians(10), Units.degreesToRadians(180)));
   // Increase these numbers to trust sensor readings from encoders and gyros less. This matrix is
   // in the form [theta], with units in radians.
-  public static Matrix<N1, N1> kLocalMeasurementStdDevs =
+  public static final Matrix<N1, N1> kLocalMeasurementStdDevs =
       VecBuilder.fill(Units.degreesToRadians(0.01));
 
+  public static final double kIgnoreYawStdDev = 10000 * FastMath.PI;
+  public static final double kTrustYawStdDev = 0.0005;
   // Increase these numbers to trust global measurements from vision less. This matrix is in the
   // form [x, y, theta]ᵀ, with units in meters and radians.
   // Vision Odometry Standard devs
-  public static Matrix<N3, N1> kVisionMeasurementStdDevs =
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(360));
+  public static final Matrix<N3, N1> kVisionMeasurementStdDevs =
+      VecBuilder.fill(0.05, 0.05, kIgnoreYawStdDev);
 }

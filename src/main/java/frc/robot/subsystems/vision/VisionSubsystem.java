@@ -87,6 +87,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   //   VisionConstants.kCam5Idx
   // };
 
+  private int trustedCameraYawIdx = -1;
+
   private DriveSubsystem driveSubsystem;
   /*Because we use two seperate loggers we can import one and then define the
   other here.*/
@@ -135,10 +137,19 @@ public class VisionSubsystem extends MeasurableSubsystem {
     this.visionUpdating = updating;
   }
 
+  public void setYawUpdateCamera(int idx) {
+    trustedCameraYawIdx = idx;
+    Logger.recordOutput("Vision/Trusted Yaw Camera Index", trustedCameraYawIdx);
+  }
+
   public void setMinTags(int minTags) {
     this.minTags = minTags;
   }
   // Getter Methods
+  public double getYawUpdateCamera() {
+    return trustedCameraYawIdx;
+  }
+
   public boolean isVisionUpdating() {
     return visionUpdating;
   }
@@ -384,10 +395,6 @@ public class VisionSubsystem extends MeasurableSubsystem {
     double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
     gyroBuffer.addFirst(gyroData);
 
-    if (gyroBuffer.size() >= 1000) {
-      Logger.recordOutput("Vision/Gyro Buffer Delayed", gyroBuffer.get(25));
-    }
-
     Logger.recordOutput("Vision/Gyro Buffer", gyroData);
 
     if (getSeconds() - timeSinceLastUpdate > VisionConstants.kMaxTimeNoVision) {
@@ -443,8 +450,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
         }
 
         Pose3d cameraPose;
-        Translation3d robotTranslation = new Translation3d();
-        Rotation3d cameraRotation = new Rotation3d();
+        Translation3d robotTranslation;
+        Rotation3d cameraRotation;
 
         if (result.getNumTags() > 1) {
           // If there our more then one tag in an image we can get pose possible pose
@@ -482,8 +489,13 @@ public class VisionSubsystem extends MeasurableSubsystem {
           Logger.recordOutput("Vision/Accepted Cam " + camNames[idx], robotPose);
           // However we do have to be accepting the poses to use them
           if (visionUpdating) {
+            if (idx == trustedCameraYawIdx) {
+              stdMatrix.set(2, 0, VisionConstants.kTrustYawStdDev);
+            }
+
             driveSubsystem.addVisionMeasurement(
                 robotPose, result.getTimeStamp() / 1_000_000.0, stdMatrix);
+            stdMatrix.set(2, 0, VisionConstants.kIgnoreYawStdDev);
           }
         } else {
           Logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);

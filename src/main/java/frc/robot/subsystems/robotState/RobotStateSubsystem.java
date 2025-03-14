@@ -290,6 +290,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStow() {
+    visionSubsystem.setYawUpdateCamera(-1);
     if (biscuitSubsystem.isSafeToStow()) {
       biscuitSubsystem.setPosition(RobotConstants.kStowSetpoint, hasAlgae());
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
@@ -469,6 +470,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toPlaceCoral() {
+    if (isAutoPlacing) {
+      visionSubsystem.setYawUpdateCamera(scoreSide == ScoreSide.LEFT ? 2 : 0);
+    }
     coralSubsystem.eject(scoringLevel);
     funnelSubsystem.clearCoral();
     isAutoReadyForEject = false;
@@ -596,6 +600,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toInterrupted() {
     if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
       tagAlignSubsystem.terminate();
+      visionSubsystem.setYawUpdateCamera(-1);
       setAutoPlacingLed(false);
       driveSubsystem.setIgnoreSticks(false);
     }
@@ -759,6 +764,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (!coralSubsystem.hasCoral()
             && scoringTimer.hasElapsed(RobotStateConstants.kCoralEjectTimer)) {
           coralLoc = CoralLoc.NONE;
+          visionSubsystem.setYawUpdateCamera(-1);
           setAutoPlacingLed(false);
           toFunnelLoad();
         } else {
