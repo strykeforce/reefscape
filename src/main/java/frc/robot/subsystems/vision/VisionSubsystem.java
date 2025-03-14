@@ -307,14 +307,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
       pose1Error =
           FastMath.abs(
               Rotation2d.fromRadians(rotation)
-                  .minus(pose1.getRotation().rotateBy(camRotations[idx].times(-1)).toRotation2d())
+                  .minus(pose1.getRotation().rotateBy(camRotations[idx]).toRotation2d())
                   .getRadians());
     }
     if (pose2 != null) {
       pose2Error =
           FastMath.abs(
               Rotation2d.fromRadians(rotation)
-                  .minus(pose2.getRotation().rotateBy(camRotations[idx].times(-1)).toRotation2d())
+                  .minus(pose2.getRotation().rotateBy(camRotations[idx]).toRotation2d())
                   .getRadians());
     }
     Logger.recordOutput("Vision/Pose 1 Yaw Error", pose1Error);
@@ -450,14 +450,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
           // If there our more then one tag in an image we can get pose possible pose
           cameraPose = result.getCameraPose();
 
-          robotTranslation =
-              cameraPose
-                  .getTranslation()
-                  .minus(
-                      camPositions[idx].rotateBy(
-                          cameraPose.getRotation().rotateBy(camRotations[idx])));
-
           cameraRotation = cameraPose.getRotation().rotateBy(camRotations[idx]);
+          robotTranslation =
+              cameraPose.getTranslation().minus(camPositions[idx].rotateBy(cameraRotation));
+
         } else {
           // If there is one we get two possible poses and have to filter them.
           Pose3d cam1Pose = result.getFirstPose();

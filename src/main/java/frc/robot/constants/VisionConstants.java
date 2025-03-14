@@ -100,18 +100,16 @@ public final class VisionConstants {
       new Pose3d(
           new Translation3d(-0.2225, -0.3025, 0.54),
           new Rotation3d(
-              Units.degreesToRadians(-10),
-              Units.degreesToRadians(0),
-              Units.degreesToRadians(-67.5)));
+              Units.degreesToRadians(10), Units.degreesToRadians(0), Units.degreesToRadians(67.5)));
   public static final Pose3d kCam3Pose =
       new Pose3d(new Translation3d(0.133, -0.305, 0.311), new Rotation3d());
   public static final Pose3d kCam4Pose =
       new Pose3d(
           new Translation3d(-0.2675, -0.3025, 0.54),
           new Rotation3d(
-              Units.degreesToRadians(-10),
+              Units.degreesToRadians(10),
               Units.degreesToRadians(0),
-              Units.degreesToRadians(-112.5)));
+              Units.degreesToRadians(112.5)));
   public static final Pose3d kCam5Pose =
       new Pose3d(
           new Translation3d(-0.229, 0.073, 0.934),
