@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import org.slf4j.LoggerFactory;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -19,10 +19,9 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
-
-import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
+import org.slf4j.LoggerFactory;
 
 public class RobotConstants {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(RobotConstants.class);
@@ -393,10 +392,10 @@ public class RobotConstants {
       MotionMagicConfigs algaeConfig =
           new MotionMagicConfigs()
               .withMotionMagicAcceleration(300)
-              .withMotionMagicCruiseVelocity(50)
+              .withMotionMagicCruiseVelocity(30)
               .withMotionMagicExpo_kA(0)
               .withMotionMagicExpo_kV(0)
-              .withMotionMagicJerk(600);
+              .withMotionMagicJerk(1500);
       return algaeConfig;
     }
 

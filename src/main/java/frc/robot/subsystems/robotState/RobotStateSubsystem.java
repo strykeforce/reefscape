@@ -291,7 +291,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toStow() {
     visionSubsystem.setYawUpdateCamera(-1);
     biscuitSubsystem.setIsRemovingAlgae(false);
-    
+
     if (biscuitSubsystem.isSafeToStow()) {
       biscuitSubsystem.setPosition(RobotConstants.kStowSetpoint, hasAlgae());
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);

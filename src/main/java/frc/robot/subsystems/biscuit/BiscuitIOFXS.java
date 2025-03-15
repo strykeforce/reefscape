@@ -1,13 +1,6 @@
 package frc.robot.subsystems.biscuit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.healthcheck.AfterHealthCheck;
-import org.strykeforce.healthcheck.BeforeHealthCheck;
-import org.strykeforce.healthcheck.Checkable;
-import org.strykeforce.healthcheck.HealthCheck;
-import org.strykeforce.healthcheck.Position;
-import org.strykeforce.telemetry.TelemetryService;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -16,9 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXSConfigurator;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
-
 import edu.wpi.first.math.MathUtil;
-import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
@@ -26,6 +17,14 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.biscuit.BiscuitIO.BiscuitIOInputs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.healthcheck.AfterHealthCheck;
+import org.strykeforce.healthcheck.BeforeHealthCheck;
+import org.strykeforce.healthcheck.Checkable;
+import org.strykeforce.healthcheck.HealthCheck;
+import org.strykeforce.healthcheck.Position;
+import org.strykeforce.telemetry.TelemetryService;
 
 public class BiscuitIOFXS implements BiscuitIO, Checkable {
 
@@ -88,8 +87,7 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
       if (hasAlgae) {
         if (isRemovingAlgae) {
           configurator.apply(RobotConstants.algaeMotionConfig);
-        }
-        else {
+        } else {
           configurator.apply(RobotConstants.algaeMotionConfig);
         }
       } else {
