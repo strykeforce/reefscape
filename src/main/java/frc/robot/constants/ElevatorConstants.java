@@ -23,7 +23,7 @@ public class ElevatorConstants {
   public static final double kCloseEnoughRotations = 0.1;
   public static final double kStowThresholdDone = 0.3676757 + 0.5;
   public static final double kMaxFwd = 53;
-  public static final double kMaxRev = 2;
+  public static final double kMaxRev = 0.1;
   public static final double kElevatorLiftHeight = 1; // for pit command
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
@@ -76,7 +76,7 @@ public class ElevatorConstants {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(false)
             .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(40)
+            .withSupplyCurrentLimit(70)
             .withSupplyCurrentLowerLimit(10)
             .withSupplyCurrentLowerTime(2);
     fxConfig.CurrentLimits = current;
@@ -114,7 +114,7 @@ public class ElevatorConstants {
     fxConfig.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs().withMotionMagicCruiseVelocity(50).withMotionMagicAcceleration(100);
+        new MotionMagicConfigs().withMotionMagicCruiseVelocity(75).withMotionMagicAcceleration(300);
     fxConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =

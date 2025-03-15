@@ -290,6 +290,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStow() {
     visionSubsystem.setYawUpdateCamera(-1);
+    biscuitSubsystem.setIsRemovingAlgae(false);
+    
     if (biscuitSubsystem.isSafeToStow()) {
       biscuitSubsystem.setPosition(RobotConstants.kStowSetpoint, hasAlgae());
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
@@ -609,6 +611,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       driveSubsystem.setIgnoreSticks(false);
     }
 
+    biscuitSubsystem.setIsRemovingAlgae(false);
+
     biscuitSubsystem.setPosition(biscuitSubsystem.getPosition(), hasAlgae());
     elevatorSubsystem.setPosition(elevatorSubsystem.getPosition());
 
@@ -716,10 +720,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case REEF_ALIGN_ALGAE -> {
-        if (biscuitSubsystem.getPosition().in(Rotations) > RobotConstants.kTagAlignThreshold) {
-          tagAlignSubsystem.setProceedToAlign(true);
-        }
         if (algaeSubsystem.hasAlgae()) {
+          biscuitSubsystem.setIsRemovingAlgae(true);
           switch (getAlgaeLevel()) {
             case L2 -> {
               biscuitSubsystem.setPosition(RobotConstants.kL2AlgaeRemovalSetpoint, hasAlgae());
@@ -749,6 +751,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case REMOVE_ALGAE -> {
         if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+          biscuitSubsystem.setIsRemovingAlgae(false);
           if (coralSubsystem.hasCoral()
               && !(isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT)) {
             toReefAlign(false, false);

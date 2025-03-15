@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.Rotations;
+import org.slf4j.LoggerFactory;
 
 import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -19,9 +19,10 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
+
+import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
-import org.slf4j.LoggerFactory;
 
 public class RobotConstants {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(RobotConstants.class);
@@ -39,8 +40,9 @@ public class RobotConstants {
 
   // Biscuit
   public static TalonFXSConfiguration talonFXSConfig;
-  public static MotionMagicConfigs alageMotionConfig;
-  public static MotionMagicConfigs noAlageMotionConfig;
+  public static MotionMagicConfigs algaeMotionConfig;
+  public static MotionMagicConfigs algaeRemovalMotionConfig;
+  public static MotionMagicConfigs noAlgaeMotionConfig;
 
   public static double kTicksPerRot;
 
@@ -92,8 +94,9 @@ public class RobotConstants {
       kElevatorFunnelSetpoint = CompConstants.kElevatorFunnelSetpoint;
       kElevatorStowSetpoint = CompConstants.kElevatorStowSetpoint;
       talonFXSConfig = CompConstants.getFXSConfig();
-      alageMotionConfig = CompConstants.getAlgaeMotionConfig();
-      noAlageMotionConfig = CompConstants.getNoAlgaeMotionConfig();
+      algaeMotionConfig = CompConstants.getAlgaeMotionConfig();
+      algaeRemovalMotionConfig = CompConstants.getAlgaeRemovalMotionConfig();
+      noAlgaeMotionConfig = CompConstants.getNoAlgaeMotionConfig();
       kTicksPerRot = 80;
       logger.info("Using Comp Constants");
 
@@ -138,8 +141,9 @@ public class RobotConstants {
       kElevatorFunnelSetpoint = ProtoConstants.kElevatorFunnelSetpoint;
       kElevatorStowSetpoint = ProtoConstants.kElevatorStowSetpoint;
       talonFXSConfig = ProtoConstants.getFXSConfig();
-      alageMotionConfig = ProtoConstants.getAlgaeMotionConfig();
-      noAlageMotionConfig = ProtoConstants.getNoAlgaeMotionConfig();
+      algaeMotionConfig = ProtoConstants.getAlgaeMotionConfig();
+      algaeRemovalMotionConfig = algaeMotionConfig;
+      noAlgaeMotionConfig = ProtoConstants.getNoAlgaeMotionConfig();
       kTicksPerRot = 160;
       logger.info("Using Proto Constants");
 
@@ -375,6 +379,17 @@ public class RobotConstants {
     public static Angle kMaxRev = kPrestageSetpoint.minus(Rotations.of(5));
 
     public static MotionMagicConfigs getAlgaeMotionConfig() {
+      MotionMagicConfigs algaeConfig =
+          new MotionMagicConfigs()
+              .withMotionMagicAcceleration(300)
+              .withMotionMagicCruiseVelocity(50)
+              .withMotionMagicExpo_kA(0)
+              .withMotionMagicExpo_kV(0)
+              .withMotionMagicJerk(600);
+      return algaeConfig;
+    }
+
+    public static MotionMagicConfigs getAlgaeRemovalMotionConfig() {
       MotionMagicConfigs algaeConfig =
           new MotionMagicConfigs()
               .withMotionMagicAcceleration(300)
