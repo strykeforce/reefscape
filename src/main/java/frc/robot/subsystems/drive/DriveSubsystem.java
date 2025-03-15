@@ -424,7 +424,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public double getAvgDriveCurrent() {
-    return inputs.avgDriveCurrent;
+    return FastMath.abs(inputs.avgDriveCurrent);
   }
 
   public double getAvgRearDriveVel() {
@@ -456,7 +456,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
       gyroDifferentCount = 0;
     }
     if (gyroDifferentCount > DriveConstants.kGyroDifferentCount && isDriveStill()) {
-      io.setPigeonGyroOffset(inputs.navxRotation2d);
+      io.setPigeonGyroOffset(
+          inputs.navxRotation2d.minus(inputs.gyroRotation2d).plus(io.getPigeonGyroOffset()));
+      logger.info(
+          "NavX gyro correction degs {} -> {}",
+          inputs.gyroRotation2d.getDegrees(),
+          inputs.navxRotation2d.getDegrees());
       gyroDifferentCount = 0;
     }
 
