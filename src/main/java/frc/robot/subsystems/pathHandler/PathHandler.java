@@ -52,6 +52,8 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean mirrorTrajectory = false;
   private boolean proceedToNext = false;
   private boolean teleop = false;
+  private boolean isPlacing = false;
+  private boolean hasPreppedCoral = false;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -225,14 +227,12 @@ public class PathHandler extends MeasurableSubsystem {
 
   private void drivePathServo() {
     if (isHandling && isServoing) {
-      robotStateSubsystem.toPrepCoral();
       if (tagAlignSubsystem.getState() == TagAlignStates.DONE) {
         isServoing = false;
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;
         pathTimer.stop();
         pathTimer.reset();
-        robotStateSubsystem.toPrepCoral();
         curState = PathStates.PLACE;
         driveSubsystem.stopDriving();
         waitingTimer.start();
@@ -377,23 +377,39 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case DRIVE_PLACE -> {
+        if (tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+                <= AutonConstants.kElevatorStageRadius
+            && !hasPreppedCoral) {
+          hasPreppedCoral = true;
+          robotStateSubsystem.toPrepCoral();
+        }
         if (!runningPath) {
           startPath(nextPath());
         }
         drivePath();
       }
       case DRIVE_PLACE_SERVO -> {
+        if (tagAlignSubsystem.getCurRadius(
+                    driveSubsystem.shouldFlip() ? Alliance.Red : Alliance.Blue)
+                <= AutonConstants.kElevatorStageRadius
+            && !hasPreppedCoral) {
+          hasPreppedCoral = true;
+          robotStateSubsystem.toPrepCoral();
+        }
         if (runningPath && isServoing) {
           drivePathServo();
         }
       }
       case PLACE -> {
-        if (robotStateSubsystem.isElevatorFinished()) {
+        hasPreppedCoral = false;
+        if (robotStateSubsystem.isElevatorFinished() && !isPlacing) {
+          isPlacing = true;
           robotStateSubsystem.toPlaceCoralAuto();
         }
         if (!robotStateSubsystem.hasCoral()) {
           // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
           // proceedToNext) {
+          isPlacing = false;
           robotStateSubsystem.toFunnelLoad();
           curState = PathStates.DRIVE_FETCH;
         }

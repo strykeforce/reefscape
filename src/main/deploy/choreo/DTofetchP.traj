@@ -16,15 +16,15 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"D.x", "val":3.89906213509461}, "y":{"exp":"D.y", "val":2.953538192264317}, "heading":{"exp":"D.heading", "val":1.0471975511965976}, "intervals":32, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"1.9099534749984741 m", "val":1.909953474998474}, "y":{"exp":"1.1158 m", "val":1.1158}, "heading":{"exp":"fetchP.heading", "val":0.942477796076938}, "intervals":11, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"D.x", "val":3.86}, "y":{"exp":"D.y", "val":2.89}, "heading":{"exp":"D.heading", "val":1.0471975511965976}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"1.9099534749984741 m", "val":1.909953474998474}, "y":{"exp":"1.1158 m", "val":1.1158}, "heading":{"exp":"fetchP.heading", "val":0.942477796076938}, "intervals":14, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"fetchP.x", "val":1.69577419757843}, "y":{"exp":"fetchP.y", "val":0.8236}, "heading":{"exp":"fetchP.heading", "val":0.942477796076938}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "w":{"exp":"17.548 m", "val":17.548}, "h":{"exp":"8.052 m", "val":8.052}}}, "enabled":false},
     {"from":0, "to":2, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"4 m / s", "val":4.0}}}, "enabled":true},
-    {"from":0, "to":2, "data":{"type":"MaxAcceleration", "props":{"max":{"exp":"maxAccel", "val":5.0}}}, "enabled":true}],
+    {"from":0, "to":2, "data":{"type":"MaxAcceleration", "props":{"max":{"exp":"maxAccel", "val":3.0}}}, "enabled":true}],
   "targetDt":{
    "exp":"0.05 s",
    "val":0.05

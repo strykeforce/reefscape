@@ -158,8 +158,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             "startToJ",
-            new ArrayList<Character>(Arrays.asList('k', 'l')),
-            new ArrayList<Integer>(Arrays.asList(4, 4)),
+            new ArrayList<Character>(Arrays.asList('k', 'l', 'i')),
+            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
             'j',
             false,
             AutonConstants.kNonProcessorShallow);
