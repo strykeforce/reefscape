@@ -120,9 +120,33 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return hexant;
   }
 
+  public int computeHexant(Alliance color, Pose2d pose) {
+    Translation2d reefT =
+        color == Alliance.Blue
+            ? TagServoingConstants.kBlueReefPose
+            : TagServoingConstants.kRedReefPose;
+    double offset = Units.degreesToRadians(30);
+
+    int hexant =
+        (((int)
+                    (FastMath.normalizeZeroTwoPi(
+                            pose.getTranslation().minus(reefT).getAngle().getRadians() + offset)
+                        / Units.degreesToRadians(60)))
+                + (color == Alliance.Blue ? 3 : 0))
+            % 6;
+
+    Logger.recordOutput("TagAlignSubsystem/Hexant", hexant);
+
+    return hexant;
+  }
+
   // Red reef numbered like blue (red 0 is facing the same direction as blue 0)
   private int computeFieldRelHexant(Alliance color) {
     return (computeHexant(color) + (color == Alliance.Blue ? 0 : 3)) % 6;
+  }
+
+  public int computeFieldRelHexant(Alliance color, Pose2d pose) {
+    return (computeHexant(color, pose) + (color == Alliance.Blue ? 0 : 3)) % 6;
   }
 
   private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft) {
@@ -145,7 +169,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
   }
 
-  private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft, int hexant) {
+  public Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft, int hexant) {
     Translation2d reefT =
         color == Alliance.Blue
             ? TagServoingConstants.kBlueReefPose

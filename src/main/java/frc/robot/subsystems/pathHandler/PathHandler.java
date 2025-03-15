@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PathHandlerConstants;
+import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
@@ -47,6 +48,8 @@ public class PathHandler extends MeasurableSubsystem {
   private Trajectory<SwerveSample> currPath;
   private String currPathString;
   private Pose2d currPathFinalPose = new Pose2d();
+  private Pose2d alignTargetPose = new Pose2d();
+  private int targetHexant = 0;
   private boolean runningPath = false;
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
@@ -287,9 +290,18 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private boolean shouldTransitionToServoing() {
+
     return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
             < PathHandlerConstants.kServoRadius
-        && curState == PathStates.DRIVE_PLACE;
+        && curState == PathStates.DRIVE_PLACE
+        && FastMath.abs(
+                alignTargetPose
+                    .getTranslation()
+                    .minus(driveSubsystem.getPoseMeters().getTranslation())
+                    .rotateBy(
+                        Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[targetHexant]))
+                    .getY())
+            < PathHandlerConstants.kMaxServoErrorY;
     // boolean isCloseEnough = false;
     // double preNormalizedAngle =
     //     FastMath.toRadians(
@@ -384,7 +396,16 @@ public class PathHandler extends MeasurableSubsystem {
           robotStateSubsystem.toPrepCoral();
         }
         if (!runningPath) {
+          char next = nodeNames.get(0);
           startPath(nextPath());
+          targetHexant =
+              tagAlignSubsystem.computeFieldRelHexant(
+                  robotStateSubsystem.getAllianceColor(), currPathFinalPose);
+          alignTargetPose =
+              tagAlignSubsystem.getTargetDrivePose(
+                  robotStateSubsystem.getAllianceColor(),
+                  (next - 'a') % 2 == 0,
+                  targetHexant);
         }
         drivePath();
       }
