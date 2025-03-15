@@ -30,6 +30,7 @@ import frc.robot.commands.auton.ToggleVirtualSwitchCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
 import frc.robot.commands.biscuit.ZeroBiscuitCommand;
+import frc.robot.commands.climb.AutoClimbCommand;
 import frc.robot.commands.climb.ClimbCommand;
 import frc.robot.commands.climb.ClimbPrepCommand;
 import frc.robot.commands.coral.EnableEjectBeamCommand;
@@ -72,6 +73,7 @@ import frc.robot.subsystems.auto.AutoSwitch;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitIOFXS;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.climb.ClimbAlignSubsystem;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbIOServoFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -111,6 +113,7 @@ public class RobotContainer {
 
   private final ClimbIO climbIO;
   private final ClimbSubsystem climbSubsystem;
+  private final ClimbAlignSubsystem climbAlignSubsystem;
 
   private final CoralIOFX coralIO;
   private final CoralSubsystem coralSubsystem;
@@ -173,6 +176,7 @@ public class RobotContainer {
       protoSwerve = new Swerve();
       driveSubsystem = new DriveSubsystem(protoSwerve);
     }
+    climbAlignSubsystem = new ClimbAlignSubsystem(climbSubsystem, driveSubsystem);
 
     elevatorIO = new ElevatorIOFX();
     elevatorSubsystem = new ElevatorSubsystem(elevatorIO);
@@ -193,6 +197,7 @@ public class RobotContainer {
             battMonSubsystem,
             biscuitSubsystem,
             climbSubsystem,
+            climbAlignSubsystem,
             coralSubsystem,
             driveSubsystem,
             elevatorSubsystem,
@@ -667,6 +672,11 @@ public class RobotContainer {
         .withPosition(1, 0)
         .withSize(1, 1);
 
+    Shuffleboard.getTab("Test")
+        .addDouble("Yaw Camera Idx", () -> visionSubsystem.getYawUpdateCamera())
+        .withPosition(1, 1)
+        .withSize(1, 1);
+
     // Shuffleboard.getTab("Test")
     //     .add("Start Auton", nonProcessorShallowAutonCommand)
     //     .withPosition(3, 0)
@@ -697,6 +707,14 @@ public class RobotContainer {
     Shuffleboard.getTab("Test")
         .add("run Auton", testAutonCommand)
         .withPosition(2, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Test")
+        .add(
+            "Auto Climb",
+            new AutoClimbCommand(
+                driveSubsystem, climbSubsystem, climbAlignSubsystem, robotStateSubsystem))
+        .withPosition(0, 1)
         .withSize(1, 1);
   }
 

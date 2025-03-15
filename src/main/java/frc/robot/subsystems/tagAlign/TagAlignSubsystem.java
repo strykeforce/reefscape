@@ -1,7 +1,6 @@
 package frc.robot.subsystems.tagAlign;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,7 +23,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   private PIDController driveX;
   private PIDController driveY;
-  private ProfiledPIDController driveOmega;
+  private PIDController driveOmega;
 
   private PIDController alignX;
   private PIDController alignY;
@@ -60,8 +59,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     this.driveX = new PIDController(4, 0, 0);
     this.driveY = new PIDController(4, 0, 0);
-    this.driveOmega =
-        new ProfiledPIDController(6.0, 0, 0, TagServoingConstants.driveOmegaConstraints);
+    this.driveOmega = new PIDController(6.0, 0, 0);
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 
     this.alignX = new PIDController(4, 0, 0); // 0.0015
@@ -220,7 +218,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     driveX.reset();
     driveY.reset();
-    driveOmega.reset(driveSubsystem.getGyroRotation2d().getRadians());
+    driveOmega.reset();
 
     alignX.reset();
     alignY.reset();
@@ -306,7 +304,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public void terminate() {
-    driveSubsystem.setIgnoreSticks(false);
     driveSubsystem.stopDriving();
     curState = TagAlignStates.DONE;
   }
@@ -357,7 +354,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         if (vX > 2) vX = 2;
         if (vY > 2) vY = 2;
 
-        Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", driveOmega.getPositionError());
+        Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", driveOmega.getError());
 
         // double radius = getCurRadius(alliance);
         boolean ignoreX = false; // radius < stopXRadius && !algae;
@@ -374,22 +371,15 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         // Translation2d poseError = targetPose.getTranslation().minus(current.getTranslation());
 
         if (finalDrive
-            || FastMath.abs(driveOmega.getPositionError())
-                < TagServoingConstants.kAngleCloseEnough) {
+            || FastMath.abs(driveOmega.getError()) < TagServoingConstants.kAngleCloseEnough) {
           switch (curState) {
             case DRIVE -> {
               if (FastMath.abs(driveX.getError()) < driveXCloseEnough
                       && FastMath.abs(driveY.getError()) < driveYCloseEnough
                   // || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough
                   || FastMath.abs(driveY.getError()) < driveYCloseEnough) {
-                if (proceedToAlign || !algae) {
-                  tagAlign();
-                  break;
-                } else {
-                  driveSubsystem.stopDriving();
-                  curState = TagAlignStates.WAITING;
-                  break;
-                }
+                tagAlign();
+                break;
               }
             }
             case TAG_ALIGN -> {

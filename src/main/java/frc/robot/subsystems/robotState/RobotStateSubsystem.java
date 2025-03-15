@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
@@ -15,6 +14,7 @@ import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.climb.ClimbAlignSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -45,6 +45,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private BattMonSubsystem battMonSubsystem;
   private BiscuitSubsystem biscuitSubsystem;
   private ClimbSubsystem climbSubsystem;
+  private ClimbAlignSubsystem climbAlignSubsystem;
   private CoralSubsystem coralSubsystem;
   private DriveSubsystem driveSubsystem;
   private ElevatorSubsystem elevatorSubsystem;
@@ -81,6 +82,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       BattMonSubsystem battMonSubsystem,
       BiscuitSubsystem biscuitSubsystem,
       ClimbSubsystem climbSubsystem,
+      ClimbAlignSubsystem climbAlignSubsystem,
       CoralSubsystem coralSubsystem,
       DriveSubsystem driveSubsystem,
       ElevatorSubsystem elevatorSubsystem,
@@ -92,6 +94,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.battMonSubsystem = battMonSubsystem;
     this.biscuitSubsystem = biscuitSubsystem;
     this.climbSubsystem = climbSubsystem;
+    this.climbAlignSubsystem = climbAlignSubsystem;
     this.coralSubsystem = coralSubsystem;
     this.driveSubsystem = driveSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
@@ -286,6 +289,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStow() {
+    visionSubsystem.setYawUpdateCamera(-1);
     if (biscuitSubsystem.isSafeToStow()) {
       biscuitSubsystem.setPosition(RobotConstants.kStowSetpoint, hasAlgae());
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
@@ -465,6 +469,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toPlaceCoral() {
+    if (isAutoPlacing) {
+      visionSubsystem.setYawUpdateCamera(scoreSide == ScoreSide.LEFT ? 2 : 0);
+    }
     coralSubsystem.eject(scoringLevel);
     funnelSubsystem.clearCoral();
     isAutoReadyForEject = false;
@@ -592,7 +599,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toInterrupted() {
     if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
       tagAlignSubsystem.terminate();
+      visionSubsystem.setYawUpdateCamera(-1);
       setAutoPlacingLed(false);
+      driveSubsystem.setIgnoreSticks(false);
+    }
+
+    if (climbAlignSubsystem.getState() != ClimbAlignSubsystem.ClimbAlignStates.DONE) {
+      climbAlignSubsystem.terminate();
       driveSubsystem.setIgnoreSticks(false);
     }
 
@@ -618,10 +631,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toClimb() {
     if (curState == RobotStates.PREP_CLIMB || climbSubsystem.getState() == ClimbState.PREPPED) {
-
-      biscuitSubsystem.setPosition(RobotConstants.kHpAlgaeSetpoint, hasAlgae());
-      elevatorSubsystem.setPosition(ElevatorConstants.kHpAlgaeSetpoint);
-
       climbSubsystem.climb();
       driveSubsystem.prepClimb();
 
@@ -758,7 +767,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (!coralSubsystem.hasCoral()
             && scoringTimer.hasElapsed(RobotStateConstants.kCoralEjectTimer)) {
           coralLoc = CoralLoc.NONE;
+          visionSubsystem.setYawUpdateCamera(-1);
           setAutoPlacingLed(false);
+          driveSubsystem.setIgnoreSticks(false);
           toFunnelLoad();
         } else {
           coralLoc = CoralLoc.SCORING;
@@ -826,20 +837,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case TO_BARGE_ALGAE -> {
         if (elevatorSubsystem.isHigherThan(ElevatorConstants.kBargeHigherThan)) {
-          Angle biscuitSetpoint;
-          double yaw = driveSubsystem.getPoseMeters().getRotation().getDegrees();
-          if (driveSubsystem.getPoseMeters().getX() <= DriveConstants.kCenterLineX) {
-            biscuitSetpoint =
-                yaw < 90 && yaw > -90
-                    ? RobotConstants.kBargeSetpoint
-                    : RobotConstants.kBargeBackwardSetpoint;
-          } else {
-            biscuitSetpoint =
-                yaw < -90 || yaw > 90
-                    ? RobotConstants.kBargeSetpoint
-                    : RobotConstants.kBargeBackwardSetpoint;
-          }
-          biscuitSubsystem.setPosition(biscuitSetpoint, hasAlgae());
+          biscuitSubsystem.setPosition(RobotConstants.kBargeSetpoint, hasAlgae());
           curState = RobotStates.BARGE_ALGAE;
         }
       }
