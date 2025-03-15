@@ -4,13 +4,9 @@
 
 package frc.robot;
 
-import java.util.Map;
-
-import org.strykeforce.telemetry.TelemetryController;
-import org.strykeforce.telemetry.TelemetryService;
+import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
@@ -97,6 +93,9 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.Map;
+import org.strykeforce.telemetry.TelemetryController;
+import org.strykeforce.telemetry.TelemetryService;
 
 public class RobotContainer {
   private final RobotConstants robotConstants;
@@ -416,7 +415,6 @@ public class RobotContainer {
             new ClimbPrepCommand(
                 robotStateSubsystem, climbSubsystem, elevatorSubsystem, biscuitSubsystem));
 
-
     // Move biscuit
     new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
         .onTrue(
@@ -440,7 +438,6 @@ public class RobotContainer {
             new JogElevatorCommand(
                 elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
         .onFalse(new HoldElevatorCommand(elevatorSubsystem));
-
   }
 
   private void configureTestOperatorBindings() {

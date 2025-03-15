@@ -304,7 +304,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public void terminate() {
-    driveSubsystem.setIgnoreSticks(false);
     driveSubsystem.stopDriving();
     curState = TagAlignStates.DONE;
   }
@@ -379,14 +378,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                       && FastMath.abs(driveY.getError()) < driveYCloseEnough
                   // || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough
                   || FastMath.abs(driveY.getError()) < driveYCloseEnough) {
-                if (proceedToAlign || !algae) {
-                  tagAlign();
-                  break;
-                } else {
-                  driveSubsystem.stopDriving();
-                  curState = TagAlignStates.WAITING;
-                  break;
-                }
+                tagAlign();
+                break;
               }
             }
             case TAG_ALIGN -> {

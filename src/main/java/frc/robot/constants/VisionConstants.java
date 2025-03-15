@@ -31,7 +31,7 @@ public final class VisionConstants {
   public static final double kOffsetOnVelFilter = 0.10;
   public static final double kSquaredCoeffOnVelFilter = 0.1;
 
-  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, 0.001);
+  public static Matrix<N3, N1> kStateStdDevs = VecBuilder.fill(0.1, 0.1, 0.0);
 
   public static final double kTimeStampOffset = 0.0;
 

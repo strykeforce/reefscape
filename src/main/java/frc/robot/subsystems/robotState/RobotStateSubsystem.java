@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
@@ -766,6 +765,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           coralLoc = CoralLoc.NONE;
           visionSubsystem.setYawUpdateCamera(-1);
           setAutoPlacingLed(false);
+          driveSubsystem.setIgnoreSticks(false);
           toFunnelLoad();
         } else {
           coralLoc = CoralLoc.SCORING;
@@ -833,20 +833,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case TO_BARGE_ALGAE -> {
         if (elevatorSubsystem.isHigherThan(ElevatorConstants.kBargeHigherThan)) {
-          Angle biscuitSetpoint;
-          double yaw = driveSubsystem.getPoseMeters().getRotation().getDegrees();
-          if (driveSubsystem.getPoseMeters().getX() <= DriveConstants.kCenterLineX) {
-            biscuitSetpoint =
-                yaw < 90 && yaw > -90
-                    ? RobotConstants.kBargeSetpoint
-                    : RobotConstants.kBargeBackwardSetpoint;
-          } else {
-            biscuitSetpoint =
-                yaw < -90 || yaw > 90
-                    ? RobotConstants.kBargeSetpoint
-                    : RobotConstants.kBargeBackwardSetpoint;
-          }
-          biscuitSubsystem.setPosition(biscuitSetpoint, hasAlgae());
+          biscuitSubsystem.setPosition(RobotConstants.kBargeSetpoint, hasAlgae());
           curState = RobotStates.BARGE_ALGAE;
         }
       }

@@ -334,11 +334,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     if (pose1Error > VisionConstants.kYawErrorThreshold) {
       pose1 = null;
-      textLogger.info("Reject 1 due to yaw");
+      // textLogger.info("Reject 1 due to yaw");
     }
     if (pose2Error > VisionConstants.kYawErrorThreshold) {
       pose2 = null;
-      textLogger.info("Reject 2 due to yaw");
+      // textLogger.info("Reject 2 due to yaw");
     }
 
     if (pose1 == null && pose2 == null) {
@@ -346,10 +346,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     if (pose1Error < pose2Error) {
-      textLogger.info("Accept 1");
+      // textLogger.info("Accept 1");
       return pose1;
     } else {
-      textLogger.info("Accept 2");
+      // textLogger.info("Accept 2");
       return pose2;
     }
   }
@@ -360,12 +360,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
     // // This filters out results by seeing if they are close to the right height
     if (dist1 > VisionConstants.kCamErrorZThreshold) {
-      textLogger.info("Reject 1 due to z");
+      // textLogger.info("Reject 1 due to z");
       pose1 = null;
     }
     if (dist2 > VisionConstants.kCamErrorZThreshold) {
       pose2 = null;
-      textLogger.info("Reject 2 due to z");
+      // textLogger.info("Reject 2 due to z");
     }
 
     // If we don't have enough data in the gyro buffer we default to returning a pose
@@ -469,11 +469,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
           Logger.recordOutput("Vision/Raw Camera 1 " + camNames[idx], cam1Pose);
           Logger.recordOutput("Vision/Raw Camera 2 " + camNames[idx], cam2Pose);
 
-          textLogger.info("Processing camera {}", camNames[idx]);
+          // textLogger.info("Processing camera {}", camNames[idx]);
           cameraPose = getCorrectPose(cam1Pose, cam2Pose, result.getTimeStamp(), idx);
 
           if (cameraPose == null) {
-            textLogger.info("Both poses rejected!");
+            // textLogger.info("Both poses rejected!");
             continue;
           }
 

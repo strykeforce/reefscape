@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -14,8 +16,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
-
-import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 
 public class ElevatorConstants {
@@ -60,13 +60,13 @@ public class ElevatorConstants {
   public static final Angle kAutoPrestageSetpoint = kL4CoralSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(3.34717);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(5.82);
   public static final Angle kMicAlgaeSetpoint = Rotations.of(2.703);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(1.8921); // was 4.297 -> 5.964
-  public static final Angle kBargeSetpoint = Rotations.of(44.943); // 41.936
+  public static final Angle kProcessorSetpoint = Rotations.of(3.348); // was 4.297 -> 5.964
+  public static final Angle kBargeSetpoint = Rotations.of(44.785); // 41.936
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 
   public static TalonFXConfiguration getBothFXConfig() {

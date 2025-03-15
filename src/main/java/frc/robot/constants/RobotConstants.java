@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import org.slf4j.LoggerFactory;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -19,10 +19,9 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
-
-import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
+import org.slf4j.LoggerFactory;
 
 public class RobotConstants {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(RobotConstants.class);
@@ -80,7 +79,7 @@ public class RobotConstants {
   // Algae scoring
   public static Angle kProcessorSetpoint;
   public static Angle kBargeSetpoint;
-  public static Angle kBargeBackwardSetpoint;
+  // public static Angle kBargeBackwardSetpoint;
 
   public static double kTagAlignThreshold;
 
@@ -132,7 +131,7 @@ public class RobotConstants {
       // Algae scoring
       kProcessorSetpoint = CompConstants.kProcessorSetpoint;
       kBargeSetpoint = CompConstants.kBargeSetpoint;
-      kBargeBackwardSetpoint = CompConstants.kBargeBackwardSetpoint;
+      // kBargeBackwardSetpoint = CompConstants.kBargeBackwardSetpoint;
       kTagAlignThreshold = CompConstants.kTagAlignThreshold;
     } else {
       // Proto constants
@@ -178,7 +177,7 @@ public class RobotConstants {
       // Algae scoring
       kProcessorSetpoint = ProtoConstants.kProcessorSetpoint;
       kBargeSetpoint = ProtoConstants.kBargeSetpoint;
-      kBargeBackwardSetpoint = ProtoConstants.kBargeBackwardSetpoint;
+      // kBargeBackwardSetpoint = ProtoConstants.kBargeBackwardSetpoint;
 
       kTagAlignThreshold = ProtoConstants.kTagAlignThreshold;
     }
@@ -230,13 +229,13 @@ public class RobotConstants {
     // Algae scoring
     public static Angle kProcessorSetpoint = Rotations.of(41.193);
     public static Angle kBargeSetpoint = Rotations.of(12.3489);
-    public static Angle kBargeBackwardSetpoint = Rotations.of(-12.3489); // 9.089
+    // public static Angle kBargeBackwardSetpoint = Rotations.of(-12.3489); // 9.089
 
     // Elevator
     public static Angle kElevatorFunnelSetpoint = Rotations.of(2.03125);
     public static Angle kElevatorStowSetpoint = kElevatorFunnelSetpoint;
     public static Angle kMaxFwd = kMicAlgaeSetpoint.plus(Rotations.of(5));
-    public static Angle kMaxRev = kBargeBackwardSetpoint.minus(Rotations.of(5));
+    public static Angle kMaxRev = kPrestageSetpoint.minus(Rotations.of(5));
 
     public static MotionMagicConfigs getAlgaeMotionConfig() {
       MotionMagicConfigs algaeConfig =
@@ -344,36 +343,36 @@ public class RobotConstants {
     // Idle
     public static Angle kBiscuitStowSetpoint = Rotations.of(1.862 / 2);
     public static Angle kFunnelSetpoint = kBiscuitStowSetpoint;
-    public static Angle kPrestageSetpoint = Rotations.of(-4.5095);
+    public static Angle kPrestageSetpoint = Rotations.of(-2.94);
     public static Angle kPrestageAlgaeSetpoint = kBiscuitStowSetpoint;
 
     // Algae removal
-    public static Angle kL2AlgaeSetpoint = Rotations.of(6.513916);
-    public static Angle kL3AlgaeSetpoint = Rotations.of(6.513916);
+    public static Angle kL2AlgaeSetpoint = Rotations.of(7.39);
+    public static Angle kL3AlgaeSetpoint = Rotations.of(7.39);
 
-    public static Angle kL2AlgaeRemovalSetpoint = kBiscuitStowSetpoint;
-    public static Angle kL3AlgaeRemovalSetpoint = kBiscuitStowSetpoint;
+    public static Angle kL2AlgaeRemovalSetpoint = kPrestageSetpoint;
+    public static Angle kL3AlgaeRemovalSetpoint = kPrestageSetpoint;
 
     public static double kTagAlignThreshold = 20.0 / 2;
 
     // Coral score
-    public static Angle kL1CoralSetpoint = kBiscuitStowSetpoint;
-    public static Angle kL2CoralSetpoint = kBiscuitStowSetpoint;
-    public static Angle kL3CoralSetpoint = kBiscuitStowSetpoint;
-    public static Angle kL4CoralSetpoint = kBiscuitStowSetpoint;
+    public static Angle kL1CoralSetpoint = kPrestageSetpoint;
+    public static Angle kL2CoralSetpoint = kPrestageSetpoint;
+    public static Angle kL3CoralSetpoint = kPrestageSetpoint;
+    public static Angle kL4CoralSetpoint = kPrestageSetpoint;
 
     // Algae obtaining
-    public static Angle kFloorAlgaeSetpoint = Rotations.of(19.98999);
+    public static Angle kFloorAlgaeSetpoint = Rotations.of(20.039);
     public static Angle kMicAlgaeSetpoint = Rotations.of(12.87085);
     public static Angle kHpAlgaeSetpoint = kBiscuitStowSetpoint;
 
     // Algae scoring
     public static Angle kProcessorSetpoint = Rotations.of(15.0139);
-    public static Angle kBargeSetpoint = Rotations.of(12.3489 / 2);
-    public static Angle kBargeBackwardSetpoint = Rotations.of(-12.3489 / 2); // 9.089
+    public static Angle kBargeSetpoint = Rotations.of(2.697);
+    // public static Angle kBargeBackwardSetpoint = Rotations.of(-12.3489 / 2); // 9.089
 
-    public static Angle kMaxFwd = kMicAlgaeSetpoint.plus(Rotations.of(5 / 2));
-    public static Angle kMaxRev = kBargeBackwardSetpoint.minus(Rotations.of(5 / 2));
+    public static Angle kMaxFwd = kFloorAlgaeSetpoint.plus(Rotations.of(5));
+    public static Angle kMaxRev = kPrestageSetpoint.minus(Rotations.of(5));
 
     public static MotionMagicConfigs getAlgaeMotionConfig() {
       MotionMagicConfigs algaeConfig =
