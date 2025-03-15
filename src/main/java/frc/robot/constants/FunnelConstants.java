@@ -16,7 +16,7 @@ import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public class FunnelConstants {
-  public static final double kFunnelPercentOutput = 0.75;
+  public static final double kFunnelPercentOutput = 1.0;
 
   public static int FunnelFxsId = 40;
   public static final int kFunnelBeamCounts = 1;

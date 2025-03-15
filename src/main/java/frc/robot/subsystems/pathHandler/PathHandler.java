@@ -222,6 +222,10 @@ public class PathHandler extends MeasurableSubsystem {
             (nodeNames.get(0) - 'a') % 2 == 0,
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
+        if (!hasPreppedCoral) {
+          robotStateSubsystem.toPrepCoral();
+          hasPreppedCoral = true;
+        }
         curState = PathStates.DRIVE_PLACE_SERVO;
         isServoing = true;
       }
@@ -293,15 +297,15 @@ public class PathHandler extends MeasurableSubsystem {
 
     return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
             < PathHandlerConstants.kServoRadius
-        && curState == PathStates.DRIVE_PLACE
-        && FastMath.abs(
-                alignTargetPose
-                    .getTranslation()
-                    .minus(driveSubsystem.getPoseMeters().getTranslation())
-                    .rotateBy(
-                        Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[targetHexant]))
-                    .getY())
-            < PathHandlerConstants.kMaxServoErrorY;
+        && curState == PathStates.DRIVE_PLACE;
+    /*&& FastMath.abs(
+        alignTargetPose
+            .getTranslation()
+            .minus(driveSubsystem.getPoseMeters().getTranslation())
+            .rotateBy(
+                Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[targetHexant]))
+            .getY())
+    < PathHandlerConstants.kMaxServoErrorY;*/
     // boolean isCloseEnough = false;
     // double preNormalizedAngle =
     //     FastMath.toRadians(
@@ -324,6 +328,22 @@ public class PathHandler extends MeasurableSubsystem {
     //     // && TagAlignSubsystem.canSeeTag(desiredTag)
     //     && isCloseEnough
     //     && false; // TODO remove, this is for testing
+  }
+
+  private boolean shouldStageElevator() {
+    return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+            < AutonConstants.kElevatorStageRadius
+        && curState == PathStates.DRIVE_PLACE
+        && getCurError() < PathHandlerConstants.kMaxServoErrorY;
+  }
+
+  private double getCurError() {
+    return FastMath.abs(
+        alignTargetPose
+            .getTranslation()
+            .minus(driveSubsystem.getPoseMeters().getTranslation())
+            .rotateBy(Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[targetHexant]))
+            .getY());
   }
 
   private SwerveSample mirrorToProcessor(SwerveSample sample) {
@@ -389,30 +409,32 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case DRIVE_PLACE -> {
-        if (tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
-                <= AutonConstants.kElevatorStageRadius
+        if (
+        /*tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+        <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
             && !hasPreppedCoral) {
           hasPreppedCoral = true;
           robotStateSubsystem.toPrepCoral();
         }
         if (!runningPath) {
-          char next = nodeNames.get(0);
+          if (nodeNames.size() > 0) {
+            char next = nodeNames.get(0);
+            targetHexant =
+                tagAlignSubsystem.computeFieldRelHexant(
+                    robotStateSubsystem.getAllianceColor(), currPathFinalPose);
+            alignTargetPose =
+                tagAlignSubsystem.getTargetDrivePose(
+                    robotStateSubsystem.getAllianceColor(), (next - 'a') % 2 == 0, targetHexant);
+          }
           startPath(nextPath());
-          targetHexant =
-              tagAlignSubsystem.computeFieldRelHexant(
-                  robotStateSubsystem.getAllianceColor(), currPathFinalPose);
-          alignTargetPose =
-              tagAlignSubsystem.getTargetDrivePose(
-                  robotStateSubsystem.getAllianceColor(),
-                  (next - 'a') % 2 == 0,
-                  targetHexant);
         }
         drivePath();
       }
       case DRIVE_PLACE_SERVO -> {
-        if (tagAlignSubsystem.getCurRadius(
-                    driveSubsystem.shouldFlip() ? Alliance.Red : Alliance.Blue)
-                <= AutonConstants.kElevatorStageRadius
+        if (
+        /*tagAlignSubsystem.getCurRadius(
+            driveSubsystem.shouldFlip() ? Alliance.Red : Alliance.Blue)
+        <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
             && !hasPreppedCoral) {
           hasPreppedCoral = true;
           robotStateSubsystem.toPrepCoral();

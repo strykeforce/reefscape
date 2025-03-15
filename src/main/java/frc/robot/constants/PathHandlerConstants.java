@@ -64,5 +64,5 @@ public class PathHandlerConstants {
   };
   public static final double kWaitingTime = 2.0;
   public static final double kServoRadius = 1.7;
-  public static final double kMaxServoErrorY = 0.3;
+  public static final double kMaxServoErrorY = 0.4;
 }

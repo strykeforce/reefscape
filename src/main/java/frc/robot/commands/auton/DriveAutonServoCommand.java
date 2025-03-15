@@ -168,7 +168,9 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
   @Override
   public void execute() {
-    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED && !hasStaged) {
+    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED
+        && !hasStaged
+        && timer.hasElapsed(AutonConstants.kInitPathPrestageTime)) {
       hasStaged = true;
       robotStateSubsystem.toAutonPrestage();
     }
