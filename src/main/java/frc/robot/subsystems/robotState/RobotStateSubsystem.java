@@ -468,6 +468,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void finishAuto() {
+    toReefAlign(false, false);
+    setState(RobotStates.FINISH_AUTO);
+  }
+
   public void toPlaceCoral() {
     if (isAutoPlacing) {
       visionSubsystem.setYawUpdateCamera(scoreSide == ScoreSide.LEFT ? 2 : 0);
@@ -881,6 +886,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case STARTUP -> {
         if (elevatorSubsystem.getState() == ElevatorStates.ZEROED) toStow();
       }
+      case FINISH_AUTO -> {
+        if (elevatorSubsystem.isFinished()) {
+          toPlaceCoral();
+        }
+      }
       default -> logger.error("Unhandled state: {}", curState);
     }
     ledSubsystem.setCoralLights(coralLoc);
@@ -921,7 +931,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     INTERRUPTED,
     TRANSFER,
     IDLE,
-    STARTUP
+    STARTUP,
+    FINISH_AUTO
   }
 
   public enum ScoringLevel {

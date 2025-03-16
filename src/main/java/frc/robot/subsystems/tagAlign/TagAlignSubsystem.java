@@ -75,7 +75,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", -1);
 
-    driveRadius = 1.223823;
+    driveRadius = 1.338;
     for (int i = 0; i < 6; i++) {
       logger.info("Hexant {}, left and right", i);
 

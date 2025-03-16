@@ -183,6 +183,25 @@ public class AutoSwitch extends MeasurableSubsystem {
             true,
             AutonConstants.kNonProcessorDeep);
       }
+      case 0x02 -> {
+        return new NonProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startToJ",
+            new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
+            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            'j',
+            false,
+            AutonConstants.kNonProcessorShallow);
+      }
+
       case 0x20 -> {
         return new ProcessorShallowAutonCommand(
             driveSubsystem,
