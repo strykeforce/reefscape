@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
+import frc.robot.commands.auton.NonProcessorDeepAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
 import frc.robot.constants.AutonConstants;
@@ -163,6 +164,24 @@ public class AutoSwitch extends MeasurableSubsystem {
             'j',
             false,
             AutonConstants.kNonProcessorShallow);
+      }
+      case 0x01 -> {
+        return new NonProcessorDeepAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startDeepToK",
+            new ArrayList<Character>(Arrays.asList('l', 'a', 'b')),
+            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            'k',
+            true,
+            AutonConstants.kNonProcessorDeep);
       }
       case 0x20 -> {
         return new ProcessorShallowAutonCommand(
