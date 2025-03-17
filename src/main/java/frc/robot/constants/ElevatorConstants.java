@@ -20,10 +20,10 @@ import edu.wpi.first.units.measure.Angle;
 
 public class ElevatorConstants {
 
-  public static final double kCloseEnoughRotations = 0.3;
+  public static final double kCloseEnoughRotations = 0.4;
   public static final double kStowThresholdDone = 0.3676757 + 0.5;
   public static final double kMaxFwd = 53;
-  public static final double kMaxRev = .1;
+  public static final double kMaxRev = 0.1;
   public static final double kElevatorLiftHeight = 1; // for pit command
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position

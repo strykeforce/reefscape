@@ -10,7 +10,8 @@ import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
 import frc.robot.commands.auton.NonProcessorDeepAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
-import frc.robot.commands.auton.ProcessorShallowAutonCommand;
+import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
+import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
@@ -148,6 +149,24 @@ public class AutoSwitch extends MeasurableSubsystem {
   private AutoCommandInterface getAutoCommand(int switchPos) {
     switch (switchPos) {
       case 0x00 -> {
+        return new NonProcessorShallowSlowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startToJSlow",
+            new ArrayList<Character>(Arrays.asList('k', 'l')),
+            new ArrayList<Integer>(Arrays.asList(4, 4)),
+            'j',
+            false,
+            AutonConstants.kNonProcessorShallow);
+      }
+      case 0x01 -> {
         return new NonProcessorShallowAutonCommand(
             driveSubsystem,
             pathHandler,
@@ -164,24 +183,6 @@ public class AutoSwitch extends MeasurableSubsystem {
             'j',
             false,
             AutonConstants.kNonProcessorShallow);
-      }
-      case 0x01 -> {
-        return new NonProcessorDeepAutonCommand(
-            driveSubsystem,
-            pathHandler,
-            robotStateSubsystem,
-            algaeSubsystem,
-            biscuitSubsystem,
-            coralSubsystem,
-            elevatorSubsystem,
-            tagAlignSubsystem,
-            visionSubsystem,
-            "startDeepToK",
-            new ArrayList<Character>(Arrays.asList('l', 'a', 'b')),
-            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
-            'k',
-            true,
-            AutonConstants.kNonProcessorDeep);
       }
       case 0x02 -> {
         return new NonProcessorShallowAutonCommand(
@@ -201,9 +202,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             false,
             AutonConstants.kNonProcessorShallow);
       }
-
-      case 0x20 -> {
-        return new ProcessorShallowAutonCommand(
+      case 0x03 -> {
+        return new NonProcessorDeepAutonCommand(
             driveSubsystem,
             pathHandler,
             robotStateSubsystem,
@@ -213,7 +213,26 @@ public class AutoSwitch extends MeasurableSubsystem {
             elevatorSubsystem,
             tagAlignSubsystem,
             visionSubsystem,
-            "startPToE",
+            "startDeepToK",
+            new ArrayList<Character>(Arrays.asList('l', 'a', 'b')),
+            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            'k',
+            true,
+            AutonConstants.kNonProcessorDeep);
+      }
+
+      case 0x20 -> {
+        return new ProcessorShallowSlowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startPToESlow",
             new ArrayList<Character>(Arrays.asList('d', 'c')),
             new ArrayList<Integer>(Arrays.asList(4, 4)),
             'e',

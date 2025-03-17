@@ -39,8 +39,9 @@ public class RobotConstants {
 
   // Biscuit
   public static TalonFXSConfiguration talonFXSConfig;
-  public static MotionMagicConfigs alageMotionConfig;
-  public static MotionMagicConfigs noAlageMotionConfig;
+  public static MotionMagicConfigs algaeMotionConfig;
+  public static MotionMagicConfigs algaeRemovalMotionConfig;
+  public static MotionMagicConfigs noAlgaeMotionConfig;
 
   public static double kTicksPerRot;
 
@@ -92,8 +93,9 @@ public class RobotConstants {
       kElevatorFunnelSetpoint = CompConstants.kElevatorFunnelSetpoint;
       kElevatorStowSetpoint = CompConstants.kElevatorStowSetpoint;
       talonFXSConfig = CompConstants.getFXSConfig();
-      alageMotionConfig = CompConstants.getAlgaeMotionConfig();
-      noAlageMotionConfig = CompConstants.getNoAlgaeMotionConfig();
+      algaeMotionConfig = CompConstants.getAlgaeMotionConfig();
+      algaeRemovalMotionConfig = CompConstants.getAlgaeRemovalMotionConfig();
+      noAlgaeMotionConfig = CompConstants.getNoAlgaeMotionConfig();
       kTicksPerRot = 80;
       logger.info("Using Comp Constants");
 
@@ -138,8 +140,9 @@ public class RobotConstants {
       kElevatorFunnelSetpoint = ProtoConstants.kElevatorFunnelSetpoint;
       kElevatorStowSetpoint = ProtoConstants.kElevatorStowSetpoint;
       talonFXSConfig = ProtoConstants.getFXSConfig();
-      alageMotionConfig = ProtoConstants.getAlgaeMotionConfig();
-      noAlageMotionConfig = ProtoConstants.getNoAlgaeMotionConfig();
+      algaeMotionConfig = ProtoConstants.getAlgaeMotionConfig();
+      algaeRemovalMotionConfig = algaeMotionConfig;
+      noAlgaeMotionConfig = ProtoConstants.getNoAlgaeMotionConfig();
       kTicksPerRot = 160;
       logger.info("Using Proto Constants");
 
@@ -382,6 +385,17 @@ public class RobotConstants {
               .withMotionMagicExpo_kA(0)
               .withMotionMagicExpo_kV(0)
               .withMotionMagicJerk(600);
+      return algaeConfig;
+    }
+
+    public static MotionMagicConfigs getAlgaeRemovalMotionConfig() {
+      MotionMagicConfigs algaeConfig =
+          new MotionMagicConfigs()
+              .withMotionMagicAcceleration(300)
+              .withMotionMagicCruiseVelocity(30)
+              .withMotionMagicExpo_kA(0)
+              .withMotionMagicExpo_kV(0)
+              .withMotionMagicJerk(1500);
       return algaeConfig;
     }
 
