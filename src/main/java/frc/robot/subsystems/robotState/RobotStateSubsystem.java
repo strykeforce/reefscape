@@ -720,15 +720,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case REEF_ALIGN_ALGAE -> {
-        if (algaeSubsystem.hasAlgae()) {
+        if (algaeSubsystem.hasAlgaeSuperCycle()) {
           biscuitSubsystem.setIsRemovingAlgae(true);
           switch (getAlgaeLevel()) {
             case L2 -> {
-              biscuitSubsystem.setPosition(RobotConstants.kL2AlgaeRemovalSetpoint, hasAlgae());
+              biscuitSubsystem.setPosition(RobotConstants.kL2AlgaeRemovalSetpoint, true);
               elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
             }
             case L3 -> {
-              biscuitSubsystem.setPosition(RobotConstants.kL3AlgaeRemovalSetpoint, hasAlgae());
+              biscuitSubsystem.setPosition(RobotConstants.kL3AlgaeRemovalSetpoint, true);
               elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
             }
             default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
@@ -750,7 +750,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case REMOVE_ALGAE -> {
-        if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+        if (elevatorSubsystem.isFinished()
+            && biscuitSubsystem.getPosition().in(Rotations)
+                <= RobotStateConstants.kBiscuitSuperCycleSafeThres) {
           biscuitSubsystem.setIsRemovingAlgae(false);
           if (coralSubsystem.hasCoral()
               && !(isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT)) {
