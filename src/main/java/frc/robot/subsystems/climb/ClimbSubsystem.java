@@ -5,6 +5,7 @@ package frc.robot.subsystems.climb;
 import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
@@ -28,6 +29,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private boolean isPinDeployed = false;
   private boolean proceedToClimb = false;
   private int climbZeroStableCounts; // idk what this means
+  private boolean spedUp = false;
   // more
 
   private double setpoints = 0.0;
@@ -36,6 +38,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   public ClimbSubsystem(ClimbIO io) {
     this.io = io;
+    Logger.recordOutput("Climb/isDesparate", false);
     enableRatchet(false);
     deployClimb(false);
     zero();
@@ -99,7 +102,15 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void climb() {
     if (curState == ClimbState.PREPPED) {
       // setPosition(ClimbConstants.kClimbCagePos);
-      io.setPercent(ClimbConstants.kClimbOpenLoopSpeed);
+      if (DriverStation.getMatchTime() < ClimbConstants.kFastClimbAfter) {
+        Logger.recordOutput("Climb/isDesparate", true);
+        io.setPercent(ClimbConstants.kClimbOpenLoopFastSpeed);
+        spedUp = true;
+      } else {
+        Logger.recordOutput("Climb/isDesparate", false);
+        io.setPercent(ClimbConstants.kClimbOpenLoopSpeed);
+        spedUp = false;
+      }
       setState(ClimbState.CLIMBING);
     }
   }
@@ -148,6 +159,10 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
       case CLIMBING:
         if (climbInputs.position >= ClimbConstants.kClimbRatchedEngage && !isRatchetOn) {
           enableRatchet(true);
+        }
+        if (climbInputs.position >= ClimbConstants.kSpeedUpPos && !spedUp) {
+          io.setPercent(ClimbConstants.kClimbOpenLoopFastSpeed);
+          spedUp = true;
         }
         if (isFinished()) {
           io.setCoastMode(true);
