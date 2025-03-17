@@ -1,7 +1,5 @@
 package frc.robot.commands.auton;
 
-import java.util.List;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -19,10 +17,12 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.List;
 
-public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup implements AutoCommandInterface {
+public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
+    implements AutoCommandInterface {
 
-    private PathHandler pathHandler;
+  private PathHandler pathHandler;
   private DriveSubsystem driveSubsystem;
   private DriveAutonServoCommand startPath;
   private CoralSubsystem coralSubsystem;
@@ -118,5 +118,4 @@ public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup imp
     pathHandler.setStartNode(startNode);
     // pathHandler.reassignAlliance();
   }
-    
 }
