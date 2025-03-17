@@ -1,9 +1,16 @@
 package frc.robot.subsystems.robotState;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import java.util.Set;
+
+import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
@@ -18,6 +25,7 @@ import frc.robot.subsystems.climb.ClimbAlignSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.coral.CoralSubsystem.CoralState;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
@@ -28,13 +36,7 @@ import frc.robot.subsystems.led.LEDSubsystem.PlaceStates;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.Set;
 import net.jafama.FastMath;
-import org.littletonrobotics.junction.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.TelemetryService;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -168,6 +170,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return algaeSubsystem.hasAlgae();
   }
 
+  public boolean safeMoveElevator() {
+    return !(coralSubsystem.getState() != CoralState.HAS_CORAL && funnelSubsystem.hasCoral());
+  }
+
   public void startupSequence() {
     if (curState == RobotStates.IDLE) {
       elevatorSubsystem.zero();
@@ -291,12 +297,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toStow() {
     visionSubsystem.setYawUpdateCamera(-1);
     biscuitSubsystem.setIsRemovingAlgae(false);
+    driveSubsystem.removeDriveMultiplier();
+    driveSubsystem.setIgnoreSticks(false);
 
     if (biscuitSubsystem.isSafeToStow()) {
       biscuitSubsystem.setPosition(RobotConstants.kStowSetpoint, hasAlgae());
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
-      driveSubsystem.removeDriveMultiplier();
-      driveSubsystem.setIgnoreSticks(false);
       algaeSubsystem.hold();
 
       setState(RobotStates.TO_STOW);
@@ -378,6 +384,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toReefAlign(boolean getAlgae, boolean drive) {
+    if (!safeMoveElevator()) {
+      logger.info("Elevator movement is dangerous!");
+      return;
+    }
     boolean wantAlgae = getAlgae || !coralSubsystem.hasCoral();
     if ((hasAlgae() && scoreSide == ScoreSide.RIGHT && drive) || (hasAlgae() && !hasCoral())) {
       setState(RobotStates.STOW);
@@ -525,6 +535,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       futureState = RobotStates.BARGE_ALGAE;
       toStowSafe();
     }
+
+    if (!safeMoveElevator()) {
+      logger.info("Elevator movement is dangerous!");
+      return;
+    }
+
     switch (algaeHeight) {
       case LOW -> {
         toProcessor();
