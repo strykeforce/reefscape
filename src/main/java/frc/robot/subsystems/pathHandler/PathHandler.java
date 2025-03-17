@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PathHandlerConstants;
+import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
@@ -47,10 +48,15 @@ public class PathHandler extends MeasurableSubsystem {
   private Trajectory<SwerveSample> currPath;
   private String currPathString;
   private Pose2d currPathFinalPose = new Pose2d();
+  private Pose2d alignTargetPose = new Pose2d();
+  private int targetHexant = 0;
   private boolean runningPath = false;
   private boolean isServoing = false;
   private boolean mirrorTrajectory = false;
   private boolean proceedToNext = false;
+  private boolean teleop = false;
+  private boolean isPlacing = false;
+  private boolean hasPreppedCoral = false;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -94,6 +100,11 @@ public class PathHandler extends MeasurableSubsystem {
     }
   }
 
+  public void addNode(Character nodeName, int nodeLevel) {
+    nodeNames.add(nodeName);
+    nodeLevels.add(nodeLevel);
+  }
+
   public void setNodeLevels(List<Integer> nodeLevels) {
     if (!isHandling) {
       this.nodeLevels = nodeLevels;
@@ -117,6 +128,7 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   public void startPathHandler() {
+    teleop = false;
     nodeNames.add(0, startNode);
     isHandling = true;
     robotStateSubsystem.setIsAutoPlacing(false);
@@ -210,8 +222,11 @@ public class PathHandler extends MeasurableSubsystem {
             (nodeNames.get(0) - 'a') % 2 == 0,
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
+        if (!hasPreppedCoral) {
+          robotStateSubsystem.toPrepCoral();
+          hasPreppedCoral = true;
+        }
         curState = PathStates.DRIVE_PLACE_SERVO;
-        robotStateSubsystem.toPrepCoral();
         isServoing = true;
       }
     }
@@ -225,7 +240,6 @@ public class PathHandler extends MeasurableSubsystem {
         runningPath = false;
         pathTimer.stop();
         pathTimer.reset();
-        robotStateSubsystem.toPlaceCoralAuto();
         curState = PathStates.PLACE;
         driveSubsystem.stopDriving();
         waitingTimer.start();
@@ -280,9 +294,18 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private boolean shouldTransitionToServoing() {
+
     return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
             < PathHandlerConstants.kServoRadius
         && curState == PathStates.DRIVE_PLACE;
+    /*&& FastMath.abs(
+        alignTargetPose
+            .getTranslation()
+            .minus(driveSubsystem.getPoseMeters().getTranslation())
+            .rotateBy(
+                Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[targetHexant]))
+            .getY())
+    < PathHandlerConstants.kMaxServoErrorY;*/
     // boolean isCloseEnough = false;
     // double preNormalizedAngle =
     //     FastMath.toRadians(
@@ -305,6 +328,22 @@ public class PathHandler extends MeasurableSubsystem {
     //     // && TagAlignSubsystem.canSeeTag(desiredTag)
     //     && isCloseEnough
     //     && false; // TODO remove, this is for testing
+  }
+
+  private boolean shouldStageElevator() {
+    return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+            < AutonConstants.kElevatorStageRadius
+        && curState == PathStates.DRIVE_PLACE
+        && getCurError() < PathHandlerConstants.kMaxServoErrorY;
+  }
+
+  private double getCurError() {
+    return FastMath.abs(
+        alignTargetPose
+            .getTranslation()
+            .minus(driveSubsystem.getPoseMeters().getTranslation())
+            .rotateBy(Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[targetHexant]))
+            .getY());
   }
 
   private SwerveSample mirrorToProcessor(SwerveSample sample) {
@@ -370,20 +409,50 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case DRIVE_PLACE -> {
+        if (
+        /*tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+        <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
+            && !hasPreppedCoral) {
+          hasPreppedCoral = true;
+          robotStateSubsystem.toPrepCoral();
+        }
         if (!runningPath) {
+          if (nodeNames.size() > 0) {
+            char next = nodeNames.get(0);
+            targetHexant =
+                tagAlignSubsystem.computeFieldRelHexant(
+                    robotStateSubsystem.getAllianceColor(), currPathFinalPose);
+            alignTargetPose =
+                tagAlignSubsystem.getTargetDrivePose(
+                    robotStateSubsystem.getAllianceColor(), (next - 'a') % 2 == 0, targetHexant);
+          }
           startPath(nextPath());
         }
         drivePath();
       }
       case DRIVE_PLACE_SERVO -> {
+        if (
+        /*tagAlignSubsystem.getCurRadius(
+            driveSubsystem.shouldFlip() ? Alliance.Red : Alliance.Blue)
+        <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
+            && !hasPreppedCoral) {
+          hasPreppedCoral = true;
+          robotStateSubsystem.toPrepCoral();
+        }
         if (runningPath && isServoing) {
           drivePathServo();
         }
       }
       case PLACE -> {
+        hasPreppedCoral = false;
+        if (robotStateSubsystem.isElevatorFinished() && !isPlacing) {
+          isPlacing = true;
+          robotStateSubsystem.toPlaceCoralAuto();
+        }
         if (!robotStateSubsystem.hasCoral()) {
           // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
           // proceedToNext) {
+          isPlacing = false;
           robotStateSubsystem.toFunnelLoad();
           curState = PathStates.DRIVE_FETCH;
         }

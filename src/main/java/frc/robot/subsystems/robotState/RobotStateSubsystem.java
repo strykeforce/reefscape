@@ -370,7 +370,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toPlaceCoralAuto() {
     isAutoReadyForEject = true;
     if (elevatorSubsystem.isFinished()) toPlaceCoral();
-    else toReefAlign(getAlgaeOnCycle, isAutoPlacing);
+    else toReefAlign(getAlgaeOnCycle, false);
   }
 
   public void toReefAlign() {
@@ -468,6 +468,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         setState(RobotStates.REEF_ALIGN_CORAL, true);
       }
     }
+  }
+
+  public void finishAuto() {
+    toReefAlign(false, false);
+    setState(RobotStates.FINISH_AUTO);
   }
 
   public void toPlaceCoral() {
@@ -640,6 +645,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       setState(RobotStates.CLIMB, true);
     }
+  }
+
+  public boolean isElevatorFinished() {
+    return elevatorSubsystem.isFinished();
   }
 
   @Override
@@ -882,6 +891,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case STARTUP -> {
         if (elevatorSubsystem.getState() == ElevatorStates.ZEROED) toStow();
       }
+      case FINISH_AUTO -> {
+        if (elevatorSubsystem.isFinished()) {
+          toPlaceCoral();
+        }
+      }
       default -> logger.error("Unhandled state: {}", curState);
     }
     ledSubsystem.setCoralLights(coralLoc);
@@ -922,7 +936,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     INTERRUPTED,
     TRANSFER,
     IDLE,
-    STARTUP
+    STARTUP,
+    FINISH_AUTO
   }
 
   public enum ScoringLevel {

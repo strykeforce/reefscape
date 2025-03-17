@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -24,6 +25,7 @@ import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
+import frc.robot.commands.auton.TestAutonCommand;
 import frc.robot.commands.auton.ToggleVirtualSwitchCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
@@ -89,6 +91,7 @@ import frc.robot.subsystems.led.LEDIO;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
@@ -145,6 +148,7 @@ public class RobotContainer {
 
   private NonProcessorShallowAutonCommand nonProcessorShallowAutonCommand;
   private ProcessorShallowAutonCommand processorShallowAutonCommand;
+  private TestAutonCommand testAutonCommand;
 
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
@@ -222,6 +226,12 @@ public class RobotContainer {
             tagAlignSubsystem,
             visionSubsystem,
             pathHandler);
+
+    testAutonCommand =
+        new TestAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            new Pose2d(3.85576086490539, 5.073261807735684, Rotation2d.fromDegrees(300.0)));
 
     configureTelemetry();
     configureDriverBindings();
@@ -414,6 +424,30 @@ public class RobotContainer {
         .onTrue(
             new ClimbPrepCommand(
                 robotStateSubsystem, climbSubsystem, elevatorSubsystem, biscuitSubsystem));
+
+    // Move biscuit
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
   }
 
   private void configureTestOperatorBindings() {
@@ -673,13 +707,12 @@ public class RobotContainer {
     //     .withPosition(3, 0)
     //     .withSize(1, 1);
 
-    // Shuffleboard.getTab("Test")
-    //     .add(
-    //         "reAssign Alliance",
-    //         new InstantCommand(() -> nonProcessorShallowAutonCommand.reassignAlliance())
-    //             .ignoringDisable(true))
-    //     .withPosition(4, 0)
-    //     .withSize(1, 1);
+    Shuffleboard.getTab("Test")
+        .add(
+            "reAssign Alliance",
+            new InstantCommand(() -> testAutonCommand.reassignAlliance()).ignoringDisable(true))
+        .withPosition(4, 0)
+        .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
         .add("Zero Wheels", new InstantCommand(() -> driveSubsystem.lockZero(), driveSubsystem))
@@ -694,6 +727,11 @@ public class RobotContainer {
     Shuffleboard.getTab("Test")
         .add("Set isAuto True", new InstantCommand(() -> robotStateSubsystem.setIsAuto(true)))
         .withPosition(7, 0)
+        .withSize(1, 1);
+
+    Shuffleboard.getTab("Test")
+        .add("run Auton", testAutonCommand)
+        .withPosition(2, 0)
         .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
@@ -739,5 +777,13 @@ public class RobotContainer {
     } else {
       protoSwerve.disableNoMotionCal();
     }
+  }
+
+  public void finishAuto() {
+    robotStateSubsystem.finishAuto();
+  }
+
+  public boolean wasScoringCoral() {
+    return robotStateSubsystem.getState() == RobotStates.PLACE_CORAL;
   }
 }

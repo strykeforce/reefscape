@@ -19,7 +19,7 @@ import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.List;
 
-public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
+public class NonProcessorDeepAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
 
   private PathHandler pathHandler;
@@ -32,7 +32,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
   private List<Integer> NodeLevels;
   private char startNode;
 
-  public NonProcessorShallowAutonCommand(
+  public NonProcessorDeepAutonCommand(
       DriveSubsystem driveSubsystem,
       PathHandler pathHandler,
       RobotStateSubsystem robotStateSubsystem,
@@ -77,24 +77,11 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
         new SequentialCommandGroup(
             new PrepOdomForAutoCommand(
                 robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
-            // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath,
             new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),
-
-            // new ParallelCommandGroup(
-            //     new ZeroElevatorCommand(elevatorSubsystem),
-            // new ResetOdometryCommand(
-            // driveSubsystem, new Pose2d(7.1008875, 5.0756788, new Rotation2d(180))),
-            // new SequentialCommandGroup(
-            //     new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
-            //     new ResetOdometryCommand(driveSubsystem, AutonConstants.kNonProcessorShallow))),
-            // new ParallelCommandGroup(
-            // //     new WaitCommand(0.03), new SetVisionUpdatesCommand(visionSubsystem, true)),
-            // startPath,
-            // new WaitForButtonPressCommand(button),
             new StartPathHandlerCommand(
                 pathHandler,
-                PathHandlerConstants.kShallowPathNames,
+                PathHandlerConstants.kDeepPathNames,
                 NodeNames,
                 NodeLevels,
                 startNode,
@@ -109,13 +96,11 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     robotStateSubsystem.setIsAutoPlacing(false);
     robotStateSubsystem.setScoringLevel(ScoringLevel.L4);
     robotStateSubsystem.setGetAlgaeOnCycle(false);
-    // robotStateSubsystem.setIsAuto(true);
     robotStateSubsystem.setScoreSide(ScoreSide.RIGHT);
     visionSubsystem.setVisionUpdating(true);
-    pathHandler.setPathNames(PathHandlerConstants.kShallowPathNames);
+    pathHandler.setPathNames(PathHandlerConstants.kDeepPathNames);
     pathHandler.setNodeNames(NodeNames);
     pathHandler.setNodeLevels(NodeLevels);
     pathHandler.setStartNode(startNode);
-    // pathHandler.reassignAlliance();
   }
 }
