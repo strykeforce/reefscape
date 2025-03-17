@@ -5,6 +5,7 @@ package frc.robot.subsystems.biscuit;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
@@ -24,7 +25,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   private Angle setPoint = Rotations.of(0);
   private boolean hasZeroed = false;
 
-  public BiscuitState curState = new BiscitState.Normal;
+  public BiscuitState curState = BiscuitState.NORMAL;
 
   public BiscuitSubsystem(BiscuitIO io) {
     this.logger = LoggerFactory.getLogger(this.getClass());
@@ -32,7 +33,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     hasZeroed = io.zero();
   }
 
-  public BiscitState getState() {
+  public BiscuitState getState() {
     return curState;
   }
 
@@ -54,7 +55,13 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   }
 
   public void zero() {
-    hasZeroed = io.zero();
+    if (!getIsEncoderBroken() && curState != BiscuitState.BROKEN) {
+      curState = BiscuitState.ZEROING;
+      hasZeroed = io.zero();
+      curState = BiscuitState.NORMAL;
+    } else {
+      curState = BiscuitState.BROKEN;
+    }
   }
 
   public boolean isFinished() {
@@ -66,14 +73,20 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
         && getPosition().in(Rotations) > RobotConstants.kSafeToStowLower;
   }
 
+  private boolean getIsEncoderBroken() {
+    return MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1) >= BiscuitConstants.kToFar;
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
 
     switch (curState) {
-      case Normal:
+      case NORMAL:
         break;
-      case Zeroing:
+      case ZEROING:
+        break;
+      case BROKEN:
         break;
     }
 
@@ -82,17 +95,18 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
     Logger.recordOutput("Biscuit/curState", curState);
 
-    // double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
-    // double error =
-    //     Math.abs(BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos) - inputs.position);
+    /*
+     double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
+     double error =
+         Math.abs(BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos) - inputs.position);
 
-    // if (setPoint == BiscuitConstants.kStowSetpoint
-    //     && isFinished()
-    //     && inputs.velocity < BiscuitConstants.kRezeroVelocityCloseEnough
-    //     && error >= BiscuitConstants.kRezeroErrorCloseEnough) {
-    //   logger.info("Rezeroing Biscuit");
-    //   zero();
-    // }
+     if (setPoint == BiscuitConstants.kStowSetpoint
+         && isFinished()
+         && inputs.velocity < BiscuitConstants.kRezeroVelocityCloseEnough
+         && error >= BiscuitConstants.kRezeroErrorCloseEnough) {
+       logger.info("Rezeroing Biscuit");
+       zero();
+    } */
   }
 
   @Override
@@ -108,8 +122,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
         new Measure("Biscuit Set Point", () -> setPoint.in(Rotations)));
   }
 
-  public enum BiscitState {
-    Normal,
-    Zeroing
+  public enum BiscuitState {
+    NORMAL,
+    ZEROING,
+    BROKEN
   }
 }

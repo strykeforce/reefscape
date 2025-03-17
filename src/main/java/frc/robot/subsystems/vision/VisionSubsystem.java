@@ -123,7 +123,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
     // Fill our camera array
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
-      cams[i] = new WallEyeCam(piNames[i], camIndex[i], -1);
+      cams[i] = new WallEyeCam(piNames[i], camIndex[i]);
     }
     // Initialize our udpSubscribers
     udpSubscriber[0] = new UdpSubscriber(5802, cams[0], cams[1]);
