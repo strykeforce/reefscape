@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
+import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
+import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
@@ -147,7 +149,7 @@ public class AutoSwitch extends MeasurableSubsystem {
   private AutoCommandInterface getAutoCommand(int switchPos) {
     switch (switchPos) {
       case 0x00 -> {
-        return new NonProcessorShallowAutonCommand(
+        return new NonProcessorShallowSlowAutonCommand(
             driveSubsystem,
             pathHandler,
             robotStateSubsystem,
@@ -157,7 +159,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             elevatorSubsystem,
             tagAlignSubsystem,
             visionSubsystem,
-            "startToJ",
+            "startToJSlow",
             new ArrayList<Character>(Arrays.asList('k', 'l')),
             new ArrayList<Integer>(Arrays.asList(4, 4)),
             'j',
@@ -165,7 +167,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonProcessorShallow);
       }
       case 0x20 -> {
-        return new ProcessorShallowAutonCommand(
+        return new ProcessorShallowSlowAutonCommand(
             driveSubsystem,
             pathHandler,
             robotStateSubsystem,
@@ -175,7 +177,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             elevatorSubsystem,
             tagAlignSubsystem,
             visionSubsystem,
-            "startPToE",
+            "startPToESlow",
             new ArrayList<Character>(Arrays.asList('d', 'c')),
             new ArrayList<Integer>(Arrays.asList(4, 4)),
             'e',

@@ -32,6 +32,37 @@ public class PathHandlerConstants {
     }
   };
 
+  public static final String[][] kSlowShallowPathNames = {
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "JTofetchSlow",
+      "KTofetchSlow",
+      "LTofetchSlow"
+    },
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchToKSlow",
+      "fetchToLSlow"
+    }
+  };
+
   public static final String[][] kProcessorShallowPathNames = {
     {
       "FiveMeterTestPath",
@@ -52,6 +83,37 @@ public class PathHandlerConstants {
       "FiveMeterTestPath",
       "fetchPToC",
       "fetchPToD",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    }
+  };
+
+  public static final String[][] kProcessorSlowShallowPathNames = {
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "CTofetchPSlow",
+      "DTofetchPSlow",
+      "ETofetchPSlow",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    },
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchPToCSlow",
+      "fetchPToDSlow",
       "FiveMeterTestPath",
       "FiveMeterTestPath",
       "FiveMeterTestPath",
