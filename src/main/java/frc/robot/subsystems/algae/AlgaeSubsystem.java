@@ -57,6 +57,12 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
     return curState == AlgaeStates.HAS_ALGAE;
   }
 
+  public boolean hasAlgaeSuperCycle() {
+    return curState == AlgaeStates.HAS_ALGAE
+        || (FastMath.abs(inputs.velocity) < AlgaeConstants.kSuperCycleHasAlgaeVelThres
+            && inputs.isBeamBroken);
+  }
+
   public void setSpeed(double speed) {
     // io.setSpeed(speed);
     // desiredSpeed = speed;

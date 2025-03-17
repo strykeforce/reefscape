@@ -17,6 +17,8 @@ public interface BiscuitIO {
 
   public default void setPosition(Angle position, boolean hasAlgae) {}
 
+  public default void setIsRemovingAlgae(boolean isRemoving) {}
+
   public default void updateInputs(BiscuitIOInputs inputs) {}
 
   public default void registerWith(TelemetryService telemetry) {}

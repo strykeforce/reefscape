@@ -47,6 +47,7 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   private Angle offset;
   private Alert rangeAlert = new Alert("Biscuit overextended! Shuting down!", AlertType.kError);
   private boolean lastHadAlgae = false;
+  private boolean isRemovingAlgae = false;
 
   private TalonFXSConfigurator configurator;
   private MotionMagicDutyCycle positionRequest =
@@ -76,12 +77,21 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   }
 
   @Override
+  public void setIsRemovingAlgae(boolean isRemoving) {
+    this.isRemovingAlgae = isRemoving;
+  }
+
+  @Override
   public void setPosition(Angle position, boolean hasAlgae) {
     if (hasAlgae != lastHadAlgae) {
       if (hasAlgae) {
-        configurator.apply(RobotConstants.alageMotionConfig);
+        if (isRemovingAlgae) {
+          configurator.apply(RobotConstants.algaeMotionConfig);
+        } else {
+          configurator.apply(RobotConstants.algaeMotionConfig);
+        }
       } else {
-        configurator.apply(RobotConstants.noAlageMotionConfig);
+        configurator.apply(RobotConstants.noAlgaeMotionConfig);
       }
       lastHadAlgae = hasAlgae;
     }
@@ -90,12 +100,11 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
 
   @Override
   public void updateInputs(BiscuitIOInputs inputs) {
+    BaseStatusSignal.refreshAll(velocity, position, rawPulseWidth);
     inputs.velocity = velocity.getValueAsDouble();
     inputs.position = position.getValueAsDouble();
     inputs.rawPulseWidth = rawPulseWidth.getValueAsDouble();
     inputs.didZero = didZero;
-
-    BaseStatusSignal.refreshAll(velocity, position, rawPulseWidth);
   }
 
   @Override
