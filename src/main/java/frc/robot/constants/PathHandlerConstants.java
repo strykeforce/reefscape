@@ -32,6 +32,37 @@ public class PathHandlerConstants {
     }
   };
 
+  public static final String[][] kSlowShallowPathNames = {
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "JTofetchSlow",
+      "KTofetchSlow",
+      "LTofetchSlow"
+    },
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchToKSlow",
+      "fetchToLSlow"
+    }
+  };
+
   public static final String[][] kProcessorShallowPathNames = {
     {
       "FiveMeterTestPath",
@@ -62,6 +93,70 @@ public class PathHandlerConstants {
       "FiveMeterTestPath"
     }
   };
+
+  public static final String[][] kProcessorSlowShallowPathNames = {
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "CTofetchPSlow",
+      "DTofetchPSlow",
+      "ETofetchPSlow",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    },
+    {
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchPToCSlow",
+      "fetchPToDSlow",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath"
+    }
+  };
+
+  public static final String[][] kDeepPathNames = {
+    {
+      "ATofetchD",
+      "BTofetchD",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "KTofetchD",
+      "LTofetchD"
+    },
+    {
+      "fetchDToA",
+      "fetchDToB",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "FiveMeterTestPath",
+      "fetchDToK",
+      "fetchDToL"
+    }
+  };
+
   public static final double kWaitingTime = 2.0;
-  public static final double kServoRadius = 1.4;
+  public static final double kServoRadius = 1.7;
+  public static final double kMaxServoErrorY = 0.4;
 }

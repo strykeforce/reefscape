@@ -47,8 +47,8 @@ public class BiscuitConstants {
   // public static final Angle kBargeBackwardSetpoint = Rotations.of(-12.3489); // 9.089
 
   // jogging
-  public static final double kJogAmountUp = 10;
-  public static final double kJogAmountDown = -10;
+  public static final double kJogAmountUp = 3;
+  public static final double kJogAmountDown = -3;
 
   // Soft Limits
   // public static final Angle kMaxFwd = kMicAlgaeSetpoint.plus(Rotations.of(5));

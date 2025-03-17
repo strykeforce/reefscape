@@ -42,6 +42,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   private boolean lastPath;
   private boolean scoreLeft;
   private boolean hasStaged = false;
+  private boolean hasPreppedCoral = false;
 
   private SwerveSample desiredState;
   private Pose2d finalPose;
@@ -167,9 +168,17 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
   @Override
   public void execute() {
-    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED && !hasStaged) {
+    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED
+        && !hasStaged
+        && timer.hasElapsed(AutonConstants.kInitPathPrestageTime)) {
       hasStaged = true;
       robotStateSubsystem.toAutonPrestage();
+    }
+    if (tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+            <= AutonConstants.kElevatorStageRadius
+        && !hasPreppedCoral) {
+      hasPreppedCoral = true;
+      robotStateSubsystem.toPrepCoral();
     }
     if (isTherePath) {
       if (!isServoing) {
@@ -178,7 +187,6 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
         if (shouldTransitionToServoing()) {
           isServoing = true;
-          robotStateSubsystem.toPrepCoral();
           tagAlignSubsystem.startAuto(
               mirrorTrajectory ? Alliance.Red : Alliance.Blue,
               mirrorToProcessor ? !scoreLeft : scoreLeft,

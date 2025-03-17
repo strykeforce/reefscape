@@ -101,7 +101,12 @@ public class Robot extends LoggedRobot {
     m_robotContainer.setIsAutoPlacing(true);
     m_robotContainer.setScoringSide(ScoreSide.LEFT);
     m_robotContainer.disableNoMotionCal();
-    m_robotContainer.stow();
+
+    if (m_robotContainer.wasScoringCoral()) {
+      m_robotContainer.finishAuto();
+    } else {
+      m_robotContainer.stow();
+    }
   }
 
   @Override

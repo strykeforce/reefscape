@@ -44,6 +44,7 @@ public class AutoReefCycleCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     tagAlignSubsystem.terminate();
+    driveSubsystem.setIgnoreSticks(false);
   }
 
   @Override

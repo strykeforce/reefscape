@@ -68,6 +68,10 @@ public interface SwerveIO {
     return null;
   }
 
+  public default Rotation2d getPigeonGyroOffset() {
+    return null;
+  }
+
   public default void setDriveCoast(boolean coast) {}
 
   public default void setOdometry(OdometryStrategy Odom) {}

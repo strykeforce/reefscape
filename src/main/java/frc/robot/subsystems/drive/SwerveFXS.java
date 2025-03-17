@@ -204,6 +204,10 @@ public class SwerveFXS implements SwerveIO, Checkable {
     return sum / 2.0;
   }
 
+  public Rotation2d getPigeonGyroOffset() {
+    return swerveDrive.getGyroOffset();
+  }
+
   @Override
   public void setOdometry(OdometryStrategy odom) {
     swerveDrive.setOdometry(odom);

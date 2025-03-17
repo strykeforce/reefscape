@@ -43,9 +43,24 @@ public class ClimbConstants {
 
   // Climb positions
   // public static final Angle kClimbCagePos = Rotations.of(); // will test
-  public static final Double kClimbRatchedEngage = -0.12;
+  public static final double kClimbRatchedEngage = -0.12;
   public static final double kFullyClimbed = kArmMaxFwd;
-  public static final double kClimbOpenLoopSpeed = 4.0;
+  public static final double kClimbOpenLoopSpeed = 3.0;
+
+  // Cage location info
+  public static final double kCenterX = DriveConstants.kFieldMaxX / 2.0;
+  public static final double kCenterY = DriveConstants.kFieldMaxY / 2.0;
+  public static final double[] kCageOffsetY = {1.0541, 2.143125, 3.235325};
+  public static final double kCageOffsetX = 1.2;
+
+  public static final double kClimbRobotOffset = 0.0075;
+
+  public static final double kFinalDriveVx = 0.25;
+  public static final double kMaxDistX = 3;
+  // Align end conditions
+  public static final double kCloseEnoughX = 0.1;
+  public static final double kCloseEnoughY = 0.03;
+  public static final double kClimbAngleGood = RobotStateConstants.kClimbAngleSmall;
 
   public static TalonFXConfiguration getPivotArmFxConfig() {
     TalonFXConfiguration armFxConfig = new TalonFXConfiguration();

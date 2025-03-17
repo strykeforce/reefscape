@@ -7,10 +7,13 @@ public class RobotStateConstants {
   public static final double kBlueBargeSafeX = 7.6;
   public static final double kRedBargeSafeX = DriveConstants.kFieldMaxX - kBlueBargeSafeX;
 
-  public static final double kCoralEjectTimer = 0.75;
+  public static final double kCoralEjectTimer = 0.25;
   public static final double kAlgaeEjectTimer = 0.5;
 
   public static final double kProcessorStowRadius = 0.5;
+
+  // Super Cycle Constants
+  public static final double kBiscuitSuperCycleSafeThres = 6;
 
   // Elevator good for climb, tolerates stuck coral
   public static final double kElevatorClimbMax = 11.4;
