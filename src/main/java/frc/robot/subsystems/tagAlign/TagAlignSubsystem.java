@@ -50,6 +50,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private boolean scoreLeft = true;
   private int currentThresCount = 0;
   private boolean finalDrive = false;
+  private double yError = 2767;
 
   // private long startServoTime;
 
@@ -92,6 +93,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void setProceedToAlign(boolean proceed) {
     this.proceedToAlign = proceed;
+  }
+
+  public boolean yErrorSmall() {
+    return curState == TagAlignStates.DONE
+        || finalDrive
+        || yError < TagServoingConstants.kSmallYThres;
   }
 
   public int computeHexant(Alliance color) {
@@ -234,6 +241,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     fieldRelHexant = computeFieldRelHexant(alliance);
     proceedToAlign = false;
+    this.yError =
+        targetPose
+            .getTranslation()
+            .minus(driveSubsystem.getPoseMeters().getTranslation())
+            .rotateBy(Rotation2d.fromRadians(-TagServoingConstants.kAngleTarget[fieldRelHexant]))
+            .getY();
 
     // Logger.recordOutput("TagAlignSubsystem/TargetTag", targetTagId);
     // Logger.recordOutput("TagAlignSubsystem/GoalTargetDiag", goalTargetDiag);
@@ -365,12 +378,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             vY = driveY.calculate(rotated.getY(), rotatedTarget.getY());
             Logger.recordOutput("TagAlignSubsystem/DriveXError", driveX.getError());
             Logger.recordOutput("TagAlignSubsystem/DriveYError", driveY.getError());
+            yError = driveY.getError();
           }
           case TAG_ALIGN -> {
             vX = alignX.calculate(rotated.getX(), rotatedTarget.getX());
             vY = alignY.calculate(rotated.getY(), rotatedTarget.getY());
             Logger.recordOutput("TagAlignSubsystem/DriveXError", alignX.getError());
             Logger.recordOutput("TagAlignSubsystem/DriveYError", alignY.getError());
+            yError = alignY.getError();
           }
           default -> {}
         }

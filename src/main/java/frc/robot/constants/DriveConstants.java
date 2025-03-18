@@ -43,9 +43,9 @@ public class DriveConstants {
 
   public static final double kWheelDiameterInches = 3.375;
   public static final double kMaxSpeedMetersPerSecond = 3.782;
-  public static final double kSpeedStillThreshold = 0.1; // meters per second
-  public static final double kGyroRateStillThreshold = 10.0; // 25  5 degrees per second
-  public static final double kGyroDifferentThreshold = 0.5; // 5 degrees
+  public static final double kSpeedStillThreshold = 0.2; // meters per second
+  public static final double kGyroRateStillThreshold = 10.0; // was 10
+  public static final double kGyroDifferentThreshold = 0.3; // 5 degrees
   public static final int kGyroDifferentCount = 3;
 
   public static final double kRobotLength = 0.61595;

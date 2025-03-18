@@ -621,6 +621,17 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(9, 1);
 
+    Shuffleboard.getTab("Match")
+        .add(
+            "Clear Coral",
+            new InstantCommand(
+                () -> {
+                  funnelSubsystem.clearCoral();
+                  coralSubsystem.setState(CoralSubsystem.CoralState.EMPTY);
+                }))
+        .withSize(1, 1)
+        .withPosition(9, 0);
+
     // Shuffleboard.getTab("Match")
     // .addBoolean(
     // "Cams Connected",

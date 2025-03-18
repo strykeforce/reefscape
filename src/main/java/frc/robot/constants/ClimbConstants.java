@@ -45,7 +45,7 @@ public class ClimbConstants {
   // public static final Angle kClimbCagePos = Rotations.of(); // will test
   public static final double kClimbRatchedEngage = -0.12;
   public static final double kFullyClimbed = kArmMaxFwd;
-  public static final double kClimbOpenLoopSpeed = 3.0;
+  public static final double kClimbOpenLoopSpeed = 11.0;
 
   // Cage location info
   public static final double kCenterX = DriveConstants.kFieldMaxX / 2.0;

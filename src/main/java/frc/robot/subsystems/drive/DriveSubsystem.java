@@ -47,6 +47,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private double driveMultiplier = 1.0;
 
   private int gyroDifferentCount = 0;
+  private int gyroCorrectionCount = 0;
 
   private boolean ignoreSticks = false;
 
@@ -449,6 +450,14 @@ public class DriveSubsystem extends MeasurableSubsystem {
     Logger.processInputs(getName(), inputs);
     org.littletonrobotics.junction.Logger.recordOutput(
         "DriveSubsystem/Swerve Pose", inputs.swervePose);
+
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Gyro Correction Count", gyroCorrectionCount);
+
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "DriveSubsystem/Gyro Disagreement",
+        inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees());
+
     if (Math.abs(inputs.gyroRotation2d.minus(inputs.navxRotation2d).getDegrees())
         > DriveConstants.kGyroDifferentThreshold) {
       gyroDifferentCount++;
@@ -463,6 +472,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
           inputs.gyroRotation2d.getDegrees(),
           inputs.navxRotation2d.getDegrees());
       gyroDifferentCount = 0;
+      gyroCorrectionCount++;
     }
 
     switch (currDriveState) {
