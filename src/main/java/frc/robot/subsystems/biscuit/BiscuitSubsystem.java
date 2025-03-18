@@ -23,7 +23,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   private BiscuitIO io;
   private BiscuitIOInputsAutoLogged inputs = new BiscuitIOInputsAutoLogged();
   private Angle setPoint = Rotations.of(0);
+  private Angle prevSetPoint = Rotations.of(0);
   private boolean hasZeroed = false;
+  private int zeroCounter = 0;
 
   public BiscuitState curState = BiscuitState.NORMAL;
 
@@ -59,6 +61,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   }
 
   public void zero() {
+    zeroCounter++;
     if (!getIsEncoderBroken() && curState != BiscuitState.BROKEN) {
       curState = BiscuitState.ZEROING;
       hasZeroed = io.zero();
@@ -98,19 +101,12 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("Biscuit setPoint", setPoint.in(Rotations));
     Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
     Logger.recordOutput("Biscuit/curState", curState);
+    Logger.recordOutput("Biscuit/zeroCounts", zeroCounter);
 
-    /*
-     double pos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
-     double error =
-         Math.abs(BiscuitConstants.kTicksPerRot * (RobotConstants.kZero - pos) - inputs.position);
-
-     if (setPoint == BiscuitConstants.kStowSetpoint
-         && isFinished()
-         && inputs.velocity < BiscuitConstants.kRezeroVelocityCloseEnough
-         && error >= BiscuitConstants.kRezeroErrorCloseEnough) {
-       logger.info("Rezeroing Biscuit");
-       zero();
-    } */
+    if (setPoint != prevSetPoint && isFinished()) {
+      zero();
+      prevSetPoint = setPoint;
+    }
   }
 
   @Override
