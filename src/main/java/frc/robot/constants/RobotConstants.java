@@ -336,7 +336,7 @@ public class RobotConstants {
     public static double kTicksPerRot = 160;
 
     public static final double kZero = .67;
-    public static final double kSafeToStowUpper = 40 / 2;
+    public static final double kSafeToStowUpper = 4.06; // was 20
     public static final double kSafeToStowLower = -5 / 2;
 
     // Speeds
