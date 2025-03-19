@@ -383,6 +383,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     toReefAlign(getAlgaeOnCycle, true);
   }
 
+  public void toReefAlignAlgaeAuto() {
+    toReefAlign(true, true);
+  }
+
   private void toReefAlign(boolean getAlgae, boolean drive) {
     if (!safeMoveElevator()) {
       logger.info("Elevator movement is dangerous!");

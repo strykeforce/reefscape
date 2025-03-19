@@ -31,6 +31,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
   private List<Character> NodeNames;
   private List<Integer> NodeLevels;
   private char startNode;
+  private boolean lastAlgae;
 
   public NonProcessorShallowAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -46,7 +47,8 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       List<Character> NodeNames,
       List<Integer> NodeLevels,
       char startNode,
-      Boolean startScoreLeft,
+      boolean startScoreLeft,
+      boolean lastAlgae,
       Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
@@ -59,6 +61,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     this.NodeNames = NodeNames;
     this.NodeLevels = NodeLevels;
     this.startNode = startNode;
+    this.lastAlgae = lastAlgae;
 
     startPath =
         new DriveAutonServoCommand(
@@ -116,6 +119,7 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     pathHandler.setNodeNames(NodeNames);
     pathHandler.setNodeLevels(NodeLevels);
     pathHandler.setStartNode(startNode);
+    pathHandler.setGetAlgaeLast(lastAlgae);
     // pathHandler.reassignAlliance();
   }
 }

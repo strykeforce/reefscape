@@ -57,6 +57,7 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean teleop = false;
   private boolean isPlacing = false;
   private boolean hasPreppedCoral = false;
+  private boolean algaeOnLast = false;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -125,6 +126,10 @@ public class PathHandler extends MeasurableSubsystem {
 
   public void setProceedToNext(boolean proceed) {
     this.proceedToNext = proceed;
+  }
+
+  public void setGetAlgaeLast(boolean algae) {
+    this.algaeOnLast = algae;
   }
 
   public void startPathHandler() {
@@ -223,7 +228,11 @@ public class PathHandler extends MeasurableSubsystem {
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
         if (!hasPreppedCoral) {
-          robotStateSubsystem.toPrepCoral();
+          if (algaeOnLast && nodeNames.size() == 1) {
+            robotStateSubsystem.toReefAlignAlgaeAuto();
+          } else {
+            robotStateSubsystem.toPrepCoral();
+          }
           hasPreppedCoral = true;
         }
         curState = PathStates.DRIVE_PLACE_SERVO;
@@ -414,7 +423,11 @@ public class PathHandler extends MeasurableSubsystem {
         <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
             && !hasPreppedCoral) {
           hasPreppedCoral = true;
-          robotStateSubsystem.toPrepCoral();
+          if (algaeOnLast && nodeNames.size() == 1) {
+            robotStateSubsystem.toReefAlignAlgaeAuto();
+          } else {
+            robotStateSubsystem.toPrepCoral();
+          }
         }
         if (!runningPath) {
           if (nodeNames.size() > 0) {
@@ -437,7 +450,11 @@ public class PathHandler extends MeasurableSubsystem {
         <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
             && !hasPreppedCoral) {
           hasPreppedCoral = true;
-          robotStateSubsystem.toPrepCoral();
+          if (algaeOnLast && nodeNames.size() == 1) {
+            robotStateSubsystem.toReefAlignAlgaeAuto();
+          } else {
+            robotStateSubsystem.toPrepCoral();
+          }
         }
         if (runningPath && isServoing) {
           drivePathServo();
