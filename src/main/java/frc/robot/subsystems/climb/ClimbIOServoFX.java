@@ -2,6 +2,7 @@ package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -12,6 +13,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Servo;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbIO.ClimbIOInputs;
@@ -36,7 +38,8 @@ public class ClimbIOServoFX implements ClimbIO {
       new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0).withSlot(0);
   private VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(false);
 
-  StatusSignal<Angle> currPosition;
+  private StatusSignal<Angle> currPosition;
+  private StatusSignal<AngularVelocity> currVelocity;
 
   public ClimbIOServoFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -52,6 +55,7 @@ public class ClimbIOServoFX implements ClimbIO {
     configuratorFront.apply(ClimbConstants.getPivotArmFxConfig());
 
     currPosition = talonFxPivotArmFront.getPosition();
+    currVelocity = talonFxPivotArmFront.getVelocity();
   }
 
   // @Override
@@ -83,7 +87,9 @@ public class ClimbIOServoFX implements ClimbIO {
 
   @Override
   public void updateInputs(ClimbIOInputs inputs) {
-    inputs.position = currPosition.refresh().getValueAsDouble();
+    BaseStatusSignal.refreshAll(currVelocity, currPosition);
+    inputs.position = currPosition.getValueAsDouble();
+    inputs.velocity = currVelocity.getValueAsDouble();
     inputs.ratchetServoPosition = ratchetServo.getPosition();
     inputs.pinServoPosition = pinServo.getPosition();
   }

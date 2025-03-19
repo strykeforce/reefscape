@@ -96,17 +96,17 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.cancel();
     }
     if (!m_robotContainer.hasElevatorZeroed()) m_robotContainer.zeroElevator();
-
+    else if (m_robotContainer.wasScoringCoral()) {
+      m_robotContainer.finishAuto();
+    } else {
+      m_robotContainer.stow();
+    }
+    
     m_robotContainer.setIsAuto(false);
     m_robotContainer.setIsAutoPlacing(true);
     m_robotContainer.setScoringSide(ScoreSide.LEFT);
     m_robotContainer.disableNoMotionCal();
 
-    if (m_robotContainer.wasScoringCoral()) {
-      m_robotContainer.finishAuto();
-    } else {
-      m_robotContainer.stow();
-    }
   }
 
   @Override

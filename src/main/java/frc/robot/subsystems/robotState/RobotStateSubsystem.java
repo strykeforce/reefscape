@@ -726,6 +726,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       case TO_STOW -> {
         if (biscuitSubsystem.isFinished() && elevatorSubsystem.isFinished()) {
+          driveSubsystem.removeDriveMultiplier();
           setState(RobotStates.STOW);
         }
       }

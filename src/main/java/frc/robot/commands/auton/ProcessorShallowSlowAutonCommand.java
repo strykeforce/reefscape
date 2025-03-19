@@ -116,6 +116,7 @@ public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
     pathHandler.setNodeNames(NodeNames);
     pathHandler.setNodeLevels(NodeLevels);
     pathHandler.setStartNode(startNode);
+    pathHandler.setGetAlgaeLast(false);
     // pathHandler.reassignAlliance();
   }
 }
