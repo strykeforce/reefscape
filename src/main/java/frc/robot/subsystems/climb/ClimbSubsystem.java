@@ -160,10 +160,10 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
         if (climbInputs.position >= ClimbConstants.kClimbRatchedEngage && !isRatchetOn) {
           enableRatchet(true);
         }
-        if (climbInputs.position >= ClimbConstants.kSpeedUpPos && !spedUp) {
-          io.setPercent(ClimbConstants.kClimbOpenLoopFastSpeed);
-          spedUp = true;
-        }
+        // if (climbInputs.position >= ClimbConstants.kSpeedUpPos && !spedUp) {
+        //   io.setPercent(ClimbConstants.kClimbOpenLoopFastSpeed);
+        //   spedUp = true;
+        // }
         if (isFinished()) {
           io.setCoastMode(true);
           setState(ClimbState.CLIMBED);

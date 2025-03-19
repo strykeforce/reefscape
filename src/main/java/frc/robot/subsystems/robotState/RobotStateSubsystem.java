@@ -867,7 +867,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case HP_ALGAE -> {
         if (algaeSubsystem.hasAlgae()) {
-          toProcessor();
+          toStowSafe();
         }
       }
       case PROCESSOR_ALGAE -> {
