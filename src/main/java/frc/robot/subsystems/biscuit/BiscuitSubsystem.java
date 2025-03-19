@@ -11,6 +11,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.RobotConstants;
 import java.util.Set;
+import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -60,15 +61,18 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     return RotationsPerSecond.of(inputs.velocity);
   }
 
-  public void zero() {
+  public void zeroCheck() {
     zeroCounter++;
     if (!getIsEncoderBroken() && curState != BiscuitState.BROKEN) {
-      curState = BiscuitState.ZEROING;
       hasZeroed = io.zero();
       curState = BiscuitState.NORMAL;
     } else {
       curState = BiscuitState.BROKEN;
     }
+  }
+
+  public void zero() {
+    io.zero();
   }
 
   public boolean isFinished() {
@@ -81,7 +85,8 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   }
 
   private boolean getIsEncoderBroken() {
-    return MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1) >= BiscuitConstants.kToFar;
+    double curPos = MathUtil.inputModulus(inputs.rawPulseWidth, 0, 1);
+    return curPos >= BiscuitConstants.kInFunnel || curPos <= BiscuitConstants.kTooLow;
   }
 
   @Override
@@ -90,23 +95,28 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
 
     switch (curState) {
       case NORMAL:
+        if (isFinished()
+            && FastMath.abs(inputs.velocity) <= BiscuitConstants.kZeroVelThresh
+            && setPoint != prevSetPoint) curState = BiscuitState.CHECK_ZERO;
         break;
-      case ZEROING:
+      case CHECK_ZERO:
+        prevSetPoint = setPoint;
+        zeroCheck();
         break;
       case BROKEN:
         break;
     }
 
     Logger.processInputs(getName(), inputs);
-    Logger.recordOutput("Biscuit setPoint", setPoint.in(Rotations));
-    Logger.recordOutput("Is Biscuit Finished", isFinished() ? 1.0 : 0.0);
+    Logger.recordOutput("Biscuit/setPoint", setPoint.in(Rotations));
+    Logger.recordOutput("Biscuit/IsFinished", isFinished() ? 1.0 : 0.0);
     Logger.recordOutput("Biscuit/curState", curState);
     Logger.recordOutput("Biscuit/zeroCounts", zeroCounter);
 
-    if (setPoint != prevSetPoint && isFinished()) {
-      zero();
-      prevSetPoint = setPoint;
-    }
+    // if (setPoint != prevSetPoint && isFinished()) {
+    //   zeroCheck();
+    //   prevSetPoint = setPoint;
+    // }
   }
 
   @Override
@@ -124,7 +134,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
 
   public enum BiscuitState {
     NORMAL,
-    ZEROING,
+    CHECK_ZERO,
     BROKEN
   }
 }
