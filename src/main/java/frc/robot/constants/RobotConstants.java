@@ -336,7 +336,7 @@ public class RobotConstants {
     public static double kTicksPerRot = 160;
 
     public static final double kZero = .67;
-    public static final double kSafeToStowUpper = 40 / 2;
+    public static final double kSafeToStowUpper = 4.06; // was 20
     public static final double kSafeToStowLower = -5 / 2;
 
     // Speeds
@@ -370,7 +370,7 @@ public class RobotConstants {
     public static Angle kHpAlgaeSetpoint = kBiscuitStowSetpoint;
 
     // Algae scoring
-    public static Angle kProcessorSetpoint = Rotations.of(15.0139);
+    public static Angle kProcessorSetpoint = Rotations.of(14.634); // was 15.0139
     public static Angle kBargeSetpoint = Rotations.of(2.697);
     // public static Angle kBargeBackwardSetpoint = Rotations.of(-12.3489 / 2); // 9.089
 

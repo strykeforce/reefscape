@@ -4,9 +4,10 @@ public class BiscuitConstants {
 
   // public static final double kZero = .37;
   public static final int talonID = 25;
-  public static final double kCloseEnough = 0.05;
-  public static final double kRezeroVelocityCloseEnough = 0.1; // FIXME: find a real value
-  public static final double kRezeroErrorCloseEnough = 0.1; // FIXME: find a real value
+  public static final double kCloseEnough = 1.3; // was 0.05
+  public static final double kInFunnel = 0.94; // TODO Put real numbers in here
+  public static final double kTooLow = 0.217;
+  public static final double kZeroVelThresh = 2;
   // public static final double kSafeToStowUpper = 40;
   // public static final double kSafeToStowLower = -5;
 

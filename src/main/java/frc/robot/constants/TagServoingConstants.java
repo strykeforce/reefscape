@@ -60,9 +60,11 @@ public class TagServoingConstants {
   // End conditions
   public static final double kInitialCloseEnough = 0.1;
   public static final double kCoralDriveXCloseEnough = 0.03;
-  public static final double kCoralDriveYCloseEnough = 0.025;
+  public static final double kCoralDriveYCloseEnough = 0.015; // was 0.025
   public static final double kAlgaeDriveXCloseEnough = 0.03;
-  public static final double kAlgaeDriveYCloseEnough = 0.025;
+  public static final double kAlgaeDriveYCloseEnough = kCoralDriveYCloseEnough;
+
+  public static final double kSmallYThres = 0.3; // For elevator staging
 
   public static final double kEndDriveCurrentThreshold = 25;
   public static final int kEndCountThreshold = 1;

@@ -104,6 +104,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
           }
 
           if (slowCounts >= AlgaeConstants.kHasAlgaeCounts) {
+            slowCounts = 0;
             hold();
             setState(AlgaeStates.HAS_ALGAE);
           }

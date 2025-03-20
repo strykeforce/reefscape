@@ -182,6 +182,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
             'j',
             false,
+            false,
             AutonConstants.kNonProcessorShallow);
       }
       case 0x02 -> {
@@ -199,6 +200,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
             new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
             'j',
+            false,
             false,
             AutonConstants.kNonProcessorShallow);
       }
@@ -218,7 +220,28 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
             'k',
             true,
+            false,
             AutonConstants.kNonProcessorDeep);
+      }
+
+      case 0x04 -> {
+        return new NonProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startToJ",
+            new ArrayList<Character>(Arrays.asList('k', 'l', 'k')),
+            new ArrayList<Integer>(Arrays.asList(4, 4, 3)),
+            'j',
+            false,
+            true,
+            AutonConstants.kNonProcessorShallow);
       }
 
       case 0x20 -> {

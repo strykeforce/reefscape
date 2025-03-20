@@ -21,14 +21,13 @@ import edu.wpi.first.units.measure.Angle;
 public class ElevatorConstants {
 
   public static final double kCloseEnoughRotations = 0.4;
-  public static final double kStowThresholdDone = 0.3676757 + 0.5;
   public static final double kMaxFwd = 53;
   public static final double kMaxRev = 0.1;
   public static final double kElevatorLiftHeight = 1; // for pit command
   public static final int kZeroMultiple =
       0; // some constant to multiply, add by to turn the analog input into a position
-  public static final double kZeroSpeed = -0.05;
-  public static final double kZeroVolts = -0.5;
+  //   public static final double kZeroSpeed = -0.05;
+  public static final double kZeroVolts = -0.75;
   public static final int kZeroCounter = 2;
   public static final double kZeroedThreshhold = 0.025;
 
@@ -65,7 +64,8 @@ public class ElevatorConstants {
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(3.348); // was 4.297 -> 5.964
+  public static final Angle kProcessorSetpoint =
+      Rotations.of(1.49365); // was 4.297 -> 5.964 -> 3.348
   public static final Angle kBargeSetpoint = Rotations.of(44.785); // 41.936
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 

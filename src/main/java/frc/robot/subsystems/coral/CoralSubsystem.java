@@ -33,7 +33,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     return inputs.velocity;
   }
 
-  private void setState(CoralState state) {
+  public void setState(CoralState state) {
     logger.info("{} -> {}", curState, state);
     this.curState = state;
   }
