@@ -41,7 +41,7 @@ public class BattMonSubsystem extends SubsystemBase {
           curState = battMonState.WARNING;
         } 
           break;
-        }
+        
 
       case WARNING:
         if (inputs.breakerTemp > curDangerThreshold) {
@@ -54,7 +54,7 @@ public class BattMonSubsystem extends SubsystemBase {
           curState = battMonState.NORMAL;
         } 
           break;
-        }
+        
 
       case DANGER:
         if (inputs.breakerTemp <= recoveryTempThreshold) {
@@ -63,7 +63,7 @@ public class BattMonSubsystem extends SubsystemBase {
           curState = battMonState.WARNING;
         }
     }
-  }
+  
 
   public battMonState getState() {
     return curState;
