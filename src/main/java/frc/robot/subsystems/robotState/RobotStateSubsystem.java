@@ -598,6 +598,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     processorReleasePose = driveSubsystem.getPoseMeters();
     Logger.recordOutput("RobotState/Processor Release Pose", processorReleasePose);
+    driveSubsystem.removeDriveMultiplier();
 
     switch (algaeHeight) {
       case LOW -> {
