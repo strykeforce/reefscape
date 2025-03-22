@@ -119,7 +119,9 @@ public class ElevatorConstants {
     fxConfig.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs().withMotionMagicCruiseVelocity(75).withMotionMagicAcceleration(300);
+        new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(75)
+            .withMotionMagicAcceleration(225); // was 300
     fxConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =

@@ -242,8 +242,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ledSubsystem.setGetAlgeaLights(getAlgaeOnCycle);
   }
 
-  public void setBiscuitTransfer(Angle setpoint) {
-    if (elevatorSubsystem.getPosition().gt(ElevatorConstants.kBiscuitSafeThreshold)) {
+  public void setBiscuitTransfer(Angle setpoint, boolean overrideThreshold) {
+    if (overrideThreshold
+        || elevatorSubsystem.getPosition().gt(ElevatorConstants.kBiscuitSafeThreshold)) {
       biscuitSubsystem.setPosition(setpoint, hasAlgae());
     }
     nextBiscuitSetpoint = setpoint;
@@ -310,7 +311,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.setIgnoreSticks(false);
 
     if (biscuitSubsystem.isSafeToStow()) {
-      setBiscuitTransfer(RobotConstants.kStowSetpoint);
+      setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
       algaeSubsystem.hold();
 
@@ -321,7 +322,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStowSafe() {
-    setBiscuitTransfer(RobotConstants.kStowSetpoint);
+    setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
     algaeSubsystem.hold();
@@ -330,7 +331,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStowSequential() {
-    setBiscuitTransfer(RobotConstants.kStowSetpoint);
+    setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
     algaeSubsystem.hold();
@@ -340,7 +341,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toAutonPrestage() {
     coralLoc = CoralLoc.CORAL;
-    setBiscuitTransfer(RobotConstants.kPrestageSetpoint);
+    setBiscuitTransfer(RobotConstants.kPrestageSetpoint, false);
     elevatorSubsystem.setPosition(ElevatorConstants.kAutoPrestageSetpoint);
     funnelSubsystem.stopMotor();
 
@@ -348,7 +349,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toFunnelLoad() {
-    setBiscuitTransfer(RobotConstants.kFunnelSetpoint);
+    setBiscuitTransfer(RobotConstants.kFunnelSetpoint, true);
     coralSubsystem.intake();
     elevatorSubsystem.setPosition(RobotConstants.kElevatorFunnelSetpoint);
 
@@ -356,7 +357,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toPrestage() {
-    setBiscuitTransfer(RobotConstants.kPrestageSetpoint);
+    setBiscuitTransfer(RobotConstants.kPrestageSetpoint, false);
 
     prestagingForAlgae = getAlgaeOnCycle;
 
@@ -424,7 +425,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     if (wantAlgae && !algaeSafe) {
       algaeSubsystem.intake();
-      setBiscuitTransfer(RobotConstants.kPrestageAlgaeSetpoint);
+      setBiscuitTransfer(RobotConstants.kPrestageAlgaeSetpoint, true);
 
       switch (getAlgaeLevel()) {
         case L2 -> {
@@ -451,11 +452,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
       switch (getAlgaeLevel()) {
         case L2 -> {
-          setBiscuitTransfer(RobotConstants.kL2AlgaeSetpoint);
+          setBiscuitTransfer(RobotConstants.kL2AlgaeSetpoint, true);
           elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeSetpoint);
         }
         case L3 -> {
-          setBiscuitTransfer(RobotConstants.kL3AlgaeSetpoint);
+          setBiscuitTransfer(RobotConstants.kL3AlgaeSetpoint, true);
           elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeSetpoint);
         }
         default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
@@ -476,19 +477,19 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           currentLevel = scoringLevel;
           switch (scoringLevel) {
             case L1 -> {
-              setBiscuitTransfer(RobotConstants.kL1CoralSetpoint);
+              setBiscuitTransfer(RobotConstants.kL1CoralSetpoint, true);
               elevatorSubsystem.setPosition(ElevatorConstants.kL1CoralSetpoint);
             }
             case L2 -> {
-              setBiscuitTransfer(RobotConstants.kL2CoralSetpoint);
+              setBiscuitTransfer(RobotConstants.kL2CoralSetpoint, true);
               elevatorSubsystem.setPosition(ElevatorConstants.kL2CoralSetpoint);
             }
             case L3 -> {
-              setBiscuitTransfer(RobotConstants.kL3CoralSetpoint);
+              setBiscuitTransfer(RobotConstants.kL3CoralSetpoint, true);
               elevatorSubsystem.setPosition(ElevatorConstants.kL3CoralSetpoint);
             }
             case L4 -> {
-              setBiscuitTransfer(RobotConstants.kL4CoralSetpoint);
+              setBiscuitTransfer(RobotConstants.kL4CoralSetpoint, true);
               elevatorSubsystem.setPosition(ElevatorConstants.kL4CoralSetpoint);
             }
           }
@@ -535,7 +536,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           return;
         }
 
-        setBiscuitTransfer(RobotConstants.kFloorAlgaeSetpoint);
+        setBiscuitTransfer(RobotConstants.kFloorAlgaeSetpoint, true);
         elevatorSubsystem.setPosition(ElevatorConstants.kFloorAlgaeSetpoint);
 
         setState(RobotStates.FLOOR_ALGAE, true);
@@ -545,7 +546,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           return;
         }
 
-        setBiscuitTransfer(RobotConstants.kMicAlgaeSetpoint);
+        setBiscuitTransfer(RobotConstants.kMicAlgaeSetpoint, true);
         elevatorSubsystem.setPosition(ElevatorConstants.kMicAlgaeSetpoint);
 
         setState(RobotStates.MIC_ALGAE, true);
@@ -633,7 +634,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     algaeSubsystem.intake();
 
-    setBiscuitTransfer(RobotConstants.kHpAlgaeSetpoint);
+    setBiscuitTransfer(RobotConstants.kHpAlgaeSetpoint, false);
     elevatorSubsystem.setPosition(ElevatorConstants.kHpAlgaeSetpoint);
 
     setState(RobotStates.HP_ALGAE, true);
@@ -650,7 +651,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       return;
     }
 
-    setBiscuitTransfer(RobotConstants.kProcessorSetpoint);
+    setBiscuitTransfer(RobotConstants.kProcessorSetpoint, true);
     elevatorSubsystem.setPosition(ElevatorConstants.kProcessorSetpoint);
 
     setState(RobotStates.PROCESSOR_ALGAE, true);
@@ -671,7 +672,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     biscuitSubsystem.setIsRemovingAlgae(false);
 
-    setBiscuitTransfer(biscuitSubsystem.getPosition());
+    biscuitSubsystem.setPosition(biscuitSubsystem.getPosition(), hasAlgae());
     elevatorSubsystem.setPosition(elevatorSubsystem.getPosition());
 
     setState(RobotStates.INTERRUPTED);
@@ -682,7 +683,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       return;
     }
 
-    setBiscuitTransfer(RobotConstants.kStowSetpoint);
+    setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
 
     climbSubsystem.prepClimb();

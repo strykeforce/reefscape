@@ -434,7 +434,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                 currentThresCount++;
                 if (currentThresCount >= TagServoingConstants.kEndCountThreshold) {
                   terminate();
-                  break;
+                  return;
                 }
               } else {
                 currentThresCount = 0;
