@@ -175,7 +175,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
       robotStateSubsystem.toAutonPrestage();
     }
     if (tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
-            <= AutonConstants.kElevatorStageRadius
+            <= AutonConstants.kElevatorStageRadiusPathOne
         && !hasPreppedCoral) {
       hasPreppedCoral = true;
       robotStateSubsystem.toPrepCoral();
