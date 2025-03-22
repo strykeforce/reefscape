@@ -787,11 +787,15 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           biscuitSubsystem.setIsRemovingAlgae(true);
           switch (getAlgaeLevel()) {
             case L2 -> {
-              biscuitSubsystem.setPosition(RobotConstants.kL2AlgaeRemovalSetpoint, true); // not using setBiscuitTransfer() to ensure hasAlgae is true
+              biscuitSubsystem.setPosition(
+                  RobotConstants.kL2AlgaeRemovalSetpoint,
+                  true); // not using setBiscuitTransfer() to ensure hasAlgae is true
               elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
             }
             case L3 -> {
-              biscuitSubsystem.setPosition(RobotConstants.kL3AlgaeRemovalSetpoint, true); // not using setBiscuitTransfer() to ensure hasAlgae is true
+              biscuitSubsystem.setPosition(
+                  RobotConstants.kL3AlgaeRemovalSetpoint,
+                  true); // not using setBiscuitTransfer() to ensure hasAlgae is true
               elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
             }
             default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
@@ -905,7 +909,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case TO_BARGE_ALGAE -> {
         if (elevatorSubsystem.isHigherThan(ElevatorConstants.kBargeHigherThan)) {
-          biscuitSubsystem.setPosition(RobotConstants.kBargeSetpoint, hasAlgae()); // not using setBiscuitTransfer(), moves biscuit at higher threshold
+          biscuitSubsystem.setPosition(
+              RobotConstants.kBargeSetpoint,
+              hasAlgae()); // not using setBiscuitTransfer(), moves biscuit at higher threshold
           curState = RobotStates.BARGE_ALGAE;
         }
       }
