@@ -21,6 +21,6 @@ public class RobotStateConstants {
   public static final double kElevatorClimbMax = 11.4;
 
   // Climb LED Thresholds
-  public static final double kClimbAngleSmall = -0.245;
-  public static final double kClimbAngleBig = -0.215;
+  public static final double kClimbAngleSmall = -0.235; // -0.245
+  public static final double kClimbAngleBig = -0.213; // -0.215
 }

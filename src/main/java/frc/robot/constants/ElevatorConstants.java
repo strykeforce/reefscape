@@ -55,7 +55,6 @@ public class ElevatorConstants {
       Rotations.of(31.0901); // was 30.42969 -> 31.7505 -> 31.0901
   public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);
 
-  public static final Angle kPrestageSetpoint = kL2CoralSetpoint;
   public static final Angle kAutoPrestageSetpoint = kL2CoralSetpoint;
 
   // Algae obtaining
@@ -63,11 +62,17 @@ public class ElevatorConstants {
   public static final Angle kMicAlgaeSetpoint = Rotations.of(2.703);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
+  // pre-stage tele
+  public static final Angle kPrestageSetpoint = Rotations.of(10.0);
+
   // Algae scoring
   public static final Angle kProcessorSetpoint =
       Rotations.of(1.49365); // was 4.297 -> 5.964 -> 3.348
   public static final Angle kBargeSetpoint = Rotations.of(44.785); // 41.936
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
+
+  // Min elevator height before biscuit movement
+  public static final Angle kBiscuitSafeThreshold = Rotations.of(5);
 
   public static TalonFXConfiguration getBothFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();
@@ -114,7 +119,9 @@ public class ElevatorConstants {
     fxConfig.Slot0 = slot0;
 
     MotionMagicConfigs motionMagic =
-        new MotionMagicConfigs().withMotionMagicCruiseVelocity(75).withMotionMagicAcceleration(300);
+        new MotionMagicConfigs()
+            .withMotionMagicCruiseVelocity(75)
+            .withMotionMagicAcceleration(225); // was 300
     fxConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =

@@ -49,6 +49,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   }
 
   public void setPosition(Angle position, boolean hasAlgae) {
+    if (position.equals(setPoint)) {
+      return;
+    }
     io.setPosition(position, hasAlgae);
     setPoint = position;
   }

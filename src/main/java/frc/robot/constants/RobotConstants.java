@@ -350,8 +350,8 @@ public class RobotConstants {
     public static Angle kPrestageAlgaeSetpoint = kBiscuitStowSetpoint;
 
     // Algae removal
-    public static Angle kL2AlgaeSetpoint = Rotations.of(7.39);
-    public static Angle kL3AlgaeSetpoint = Rotations.of(7.39);
+    public static Angle kL2AlgaeSetpoint = Rotations.of(8.125); // was 7.39
+    public static Angle kL3AlgaeSetpoint = Rotations.of(8.125); // was 7.39
 
     public static Angle kL2AlgaeRemovalSetpoint = kPrestageSetpoint;
     public static Angle kL3AlgaeRemovalSetpoint = kPrestageSetpoint;
