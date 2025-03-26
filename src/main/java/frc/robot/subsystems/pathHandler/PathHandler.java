@@ -224,6 +224,7 @@ public class PathHandler extends MeasurableSubsystem {
       } else if (shouldTransitionToServoing()) {
         tagAlignSubsystem.startAuto(
             mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+            robotStateSubsystem.getCoralLevel(),
             (nodeNames.get(0) - 'a') % 2 == 0,
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
@@ -283,6 +284,7 @@ public class PathHandler extends MeasurableSubsystem {
     if (nodeNames.size() > 0) {
       tagAlignSubsystem.setup(
           mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+          robotStateSubsystem.getCoralLevel(),
           (nodeNames.get(0) - 'a') % 2 == (mirrorToProcessor ? 1 : 0),
           false);
       nodeNames.remove(0);

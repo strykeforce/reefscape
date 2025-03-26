@@ -189,6 +189,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
           isServoing = true;
           tagAlignSubsystem.startAuto(
               mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+              robotStateSubsystem.getCoralLevel(),
               mirrorToProcessor ? !scoreLeft : scoreLeft,
               false);
         }
