@@ -1,13 +1,16 @@
 package frc.robot.subsystems.algae;
 
-import frc.robot.constants.AlgaeConstants;
 import java.util.Set;
-import net.jafama.FastMath;
+
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.AlgaeConstants;
+import net.jafama.FastMath;
 
 public class AlgaeSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(AlgaeSubsystem.class);
@@ -38,6 +41,12 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
     slowCounts = 0;
   }
 
+  public void intakeCoral() {
+    // setSpeed(AlgaeConstants.kCoralIntakingSpeed); OR - AlgaeConstants.kIntakingSpeed
+    setPct(-0.5);
+    slowCounts = 0;
+  }
+
   public void scoreProcessor() {
     // setSpeed(AlgaeConstants.kProcessorScoreSpeed);
     setPct(-1);
@@ -48,13 +57,27 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
     setPct(-1);
   }
 
+  public void scoreCoral() {
+    // setSpeed(AlgaeConstants.kCoralScoreSpeed);
+    setPct(0.5);
+  }
+
   public void hold() {
     // setSpeed(AlgaeConstants.kHoldSpeed);
     setPct(0.04);
   }
 
+  public void holdCoral() {
+    // setSpeed(AlgaeConstants.kCoralHoldSpeed); OR -AlgaeConstants.kHoldSpeed
+    setPct(-0.04);
+  }
+
   public boolean hasAlgae() {
     return curState == AlgaeStates.HAS_ALGAE;
+  }
+
+  public boolean hasCoral() {
+    return curState == AlgaeStates.HAS_CORAL;
   }
 
   public boolean hasAlgaeSuperCycle() {
@@ -95,6 +118,26 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
           // setSpeed(RotationsPerSecond.of(0));
         }
       }
+      case HAS_CORAL -> {
+        if (!inputs.isCoralBeamBroken) {
+          setState(AlgaeStates.EMPTY);
+        }
+      }
+      case CORAL_INTAKE -> {
+        if (inputs.isCoralBeamBroken) {
+          if (FastMath.abs(inputs.velocity) < AlgaeConstants.kHasCoralVelThreshold) {
+            slowCounts++;
+          } else {
+            slowCounts = 0;
+          }
+
+          if (slowCounts >= AlgaeConstants.kHasCoralCounts) {
+            slowCounts = 0;
+            holdCoral();
+            setState(AlgaeStates.HAS_CORAL);
+          }
+        }
+      }
       case EMPTY -> {
         if (inputs.isBeamBroken) {
           if (FastMath.abs(inputs.velocity) < AlgaeConstants.kHasAlgaeVelThreshold) {
@@ -110,7 +153,8 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
           }
         }
       }
-      case IDLE -> {}
+      case IDLE -> {
+      }
     }
   }
 
@@ -127,6 +171,8 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
 
   public enum AlgaeStates {
     HAS_ALGAE,
+    HAS_CORAL,
+    CORAL_INTAKE,
     EMPTY,
     IDLE
   }

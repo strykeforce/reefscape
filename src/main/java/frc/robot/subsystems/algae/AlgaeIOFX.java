@@ -56,6 +56,7 @@ public class AlgaeIOFX implements AlgaeIO, Checkable {
     BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
     inputs.velocity = curVelocity.getValueAsDouble();
     inputs.isBeamBroken = fwdLimitSwitch.getValue().value == 0;
+    inputs.isCoralBeamBroken = revLimitSwitch.getValue().value == 0;
   }
 
   @Override
