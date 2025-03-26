@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLog;
 import org.strykeforce.swerve.OdometryStrategy;
@@ -22,6 +23,7 @@ public interface SwerveIO {
   public static class SwerveIOInputs {
     public double odometryX = 0.0;
     public double odometryY = 0.0;
+    public Pose2d swervePose;
     public double odometryRotation2D = 0.0;
     public Rotation2d gyroRotation2d = new Rotation2d();
     public Rotation2d navxRotation2d = new Rotation2d();
@@ -34,9 +36,13 @@ public interface SwerveIO {
     public double pigeonTemp = 0;
     public double fieldX = 0;
     public double fieldY = 0;
+    public ChassisSpeeds robotRelSpeed = new ChassisSpeeds();
     public ChassisSpeeds fieldRelSpeed = new ChassisSpeeds();
     public double[] azimuthVels = {0, 0, 0, 0};
     public double[] azimuthCurrent = {0, 0, 0, 0};
+    public double avgDriveCurrent = 0;
+    public double avgRearDriveVel = 0;
+    public boolean didZero = false;
   }
 
   private SwerveModule[] getSwerveModules() {
@@ -61,6 +67,12 @@ public interface SwerveIO {
   public default SwerveDriveKinematics getKinematics() {
     return null;
   }
+
+  public default Rotation2d getPigeonGyroOffset() {
+    return null;
+  }
+
+  public default void setDriveCoast(boolean coast) {}
 
   public default void setOdometry(OdometryStrategy Odom) {}
 
@@ -95,4 +107,8 @@ public interface SwerveIO {
   public default BooleanSupplier getAzimuth1FwdLimitSwitch() {
     return () -> false;
   }
+
+  public default void zeroModules() {}
+
+  public default void prepForAuto(Pose2d pose2d, double offsetDegrees, Alliance alliance) {}
 }
