@@ -705,6 +705,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return elevatorSubsystem.isFinished();
   }
 
+  public void setLEDLoadCoral(boolean isOn) {
+    ledSubsystem.setLoadCoral(isOn);
+  }
+
   @Override
   public void periodic() {
     Logger.recordOutput("RobotState/state", curState);

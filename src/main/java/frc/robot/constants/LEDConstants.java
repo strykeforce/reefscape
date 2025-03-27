@@ -52,6 +52,9 @@ public class LEDConstants {
   public static final Color kGood = invertRedGreen(Color.kGreen);
   public static final Color kTooClose = invertRedGreen(Color.kBlue);
 
+  // HP Load Color
+  public static final Color kLoadCoral = invertRedGreen(Color.kYellow);
+
   public static final Color[] kGameColors = {
     invertRedGreen(Color.kBlack), // a dummy color
     invertRedGreen(Color.kDarkRed),

@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -227,11 +226,7 @@ public class RobotContainer {
             visionSubsystem,
             pathHandler);
 
-    testAutonCommand =
-        new TestAutonCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            new Pose2d(3.85576086490539, 5.073261807735684, Rotation2d.fromDegrees(300.0)));
+    testAutonCommand = new TestAutonCommand(driveSubsystem, robotStateSubsystem, elevatorSubsystem);
 
     configureTelemetry();
     configureDriverBindings();

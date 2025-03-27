@@ -407,6 +407,9 @@ public class PathHandler extends MeasurableSubsystem {
         if (!runningPath) {
           startPath(nextPath());
         }
+        if (tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
+            < .5) { // TODO magic num
+        }
         drivePath();
       }
       case FETCH -> {
