@@ -1,16 +1,13 @@
 package frc.robot.subsystems.algae;
 
+import frc.robot.constants.AlgaeConstants;
 import java.util.Set;
-
+import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-
-import edu.wpi.first.wpilibj.Timer;
-import frc.robot.constants.AlgaeConstants;
-import net.jafama.FastMath;
 
 public class AlgaeSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(AlgaeSubsystem.class);
@@ -153,8 +150,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
           }
         }
       }
-      case IDLE -> {
-      }
+      case IDLE -> {}
     }
   }
 
