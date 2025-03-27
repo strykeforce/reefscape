@@ -75,6 +75,9 @@ public class TagServoingConstants {
   public static final double kAlgaeStopXDriveRadius =
       kAlgaeInitialDriveRadius; // Should be closer to reef than target
   public static final double kL1CoralRadius = 1.5;
+
+  // Final drive
+  public static final double kFinalDriveVel = 0.25;
   // pose
   // public static final double kMinVelX = 0.85;
 
@@ -94,6 +97,8 @@ public class TagServoingConstants {
   // Stuck coral
   public static final double kMaxStalledDer = 0.05;
   public static final double kMinStuckCounts = 5;
+  public static final double kCoralStuckRadius = 1.45;
+  public static final double kCoralStuckAllowence = 0.05;
 
   // Reef
   public static final Translation2d kBlueReefPose = new Translation2d(4.489323, 4.0259);

@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
@@ -43,10 +44,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private boolean scoreLeft = true;
   private int currentThresCount = 0;
   private boolean finalDrive = false;
+  private double xError = 2767;
   private double yError = 2767;
+  private double yawError = 2767;
   private double coralOffset = 0;
   private double noProgressCounts = 0;
-  private double xError = 2767;
 
   public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -66,14 +68,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     for (int i = 0; i < 6; i++) {
       logger.info("Hexant {}, left and right", i);
 
+      logger.info("{}, {}", getTargetDrivePose(true, i).getX(), getTargetDrivePose(true, i).getY());
       logger.info(
-          "{}, {}",
-          getTargetDrivePose(Alliance.Blue, true, i).getX(),
-          getTargetDrivePose(Alliance.Blue, true, i).getY());
-      logger.info(
-          "{}, {}",
-          getTargetDrivePose(Alliance.Blue, false, i).getX(),
-          getTargetDrivePose(Alliance.Blue, false, i).getY());
+          "{}, {}", getTargetDrivePose(false, i).getX(), getTargetDrivePose(false, i).getY());
     }
   }
 
@@ -87,11 +84,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         || yError < TagServoingConstants.kSmallYThres;
   }
 
-  public int computeHexant(Alliance color) {
+  public int computeHexant() {
+    boolean blueSide = driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2);
     Translation2d reefT =
-        color == Alliance.Blue
-            ? TagServoingConstants.kBlueReefPose
-            : TagServoingConstants.kRedReefPose;
+        blueSide ? TagServoingConstants.kBlueReefPose : TagServoingConstants.kRedReefPose;
     double offset = Units.degreesToRadians(30);
 
     int hexant =
@@ -105,7 +101,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                                     .getRadians()
                                 + offset)
                         / Units.degreesToRadians(60)))
-                + (color == Alliance.Blue ? 3 : 0))
+                + (blueSide ? 3 : 0))
             % 6;
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", hexant);
@@ -113,11 +109,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return hexant;
   }
 
-  public int computeHexant(Alliance color, Pose2d pose) {
+  public int computeHexant(Pose2d pose) {
+    boolean blueSide = driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2);
     Translation2d reefT =
-        color == Alliance.Blue
-            ? TagServoingConstants.kBlueReefPose
-            : TagServoingConstants.kRedReefPose;
+        blueSide ? TagServoingConstants.kBlueReefPose : TagServoingConstants.kRedReefPose;
     double offset = Units.degreesToRadians(30);
 
     int hexant =
@@ -125,7 +120,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                     (FastMath.normalizeZeroTwoPi(
                             pose.getTranslation().minus(reefT).getAngle().getRadians() + offset)
                         / Units.degreesToRadians(60)))
-                + (color == Alliance.Blue ? 3 : 0))
+                + (blueSide ? 3 : 0))
             % 6;
 
     Logger.recordOutput("TagAlignSubsystem/Hexant", hexant);
@@ -134,39 +129,40 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   // Red reef numbered like blue (red 0 is facing the same direction as blue 0)
-  private int computeFieldRelHexant(Alliance color) {
-    return (computeHexant(color) + (color == Alliance.Blue ? 0 : 3)) % 6;
+  private int computeFieldRelHexant() {
+    return (computeHexant()
+            + (driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2) ? 0 : 3))
+        % 6;
   }
 
-  public int computeFieldRelHexant(Alliance color, Pose2d pose) {
-    return (computeHexant(color, pose) + (color == Alliance.Blue ? 0 : 3)) % 6;
+  public int computeFieldRelHexant(Pose2d pose) {
+    return (computeHexant(pose)
+            + (driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2) ? 0 : 3))
+        % 6;
   }
 
-  private Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft) {
+  private Pose2d getTargetDrivePose(boolean scoreLeft) {
+    boolean blueSide = driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2);
     Translation2d reefT =
-        color == Alliance.Blue
-            ? TagServoingConstants.kBlueReefPose
-            : TagServoingConstants.kRedReefPose;
+        blueSide ? TagServoingConstants.kBlueReefPose : TagServoingConstants.kRedReefPose;
 
     Translation2d offset =
-        new Translation2d(
-            driveRadius, Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180));
+        new Translation2d(driveRadius, Rotation2d.fromDegrees(computeFieldRelHexant() * 60 + 180));
 
     Translation2d sideOffset =
         new Translation2d(
             scoreLeft
                 ? TagServoingConstants.kRightCamOffset
                 : TagServoingConstants.kLeftCamOffset + coralOffset,
-            Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60 + 180 + 90));
+            Rotation2d.fromDegrees(computeFieldRelHexant() * 60 + 180 + 90));
 
     return new Pose2d(
-        reefT.plus(offset).plus(sideOffset),
-        Rotation2d.fromDegrees(computeFieldRelHexant(color) * 60));
+        reefT.plus(offset).plus(sideOffset), Rotation2d.fromDegrees(computeFieldRelHexant() * 60));
   }
 
-  public Pose2d getTargetDrivePose(Alliance color, boolean scoreLeft, int hexant) {
+  public Pose2d getTargetDrivePose(boolean scoreLeft, int hexant) {
     Translation2d reefT =
-        color == Alliance.Blue
+        driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2)
             ? TagServoingConstants.kBlueReefPose
             : TagServoingConstants.kRedReefPose;
 
@@ -181,9 +177,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return new Pose2d(reefT.plus(offset).plus(sideOffset), Rotation2d.fromDegrees(hexant * 60));
   }
 
-  public double getCurRadius(Alliance color) {
+  public double getCurRadius() {
     Translation2d reefT =
-        color == Alliance.Blue
+        driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2)
             ? TagServoingConstants.kBlueReefPose
             : TagServoingConstants.kRedReefPose;
 
@@ -200,12 +196,27 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return xError;
   }
 
-  public boolean progressStalled() {
-    return noProgressCounts > TagServoingConstants.kMinStuckCounts;
+  public double getErrY() {
+    return yError;
+  }
+
+  public double getErrYaw() {
+    return yawError;
   }
 
   public boolean isFinalDrive() {
     return finalDrive;
+  }
+
+  public boolean stuckCoral() {
+    return noProgressCounts > TagServoingConstants.kMinStuckCounts
+        && FastMath.abs(getCurRadius() - TagServoingConstants.kCoralStuckRadius)
+            < TagServoingConstants.kCoralStuckAllowence;
+  }
+
+  public boolean isAligned() {
+    return FastMath.abs(yError) < TagServoingConstants.kCoralDriveYCloseEnough
+        && FastMath.abs(yawError) < TagServoingConstants.kAngleCloseEnough;
   }
 
   public void setup(Alliance alliance, ScoringLevel level, boolean scoreLeft, boolean algae) {
@@ -225,11 +236,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     this.driveYCloseEnough = TagServoingConstants.kInitialCloseEnough;
     this.currentThresCount = 0;
 
-    this.targetPose = getTargetDrivePose(alliance, scoreLeft);
+    this.targetPose = getTargetDrivePose(scoreLeft);
 
-    this.fieldRelHexant = computeFieldRelHexant(alliance);
+    this.fieldRelHexant = computeFieldRelHexant();
     this.coralOffset =
-        alliance == Alliance.Blue
+        driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2)
             ? TagServoingConstants.kBlueCoralOffset[fieldRelHexant][level.ordinal()][
                 scoreLeft ? 0 : 1]
             : TagServoingConstants.kRedCoralOffset[(fieldRelHexant + 3) % 6][level.ordinal()][
@@ -282,7 +293,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     this.driveRadius =
         algae ? TagServoingConstants.kAlgaeAlignRadius : TagServoingConstants.kCoralAlignRadius;
-    targetPose = getTargetDrivePose(alliance, scoreLeft);
+    targetPose = getTargetDrivePose(scoreLeft);
     Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
   }
 
@@ -305,6 +316,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         double vOmega =
             driveOmega.calculate(
                 current.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+        yawError = driveOmega.getError();
 
         Translation2d rotated =
             current
@@ -338,7 +351,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         if (vX > 2) vX = 2;
         if (vY > 2) vY = 2;
 
-        Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", driveOmega.getError());
+        Logger.recordOutput("TagAlignSubsystem/DriveOmegaError", yawError);
 
         // double radius = getCurRadius(alliance);
         boolean ignoreX = false; // radius < stopXRadius && !algae;
@@ -398,7 +411,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         }
 
         if (finalDrive) {
-          vX = 0.25;
+          vX = TagServoingConstants.kFinalDriveVel;
         }
         if (curState == TagAlignStates.WAITING) {
           break;

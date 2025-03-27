@@ -49,7 +49,8 @@ public class AutoReefCycleCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return scoringCoral && !robotStateSubsystem.hasCoral()
+    return scoringCoral
+            && (!robotStateSubsystem.hasCoral() || robotStateSubsystem.isStuckAndMisaligned())
         || !scoringCoral && robotStateSubsystem.hasAlgae();
   }
 }

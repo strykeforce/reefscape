@@ -29,9 +29,82 @@ public class RobotStateConstants {
   public static final double kClimbAngleBig = -0.213; // -0.215
 
   // Offsets
-  public static final Angle[] kStuckCoralElevatorOffset = {
-    Rotations.of(0), Rotations.of(0), Rotations.of(0), Rotations.of(0)
+  public static final Angle kStuckCoralElevatorOffset = Rotations.of(5);
+  public static final Angle[][][] kBlueCoralElevatorOffset = {
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    }
   };
-  public static final double kCoralStuckError = 0.1;
-  public static final double kCoralStuckAllowence = 0.05;
+
+  public static final Angle[][][] kRedCoralElevatorOffset = {
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    }
+  };
 }
