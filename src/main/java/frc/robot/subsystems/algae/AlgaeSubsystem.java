@@ -15,7 +15,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
   private final AlgaeIO io;
   private final AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
   private double desiredSpeed = 0;
-  private double slowCounts = 0;
+  private int slowCounts = 0;
 
   private AlgaeStates curState = AlgaeStates.EMPTY;
 
@@ -32,16 +32,18 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
     curState = newState;
   }
 
-  public void intake() {
+  public void intakeAlgae() {
     // setSpeed(AlgaeConstants.kIntakingSpeed);
     setPct(0.5);
     slowCounts = 0;
+    setState(AlgaeStates.EMPTY);
   }
 
   public void intakeCoral() {
     // setSpeed(AlgaeConstants.kCoralIntakingSpeed); OR - AlgaeConstants.kIntakingSpeed
     setPct(-0.5);
     slowCounts = 0;
+    setState(AlgaeStates.CORAL_INTAKE);
   }
 
   public void scoreProcessor() {
@@ -59,7 +61,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
     setPct(0.5);
   }
 
-  public void hold() {
+  public void holdAlgae() {
     // setSpeed(AlgaeConstants.kHoldSpeed);
     setPct(0.04);
   }
@@ -145,7 +147,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
 
           if (slowCounts >= AlgaeConstants.kHasAlgaeCounts) {
             slowCounts = 0;
-            hold();
+            holdAlgae();
             setState(AlgaeStates.HAS_ALGAE);
           }
         }

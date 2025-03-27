@@ -1,9 +1,16 @@
 package frc.robot.subsystems.robotState;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import java.util.Set;
+
+import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -30,13 +37,7 @@ import frc.robot.subsystems.led.LEDSubsystem.PlaceStates;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.Set;
 import net.jafama.FastMath;
-import org.littletonrobotics.junction.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.TelemetryService;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -314,7 +315,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     if (biscuitSubsystem.isSafeToStow()) {
       setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
-      algaeSubsystem.hold();
+      algaeSubsystem.holdAlgae();
 
       setState(RobotStates.TO_STOW);
     } else {
@@ -326,7 +327,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
-    algaeSubsystem.hold();
+    algaeSubsystem.holdAlgae();
 
     setState(RobotStates.TO_STOW_SAFE);
   }
@@ -335,7 +336,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
-    algaeSubsystem.hold();
+    algaeSubsystem.holdAlgae();
 
     setState(RobotStates.TO_STOW_SEQUENTIAL);
   }
@@ -425,7 +426,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     boolean ignoreCoralScoring = isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT;
 
     if (wantAlgae && !algaeSafe) {
-      algaeSubsystem.intake();
+      algaeSubsystem.intakeAlgae();
       setBiscuitTransfer(RobotConstants.kPrestageAlgaeSetpoint, true);
 
       switch (getAlgaeLevel()) {
@@ -450,7 +451,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       // REEF_ALIGN_ALGAE
       setState(RobotStates.REEF_ALIGN_ALGAE, true);
 
-      algaeSubsystem.intake();
+      algaeSubsystem.intakeAlgae();
 
       switch (getAlgaeLevel()) {
         case L2 -> {
@@ -533,7 +534,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       return;
     }
 
-    algaeSubsystem.intake();
+    algaeSubsystem.intakeAlgae();
     currentAlgaeHeight = algaeHeight;
 
     switch (algaeHeight) {
@@ -638,7 +639,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       return;
     }
 
-    algaeSubsystem.intake();
+    algaeSubsystem.intakeAlgae();
 
     setBiscuitTransfer(RobotConstants.kHpAlgaeSetpoint, false);
     elevatorSubsystem.setPosition(ElevatorConstants.kHpAlgaeSetpoint);
@@ -849,7 +850,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           setAutoPlacingLed(false);
           driveSubsystem.setIgnoreSticks(false);
           toFunnelLoad();
-        } else if (coralSubsystem.hasCoral()) {
+        } else if (hasCoral()) {
           coralLoc = CoralLoc.SCORING;
         }
       }
