@@ -220,6 +220,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public void setup(Alliance alliance, ScoringLevel level, boolean scoreLeft, boolean algae) {
+    boolean blueSide = driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2);
+      
     this.alliance = alliance;
     this.scoreLeft = scoreLeft;
     this.finalDrive = false;
@@ -239,8 +241,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     this.targetPose = getTargetDrivePose(scoreLeft);
 
     this.fieldRelHexant = computeFieldRelHexant();
+
     this.coralOffset =
-        driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2)
+    blueSide
             ? TagServoingConstants.kBlueCoralOffset[fieldRelHexant][level.ordinal()][
                 scoreLeft ? 0 : 1]
             : TagServoingConstants.kRedCoralOffset[(fieldRelHexant + 3) % 6][level.ordinal()][
