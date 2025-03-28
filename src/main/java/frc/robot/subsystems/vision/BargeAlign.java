@@ -16,18 +16,20 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class BargeAlign extends MeasurableSubsystem{
-private DoubleSupplier strStick;
+private DoubleSupplier strStick; //note to Huck: what's strStick?
+
 private DriveSubsystem driveSubsystem;
 
 //These are here to determine offsets for target positions.
 
 private boolean blueAlliance;
 private boolean redBarge;
+private final XboxController xboxController = new XboxController(1);
 private Alliance alliance;
 private double driveRadius = 1.5; //TODO This is a magic number that needs creating
 private BargeAlignStates curState;
 
-    public BargeAlign(
+public BargeAlign(
         DoubleSupplier strStick,
         DriveSubsystem driveSubsystem){
 
@@ -38,7 +40,7 @@ private BargeAlignStates curState;
         blueAlliance = false;
     }
     curState = BargeAlignStates.DRIVE;
-    }
+}
 
 public void setState(BargeAlignStates curState){
     this.curState = curState;
@@ -57,14 +59,29 @@ private boolean getOnRedSide() {
 }
 
 private double getYStickReading() {
-     return xboxController.XkY.value);
+     return XboxController.Button.kLeftStick.kY.value; //just a placeholder, to remind me
 } //same joystick reading as the drive
+
+/*
+ private void configureDriverBindings() {
+    driveSubsystem.setDefaultCommand(
+    new DriveTeleopCommand(
+    () -> flysky.getStr()
+    driveSubsystem,
+    robotStateSubsystem));
+*/
 
 private Translation2d getTargetTranslation(){
 
-    Translation2d offset = new Translation2d(
+    Translation2d blueOffset = new Translation2d(
         getOnBlueSide() ? driveRadius : driveRadius * -1 , new Rotation2d(
         getOnBlueSide() ? 0 : Math.PI));
+
+    /* 
+    Translation2d redOffset = new Translation2d(
+        getOnRedSide() ? driveRadius : driveRadius * -1 , new Rotation2d(
+        getOnRedSide() ? 0 : Math.PI));
+    */
 
     Translation2d targetBarge = 
         blueAlliance ? BargeAlignConstants.blueBargePos : BargeAlignConstants.redBargePos;
