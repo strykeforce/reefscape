@@ -1,9 +1,16 @@
 package frc.robot.subsystems.robotState;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import java.util.Set;
+
+import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -30,13 +37,7 @@ import frc.robot.subsystems.led.LEDSubsystem.PlaceStates;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.Set;
 import net.jafama.FastMath;
-import org.littletonrobotics.junction.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.TelemetryService;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -173,7 +174,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public boolean safeMoveElevator() {
-    return !(coralSubsystem.getState() != CoralState.HAS_CORAL && funnelSubsystem.hasCoral());
+    return !(coralSubsystem.getState() != CoralState.HAS_CORAL && funnelSubsystem.hasCoral() || algaeSubsystem.hasCoral());
   }
 
   public void startupSequence() {
@@ -421,7 +422,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       logger.info("Elevator movement is dangerous!");
       return;
     }
-    boolean wantAlgae = (getAlgae || !coralSubsystem.hasCoral()) && scoringLevel != ScoringLevel.L1;
+    boolean wantAlgae = (getAlgae || !hasCoral()) && scoringLevel != ScoringLevel.L1;
     if ((hasAlgae() && scoreSide == ScoreSide.RIGHT && drive) || (hasAlgae() && !hasCoral())) {
       setState(RobotStates.STOW);
     }
@@ -429,7 +430,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       tagAlignSubsystem.start(
           allianceColor,
           scoreSide == ScoreSide.LEFT
-              || !coralSubsystem.hasCoral()
+              || !hasCoral()
               || (wantAlgae && getAlgaeOnCycle),
           wantAlgae);
       setAutoPlacingLed(true);
