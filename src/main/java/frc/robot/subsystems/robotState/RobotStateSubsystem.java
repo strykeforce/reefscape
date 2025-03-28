@@ -1,16 +1,9 @@
 package frc.robot.subsystems.robotState;
 
-import java.util.Set;
-
-import org.littletonrobotics.junction.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.TelemetryService;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -37,7 +30,13 @@ import frc.robot.subsystems.led.LEDSubsystem.PlaceStates;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.Set;
 import net.jafama.FastMath;
+import org.littletonrobotics.junction.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.TelemetryService;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
 
 public class RobotStateSubsystem extends MeasurableSubsystem {
   private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -251,6 +250,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     nextBiscuitSetpoint = setpoint;
   }
 
+  public void setBiscuitTransferSlow(Angle setpoint, boolean overrideThreshold) {
+    if (overrideThreshold
+        || elevatorSubsystem.getPosition().gt(ElevatorConstants.kBiscuitSafeThreshold)) {
+      biscuitSubsystem.setPosition(setpoint, true);
+    }
+    nextBiscuitSetpoint = setpoint;
+  }
+
   public void setCurrentLimiting(boolean isCurrentLimiting) {
     this.isCurrentLimiting = isCurrentLimiting;
     ledSubsystem.setCurrentLimiting(isCurrentLimiting);
@@ -351,11 +358,21 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toFunnelLoad() {
-    setBiscuitTransfer(RobotConstants.kFunnelSetpoint, true);
-    coralSubsystem.intake();
-    elevatorSubsystem.setPosition(RobotConstants.kElevatorFunnelSetpoint);
 
-    setState(RobotStates.FUNNEL_LOAD, true);
+    if (scoringLevel == ScoringLevel.L1) {
+      setBiscuitTransferSlow(RobotConstants.kL1CoralLoadSetpoint, true);
+      elevatorSubsystem.setPosition(RobotConstants.kElevatorL1LoadSetpoint);
+      algaeSubsystem.intakeCoral();
+      funnelSubsystem.reverse();
+      coralSubsystem.stop();
+
+      setState(RobotStates.ALGAE_CORAL_LOAD, true);
+    } else {
+      setBiscuitTransfer(RobotConstants.kFunnelSetpoint, true);
+      elevatorSubsystem.setPosition(RobotConstants.kElevatorFunnelSetpoint);
+      coralSubsystem.intake();
+      setState(RobotStates.FUNNEL_LOAD, true);
+    }
   }
 
   private void toPrestage() {
@@ -404,7 +421,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       logger.info("Elevator movement is dangerous!");
       return;
     }
-    boolean wantAlgae = getAlgae || !coralSubsystem.hasCoral();
+    boolean wantAlgae = (getAlgae || !coralSubsystem.hasCoral()) && scoringLevel != ScoringLevel.L1;
     if ((hasAlgae() && scoreSide == ScoreSide.RIGHT && drive) || (hasAlgae() && !hasCoral())) {
       setState(RobotStates.STOW);
     }
@@ -480,7 +497,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           currentLevel = scoringLevel;
           switch (scoringLevel) {
             case L1 -> {
-              setBiscuitTransfer(RobotConstants.kL1CoralSetpoint, true);
+              setBiscuitTransferSlow(RobotConstants.kL1CoralSetpoint, true);
               elevatorSubsystem.setPosition(ElevatorConstants.kL1CoralSetpoint);
             }
             case L2 -> {
@@ -780,7 +797,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         futureState = null;
 
-        if (!coralSubsystem.hasCoral()) {
+        if (!hasCoral()) {
           toFunnelLoad();
         }
       }
@@ -867,6 +884,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           setState(RobotStates.LOADING_CORAL);
         }
       }
+
+      case ALGAE_CORAL_LOAD -> {
+        if (algaeSubsystem.hasCoral()) {
+          coralLoc = CoralLoc.ALGAE;
+          toPrestage();
+        }
+      }
+
       case LOADING_CORAL -> {
         if (coralSubsystem.hasCoral()) {
           coralLoc = CoralLoc.CORAL;
@@ -994,6 +1019,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     REMOVE_ALGAE,
     PLACE_CORAL,
     FUNNEL_LOAD,
+    ALGAE_CORAL_LOAD,
     LOADING_CORAL,
     PRESTAGE,
     HP_ALGAE,
@@ -1029,6 +1055,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public enum CoralLoc {
+    ALGAE,
     FUNNEL,
     TRANSFER,
     CORAL,

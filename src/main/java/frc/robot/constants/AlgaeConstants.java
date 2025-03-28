@@ -35,8 +35,8 @@ public class AlgaeConstants {
   public static final double kSuperCycleHasAlgaeVelThres = 40;
   public static final int kHasAlgaeCounts = 2;
 
-  public static final double kHasCoralVelThreshold = 10; // FIXME
-  public static final int kHasCoralCounts = 2; // FIXME
+  public static final double kHasCoralVelThreshold = 55; // FIXME
+  public static final int kHasCoralCounts = 10; // FIXME
 
   public static final double kCoralScoringTime = 1; // FIXME
 

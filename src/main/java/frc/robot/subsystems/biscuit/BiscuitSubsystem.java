@@ -11,7 +11,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.RobotConstants;
 import java.util.Set;
-import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.TelemetryService;
@@ -98,9 +97,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
 
     switch (curState) {
       case NORMAL:
-        if (isFinished()
-            && FastMath.abs(inputs.velocity) <= BiscuitConstants.kZeroVelThresh
-            && setPoint != prevSetPoint) curState = BiscuitState.CHECK_ZERO;
+        // if (isFinished()
+        //     && FastMath.abs(inputs.velocity) <= BiscuitConstants.kZeroVelThresh
+        //     && setPoint != prevSetPoint) curState = BiscuitState.CHECK_ZERO;
         break;
       case CHECK_ZERO:
         prevSetPoint = setPoint;
