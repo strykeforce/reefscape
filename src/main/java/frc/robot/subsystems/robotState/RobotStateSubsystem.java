@@ -374,7 +374,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toPrepCoral() {
     if (curState == RobotStates.REEF_ALIGN_CORAL) {
-      if (isAuto) isAutoReadyForEject = true;
+      if (isAuto) toReefAlign(false, false);
       if (elevatorSubsystem.isFinished()) {
         toPlaceCoral();
       }
@@ -386,7 +386,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toPlaceCoralAuto() {
     isAutoReadyForEject = true;
     if (elevatorSubsystem.isFinished()) toPlaceCoral();
-    else toReefAlign(getAlgaeOnCycle, false);
+    else toReefAlign(false, false);
   }
 
   public void toReefAlign() {
@@ -394,7 +394,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toReefAlignAlgaeAuto() {
-    toReefAlign(true, true);
+    toReefAlign(true, false);
   }
 
   private void toReefAlign(boolean getAlgae, boolean drive) {

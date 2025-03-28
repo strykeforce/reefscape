@@ -13,6 +13,7 @@ import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.ArrayList;
@@ -34,7 +35,8 @@ public class PathHandler extends MeasurableSubsystem {
   private String[][] pathNames =
       PathHandlerConstants.kShallowPathNames; // the array of paths, in string form
   private List<Character> nodeNames = new ArrayList<>(); // the list of nodes, in order, to score on
-  private List<Integer> nodeLevels = new ArrayList<>(); // the list of levels, in order, to score on
+  private List<ScoringLevel> nodeLevels =
+      new ArrayList<>(); // the list of levels, in order, to score on
   private Character startNode = 'a'; // the node that the robot starts in front of
   private boolean mirrorToProcessor =
       false; // whether the robot starts and fetches on the processor side.
@@ -58,6 +60,7 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean isPlacing = false;
   private boolean hasPreppedCoral = false;
   private boolean algaeOnLast = false;
+  private boolean hasLEDsOn = false;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -75,7 +78,7 @@ public class PathHandler extends MeasurableSubsystem {
       RobotStateSubsystem robotStateSubsystem,
       String[][] pathNames,
       List<Character> nodeNames,
-      List<Integer> nodeLevels,
+      List<ScoringLevel> nodeLevels,
       Character startNode,
       boolean mirrorToProcessor) {
     this.driveSubsystem = driveSubsystem;
@@ -101,12 +104,12 @@ public class PathHandler extends MeasurableSubsystem {
     }
   }
 
-  public void addNode(Character nodeName, int nodeLevel) {
+  public void addNode(Character nodeName, ScoringLevel nodeLevel) {
     nodeNames.add(nodeName);
     nodeLevels.add(nodeLevel);
   }
 
-  public void setNodeLevels(List<Integer> nodeLevels) {
+  public void setNodeLevels(List<ScoringLevel> nodeLevels) {
     if (!isHandling) {
       this.nodeLevels = nodeLevels;
     }
@@ -135,6 +138,7 @@ public class PathHandler extends MeasurableSubsystem {
   public void startPathHandler() {
     teleop = false;
     nodeNames.add(0, startNode);
+    nodeLevels.add(0, ScoringLevel.L4); // a dummy level
     isHandling = true;
     robotStateSubsystem.setIsAutoPlacing(false);
     curState = PathStates.DRIVE_FETCH;
@@ -286,6 +290,7 @@ public class PathHandler extends MeasurableSubsystem {
           (nodeNames.get(0) - 'a') % 2 == (mirrorToProcessor ? 1 : 0),
           false);
       nodeNames.remove(0);
+      nodeLevels.remove(0);
     }
   }
 
@@ -407,12 +412,23 @@ public class PathHandler extends MeasurableSubsystem {
         if (!runningPath) {
           startPath(nextPath());
         }
-        if (tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
-            < .5) { // TODO magic num
+        if (FastMath.sqrt(
+                    FastMath.pow(
+                            driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
+                        + FastMath.pow(
+                            driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2))
+                < 0.5
+            && !hasLEDsOn) {
+          robotStateSubsystem.setLEDLoadCoral(true);
+          hasLEDsOn = true;
         }
         drivePath();
       }
       case FETCH -> {
+        if (hasLEDsOn) {
+          robotStateSubsystem.setLEDLoadCoral(false);
+          hasLEDsOn = false;
+        }
         if (robotStateSubsystem.hasCoral() || (robotStateSubsystem.hasCoralAuton())) {
           // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
           // proceedToNext) {
@@ -443,6 +459,7 @@ public class PathHandler extends MeasurableSubsystem {
                     robotStateSubsystem.getAllianceColor(), (next - 'a') % 2 == 0, targetHexant);
           }
           startPath(nextPath());
+          robotStateSubsystem.setScoringLevel(nodeLevels.get(0));
         }
         drivePath();
       }
@@ -454,6 +471,7 @@ public class PathHandler extends MeasurableSubsystem {
             && !hasPreppedCoral) {
           hasPreppedCoral = true;
           if (algaeOnLast && nodeNames.size() == 1) {
+            robotStateSubsystem.setScoringLevel(nodeLevels.get(0));
             robotStateSubsystem.toReefAlignAlgaeAuto();
           } else {
             robotStateSubsystem.toPrepCoral();
@@ -464,6 +482,10 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case PLACE -> {
+        if (algaeOnLast && nodeNames.size() == 1) {
+          killPathHandler();
+          return;
+        }
         hasPreppedCoral = false;
         if (robotStateSubsystem.isElevatorFinished() && !isPlacing) {
           isPlacing = true;

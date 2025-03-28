@@ -33,6 +33,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   // private ProfiledPIDController servoY;
 
   private TagAlignStates curState = TagAlignStates.DONE;
+  private boolean isAuto = false;
 
   // Set by start()
   private Pose2d targetPose;
@@ -299,12 +300,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public void start(Alliance alliance, boolean scoreLeft, boolean algae) {
+    isAuto = false;
     setup(alliance, scoreLeft, algae);
 
     curState = TagAlignStates.DRIVE;
   }
 
   public void startAuto(Alliance alliance, boolean scoreLeft, boolean algae) {
+    isAuto = true;
     setup(alliance, scoreLeft, algae);
     tagAlign();
   }
@@ -422,7 +425,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               }
             }
             case TAG_ALIGN -> {
-              if (FastMath.abs(alignX.getError()) < driveXCloseEnough
+              if ((isAuto ? true : FastMath.abs(alignX.getError()) < driveXCloseEnough)
                   && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
                 finalDrive = true;
               }

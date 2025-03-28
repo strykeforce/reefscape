@@ -25,6 +25,7 @@ import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.ArrayList;
@@ -161,7 +162,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             "startToJSlow",
             new ArrayList<Character>(Arrays.asList('k', 'l')),
-            new ArrayList<Integer>(Arrays.asList(4, 4)),
+            new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
             'j',
             false,
             AutonConstants.kNonProcessorShallow);
@@ -179,7 +180,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             "startToJ",
             new ArrayList<Character>(Arrays.asList('k', 'l', 'i')),
-            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            new ArrayList<ScoringLevel>(
+                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
             'j',
             false,
             false,
@@ -198,7 +200,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             "startToJ",
             new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
-            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            new ArrayList<ScoringLevel>(
+                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
             'j',
             false,
             false,
@@ -217,7 +220,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             "startDeepToK",
             new ArrayList<Character>(Arrays.asList('l', 'a', 'b')),
-            new ArrayList<Integer>(Arrays.asList(4, 4, 4)),
+            new ArrayList<ScoringLevel>(
+                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
             'k',
             true,
             false,
@@ -237,7 +241,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             "startToJ",
             new ArrayList<Character>(Arrays.asList('k', 'l', 'k')),
-            new ArrayList<Integer>(Arrays.asList(4, 4, 3)),
+            new ArrayList<ScoringLevel>(
+                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
             'j',
             false,
             true,
@@ -257,7 +262,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             "startPToESlow",
             new ArrayList<Character>(Arrays.asList('d', 'c')),
-            new ArrayList<Integer>(Arrays.asList(4, 4)),
+            new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
             'e',
             true,
             AutonConstants.kNonProcessorShallow);
