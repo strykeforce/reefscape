@@ -12,34 +12,53 @@ import frc.robot.constants.BargeAlignConstants;
 import java.util.function.DoubleSupplier;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class BargeAlign extends MeasurableSubsystem{
 private DoubleSupplier strStick;
 private DriveSubsystem driveSubsystem;
+
 //These are here to determine offsets for target positions.
+
 private boolean blueAlliance;
-private boolean redBare;
+private boolean redBarge;
 private Alliance alliance;
 private double driveRadius = 1.5; //TODO This is a magic number that needs creating
 private BargeAlignStates curState;
 
     public BargeAlign(
-    DoubleSupplier strStick,
-    DriveSubsystem driveSubsystem){
+        DoubleSupplier strStick,
+        DriveSubsystem driveSubsystem){
+
     if(alliance == Alliance.Blue){
         blueAlliance = true;
-    }else{
+    }
+    else{
         blueAlliance = false;
     }
+    curState = BargeAlignStates.DRIVE;
     }
+
 public void setState(BargeAlignStates curState){
     this.curState = curState;
 }
-private boolean getOnBlueSide(){
+
+private boolean getOnBlueSide() {
     return 
     driveSubsystem.getPoseMeters().getMeasureX()
     .compareTo(BargeAlignConstants.blueBargePos.getMeasureX()) <= 0;
 }
+
+private boolean getOnRedSide() {
+    return
+    driveSubsystem.getPoseMeters().getMeasureX()
+    .compareTo(BargeAlignConstants.redBargePos.getMeasureX()) <= 0;
+}
+
+private double getYStickReading() {
+     return xboxController.XkY.value);
+} //same joystick reading as the drive
 
 private Translation2d getTargetTranslation(){
 
@@ -60,7 +79,7 @@ public void periodic(){
         case DRIVE:
             
         break;
-        case DONE:
+        case FINISHED:
         break;
     }
 }
@@ -71,8 +90,9 @@ public Set<Measure> getMeasures(){
 }
 
 public enum BargeAlignStates {
+    //INIT,
     DRIVE,
-    DONE
+    FINISHED
 }
 
 }
