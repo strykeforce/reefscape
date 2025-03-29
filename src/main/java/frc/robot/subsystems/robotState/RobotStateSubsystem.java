@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.constants.DriveConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
@@ -28,12 +27,10 @@ import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem.LEDStates;
 import frc.robot.subsystems.led.LEDSubsystem.PlaceStates;
 import frc.robot.subsystems.tagAlign.BargeAlignSubsystem;
-import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.BargeAlignSubsystem.BargeAlignStates;
+import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import kotlinx.html.BaseTarget;
-
 import java.util.Set;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
@@ -83,6 +80,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private boolean prestagingForAlgae = false;
   private boolean hasElevatorAutoCoralPrestaged = false;
 
+  private RobotStates interruptedState = RobotStates.IDLE;
+
   private Timer scoringTimer = new Timer();
   private Angle nextBiscuitSetpoint;
 
@@ -123,6 +122,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public RobotStates getNextState() {
     return nextState;
+  }
+
+  public RobotStates getInterruptedState() {
+    return interruptedState;
   }
 
   public CoralLoc getCoralLoc() {
@@ -563,8 +566,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toScoreAlgae() {
     currentAlgaeHeight = algaeHeight;
-    if (curState == RobotStates.BARGE_ALGAE || curState == RobotStates.BARGE_ALIGN || curState == RobotStates.TO_BARGE_ALGAE && algaeHeight == AlgaeHeight.LOW) {
+    if ((curState == RobotStates.BARGE_ALGAE
+            || curState == RobotStates.BARGE_ALIGN
+            || curState == RobotStates.TO_BARGE_ALGAE)
+        && algaeHeight == AlgaeHeight.LOW) {
       futureState = RobotStates.PROCESSOR_ALGAE;
+      bargeAlignSubsystem.terminate();
       toStowSafe();
     } else if (curState == RobotStates.PROCESSOR_ALGAE && algaeHeight == AlgaeHeight.HIGH) {
       futureState = RobotStates.BARGE_ALGAE;
@@ -589,8 +596,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             poseX > RobotStateConstants.kRedBargeSafeX
                 || poseX < RobotStateConstants.kBlueBargeSafeX;
         if (isBargeSafe) {
-          bargeAlignSubsystem.startBargeAlign();
-          setState(RobotStates.TO_BARGE_ALGAE);
+          if (isAutoPlacing) {
+            driveSubsystem.setIgnoreSticks(true);
+            bargeAlignSubsystem.startBargeAlign();
+            setState(RobotStates.BARGE_ALIGN);
+          } else {
+            elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
+            setState(RobotStates.TO_BARGE_ALGAE);
+          }
         }
       }
     }
@@ -658,6 +671,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toInterrupted() {
+    interruptedState = curState;
     if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
       tagAlignSubsystem.terminate();
       visionSubsystem.setYawUpdateCamera(-1);
@@ -667,6 +681,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     if (climbAlignSubsystem.getState() != ClimbAlignSubsystem.ClimbAlignStates.DONE) {
       climbAlignSubsystem.terminate();
+      driveSubsystem.setIgnoreSticks(false);
+    }
+
+    if (bargeAlignSubsystem.getState() != BargeAlignStates.FINISHED) {
+      bargeAlignSubsystem.terminate();
       driveSubsystem.setIgnoreSticks(false);
     }
 
@@ -923,11 +942,16 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case BARGE_ALGAE -> {
-        if (!isEjectingAlgae && elevatorSubsystem.isFinished() && biscuitSubsystem.isFinished() && bargeAlignSubsystem.getState() == BargeAlignStates.FINISHED) {
+        if (!isEjectingAlgae
+            && elevatorSubsystem.isFinished()
+            && biscuitSubsystem.isFinished()
+            && bargeAlignSubsystem.getState() == BargeAlignStates.FINISHED
+            && isAutoPlacing) {
           releaseAlgae();
         } else if (!algaeSubsystem.hasAlgae()
             && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)
             && isEjectingAlgae) {
+          driveSubsystem.setIgnoreSticks(false);
           isEjectingAlgae = false;
           toStowSafe();
         } else if (algaeHeight != currentAlgaeHeight) {

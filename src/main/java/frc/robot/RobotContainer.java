@@ -208,7 +208,8 @@ public class RobotContainer {
             funnelSubsystem,
             ledSubsystem,
             tagAlignSubsystem,
-            visionSubsystem, bargeAlignSubsystem);
+            visionSubsystem,
+            bargeAlignSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
