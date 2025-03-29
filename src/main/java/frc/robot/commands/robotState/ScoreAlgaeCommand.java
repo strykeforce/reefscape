@@ -12,6 +12,7 @@ public class ScoreAlgaeCommand extends Command {
   private ElevatorSubsystem elevatorSubsystem;
   private RobotStates startState;
   private boolean startingElevatorFinished;
+  private boolean hasEjectedToBarge;
 
   public ScoreAlgaeCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -27,7 +28,7 @@ public class ScoreAlgaeCommand extends Command {
   public void initialize() {
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
-    if (startState == RobotStates.BARGE_ALGAE || startState == RobotStates.PROCESSOR_ALGAE) {
+    if (startState == RobotStates.PROCESSOR_ALGAE) {
       robotStateSubsystem.releaseAlgae();
     } else {
       robotStateSubsystem.toScoreAlgae();
@@ -36,14 +37,16 @@ public class ScoreAlgaeCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    if (startState == RobotStates.BARGE_ALGAE || startState == RobotStates.PROCESSOR_ALGAE) {
+    if (startState == RobotStates.PROCESSOR_ALGAE || hasEjectedToBarge) {
       return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
           || robotStateSubsystem.getState() == RobotStates.STOW
           || !startingElevatorFinished;
+    } else if (robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE) {
+      hasEjectedToBarge = true;
     } else {
-      return robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE
-          || robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
+      return robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
           || !robotStateSubsystem.getIsBargeSafe();
     }
+    return false;
   }
 }

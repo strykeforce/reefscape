@@ -27,9 +27,13 @@ import frc.robot.subsystems.funnel.FunnelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem.LEDStates;
 import frc.robot.subsystems.led.LEDSubsystem.PlaceStates;
+import frc.robot.subsystems.tagAlign.BargeAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import frc.robot.subsystems.tagAlign.BargeAlignSubsystem.BargeAlignStates;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import kotlinx.html.BaseTarget;
+
 import java.util.Set;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;
@@ -54,6 +58,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   private FunnelSubsystem funnelSubsystem;
   private LEDSubsystem ledSubsystem;
   private TagAlignSubsystem tagAlignSubsystem;
+  private BargeAlignSubsystem bargeAlignSubsystem;
   private VisionSubsystem visionSubsystem;
 
   private RobotStates curState = RobotStates.IDLE;
@@ -93,7 +98,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       FunnelSubsystem funnelSubsystem,
       LEDSubsystem ledSubsystem,
       TagAlignSubsystem tagAlignSubsystem,
-      VisionSubsystem visionSubsystem) {
+      VisionSubsystem visionSubsystem,
+      BargeAlignSubsystem bargeAlignSubsystem) {
     this.algaeSubsystem = algaeSubsystem;
     this.battMonSubsystem = battMonSubsystem;
     this.biscuitSubsystem = biscuitSubsystem;
@@ -106,6 +112,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.ledSubsystem = ledSubsystem;
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.visionSubsystem = visionSubsystem;
+    this.bargeAlignSubsystem = bargeAlignSubsystem;
 
     ledSubsystem.setState(LEDStates.NORMAL);
   }
@@ -556,7 +563,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toScoreAlgae() {
     currentAlgaeHeight = algaeHeight;
-    if (curState == RobotStates.BARGE_ALGAE && algaeHeight == AlgaeHeight.LOW) {
+    if (curState == RobotStates.BARGE_ALGAE || curState == RobotStates.BARGE_ALIGN || curState == RobotStates.TO_BARGE_ALGAE && algaeHeight == AlgaeHeight.LOW) {
       futureState = RobotStates.PROCESSOR_ALGAE;
       toStowSafe();
     } else if (curState == RobotStates.PROCESSOR_ALGAE && algaeHeight == AlgaeHeight.HIGH) {
@@ -577,18 +584,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (needSafeAlgaeTransfer(RobotStates.BARGE_ALGAE)) {
           return;
         }
-
-        driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
-
         double poseX = driveSubsystem.getPoseMeters().getX();
-
         isBargeSafe =
             poseX > RobotStateConstants.kRedBargeSafeX
                 || poseX < RobotStateConstants.kBlueBargeSafeX;
-
         if (isBargeSafe) {
-          elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
-
+          bargeAlignSubsystem.startBargeAlign();
           setState(RobotStates.TO_BARGE_ALGAE);
         }
       }
@@ -617,7 +618,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case HIGH -> {
         algaeSubsystem.scoreBarge();
-        setState(RobotStates.BARGE_ALGAE);
       }
     }
   }
@@ -908,6 +908,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toScoreAlgae();
         }
       }
+      case BARGE_ALIGN -> {
+        if (bargeAlignSubsystem.getState() == BargeAlignStates.RAISE_ELEV) {
+          elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
+          curState = RobotStates.TO_BARGE_ALGAE;
+        }
+      }
       case TO_BARGE_ALGAE -> {
         if (elevatorSubsystem.isHigherThan(ElevatorConstants.kBargeHigherThan)) {
           biscuitSubsystem.setPosition(
@@ -917,7 +923,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
       }
       case BARGE_ALGAE -> {
-        if (!algaeSubsystem.hasAlgae()
+        if (!isEjectingAlgae && elevatorSubsystem.isFinished() && biscuitSubsystem.isFinished() && bargeAlignSubsystem.getState() == BargeAlignStates.FINISHED) {
+          releaseAlgae();
+        } else if (!algaeSubsystem.hasAlgae()
             && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)
             && isEjectingAlgae) {
           isEjectingAlgae = false;
@@ -992,6 +1000,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     PRESTAGE,
     HP_ALGAE,
     PROCESSOR_ALGAE,
+    BARGE_ALIGN,
     TO_BARGE_ALGAE,
     BARGE_ALGAE,
     MIC_ALGAE,

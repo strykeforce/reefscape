@@ -94,6 +94,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
+import frc.robot.subsystems.tagAlign.BargeAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Map;
@@ -133,6 +134,7 @@ public class RobotContainer {
   private final LEDSubsystem ledSubsystem;
 
   private final TagAlignSubsystem tagAlignSubsystem;
+  private final BargeAlignSubsystem bargeAlignSubsystem;
 
   private final VisionSubsystem visionSubsystem;
 
@@ -191,6 +193,7 @@ public class RobotContainer {
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
     tagAlignSubsystem = new TagAlignSubsystem(driveSubsystem, visionSubsystem);
+    bargeAlignSubsystem = new BargeAlignSubsystem(flysky, driveSubsystem);
 
     robotStateSubsystem =
         new RobotStateSubsystem(
@@ -205,7 +208,7 @@ public class RobotContainer {
             funnelSubsystem,
             ledSubsystem,
             tagAlignSubsystem,
-            visionSubsystem);
+            visionSubsystem, bargeAlignSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
