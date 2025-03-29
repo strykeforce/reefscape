@@ -10,8 +10,8 @@ public class AutonConstants {
   public static final double kMaxOmegaErrorDegrees = 0.5;
   public static final double kMaxOmegaErrorRadians = Units.degreesToRadians(kMaxOmegaErrorDegrees);
   public static final int kSwitchStableCounts = 3;
-  public static final double kElevatorStageRadius = 2.2;
-  public static final double kElevatorStageRadiusPathOne = 1.8;
+  public static final double kElevatorStageRadius = 2.3;
+  public static final double kElevatorStageRadiusPathOne = 2.1; // 1.8
   public static final double kInitPathPrestageTime = 0.6;
 
   // Start Poses

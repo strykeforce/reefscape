@@ -63,6 +63,8 @@ public class Swerve implements SwerveIO, Checkable {
   private StatusSignal<Current> drive11StatorCurrent;
   private StatusSignal<Current> drive12StatorCurrent;
   private StatusSignal<Current> drive13StatorCurrent;
+  private StatusSignal<AngularVelocity> drive10Velocity;
+  private StatusSignal<AngularVelocity> drive11Velocity;
   private StatusSignal<AngularVelocity> drive12Velocity;
   private StatusSignal<AngularVelocity> drive13Velocity;
   private boolean didZero = false;
@@ -112,6 +114,8 @@ public class Swerve implements SwerveIO, Checkable {
     drive11StatorCurrent = drives[1].getStatorCurrent();
     drive12StatorCurrent = drives[2].getStatorCurrent();
     drive13StatorCurrent = drives[3].getStatorCurrent();
+    drive10Velocity = drives[0].getVelocity();
+    drive11Velocity = drives[1].getVelocity();
     drive12Velocity = drives[2].getVelocity();
     drive13Velocity = drives[3].getVelocity();
     didZero = true;
@@ -345,6 +349,8 @@ public class Swerve implements SwerveIO, Checkable {
         drive11StatorCurrent,
         drive12StatorCurrent,
         drive13StatorCurrent,
+        drive10Velocity,
+        drive11Velocity,
         drive12Velocity,
         drive13Velocity);
     // inputs.avgDriveCurrent = getAvgDriveCurrent();
@@ -359,6 +365,10 @@ public class Swerve implements SwerveIO, Checkable {
     inputs.avgRearDriveVel =
         (Math.abs(drive12Velocity.getValueAsDouble())
                 + Math.abs(drive13Velocity.getValueAsDouble()))
+            / 2;
+    inputs.avgRearDriveVel =
+        (Math.abs(drive10Velocity.getValueAsDouble())
+                + Math.abs(drive11Velocity.getValueAsDouble()))
             / 2;
   }
 

@@ -2,10 +2,13 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
+import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 
 public class TestAutonCommand extends SequentialCommandGroup implements AutoCommandInterface {
@@ -14,17 +17,21 @@ public class TestAutonCommand extends SequentialCommandGroup implements AutoComm
   private RobotStateSubsystem robotStateSubsystem;
 
   public TestAutonCommand(
-      DriveSubsystem driveSubsystem, RobotStateSubsystem robotStateSubsystem, Pose2d startPose) {
+      DriveSubsystem driveSubsystem,
+      RobotStateSubsystem robotStateSubsystem,
+      ElevatorSubsystem elevatorSubsystem) {
 
     this.driveSubsystem = driveSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
 
-    this.startPath = new DriveAutonCommand(driveSubsystem, "LTofetch", true, true, false);
+    this.startPath = new DriveAutonCommand(driveSubsystem, "FiveMeterTestPath", true, true, false);
 
     addCommands(
         new SequentialCommandGroup(
-            new PrepOdomForAutoCommand(
-                robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(300.0), startPose),
+            new ParallelCommandGroup(
+                new PrepOdomForAutoCommand(
+                    robotStateSubsystem, driveSubsystem, new Rotation2d(), new Pose2d()),
+                new ZeroElevatorCommand(elevatorSubsystem)),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             startPath));
   }

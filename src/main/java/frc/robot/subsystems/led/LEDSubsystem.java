@@ -45,6 +45,11 @@ public class LEDSubsystem extends MeasurableSubsystem {
           .blink(Seconds.of(0.25));
   private LEDPattern currentLimiting =
       LEDPattern.solid(LEDConstants.kCurrentLimiting).blink(Seconds.of(0.5), Seconds.of(1));
+  private LEDPattern loadCoral =
+      LEDPattern.steps(
+          Map.of(
+              LEDConstants.kTopFirstIndex / (double) LEDConstants.kTotalStripLength,
+              LEDConstants.kLoadCoral));
 
   // section booleans and states
   private boolean hasAlgae = false;
@@ -52,6 +57,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
   private ScoringLevel levelState = ScoringLevel.L4;
   private PlaceStates placeState = PlaceStates.MANUAL;
   private boolean shouldGetAlgae = false;
+  private boolean shouldLoadCoral = false;
   private boolean autoPlacing = false;
   private boolean isLimiting = false;
 
@@ -115,6 +121,11 @@ public class LEDSubsystem extends MeasurableSubsystem {
     buildBase();
   }
 
+  public void setLoadCoral(boolean loadCoral) {
+    this.shouldLoadCoral = loadCoral;
+    buildBase();
+  }
+
   // getters
   public boolean getAlgeaLights() {
     return hasAlgae;
@@ -145,6 +156,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
   }
 
   private void buildBase() {
+
     algae =
         LEDPattern.steps(
             Map.of(
@@ -157,51 +169,53 @@ public class LEDSubsystem extends MeasurableSubsystem {
       case CORAL, SCORING -> coral = LEDPattern.solid(LEDConstants.kCoralInRobot);
       case NONE -> coral = LEDPattern.solid(LEDConstants.kCoralNotInRobot);
     }
-    switch (levelState) {
-      case L1 -> level =
+    if (!shouldLoadCoral) {
+      switch (levelState) {
+        case L1 -> level =
+            LEDPattern.steps(
+                Map.of(
+                    LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
+                    LEDConstants.kL1));
+        case L2 -> level =
+            LEDPattern.steps(
+                Map.of(
+                    LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
+                    LEDConstants.kL2));
+        case L3 -> level =
+            LEDPattern.steps(
+                Map.of(
+                    LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
+                    LEDConstants.kL3));
+        case L4 -> level =
+            LEDPattern.steps(
+                Map.of(
+                    LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
+                    LEDConstants.kL4));
+      }
+      switch (placeState) {
+        case MANUAL -> place =
+            LEDPattern.steps(
+                Map.of(
+                    LEDConstants.kPlaceStart / (double) LEDConstants.kTotalStripLength,
+                    LEDConstants.kManual));
+        case LEFT -> place =
+            LEDPattern.steps(
+                Map.of(
+                    LEDConstants.kPlaceStart / (double) LEDConstants.kTotalStripLength,
+                    LEDConstants.kLeft));
+        case RIGHT -> place =
+            LEDPattern.steps(
+                Map.of(
+                    LEDConstants.kPlaceStart / (double) LEDConstants.kTotalStripLength,
+                    LEDConstants.kRight));
+      }
+      getAlgea =
           LEDPattern.steps(
               Map.of(
-                  LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
-                  LEDConstants.kL1));
-      case L2 -> level =
-          LEDPattern.steps(
-              Map.of(
-                  LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
-                  LEDConstants.kL2));
-      case L3 -> level =
-          LEDPattern.steps(
-              Map.of(
-                  LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
-                  LEDConstants.kL3));
-      case L4 -> level =
-          LEDPattern.steps(
-              Map.of(
-                  LEDConstants.kLevelStart / (double) LEDConstants.kTotalStripLength,
-                  LEDConstants.kL4));
+                  LEDConstants.kGetAlgeaStart / (double) LEDConstants.kTotalStripLength,
+                  shouldGetAlgae ? LEDConstants.kGetAlgea : LEDConstants.kNotGetAlgea));
+      base = algae.overlayOn(coral);
     }
-    switch (placeState) {
-      case MANUAL -> place =
-          LEDPattern.steps(
-              Map.of(
-                  LEDConstants.kPlaceStart / (double) LEDConstants.kTotalStripLength,
-                  LEDConstants.kManual));
-      case LEFT -> place =
-          LEDPattern.steps(
-              Map.of(
-                  LEDConstants.kPlaceStart / (double) LEDConstants.kTotalStripLength,
-                  LEDConstants.kLeft));
-      case RIGHT -> place =
-          LEDPattern.steps(
-              Map.of(
-                  LEDConstants.kPlaceStart / (double) LEDConstants.kTotalStripLength,
-                  LEDConstants.kRight));
-    }
-    getAlgea =
-        LEDPattern.steps(
-            Map.of(
-                LEDConstants.kGetAlgeaStart / (double) LEDConstants.kTotalStripLength,
-                shouldGetAlgae ? LEDConstants.kGetAlgea : LEDConstants.kNotGetAlgea));
-    base = algae.overlayOn(coral);
 
     if (isLimiting) {
       base = currentLimiting.overlayOn(base);
@@ -210,8 +224,11 @@ public class LEDSubsystem extends MeasurableSubsystem {
     if (autoPlacing) {
       base = autoplace.overlayOn(base);
     }
-
-    base = getAlgea.overlayOn(place.overlayOn(level.overlayOn(base)));
+    if (shouldLoadCoral) {
+      base = loadCoral.overlayOn(base);
+    } else {
+      base = getAlgea.overlayOn(place.overlayOn(level.overlayOn(base)));
+    }
   }
 
   // game stuff

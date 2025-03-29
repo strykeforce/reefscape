@@ -10,7 +10,7 @@ public class LEDConstants {
   public static final int kLEDPort = 0;
   // Auto/Operator = 27
   // other = 21.5
-  public static final int kTotalStripLength = 51;
+  public static final int kTotalStripLength = 51 + 10;
   public static final int kBottomStripLength = 34;
   public static final int kTopStripLength = 17;
   public static final int kTopFirstIndex = kBottomStripLength;
@@ -51,6 +51,9 @@ public class LEDConstants {
   public static final Color kTooFar = invertRedGreen(Color.kRed);
   public static final Color kGood = invertRedGreen(Color.kGreen);
   public static final Color kTooClose = invertRedGreen(Color.kBlue);
+
+  // HP Load Color
+  public static final Color kLoadCoral = invertRedGreen(Color.kBlue);
 
   public static final Color[] kGameColors = {
     invertRedGreen(Color.kBlack), // a dummy color
