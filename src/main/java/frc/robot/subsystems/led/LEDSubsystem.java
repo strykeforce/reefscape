@@ -46,7 +46,10 @@ public class LEDSubsystem extends MeasurableSubsystem {
   private LEDPattern currentLimiting =
       LEDPattern.solid(LEDConstants.kCurrentLimiting).blink(Seconds.of(0.5), Seconds.of(1));
   private LEDPattern loadCoral =
-      LEDPattern.steps(Map.of(LEDConstants.kTopFirstIndex, LEDConstants.kLoadCoral));
+      LEDPattern.steps(
+          Map.of(
+              LEDConstants.kTopFirstIndex / (double) LEDConstants.kTotalStripLength,
+              LEDConstants.kLoadCoral));
 
   // section booleans and states
   private boolean hasAlgae = false;
@@ -153,9 +156,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
   }
 
   private void buildBase() {
-    if (shouldLoadCoral) {
-      base = loadCoral.overlayOn(base);
-    }
+
     algae =
         LEDPattern.steps(
             Map.of(
@@ -223,8 +224,11 @@ public class LEDSubsystem extends MeasurableSubsystem {
     if (autoPlacing) {
       base = autoplace.overlayOn(base);
     }
-
-    base = getAlgea.overlayOn(place.overlayOn(level.overlayOn(base)));
+    if (shouldLoadCoral) {
+      base = loadCoral.overlayOn(base);
+    } else {
+      base = getAlgea.overlayOn(place.overlayOn(level.overlayOn(base)));
+    }
   }
 
   // game stuff

@@ -723,6 +723,15 @@ public class RobotContainer {
                 driveSubsystem, climbSubsystem, climbAlignSubsystem, robotStateSubsystem))
         .withPosition(0, 1)
         .withSize(1, 1);
+
+    Shuffleboard.getTab("Test")
+        .add("Headlights On", new InstantCommand(() -> pathHandler.setHeadlights(true)))
+        .withPosition(2, 2)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Test")
+        .add("Headlights Off", new InstantCommand(() -> pathHandler.setHeadlights(false)))
+        .withPosition(3, 2)
+        .withSize(1, 1);
   }
 
   public Command getAutonomousCommand() {

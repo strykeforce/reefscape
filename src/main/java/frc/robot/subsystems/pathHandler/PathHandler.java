@@ -5,6 +5,7 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants;
@@ -59,8 +60,11 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean teleop = false;
   private boolean isPlacing = false;
   private boolean hasPreppedCoral = false;
+  private boolean hasStagedAlgae = false;
   private boolean algaeOnLast = false;
   private boolean hasLEDsOn = false;
+
+  private DigitalOutput lights = new DigitalOutput(3);
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -184,6 +188,9 @@ public class PathHandler extends MeasurableSubsystem {
       if (curState == PathStates.PLACE) {
         curState = PathStates.DRIVE_FETCH;
       } else if (curState == PathStates.FETCH) {
+        robotStateSubsystem.setLEDLoadCoral(false);
+        hasLEDsOn = false;
+        setHeadlights(true);
         curState = PathStates.DRIVE_PLACE;
       }
     }
@@ -223,6 +230,9 @@ public class PathHandler extends MeasurableSubsystem {
         pathTimer.reset();
         driveSubsystem.drive(0, 0, 0);
         advanceNodes();
+        robotStateSubsystem.setLEDLoadCoral(false);
+        hasLEDsOn = false;
+        setHeadlights(true);
         curState = PathStates.DRIVE_PLACE;
 
       } else if (shouldTransitionToServoing()) {
@@ -400,6 +410,10 @@ public class PathHandler extends MeasurableSubsystem {
     return !isHandling;
   }
 
+  public void setHeadlights(boolean on) {
+    lights.set(on);
+  }
+
   @Override
   public void periodic() {
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/State", curState);
@@ -407,6 +421,10 @@ public class PathHandler extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput(
         "PathHandler/curRadius",
         tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor()));
+    org.littletonrobotics.junction.Logger.recordOutput("PathHandler/hasLEDsOn", hasLEDsOn);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "PathHandler/hasStagedAlgae", hasStagedAlgae);
+
     switch (curState) {
       case DRIVE_FETCH -> {
         if (!runningPath) {
@@ -417,36 +435,41 @@ public class PathHandler extends MeasurableSubsystem {
                             driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
                         + FastMath.pow(
                             driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2))
-                < 0.5
+                < 1.7
             && !hasLEDsOn) {
           robotStateSubsystem.setLEDLoadCoral(true);
           hasLEDsOn = true;
+          setHeadlights(false);
         }
         drivePath();
       }
       case FETCH -> {
-        if (hasLEDsOn) {
-          robotStateSubsystem.setLEDLoadCoral(false);
-          hasLEDsOn = false;
-        }
         if (robotStateSubsystem.hasCoral() || (robotStateSubsystem.hasCoralAuton())) {
           // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
           // proceedToNext) {
           advanceNodes();
+
+          robotStateSubsystem.setLEDLoadCoral(false);
+          hasLEDsOn = false;
+          setHeadlights(true);
           curState = PathStates.DRIVE_PLACE;
         }
       }
       case DRIVE_PLACE -> {
+        if (algaeOnLast
+            && nodeNames.size() == 1
+            && !hasStagedAlgae
+            && robotStateSubsystem.hasCoral()) {
+          robotStateSubsystem.toReefAlignAlgaeAuto();
+          hasStagedAlgae = true;
+        }
         if (
         /*tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
         <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
-            && !hasPreppedCoral) {
+            && !hasPreppedCoral
+            && !hasStagedAlgae) {
           hasPreppedCoral = true;
-          if (algaeOnLast && nodeNames.size() == 1) {
-            robotStateSubsystem.toReefAlignAlgaeAuto();
-          } else {
-            robotStateSubsystem.toPrepCoral();
-          }
+          robotStateSubsystem.toPrepCoral();
         }
         if (!runningPath) {
           if (nodeNames.size() > 0) {
@@ -487,6 +510,7 @@ public class PathHandler extends MeasurableSubsystem {
           return;
         }
         hasPreppedCoral = false;
+        hasStagedAlgae = false;
         if (robotStateSubsystem.isElevatorFinished() && !isPlacing) {
           isPlacing = true;
           robotStateSubsystem.toPlaceCoralAuto();
