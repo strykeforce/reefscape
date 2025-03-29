@@ -39,9 +39,8 @@ public class BattMonSubsystem extends SubsystemBase {
           safeAlert.set(false);
           recoveryTempThreshold = curWarnThreshold - BattMonConstants.kHysteresis;
           curState = battMonState.WARNING;
-        } 
-          break;
-        
+        }
+        break;
 
       case WARNING:
         if (inputs.breakerTemp > curDangerThreshold) {
@@ -52,9 +51,8 @@ public class BattMonSubsystem extends SubsystemBase {
           highTempAlert.set(false);
           safeAlert.set(true);
           curState = battMonState.NORMAL;
-        } 
-          break;
-        
+        }
+        break;
 
       case DANGER:
         if (inputs.breakerTemp <= recoveryTempThreshold) {
@@ -63,7 +61,7 @@ public class BattMonSubsystem extends SubsystemBase {
           curState = battMonState.WARNING;
         }
     }
-  
+  }
 
   public battMonState getState() {
     return curState;

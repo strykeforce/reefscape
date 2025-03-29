@@ -2,6 +2,9 @@ package frc.robot.constants;
 
 public class BattMonConstants {
   // All of these aren't right and will need to be determined
+  public static final int kBattCurrentID = 1;
+  public static final int kBattVoltID = 1;
+  public static final int kBattTempID = 1;
 
   // Battery Voltage Conversion
   public static final double kBattVolt1 = 12;
