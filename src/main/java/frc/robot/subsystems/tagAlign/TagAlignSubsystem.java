@@ -432,7 +432,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               if (finalDrive
                   && driveSubsystem.getAvgDriveCurrent()
                       > TagServoingConstants.kEndDriveCurrentThreshold
-                  && driveSubsystem.getAvgRearDriveVel() < TagServoingConstants.kEndVelThreshold) {
+                  && (!isAuto
+                          && driveSubsystem.getAvgRearDriveVel()
+                              < TagServoingConstants.kEndVelThreshold
+                      || isAuto && driveSubsystem.getAvgRearDriveVel() < 8)) {
 
                 currentThresCount++;
                 if (currentThresCount >= TagServoingConstants.kEndCountThreshold) {
@@ -447,7 +450,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
         }
 
         if (finalDrive) {
-          vX = 0.25;
+          if (isAuto) {
+            vX = 0.35;
+          } else {
+            vX = 0.25;
+          }
         }
         if (curState == TagAlignStates.WAITING) {
           break;

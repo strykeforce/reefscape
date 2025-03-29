@@ -725,11 +725,15 @@ public class RobotContainer {
         .withSize(1, 1);
 
     Shuffleboard.getTab("Test")
-        .add("Headlights On", new InstantCommand(() -> pathHandler.setHeadlights(true)))
+        .add(
+            "Headlights On",
+            new InstantCommand(() -> pathHandler.setHeadlights(true)).runsWhenDisabled())
         .withPosition(2, 2)
         .withSize(1, 1);
     Shuffleboard.getTab("Test")
-        .add("Headlights Off", new InstantCommand(() -> pathHandler.setHeadlights(false)))
+        .add(
+            "Headlights Off",
+            new InstantCommand(() -> pathHandler.setHeadlights(false)).runsWhenDisabled())
         .withPosition(3, 2)
         .withSize(1, 1);
   }
@@ -755,7 +759,7 @@ public class RobotContainer {
   }
 
   public void stow() {
-    robotStateSubsystem.toStow();
+    robotStateSubsystem.toStowSafe();
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -776,5 +780,9 @@ public class RobotContainer {
 
   public boolean wasScoringCoral() {
     return robotStateSubsystem.getState() == RobotStates.PLACE_CORAL;
+  }
+
+  public void setHeadlights(boolean on) {
+    pathHandler.setHeadlights(on);
   }
 }

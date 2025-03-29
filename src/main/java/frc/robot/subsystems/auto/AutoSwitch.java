@@ -11,6 +11,7 @@ import frc.robot.commands.auton.DefaultAutonCommand;
 import frc.robot.commands.auton.NonProcessorDeepAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
+import frc.robot.commands.auton.ProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.RobotConstants;
@@ -267,6 +268,28 @@ public class AutoSwitch extends MeasurableSubsystem {
             true,
             AutonConstants.kNonProcessorShallow);
       }
+
+      case 0x21 -> {
+        return new ProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startPToE",
+            new ArrayList<Character>(Arrays.asList('d', 'c', 'c')),
+            new ArrayList<ScoringLevel>(
+                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
+            'e',
+            true,
+            true,
+            AutonConstants.kNonProcessorShallow);
+      }
+
       default -> {
         String msg = String.format("no auto command assigned for switch pos: %02X", switchPos);
         DriverStation.reportWarning(msg, false);

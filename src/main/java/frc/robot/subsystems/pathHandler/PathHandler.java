@@ -93,6 +93,8 @@ public class PathHandler extends MeasurableSubsystem {
     this.nodeLevels = nodeLevels;
     this.startNode = startNode;
     this.mirrorToProcessor = mirrorToProcessor;
+
+    setHeadlights(true);
   }
 
   public void setPathNames(String[][] pathNames) {
@@ -190,7 +192,7 @@ public class PathHandler extends MeasurableSubsystem {
       } else if (curState == PathStates.FETCH) {
         robotStateSubsystem.setLEDLoadCoral(false);
         hasLEDsOn = false;
-        setHeadlights(true);
+        // setHeadlights(true);
         curState = PathStates.DRIVE_PLACE;
       }
     }
@@ -232,7 +234,7 @@ public class PathHandler extends MeasurableSubsystem {
         advanceNodes();
         robotStateSubsystem.setLEDLoadCoral(false);
         hasLEDsOn = false;
-        setHeadlights(true);
+        // setHeadlights(true);
         curState = PathStates.DRIVE_PLACE;
 
       } else if (shouldTransitionToServoing()) {
@@ -439,7 +441,7 @@ public class PathHandler extends MeasurableSubsystem {
             && !hasLEDsOn) {
           robotStateSubsystem.setLEDLoadCoral(true);
           hasLEDsOn = true;
-          setHeadlights(false);
+          // setHeadlights(false);
         }
         drivePath();
       }
@@ -451,7 +453,7 @@ public class PathHandler extends MeasurableSubsystem {
 
           robotStateSubsystem.setLEDLoadCoral(false);
           hasLEDsOn = false;
-          setHeadlights(true);
+          // setHeadlights(true);
           curState = PathStates.DRIVE_PLACE;
         }
       }
