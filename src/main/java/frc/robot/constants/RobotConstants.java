@@ -243,7 +243,7 @@ public class RobotConstants {
 
     // Elevator
     public static Angle kElevatorFunnelSetpoint = Rotations.of(2.03125);
-    public static Angle kElevatorL1LoadSetpoint = Rotations.of(1.9);
+    public static Angle kElevatorL1LoadSetpoint = Rotations.of(1.76);
     public static Angle kElevatorStowSetpoint = kElevatorFunnelSetpoint;
     public static Angle kMaxFwd = kMicAlgaeSetpoint.plus(Rotations.of(5));
     public static Angle kMaxRev = kPrestageSetpoint.minus(Rotations.of(5));
@@ -349,7 +349,7 @@ public class RobotConstants {
 
   public static class CompConstants {
     public static Angle kElevatorFunnelSetpoint = Rotations.of(0.3676757);
-    public static Angle kElevatorL1LoadSetpoint = Rotations.of(1.9);
+    public static Angle kElevatorL1LoadSetpoint = Rotations.of(1.84);
     public static Angle kElevatorStowSetpoint = kElevatorFunnelSetpoint;
 
     // Biscuit
@@ -366,7 +366,7 @@ public class RobotConstants {
     // Idle
     public static Angle kBiscuitStowSetpoint = Rotations.of(1.862 / 2);
     public static Angle kFunnelSetpoint = kBiscuitStowSetpoint;
-    public static Angle kL1CoralLoadSetpoint = Rotations.of(3.96);
+    public static Angle kL1CoralLoadSetpoint = Rotations.of(8.078);
     public static Angle kPrestageSetpoint = Rotations.of(-2.94);
     public static Angle kPrestageAlgaeSetpoint = kBiscuitStowSetpoint;
 
@@ -380,7 +380,7 @@ public class RobotConstants {
     public static double kTagAlignThreshold = 20.0 / 2;
 
     // Coral score
-    public static Angle kL1CoralSetpoint = Rotations.of(12.7);
+    public static Angle kL1CoralSetpoint = Rotations.of(16.071);
     public static Angle kL2CoralSetpoint = kPrestageSetpoint;
     public static Angle kL3CoralSetpoint = kPrestageSetpoint;
     public static Angle kL4CoralSetpoint = kPrestageSetpoint;

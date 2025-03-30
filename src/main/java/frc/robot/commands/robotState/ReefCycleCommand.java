@@ -49,6 +49,8 @@ public class ReefCycleCommand extends Command {
       if (startingRobotState == RobotStates.REEF_ALIGN_CORAL) {
         return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
             || robotStateSubsystem.getState() == RobotStates.LOADING_CORAL
+            || robotStateSubsystem.getState() == RobotStates.TO_ALGAE_CORAL_LOAD
+            || robotStateSubsystem.getState() == RobotStates.ALGAE_CORAL_LOAD
             || !startingElevatorFinished;
       }
     }
