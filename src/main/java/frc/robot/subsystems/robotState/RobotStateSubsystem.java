@@ -857,7 +857,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toReefAlign(false, false);
           break;
         }
-
+        /*
         if (isAutoPlacing
             && !reefCoralStuckFixable
             && (tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.TAG_ALIGN
@@ -903,17 +903,17 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           if (!tagAlignSubsystem.isAligned()) {
             stuckAndMisaligned = true;
           }
-        }
+        } */
 
         if ((isAutoPlacing
                 && (tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE
-                    || reefCoralStuckFixable
-                        && tagAlignSubsystem.isAligned()
-                        && scoringLevel != ScoringLevel.L4)
+                /*  || reefCoralStuckFixable
+                && tagAlignSubsystem.isAligned()
+                && scoringLevel != ScoringLevel.L4*/ )
                 && elevatorSubsystem.isFinished())
             || (isAuto && isAutoReadyForEject)) {
           toPlaceCoral();
-          tagAlignSubsystem.terminate();
+          // tagAlignSubsystem.terminate();
           isAutoReadyForEject = false;
           reefCoralStuckFixable = false;
         }
