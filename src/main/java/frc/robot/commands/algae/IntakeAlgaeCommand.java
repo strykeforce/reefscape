@@ -12,6 +12,6 @@ public class IntakeAlgaeCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    algaeSubsystem.intake();
+    algaeSubsystem.intakeAlgae();
   }
 }

@@ -48,6 +48,7 @@ import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.LockWheelsCommand;
+import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
@@ -423,6 +424,33 @@ public class RobotContainer {
         .onTrue(
             new ClimbPrepCommand(
                 robotStateSubsystem, climbSubsystem, elevatorSubsystem, biscuitSubsystem));
+
+    new Trigger(() -> robotStateSubsystem.isStuckAndMisaligned())
+        .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+
+    // Move biscuit
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
   }
 
   private void configureTestOperatorBindings() {
@@ -603,6 +631,7 @@ public class RobotContainer {
                 () -> {
                   funnelSubsystem.clearCoral();
                   coralSubsystem.setState(CoralSubsystem.CoralState.EMPTY);
+                  algaeSubsystem.setState(AlgaeSubsystem.AlgaeStates.EMPTY);
                 }))
         .withSize(1, 1)
         .withPosition(9, 0);

@@ -240,6 +240,7 @@ public class PathHandler extends MeasurableSubsystem {
       } else if (shouldTransitionToServoing()) {
         tagAlignSubsystem.startAuto(
             mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+            robotStateSubsystem.getCoralLevel(),
             (nodeNames.get(0) - 'a') % 2 == 0,
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
@@ -299,6 +300,7 @@ public class PathHandler extends MeasurableSubsystem {
     if (nodeNames.size() > 0) {
       tagAlignSubsystem.setup(
           mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+          robotStateSubsystem.getCoralLevel(),
           (nodeNames.get(0) - 'a') % 2 == (mirrorToProcessor ? 1 : 0),
           false);
       nodeNames.remove(0);
@@ -321,8 +323,7 @@ public class PathHandler extends MeasurableSubsystem {
 
   private boolean shouldTransitionToServoing() {
 
-    return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
-            < PathHandlerConstants.kServoRadius
+    return tagAlignSubsystem.getCurRadius() < PathHandlerConstants.kServoRadius
         && curState == PathStates.DRIVE_PLACE;
     /*&& FastMath.abs(
         alignTargetPose
@@ -357,8 +358,7 @@ public class PathHandler extends MeasurableSubsystem {
   }
 
   private boolean shouldStageElevator() {
-    return tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
-            < AutonConstants.kElevatorStageRadius
+    return tagAlignSubsystem.getCurRadius() < AutonConstants.kElevatorStageRadius
         && curState == PathStates.DRIVE_PLACE
         && getCurError() < PathHandlerConstants.kMaxServoErrorY;
   }
@@ -421,8 +421,7 @@ public class PathHandler extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/State", curState);
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/curPath", currPathString);
     org.littletonrobotics.junction.Logger.recordOutput(
-        "PathHandler/curRadius",
-        tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor()));
+        "PathHandler/curRadius", tagAlignSubsystem.getCurRadius());
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/hasLEDsOn", hasLEDsOn);
     org.littletonrobotics.junction.Logger.recordOutput(
         "PathHandler/hasStagedAlgae", hasStagedAlgae);
@@ -476,12 +475,9 @@ public class PathHandler extends MeasurableSubsystem {
         if (!runningPath) {
           if (nodeNames.size() > 0) {
             char next = nodeNames.get(0);
-            targetHexant =
-                tagAlignSubsystem.computeFieldRelHexant(
-                    robotStateSubsystem.getAllianceColor(), currPathFinalPose);
+            targetHexant = tagAlignSubsystem.computeFieldRelHexant(currPathFinalPose);
             alignTargetPose =
-                tagAlignSubsystem.getTargetDrivePose(
-                    robotStateSubsystem.getAllianceColor(), (next - 'a') % 2 == 0, targetHexant);
+                tagAlignSubsystem.getTargetDrivePose((next - 'a') % 2 == 0, targetHexant);
           }
           startPath(nextPath());
           robotStateSubsystem.setScoringLevel(nodeLevels.get(0));

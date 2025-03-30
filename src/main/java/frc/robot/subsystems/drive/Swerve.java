@@ -199,6 +199,10 @@ public class Swerve implements SwerveIO, Checkable {
     return new ChassisSpeeds(fieldX, fieldY, roboRelSpeed.omegaRadiansPerSecond);
   }
 
+  public Rotation2d getPigeonGyroOffset() {
+    return swerveDrive.getGyroOffset();
+  }
+
   @Override
   public void setOdometry(OdometryStrategy odom) {
     swerveDrive.setOdometry(odom);
