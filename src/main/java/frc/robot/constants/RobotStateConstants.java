@@ -1,5 +1,9 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.Rotations;
+
+import edu.wpi.first.units.measure.Angle;
+
 public class RobotStateConstants {
   public static final double[] kNodeAngles = {0.0, 60.0, 120.0, 180.0, -120.0, -60.0};
   public static final double kAlgaeRetreatDistance = 0;
@@ -24,4 +28,84 @@ public class RobotStateConstants {
   // Climb LED Thresholds
   public static final double kClimbAngleSmall = -0.235; // -0.245
   public static final double kClimbAngleBig = -0.213; // -0.215
+
+  // Offsets
+  public static final Angle kStuckCoralElevatorOffset = Rotations.of(3.746);
+  public static final Angle[][][] kBlueCoralElevatorOffset = {
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    }
+  };
+
+  public static final Angle[][][] kRedCoralElevatorOffset = {
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    },
+    {
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)},
+      {Rotations.of(0), Rotations.of(0)}
+    }
+  };
 }

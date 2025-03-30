@@ -174,8 +174,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
       hasStaged = true;
       robotStateSubsystem.toAutonPrestage();
     }
-    if (tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
-            <= AutonConstants.kElevatorStageRadiusPathOne
+    if (tagAlignSubsystem.getCurRadius() <= AutonConstants.kElevatorStageRadiusPathOne
         && !hasPreppedCoral) {
       hasPreppedCoral = true;
       robotStateSubsystem.toPrepCoral();
@@ -189,6 +188,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
           isServoing = true;
           tagAlignSubsystem.startAuto(
               mirrorTrajectory ? Alliance.Red : Alliance.Blue,
+              robotStateSubsystem.getCoralLevel(),
               mirrorToProcessor ? !scoreLeft : scoreLeft,
               false);
         }
@@ -199,8 +199,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   }
 
   private boolean shouldTransitionToServoing() {
-    return tagAlignSubsystem.getCurRadius(mirrorTrajectory ? Alliance.Red : Alliance.Blue)
-        < PathHandlerConstants.kServoRadius;
+    return tagAlignSubsystem.getCurRadius() < PathHandlerConstants.kServoRadius;
   }
 
   @Override

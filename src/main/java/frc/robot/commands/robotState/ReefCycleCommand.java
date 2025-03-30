@@ -44,7 +44,8 @@ public class ReefCycleCommand extends Command {
       return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD;
     } else {
       if (startingRobotState == RobotStates.PRESTAGE || startingRobotState == RobotStates.STOW) {
-        return robotStateSubsystem.getState() == RobotStates.REEF_ALIGN_CORAL;
+        return robotStateSubsystem.getState() == RobotStates.REEF_ALIGN_CORAL
+            || (!robotStateSubsystem.hasCoral() && !robotStateSubsystem.getGetAlgaeOnCycle());
       }
       if (startingRobotState == RobotStates.REEF_ALIGN_CORAL) {
         return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD

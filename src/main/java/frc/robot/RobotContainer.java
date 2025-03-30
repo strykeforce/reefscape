@@ -49,6 +49,7 @@ import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.LockWheelsCommand;
+import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
@@ -425,7 +426,9 @@ public class RobotContainer {
             new ClimbPrepCommand(
                 robotStateSubsystem, climbSubsystem, elevatorSubsystem, biscuitSubsystem));
 
-    ////////////////////////// TODO: REMOVE!!!  /////////////////////////////
+    new Trigger(() -> robotStateSubsystem.isStuckAndMisaligned())
+        .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+
     // Move biscuit
     new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
         .onTrue(
@@ -449,7 +452,6 @@ public class RobotContainer {
             new JogElevatorCommand(
                 elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
         .onFalse(new HoldElevatorCommand(elevatorSubsystem));
-    //////////////////////////////////////////////////////////////////
   }
 
   private void configureTestOperatorBindings() {

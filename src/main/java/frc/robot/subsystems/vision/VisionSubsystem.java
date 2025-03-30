@@ -107,6 +107,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Matrix<N3, N1> adativeMatrix;
   private Matrix<N3, N1> stdMatrix;
 
+  private boolean[] acceptUpdates = new boolean[VisionConstants.kNumCams];
+
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
     textLogger = LoggerFactory.getLogger("Vision");
