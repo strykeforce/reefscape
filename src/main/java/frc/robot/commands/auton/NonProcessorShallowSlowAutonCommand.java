@@ -30,7 +30,7 @@ public class NonProcessorShallowSlowAutonCommand extends SequentialCommandGroup
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
   private List<Character> NodeNames;
-  private List<Integer> NodeLevels;
+  private List<ScoringLevel> NodeLevels;
   private char startNode;
 
   public NonProcessorShallowSlowAutonCommand(
@@ -45,7 +45,7 @@ public class NonProcessorShallowSlowAutonCommand extends SequentialCommandGroup
       VisionSubsystem visionSubsystem,
       String startPathName,
       List<Character> NodeNames,
-      List<Integer> NodeLevels,
+      List<ScoringLevel> NodeLevels,
       char startNode,
       Boolean startScoreLeft,
       Pose2d startPose) {

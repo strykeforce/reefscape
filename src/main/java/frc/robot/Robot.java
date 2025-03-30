@@ -82,6 +82,7 @@ public class Robot extends LoggedRobot {
     if (m_robotContainer.getAutoSwitch().getAutoCommand() != null) {
       m_robotContainer.getAutoSwitch().getAutoCommand().schedule();
     }
+    m_robotContainer.setHeadlights(true);
   }
 
   @Override

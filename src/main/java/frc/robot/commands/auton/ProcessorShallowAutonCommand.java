@@ -29,7 +29,7 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
   private List<Character> NodeNames;
-  private List<Integer> NodeLevels;
+  private List<ScoringLevel> NodeLevels;
   private char startNode;
   private boolean lastAlgae;
 
@@ -45,7 +45,7 @@ public class ProcessorShallowAutonCommand extends SequentialCommandGroup
       VisionSubsystem visionSubsystem,
       String startPathName,
       List<Character> NodeNames,
-      List<Integer> NodeLevels,
+      List<ScoringLevel> NodeLevels,
       char startNode,
       boolean startScoreLeft,
       boolean lastAlgae,

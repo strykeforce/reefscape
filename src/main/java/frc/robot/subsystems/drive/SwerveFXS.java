@@ -194,6 +194,16 @@ public class SwerveFXS implements SwerveIO, Checkable {
     return sum / 4.0;
   }
 
+  public double getFrontDriveAvgVel() {
+    double sum = 0;
+
+    for (int i = 0; i < 2; i++) {
+      sum += FastMath.abs(drives[i].getVelocity().getValueAsDouble());
+    }
+
+    return sum / 2.0;
+  }
+
   public double getRearDriveAvgVel() {
     double sum = 0;
 
@@ -310,6 +320,7 @@ public class SwerveFXS implements SwerveIO, Checkable {
     }
     inputs.avgDriveCurrent = getAvgDriveCurrent();
     inputs.avgRearDriveVel = getRearDriveAvgVel();
+    inputs.avgFrontDriveVel = getFrontDriveAvgVel();
     inputs.robotRelSpeed = getRobotRelSpeed();
     inputs.fieldRelSpeed = getFieldRelSpeed(inputs.robotRelSpeed);
     inputs.fieldY = fieldY;

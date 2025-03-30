@@ -5,6 +5,7 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants;
@@ -13,6 +14,7 @@ import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
 import java.util.ArrayList;
@@ -34,7 +36,8 @@ public class PathHandler extends MeasurableSubsystem {
   private String[][] pathNames =
       PathHandlerConstants.kShallowPathNames; // the array of paths, in string form
   private List<Character> nodeNames = new ArrayList<>(); // the list of nodes, in order, to score on
-  private List<Integer> nodeLevels = new ArrayList<>(); // the list of levels, in order, to score on
+  private List<ScoringLevel> nodeLevels =
+      new ArrayList<>(); // the list of levels, in order, to score on
   private Character startNode = 'a'; // the node that the robot starts in front of
   private boolean mirrorToProcessor =
       false; // whether the robot starts and fetches on the processor side.
@@ -57,7 +60,11 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean teleop = false;
   private boolean isPlacing = false;
   private boolean hasPreppedCoral = false;
+  private boolean hasStagedAlgae = false;
   private boolean algaeOnLast = false;
+  private boolean hasLEDsOn = false;
+
+  private DigitalOutput lights = new DigitalOutput(3);
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -75,7 +82,7 @@ public class PathHandler extends MeasurableSubsystem {
       RobotStateSubsystem robotStateSubsystem,
       String[][] pathNames,
       List<Character> nodeNames,
-      List<Integer> nodeLevels,
+      List<ScoringLevel> nodeLevels,
       Character startNode,
       boolean mirrorToProcessor) {
     this.driveSubsystem = driveSubsystem;
@@ -86,6 +93,8 @@ public class PathHandler extends MeasurableSubsystem {
     this.nodeLevels = nodeLevels;
     this.startNode = startNode;
     this.mirrorToProcessor = mirrorToProcessor;
+
+    setHeadlights(true);
   }
 
   public void setPathNames(String[][] pathNames) {
@@ -101,12 +110,12 @@ public class PathHandler extends MeasurableSubsystem {
     }
   }
 
-  public void addNode(Character nodeName, int nodeLevel) {
+  public void addNode(Character nodeName, ScoringLevel nodeLevel) {
     nodeNames.add(nodeName);
     nodeLevels.add(nodeLevel);
   }
 
-  public void setNodeLevels(List<Integer> nodeLevels) {
+  public void setNodeLevels(List<ScoringLevel> nodeLevels) {
     if (!isHandling) {
       this.nodeLevels = nodeLevels;
     }
@@ -135,6 +144,7 @@ public class PathHandler extends MeasurableSubsystem {
   public void startPathHandler() {
     teleop = false;
     nodeNames.add(0, startNode);
+    nodeLevels.add(0, ScoringLevel.L4); // a dummy level
     isHandling = true;
     robotStateSubsystem.setIsAutoPlacing(false);
     curState = PathStates.DRIVE_FETCH;
@@ -180,6 +190,9 @@ public class PathHandler extends MeasurableSubsystem {
       if (curState == PathStates.PLACE) {
         curState = PathStates.DRIVE_FETCH;
       } else if (curState == PathStates.FETCH) {
+        robotStateSubsystem.setLEDLoadCoral(false);
+        hasLEDsOn = false;
+        // setHeadlights(true);
         curState = PathStates.DRIVE_PLACE;
       }
     }
@@ -219,6 +232,9 @@ public class PathHandler extends MeasurableSubsystem {
         pathTimer.reset();
         driveSubsystem.drive(0, 0, 0);
         advanceNodes();
+        robotStateSubsystem.setLEDLoadCoral(false);
+        hasLEDsOn = false;
+        // setHeadlights(true);
         curState = PathStates.DRIVE_PLACE;
 
       } else if (shouldTransitionToServoing()) {
@@ -286,6 +302,7 @@ public class PathHandler extends MeasurableSubsystem {
           (nodeNames.get(0) - 'a') % 2 == (mirrorToProcessor ? 1 : 0),
           false);
       nodeNames.remove(0);
+      nodeLevels.remove(0);
     }
   }
 
@@ -395,6 +412,10 @@ public class PathHandler extends MeasurableSubsystem {
     return !isHandling;
   }
 
+  public void setHeadlights(boolean on) {
+    lights.set(on);
+  }
+
   @Override
   public void periodic() {
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/State", curState);
@@ -402,10 +423,25 @@ public class PathHandler extends MeasurableSubsystem {
     org.littletonrobotics.junction.Logger.recordOutput(
         "PathHandler/curRadius",
         tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor()));
+    org.littletonrobotics.junction.Logger.recordOutput("PathHandler/hasLEDsOn", hasLEDsOn);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "PathHandler/hasStagedAlgae", hasStagedAlgae);
+
     switch (curState) {
       case DRIVE_FETCH -> {
         if (!runningPath) {
           startPath(nextPath());
+        }
+        if (FastMath.sqrt(
+                    FastMath.pow(
+                            driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
+                        + FastMath.pow(
+                            driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2))
+                < 1.7
+            && !hasLEDsOn) {
+          robotStateSubsystem.setLEDLoadCoral(true);
+          hasLEDsOn = true;
+          // setHeadlights(false);
         }
         drivePath();
       }
@@ -414,20 +450,28 @@ public class PathHandler extends MeasurableSubsystem {
           // waitingTimer.hasElapsed(PathHandlerConstants.kWaitingTime)
           // proceedToNext) {
           advanceNodes();
+
+          robotStateSubsystem.setLEDLoadCoral(false);
+          hasLEDsOn = false;
+          // setHeadlights(true);
           curState = PathStates.DRIVE_PLACE;
         }
       }
       case DRIVE_PLACE -> {
+        if (algaeOnLast
+            && nodeNames.size() == 1
+            && !hasStagedAlgae
+            && robotStateSubsystem.hasCoral()) {
+          robotStateSubsystem.toReefAlignAlgaeAuto();
+          hasStagedAlgae = true;
+        }
         if (
         /*tagAlignSubsystem.getCurRadius(robotStateSubsystem.getAllianceColor())
         <= AutonConstants.kElevatorStageRadius*/ shouldStageElevator()
-            && !hasPreppedCoral) {
+            && !hasPreppedCoral
+            && !hasStagedAlgae) {
           hasPreppedCoral = true;
-          if (algaeOnLast && nodeNames.size() == 1) {
-            robotStateSubsystem.toReefAlignAlgaeAuto();
-          } else {
-            robotStateSubsystem.toPrepCoral();
-          }
+          robotStateSubsystem.toPrepCoral();
         }
         if (!runningPath) {
           if (nodeNames.size() > 0) {
@@ -440,6 +484,7 @@ public class PathHandler extends MeasurableSubsystem {
                     robotStateSubsystem.getAllianceColor(), (next - 'a') % 2 == 0, targetHexant);
           }
           startPath(nextPath());
+          robotStateSubsystem.setScoringLevel(nodeLevels.get(0));
         }
         drivePath();
       }
@@ -451,6 +496,7 @@ public class PathHandler extends MeasurableSubsystem {
             && !hasPreppedCoral) {
           hasPreppedCoral = true;
           if (algaeOnLast && nodeNames.size() == 1) {
+            robotStateSubsystem.setScoringLevel(nodeLevels.get(0));
             robotStateSubsystem.toReefAlignAlgaeAuto();
           } else {
             robotStateSubsystem.toPrepCoral();
@@ -461,7 +507,12 @@ public class PathHandler extends MeasurableSubsystem {
         }
       }
       case PLACE -> {
+        if (algaeOnLast && nodeNames.size() == 1) {
+          killPathHandler();
+          return;
+        }
         hasPreppedCoral = false;
+        hasStagedAlgae = false;
         if (robotStateSubsystem.isElevatorFinished() && !isPlacing) {
           isPlacing = true;
           robotStateSubsystem.toPlaceCoralAuto();

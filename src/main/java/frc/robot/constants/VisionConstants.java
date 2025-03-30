@@ -76,9 +76,9 @@ public final class VisionConstants {
 
   // Names
   public static final String kCam1Name = "Left Servo";
-  public static final String kCam2Name = "Front";
+  public static final String kCam2Name = "Rear Right"; // when looking out the back
   public static final String kCam3Name = "Right Servo";
-  public static final String kCam4Name = "Back";
+  public static final String kCam4Name = "Rear Left";
   public static final String kCam5Name = "Rear";
 
   //   public static final String kPi1Name = "Left";
@@ -99,18 +99,16 @@ public final class VisionConstants {
       new Pose3d(new Translation3d(0.305, 0.025, 0.311), new Rotation3d());
   public static final Pose3d kCam2Pose =
       new Pose3d(
-          new Translation3d(-0.2225, -0.3025, 0.54),
+          new Translation3d(-0.275, -0.21, 0.49),
           new Rotation3d(
-              Units.degreesToRadians(10), Units.degreesToRadians(0), Units.degreesToRadians(67.5)));
+              Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(145)));
   public static final Pose3d kCam3Pose =
       new Pose3d(new Translation3d(0.133, -0.305, 0.311), new Rotation3d());
   public static final Pose3d kCam4Pose =
       new Pose3d(
-          new Translation3d(-0.2675, -0.3025, 0.54),
+          new Translation3d(-0.275, -0.145, 0.49),
           new Rotation3d(
-              Units.degreesToRadians(10),
-              Units.degreesToRadians(0),
-              Units.degreesToRadians(112.5)));
+              Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(-145)));
   public static final Pose3d kCam5Pose =
       new Pose3d(
           new Translation3d(-0.229, 0.073, 0.934),

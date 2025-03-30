@@ -2,13 +2,14 @@ package frc.robot.commands.pathHandler;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.pathHandler.PathHandler;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import java.util.List;
 
 public class SetPathHandlerCommand extends InstantCommand {
   private PathHandler pathHandler;
   private String[][] pathNames;
   private List<Character> NodeNames;
-  private List<Integer> NodeLevels;
+  private List<ScoringLevel> NodeLevels;
   private Character startNode;
   private boolean mirrorToProcessor;
 
@@ -16,7 +17,7 @@ public class SetPathHandlerCommand extends InstantCommand {
       PathHandler pathHandler,
       String[][] pathNames,
       List<Character> NodeNames,
-      List<Integer> NodeLevels,
+      List<ScoringLevel> NodeLevels,
       Character startNode,
       boolean mirrorToProcessor) {
     this.pathHandler = pathHandler;
