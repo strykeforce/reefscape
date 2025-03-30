@@ -599,6 +599,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (isBargeSafe) {
           driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
           if (isAutoPlacing) {
+            setAutoPlacingLed(true);
             driveSubsystem.setIgnoreSticks(true);
             bargeAlignSubsystem.startBargeAlign(allianceColor);
             setState(RobotStates.BARGE_ALIGN);
@@ -958,10 +959,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         } else if (!algaeSubsystem.hasAlgae()
             && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)
             && isEjectingAlgae) {
+          setAutoPlacingLed(false);
           driveSubsystem.setIgnoreSticks(false);
           isEjectingAlgae = false;
           toStowSafe();
         } else if (algaeHeight != currentAlgaeHeight) {
+          setAutoPlacingLed(false);
           toScoreAlgae();
         }
       }
