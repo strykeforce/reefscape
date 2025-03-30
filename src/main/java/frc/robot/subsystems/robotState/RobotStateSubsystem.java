@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
@@ -596,9 +597,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             poseX > RobotStateConstants.kRedBargeSafeX
                 || poseX < RobotStateConstants.kBlueBargeSafeX;
         if (isBargeSafe) {
+          driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
           if (isAutoPlacing) {
             driveSubsystem.setIgnoreSticks(true);
-            bargeAlignSubsystem.startBargeAlign();
+            bargeAlignSubsystem.startBargeAlign(allianceColor);
             setState(RobotStates.BARGE_ALIGN);
           } else {
             elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
@@ -623,6 +625,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     processorReleasePose = driveSubsystem.getPoseMeters();
     Logger.recordOutput("RobotState/Processor Release Pose", processorReleasePose);
     driveSubsystem.removeDriveMultiplier();
+    if (curState == RobotStates.INTERRUPTED) setState(RobotStates.BARGE_ALGAE);
 
     switch (algaeHeight) {
       case LOW -> {

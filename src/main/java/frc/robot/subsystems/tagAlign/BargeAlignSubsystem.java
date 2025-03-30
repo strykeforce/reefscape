@@ -2,12 +2,14 @@ package frc.robot.subsystems.tagAlign;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.BargeAlignConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
 
@@ -18,6 +20,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
   private FlyskyJoystick flysky;
   private PIDController driveOmega;
   private PIDController driveX;
+  private Alliance alliance;
 
   private BargeAlignStates curState = BargeAlignStates.FINISHED;
   private boolean isOnBlueSide = true;
@@ -34,7 +37,8 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
     this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
   }
 
-  public void startBargeAlign() {
+  public void startBargeAlign(Alliance alliance) {
+    this.alliance = alliance;
     if (isSafe()) {
       this.isOnBlueSide = isOnBlueSide();
       setState(BargeAlignStates.DRIVE);
@@ -92,7 +96,9 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
 
   private double getYStickReading() {
     return flysky.getStr()
-        * DriveConstants.kMaxSpeedMetersPerSecond; // just a placeholder, to remind me
+        * DriveConstants.kMaxSpeedMetersPerSecond
+        * DriveConstants.kBargeScoreStickMultiplier
+        * (alliance == Alliance.Blue ? -1 : 1); // just a placeholder, to remind me
   } // same joystick reading as the drive
 
   /*
@@ -112,6 +118,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    Logger.recordOutput("BargeAlign/State", curState);
     switch (curState) {
       case DRIVE -> {
         double driveXVel = driveX.calculate(driveSubsystem.getPoseMeters().getX(), targetX);
@@ -119,6 +126,10 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
             driveOmega.calculate(
                 driveSubsystem.getPoseMeters().getRotation().getRadians(), targetYaw.getRadians());
         driveSubsystem.move(driveXVel, getYStickReading(), vOmega, true);
+        Logger.recordOutput("BargeAlign/XErr", driveX.getError());
+        Logger.recordOutput("BargeAlign/Vx", driveXVel);
+        Logger.recordOutput("BargeAlign/OmegaErr", driveOmega.getError());
+        Logger.recordOutput("BargeAlign/Vomega", vOmega);
         if (shouldRaiseElevator()) {
           setState(BargeAlignStates.RAISE_ELEV);
         }
@@ -128,6 +139,9 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
             driveOmega.calculate(
                 driveSubsystem.getPoseMeters().getRotation().getRadians(), targetYaw.getRadians());
         driveSubsystem.move(vX, getYStickReading(), vOmega, true);
+        Logger.recordOutput("BargeAlign/Vx", vX);
+        Logger.recordOutput("BargeAlign/OmegaErr", driveOmega.getError());
+        Logger.recordOutput("BargeAlign/Vomega", vOmega);
         if (shouldEjectAlgae()) {
           terminate();
         }
