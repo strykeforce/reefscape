@@ -8,6 +8,8 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 public class InterruptAutoCommand extends Command {
   private RobotStateSubsystem robotState;
   private boolean ejectCoral = false;
+  private boolean ejectAlgae = false;
+  private RobotStates interruptedState;
 
   public InterruptAutoCommand(RobotStateSubsystem robotState, CoralSubsystem coralSubsystem) {
     this.robotState = robotState;
@@ -17,9 +19,17 @@ public class InterruptAutoCommand extends Command {
 
   @Override
   public void initialize() {
+    interruptedState = robotState.getInterruptedState();
     if (robotState.getState() == RobotStates.INTERRUPTED) {
-      ejectCoral = true;
-      robotState.toPlaceCoral();
+      if (interruptedState == RobotStates.BARGE_ALIGN
+          || interruptedState == RobotStates.TO_BARGE_ALGAE
+          || interruptedState == RobotStates.BARGE_ALGAE) {
+        ejectAlgae = true;
+        robotState.releaseAlgae();
+      } else {
+        ejectCoral = true;
+        robotState.toPlaceCoral();
+      }
     } else {
       ejectCoral = false;
       robotState.toInterrupted();
@@ -28,6 +38,8 @@ public class InterruptAutoCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return !ejectCoral || !robotState.hasCoral();
+    return !ejectCoral
+        || (ejectCoral && !robotState.hasCoral())
+        || (ejectAlgae && !robotState.hasAlgae());
   }
 }

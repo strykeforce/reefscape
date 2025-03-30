@@ -84,7 +84,7 @@ public class TagServoingConstants {
   // End conditions
   public static final double kInitialCloseEnough = 0.1;
   public static final double kCoralDriveXCloseEnough = 0.03;
-  public static final double kCoralDriveYCloseEnough = 0.015; // was 0.025
+  public static final double kCoralDriveYCloseEnough = 0.02; // was 0.025
   public static final double kAlgaeDriveXCloseEnough = 0.03;
   public static final double kAlgaeDriveYCloseEnough = kCoralDriveYCloseEnough;
 

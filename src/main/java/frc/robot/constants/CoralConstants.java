@@ -36,9 +36,9 @@ public class CoralConstants {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimit(10)
             .withStatorCurrentLimitEnable(false)
-            .withSupplyCurrentLimit(10)
+            .withSupplyCurrentLimit(30)
             .withSupplyCurrentLowerLimit(8)
-            .withSupplyCurrentLowerTime(0.02)
+            .withSupplyCurrentLowerTime(0.5)
             .withSupplyCurrentLimitEnable(true);
     fxsConfig.CurrentLimits = current;
 
