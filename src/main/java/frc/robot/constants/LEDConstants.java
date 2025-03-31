@@ -13,12 +13,15 @@ public class LEDConstants {
   public static final int kTotalStripLength = 51 + 10;
   public static final int kBottomStripLength = 34;
   public static final int kTopStripLength = 17;
+  public static final int kFunnelStripLength = 10;
   public static final int kTopFirstIndex = kBottomStripLength;
+  public static final int kFunnelFirstIndex = kTopFirstIndex + kTopStripLength;
   public static final int kAlgeaEnd = kBottomStripLength / 3 + 1;
 
   public static final int kLevelStart = kTopFirstIndex;
   public static final int kPlaceStart = kTopFirstIndex + kTopStripLength / 3;
   public static final int kGetAlgeaStart = kTopFirstIndex + kTopStripLength / 3 * 2;
+  public static final int kAlgeaHeightStart = kFunnelFirstIndex;
   public static final int kAutoPlacingStart = kBottomStripLength / 3 * 2 + 1;
 
   public static final Color kAlmostBlack = new Color(0, 0, 1);
@@ -54,6 +57,10 @@ public class LEDConstants {
 
   // HP Load Color
   public static final Color kLoadCoral = invertRedGreen(Color.kBlue);
+
+  // Algea Height Colors
+  public static final Color kAlgeaLow = invertRedGreen(Color.kSaddleBrown);
+  public static final Color kAlgeaHigh = invertRedGreen(Color.kSkyBlue);
 
   public static final Color[] kGameColors = {
     invertRedGreen(Color.kBlack), // a dummy color
