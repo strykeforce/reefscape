@@ -280,6 +280,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
+    visionSubsystem.setIsAuto(isAuto);
     isAutoReadyForEject = false;
   }
 
@@ -330,6 +331,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStow() {
     visionSubsystem.setYawUpdateCamera(-1);
+    visionSubsystem.setIgnoreRearCams(false);
     biscuitSubsystem.setIsRemovingAlgae(false);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
@@ -346,6 +348,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStowSafe() {
+    visionSubsystem.setIgnoreRearCams(false);
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
@@ -355,6 +358,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public void toStowSequential() {
+    visionSubsystem.setIgnoreRearCams(false);
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
@@ -431,6 +435,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   private void toReefAlign(boolean getAlgae, boolean drive) {
+    visionSubsystem.setIgnoreRearCams(true);
     reefCoralStuckFixable = false;
     if (scoringLevel == ScoringLevel.L1) {
       drive = false;
