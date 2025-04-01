@@ -60,7 +60,7 @@ public class LEDConstants {
 
   // Algea Height Colors
   public static final Color kAlgeaLow = invertRedGreen(Color.kSaddleBrown);
-  public static final Color kAlgeaHigh = invertRedGreen(Color.kSkyBlue);
+  public static final Color kAlgeaHigh = invertRedGreen(Color.kDarkSlateBlue);
 
   public static final Color[] kGameColors = {
     invertRedGreen(Color.kBlack), // a dummy color
