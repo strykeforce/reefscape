@@ -44,6 +44,8 @@ import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoReefCycleCommand;
 import frc.robot.commands.robotState.DepthChargeHealthCheckCommand;
 import frc.robot.commands.robotState.FloorAlgaeCommand;
+import frc.robot.commands.robotState.ForceBargeCommand;
+import frc.robot.commands.robotState.ForceLowFloorAlgaeCommand;
 import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
@@ -358,20 +360,18 @@ public class RobotContainer {
         .onTrue(
             new ScoreAlgaeCommand(
                 robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+            // new ForceBargeCommand(
+            //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)); // for easy swapping
+    Command floorAlgaeCommand =
+        new FloorAlgaeCommand(robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem);
+        // new ForceLowFloorAlgaeCommand(
+        //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem); // for easy swapping
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
-        .onTrue(
-            new FloorAlgaeCommand(
-                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
-        .onFalse(
-            new FloorAlgaeCommand(
-                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+        .onTrue(floorAlgaeCommand)
+        .onFalse(floorAlgaeCommand);
     new JoystickButton(driveJoystick, Button.SWF_DWN.id)
-        .onTrue(
-            new FloorAlgaeCommand(
-                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
-        .onFalse(
-            new FloorAlgaeCommand(
-                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+        .onTrue(floorAlgaeCommand)
+        .onFalse(floorAlgaeCommand);
 
     // climb
     new JoystickButton(driveJoystick, Button.SWA.id)
