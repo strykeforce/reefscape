@@ -1,5 +1,15 @@
 package frc.robot.subsystems.auto;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
+import org.strykeforce.telemetry.measurable.Measure;
+import org.strykeforce.thirdcoast.util.AutonSwitch;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -29,14 +39,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
-import org.strykeforce.telemetry.measurable.Measure;
-import org.strykeforce.thirdcoast.util.AutonSwitch;
 
 public class AutoSwitch extends MeasurableSubsystem {
   public Logger logger = LoggerFactory.getLogger(AutoSwitch.class);
@@ -254,7 +256,7 @@ public class AutoSwitch extends MeasurableSubsystem {
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance,
                     2.1)),
-            new ArrayList<>(Arrays.asList(0.0575, 0.0, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(-0.0575, 0.0, 0.0, 0.0)),
             'j',
             false,
             true,
