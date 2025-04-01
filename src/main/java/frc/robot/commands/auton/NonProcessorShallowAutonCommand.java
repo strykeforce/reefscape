@@ -17,6 +17,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
@@ -29,7 +30,9 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
   private List<Character> NodeNames;
-  private List<Integer> NodeLevels;
+  private List<ScoringLevel> NodeLevels;
+  private List<Double> lightDistances = new ArrayList<>();
+  private List<Double> postOffsets = new ArrayList<>();
   private char startNode;
   private boolean lastAlgae;
 
@@ -45,7 +48,9 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
       VisionSubsystem visionSubsystem,
       String startPathName,
       List<Character> NodeNames,
-      List<Integer> NodeLevels,
+      List<ScoringLevel> NodeLevels,
+      List<Double> lightDistances,
+      List<Double> postOffsets,
       char startNode,
       boolean startScoreLeft,
       boolean lastAlgae,
@@ -63,6 +68,9 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     this.startNode = startNode;
     this.lastAlgae = lastAlgae;
 
+    this.lightDistances = lightDistances;
+    this.postOffsets = postOffsets;
+
     startPath =
         new DriveAutonServoCommand(
             driveSubsystem,
@@ -74,7 +82,9 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
             true,
             true,
             false,
-            startScoreLeft);
+            startScoreLeft,
+            postOffsets.get(0));
+    postOffsets.remove(0);
 
     addCommands(
         new SequentialCommandGroup(
@@ -120,6 +130,8 @@ public class NonProcessorShallowAutonCommand extends SequentialCommandGroup
     pathHandler.setNodeLevels(NodeLevels);
     pathHandler.setStartNode(startNode);
     pathHandler.setGetAlgaeLast(lastAlgae);
+    pathHandler.setLightDistances(lightDistances);
+    pathHandler.setPostOffsets(postOffsets);
     // pathHandler.reassignAlliance();
   }
 }

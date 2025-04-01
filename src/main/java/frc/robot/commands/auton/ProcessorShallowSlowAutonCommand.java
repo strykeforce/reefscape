@@ -17,6 +17,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
@@ -29,7 +30,9 @@ public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
   private List<Character> NodeNames;
-  private List<Integer> NodeLevels;
+  private List<ScoringLevel> NodeLevels;
+  private List<Double> lightDistances = new ArrayList<>();
+  private List<Double> postOffsets = new ArrayList<>();
   private char startNode;
 
   public ProcessorShallowSlowAutonCommand(
@@ -44,7 +47,9 @@ public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
       VisionSubsystem visionSubsystem,
       String startPathName,
       List<Character> NodeNames,
-      List<Integer> NodeLevels,
+      List<ScoringLevel> NodeLevels,
+      List<Double> lightDistances,
+      List<Double> postOffsets,
       char startNode,
       boolean startScoreLeft,
       Pose2d startPose) {
@@ -59,6 +64,8 @@ public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
     this.NodeNames = NodeNames;
     this.NodeLevels = NodeLevels;
     this.startNode = startNode;
+    this.lightDistances = lightDistances;
+    this.postOffsets = postOffsets;
 
     startPath =
         new DriveAutonServoCommand(
@@ -71,7 +78,9 @@ public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
             true,
             true,
             false,
-            startScoreLeft);
+            startScoreLeft,
+            postOffsets.get(0));
+    postOffsets.remove(0);
 
     addCommands(
         new SequentialCommandGroup(
@@ -117,6 +126,8 @@ public class ProcessorShallowSlowAutonCommand extends SequentialCommandGroup
     pathHandler.setNodeLevels(NodeLevels);
     pathHandler.setStartNode(startNode);
     pathHandler.setGetAlgaeLast(false);
+    pathHandler.setLightDistances(lightDistances);
+    pathHandler.setPostOffsets(postOffsets);
     // pathHandler.reassignAlliance();
   }
 }

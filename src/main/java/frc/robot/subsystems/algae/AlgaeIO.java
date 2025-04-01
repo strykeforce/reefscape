@@ -8,6 +8,7 @@ public interface AlgaeIO {
   public static class AlgaeIOInputs {
     public double velocity;
     public boolean isBeamBroken;
+    public boolean isCoralBeamBroken;
   }
 
   public default void updateInputs(AlgaeIOInputs inputs) {}

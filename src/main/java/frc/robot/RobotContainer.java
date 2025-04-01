@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -49,6 +48,7 @@ import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
 import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.LockWheelsCommand;
+import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
@@ -94,6 +94,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
+import frc.robot.subsystems.tagAlign.BargeAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Map;
@@ -133,6 +134,7 @@ public class RobotContainer {
   private final LEDSubsystem ledSubsystem;
 
   private final TagAlignSubsystem tagAlignSubsystem;
+  private final BargeAlignSubsystem bargeAlignSubsystem;
 
   private final VisionSubsystem visionSubsystem;
 
@@ -191,6 +193,7 @@ public class RobotContainer {
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
     tagAlignSubsystem = new TagAlignSubsystem(driveSubsystem, visionSubsystem);
+    bargeAlignSubsystem = new BargeAlignSubsystem(flysky, driveSubsystem);
 
     robotStateSubsystem =
         new RobotStateSubsystem(
@@ -205,7 +208,8 @@ public class RobotContainer {
             funnelSubsystem,
             ledSubsystem,
             tagAlignSubsystem,
-            visionSubsystem);
+            visionSubsystem,
+            bargeAlignSubsystem);
 
     driveSubsystem.setRobotStateSubsystem(robotStateSubsystem);
 
@@ -227,11 +231,7 @@ public class RobotContainer {
             visionSubsystem,
             pathHandler);
 
-    testAutonCommand =
-        new TestAutonCommand(
-            driveSubsystem,
-            robotStateSubsystem,
-            new Pose2d(3.85576086490539, 5.073261807735684, Rotation2d.fromDegrees(300.0)));
+    testAutonCommand = new TestAutonCommand(driveSubsystem, robotStateSubsystem, elevatorSubsystem);
 
     configureTelemetry();
     configureDriverBindings();
@@ -347,7 +347,9 @@ public class RobotContainer {
                     coralSubsystem,
                     biscuitSubsystem,
                     algaeSubsystem),
-                () -> robotStateSubsystem.getIsAutoPlacing()));
+                () ->
+                    (robotStateSubsystem.getIsAutoPlacing()
+                        && robotStateSubsystem.getCoralLevel() != ScoringLevel.L1)));
 
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(
@@ -424,6 +426,33 @@ public class RobotContainer {
         .onTrue(
             new ClimbPrepCommand(
                 robotStateSubsystem, climbSubsystem, elevatorSubsystem, biscuitSubsystem));
+
+    new Trigger(() -> robotStateSubsystem.isStuckAndMisaligned())
+        .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
+
+    // Move biscuit
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
   }
 
   private void configureTestOperatorBindings() {
@@ -604,6 +633,7 @@ public class RobotContainer {
                 () -> {
                   funnelSubsystem.clearCoral();
                   coralSubsystem.setState(CoralSubsystem.CoralState.EMPTY);
+                  algaeSubsystem.setState(AlgaeSubsystem.AlgaeStates.EMPTY);
                 }))
         .withSize(1, 1)
         .withPosition(9, 0);
@@ -728,6 +758,19 @@ public class RobotContainer {
                 driveSubsystem, climbSubsystem, climbAlignSubsystem, robotStateSubsystem))
         .withPosition(0, 1)
         .withSize(1, 1);
+
+    Shuffleboard.getTab("Test")
+        .add(
+            "Headlights On",
+            new InstantCommand(() -> pathHandler.setHeadlights(true)).runsWhenDisabled())
+        .withPosition(2, 2)
+        .withSize(1, 1);
+    Shuffleboard.getTab("Test")
+        .add(
+            "Headlights Off",
+            new InstantCommand(() -> pathHandler.setHeadlights(false)).runsWhenDisabled())
+        .withPosition(3, 2)
+        .withSize(1, 1);
   }
 
   public Command getAutonomousCommand() {
@@ -751,7 +794,7 @@ public class RobotContainer {
   }
 
   public void stow() {
-    robotStateSubsystem.toStow();
+    robotStateSubsystem.toStowSafe();
   }
 
   public AutoSwitch getAutoSwitch() {
@@ -772,5 +815,9 @@ public class RobotContainer {
 
   public boolean wasScoringCoral() {
     return robotStateSubsystem.getState() == RobotStates.PLACE_CORAL;
+  }
+
+  public void setHeadlights(boolean on) {
+    pathHandler.setHeadlights(on);
   }
 }

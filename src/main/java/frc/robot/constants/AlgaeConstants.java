@@ -32,8 +32,13 @@ public class AlgaeConstants {
   public static final double kIntakingSpeed = -1;
 
   public static final double kHasAlgaeVelThreshold = 10;
-  public static final double kSuperCycleHasAlgaeVelThres = 40;
-  public static final double kHasAlgaeCounts = 2;
+  public static final double kSuperCycleHasAlgaeVelThres = 50; // was 40
+  public static final int kHasAlgaeCounts = 2;
+
+  public static final double kHasCoralVelThreshold = 70; // FIXME
+  public static final int kHasCoralCounts = 10; // FIXME
+
+  public static final double kCoralScoringTime = 1; // FIXME
 
   // Example Talon FX Config
   public static TalonFXSConfiguration getFXConfig() {

@@ -111,6 +111,10 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     setState(CoralState.EJECTING);
   }
 
+  public void stop() {
+    setPct(0);
+  }
+
   // Periodic Function
   @Override
   public void periodic() {

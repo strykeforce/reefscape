@@ -107,6 +107,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Matrix<N3, N1> adativeMatrix;
   private Matrix<N3, N1> stdMatrix;
 
+  private boolean[] acceptUpdates = new boolean[VisionConstants.kNumCams];
+  private boolean ignoreRearCams = false;
+  private boolean isAuto = false;
+
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
     textLogger = LoggerFactory.getLogger("Vision");
@@ -144,6 +148,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   public void setMinTags(int minTags) {
     this.minTags = minTags;
+  }
+
+  public void setIgnoreRearCams(boolean ignore) {
+    this.ignoreRearCams = ignore;
+  }
+
+  public void setIsAuto(boolean isAuto) {
+    this.isAuto = isAuto;
   }
   // Getter Methods
   public double getYawUpdateCamera() {
@@ -404,10 +416,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
     validResults.clear();
 
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
-      if (cams[i].hasNewUpdate()) {
-        timeSinceLastUpdate = getSeconds();
-        validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
-        lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+      if (!ignoreRearCams && !isAuto || (i == 0 || i == 2)) {
+        if (cams[i].hasNewUpdate()) {
+          timeSinceLastUpdate = getSeconds();
+          validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
+          lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+        }
       }
     }
 

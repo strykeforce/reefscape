@@ -85,8 +85,9 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   public void setPosition(Angle position, boolean hasAlgae) {
     if (hasAlgae != lastHadAlgae) {
       if (hasAlgae) {
+        // why is this if statement here???
         if (isRemovingAlgae) {
-          configurator.apply(RobotConstants.algaeMotionConfig);
+          configurator.apply(RobotConstants.algaeRemovalMotionConfig);
         } else {
           configurator.apply(RobotConstants.algaeMotionConfig);
         }

@@ -49,7 +49,7 @@ public class ElevatorConstants {
   public static final Angle kL3AlgaeRemovalSetpoint = kL3AlgaeSetpoint;
 
   // Coral score
-  public static final Angle kL1CoralSetpoint = Rotations.of(15.2); // 13.04053
+  public static final Angle kL1CoralSetpoint = Rotations.of(3.931); // 13.04053
   public static final Angle kL2CoralSetpoint = Rotations.of(19.62793); // 19.62793 -> 21.0786 ->
   public static final Angle kL3CoralSetpoint =
       Rotations.of(31.0901); // was 30.42969 -> 31.7505 -> 31.0901
@@ -120,8 +120,9 @@ public class ElevatorConstants {
 
     MotionMagicConfigs motionMagic =
         new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(75)
-            .withMotionMagicAcceleration(225); // was 300
+            .withMotionMagicCruiseVelocity(70)
+            .withMotionMagicAcceleration(300) // was 300
+            .withMotionMagicJerk(1500);
     fxConfig.MotionMagic = motionMagic;
 
     MotorOutputConfigs motorOut =

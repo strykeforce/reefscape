@@ -35,6 +35,7 @@ public class RobotConstants {
 
   // Elevator
   public static Angle kElevatorFunnelSetpoint; // Elevator
+  public static Angle kElevatorL1LoadSetpoint; // Elevator
   public static Angle kElevatorStowSetpoint; // Elevator
 
   // Biscuit
@@ -56,6 +57,7 @@ public class RobotConstants {
   // Idle
   public static Angle kStowSetpoint;
   public static Angle kFunnelSetpoint;
+  public static Angle kL1CoralLoadSetpoint;
   public static Angle kPrestageSetpoint;
   public static Angle kPrestageAlgaeSetpoint;
 
@@ -91,6 +93,7 @@ public class RobotConstants {
     if (isComp) {
       // Comp bot constants
       kElevatorFunnelSetpoint = CompConstants.kElevatorFunnelSetpoint;
+      kElevatorL1LoadSetpoint = CompConstants.kElevatorL1LoadSetpoint;
       kElevatorStowSetpoint = CompConstants.kElevatorStowSetpoint;
       talonFXSConfig = CompConstants.getFXSConfig();
       algaeMotionConfig = CompConstants.getAlgaeMotionConfig();
@@ -109,6 +112,7 @@ public class RobotConstants {
       // Idle
       kStowSetpoint = CompConstants.kBiscuitStowSetpoint;
       kFunnelSetpoint = CompConstants.kFunnelSetpoint;
+      kL1CoralLoadSetpoint = CompConstants.kL1CoralLoadSetpoint;
       kPrestageSetpoint = CompConstants.kPrestageSetpoint;
       kPrestageAlgaeSetpoint = CompConstants.kBiscuitStowSetpoint;
 
@@ -138,6 +142,7 @@ public class RobotConstants {
     } else {
       // Proto constants
       kElevatorFunnelSetpoint = ProtoConstants.kElevatorFunnelSetpoint;
+      kElevatorL1LoadSetpoint = ProtoConstants.kElevatorL1LoadSetpoint;
       kElevatorStowSetpoint = ProtoConstants.kElevatorStowSetpoint;
       talonFXSConfig = ProtoConstants.getFXSConfig();
       algaeMotionConfig = ProtoConstants.getAlgaeMotionConfig();
@@ -156,6 +161,7 @@ public class RobotConstants {
       // Idle
       kStowSetpoint = ProtoConstants.kBiscuitStowSetpoint;
       kFunnelSetpoint = ProtoConstants.kFunnelSetpoint;
+      kL1CoralLoadSetpoint = ProtoConstants.kL1CoralLoadSetpoint;
       kPrestageSetpoint = ProtoConstants.kPrestageSetpoint;
       kPrestageAlgaeSetpoint = ProtoConstants.kPrestageAlgaeSetpoint;
 
@@ -195,47 +201,49 @@ public class RobotConstants {
 
     public static double kTicksPerRot = 160;
 
-    public static final double kZero = .37;
-    public static final double kSafeToStowUpper = 40;
-    public static final double kSafeToStowLower = -5;
+    public static final double kZero = .69;
+    public static final double kSafeToStowUpper = 4.06;
+    public static final double kSafeToStowLower = -5 / 2;
 
     // Speeds
     // public static final double kDosntHaveAlgaeSpeed = 500;
 
     // Setpoints
     // Idle
-    public static Angle kBiscuitStowSetpoint = Rotations.of(1.862);
+    public static Angle kBiscuitStowSetpoint = Rotations.of(1.862 / 2);
     public static Angle kFunnelSetpoint = kBiscuitStowSetpoint;
+    public static Angle kL1CoralLoadSetpoint = Rotations.of(3.96);
     public static Angle kPrestageSetpoint = kBiscuitStowSetpoint;
-    public static Angle kPrestageAlgaeSetpoint = Rotations.of(9.089);
+    public static Angle kPrestageAlgaeSetpoint = Rotations.of(9.089 / 2);
 
     // Algae removal
-    public static Angle kL2AlgaeSetpoint = Rotations.of(24.104);
-    public static Angle kL3AlgaeSetpoint = Rotations.of(24.562);
+    public static Angle kL2AlgaeSetpoint = Rotations.of(24.104 / 2);
+    public static Angle kL3AlgaeSetpoint = Rotations.of(24.562 / 2);
 
     public static Angle kL2AlgaeRemovalSetpoint = kBiscuitStowSetpoint;
     public static Angle kL3AlgaeRemovalSetpoint = kBiscuitStowSetpoint;
 
-    public static double kTagAlignThreshold = 20.0;
+    public static double kTagAlignThreshold = 20.0 / 2;
 
     // Coral score
-    public static Angle kL1CoralSetpoint = kBiscuitStowSetpoint;
+    public static Angle kL1CoralSetpoint = Rotations.of(12.7);
     public static Angle kL2CoralSetpoint = kBiscuitStowSetpoint;
     public static Angle kL3CoralSetpoint = kBiscuitStowSetpoint;
     public static Angle kL4CoralSetpoint = kBiscuitStowSetpoint;
 
     // Algae obtaining
-    public static Angle kFloorAlgaeSetpoint = Rotations.of(49.627);
-    public static Angle kMicAlgaeSetpoint = Rotations.of(51.61872);
-    public static Angle kHpAlgaeSetpoint = Rotations.of(16.97559);
+    public static Angle kFloorAlgaeSetpoint = Rotations.of(49.627 / 2);
+    public static Angle kMicAlgaeSetpoint = Rotations.of(51.61872 / 2);
+    public static Angle kHpAlgaeSetpoint = Rotations.of(16.97559 / 2);
 
     // Algae scoring
-    public static Angle kProcessorSetpoint = Rotations.of(41.193);
-    public static Angle kBargeSetpoint = Rotations.of(12.3489);
+    public static Angle kProcessorSetpoint = Rotations.of(41.193 / 2);
+    public static Angle kBargeSetpoint = Rotations.of(12.3489 / 2);
     // public static Angle kBargeBackwardSetpoint = Rotations.of(-12.3489); // 9.089
 
     // Elevator
     public static Angle kElevatorFunnelSetpoint = Rotations.of(2.03125);
+    public static Angle kElevatorL1LoadSetpoint = Rotations.of(1.76);
     public static Angle kElevatorStowSetpoint = kElevatorFunnelSetpoint;
     public static Angle kMaxFwd = kMicAlgaeSetpoint.plus(Rotations.of(5));
     public static Angle kMaxRev = kPrestageSetpoint.minus(Rotations.of(5));
@@ -248,6 +256,17 @@ public class RobotConstants {
               .withMotionMagicExpo_kA(0)
               .withMotionMagicExpo_kV(0)
               .withMotionMagicJerk(600);
+      return algaeConfig;
+    }
+
+    public static MotionMagicConfigs getAlgaeRemovalMotionConfig() {
+      MotionMagicConfigs algaeConfig =
+          new MotionMagicConfigs()
+              .withMotionMagicAcceleration(300)
+              .withMotionMagicCruiseVelocity(30)
+              .withMotionMagicExpo_kA(0)
+              .withMotionMagicExpo_kV(0)
+              .withMotionMagicJerk(1500);
       return algaeConfig;
     }
 
@@ -330,6 +349,7 @@ public class RobotConstants {
 
   public static class CompConstants {
     public static Angle kElevatorFunnelSetpoint = Rotations.of(0.3676757);
+    public static Angle kElevatorL1LoadSetpoint = Rotations.of(1.84);
     public static Angle kElevatorStowSetpoint = kElevatorFunnelSetpoint;
 
     // Biscuit
@@ -346,6 +366,7 @@ public class RobotConstants {
     // Idle
     public static Angle kBiscuitStowSetpoint = Rotations.of(1.862 / 2);
     public static Angle kFunnelSetpoint = kBiscuitStowSetpoint;
+    public static Angle kL1CoralLoadSetpoint = Rotations.of(8.078);
     public static Angle kPrestageSetpoint = Rotations.of(-2.94);
     public static Angle kPrestageAlgaeSetpoint = kBiscuitStowSetpoint;
 
@@ -359,7 +380,7 @@ public class RobotConstants {
     public static double kTagAlignThreshold = 20.0 / 2;
 
     // Coral score
-    public static Angle kL1CoralSetpoint = kPrestageSetpoint;
+    public static Angle kL1CoralSetpoint = Rotations.of(16.071);
     public static Angle kL2CoralSetpoint = kPrestageSetpoint;
     public static Angle kL3CoralSetpoint = kPrestageSetpoint;
     public static Angle kL4CoralSetpoint = kPrestageSetpoint;

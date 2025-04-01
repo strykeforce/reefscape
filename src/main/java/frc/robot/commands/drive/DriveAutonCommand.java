@@ -130,7 +130,7 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
       timer.reset();
       // logger.info("Begin Trajectory: {}", trajectoryName);
       desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
-      driveSubsystem.calculateController(desiredState);
+      // driveSubsystem.calculateController(desiredState);
       if (resetOdometry) {
         driveSubsystem.resetOdometry(initialPose);
       }

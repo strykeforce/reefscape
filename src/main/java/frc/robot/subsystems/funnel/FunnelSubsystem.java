@@ -90,6 +90,10 @@ public class FunnelSubsystem extends MeasurableSubsystem implements OpenLoopSubs
     setPercent(0.0);
   }
 
+  public void reverse() {
+    setPercent(-0.5);
+  }
+
   public void clearCoral() {
     curState = FunnelState.HasNotSeenCoral;
   }

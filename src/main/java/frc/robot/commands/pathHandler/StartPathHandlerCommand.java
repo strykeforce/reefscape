@@ -2,6 +2,7 @@ package frc.robot.commands.pathHandler;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.pathHandler.PathHandler;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import java.util.List;
 
 public class StartPathHandlerCommand extends Command {
@@ -11,7 +12,7 @@ public class StartPathHandlerCommand extends Command {
       PathHandler pathHandler,
       String[][] pathNames,
       List<Character> NodeNames,
-      List<Integer> NodeLevels,
+      List<ScoringLevel> NodeLevels,
       Character startNode,
       boolean mirrorToProcessor) {
     pathHandler.setPathNames(pathNames);
