@@ -249,11 +249,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Character>(Arrays.asList('k', 'l', 'k')),
             new ArrayList<ScoringLevel>(
                 Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
-            new ArrayList<>(
-                Arrays.asList(
-                    PathHandlerConstants.kLoadLightDistance,
-                    PathHandlerConstants.kLoadLightDistance,
-                    2.1)),
+            new ArrayList<>(Arrays.asList(2.1, PathHandlerConstants.kLoadLightDistance, 2.1)),
             new ArrayList<>(Arrays.asList(-0.0575, 0.0, 0.0, 0.0)),
             'j',
             false,

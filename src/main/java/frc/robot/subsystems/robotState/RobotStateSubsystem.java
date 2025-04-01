@@ -1075,9 +1075,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)) {
           Pose2d currentPose = driveSubsystem.getPoseMeters();
           double distanceFromRelease =
-              FastMath.sqrt(
-                  FastMath.pow(currentPose.getX() - processorReleasePose.getX(), 2)
-                      + FastMath.pow(currentPose.getY() - processorReleasePose.getY(), 2));
+              FastMath.sqrtQuick(
+                  FastMath.pow2(currentPose.getX() - processorReleasePose.getX())
+                      + FastMath.pow2(currentPose.getY() - processorReleasePose.getY()));
           Logger.recordOutput("RobotState/Processor Release Distance", distanceFromRelease);
 
           if (distanceFromRelease > RobotStateConstants.kProcessorStowRadius) {

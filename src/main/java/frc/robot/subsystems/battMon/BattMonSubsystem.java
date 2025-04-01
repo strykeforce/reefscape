@@ -19,6 +19,10 @@ public class BattMonSubsystem extends SubsystemBase {
   private double curDangerThreshold;
   private double curWarnThreshold;
 
+  public BattMonSubsystem(BattMonIO io) {
+    this.io = io;
+  }
+
   @Override
   public void periodic() {
     // Refresh data and graph it

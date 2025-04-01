@@ -8,7 +8,7 @@ public interface BattMonIO {
   public class BattMonIOInputs {
     public double batteryVoltage;
     public double batteryCurrent;
-    public double pdpVoltage;
+    // public double pdpVoltage;
     public double breakerTemp;
   }
 

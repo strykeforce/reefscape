@@ -187,7 +187,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     Translation2d reefRelative = driveSubsystem.getPoseMeters().getTranslation().minus(reefT);
 
-    return FastMath.hypot(reefRelative.getX(), reefRelative.getY());
+    return FastMath.sqrtQuick(
+        FastMath.pow2(reefRelative.getX()) + FastMath.pow2(reefRelative.getY()));
   }
 
   public TagAlignStates getState() {

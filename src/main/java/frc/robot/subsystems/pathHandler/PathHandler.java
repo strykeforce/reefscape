@@ -159,6 +159,8 @@ public class PathHandler extends MeasurableSubsystem {
     teleop = false;
     nodeNames.add(0, startNode);
     nodeLevels.add(0, ScoringLevel.L4); // a dummy level
+    postOffsets.add(0, 0.0); // dummy offset
+
     isHandling = true;
     robotStateSubsystem.setIsAutoPlacing(false);
     curState = PathStates.DRIVE_FETCH;
@@ -217,11 +219,11 @@ public class PathHandler extends MeasurableSubsystem {
       driveSubsystem.calculateController(
           mirrorToProcessor(currPath.sampleAt(pathTimer.get(), mirrorTrajectory).get()));
       if (pathTimer.hasElapsed(currPath.getTotalTime() + AutonConstants.kAutoTimeout)
-          || (FastMath.sqrt(
-                      FastMath.pow(
-                              driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
-                          + FastMath.pow(
-                              driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2))
+          || (FastMath.sqrtQuick(
+                      FastMath.pow2(
+                              driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX())
+                          + FastMath.pow2(
+                              driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY()))
                   < AutonConstants.kMaxPathErrorMeters
               && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
                   < AutonConstants.kMaxOmegaErrorRadians)) {
@@ -449,10 +451,10 @@ public class PathHandler extends MeasurableSubsystem {
           startPath(nextPath());
         }
         double fetchDistance =
-            FastMath.sqrt(
-                FastMath.pow(driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
-                    + FastMath.pow(
-                        driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2));
+            FastMath.sqrtQuick(
+                FastMath.pow2(driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX())
+                    + FastMath.pow2(
+                        driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY()));
         org.littletonrobotics.junction.Logger.recordOutput(
             "PathHandler/fetchDistance", fetchDistance);
         if (fetchDistance < lightDistances.get(0) && !hasLEDsOn) {
