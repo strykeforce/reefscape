@@ -238,10 +238,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setAlgaeHeight(AlgaeHeight algaeHeight) {
     this.algaeHeight = algaeHeight;
+    ledSubsystem.setAlgeaHeight(algaeHeight);
   }
 
   public void toggleAlgaeHeight() {
     algaeHeight = algaeHeight == AlgaeHeight.LOW ? AlgaeHeight.HIGH : AlgaeHeight.LOW;
+    ledSubsystem.setAlgeaHeight(algaeHeight);
   }
 
   public void setIsAutoPlacing(boolean isAutoPlacing) {
