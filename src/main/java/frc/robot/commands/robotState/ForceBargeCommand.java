@@ -14,6 +14,7 @@ public class ForceBargeCommand extends Command {
   boolean hasTriedToPickup = false;
   private RobotStates startState;
   private boolean startingElevatorFinished;
+  private boolean hasEjectedToBarge;
 
   public ForceBargeCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -30,20 +31,22 @@ public class ForceBargeCommand extends Command {
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
     robotStateSubsystem.setAlgaeHeight(AlgaeHeight.HIGH);
-    if (startState == RobotStates.BARGE_ALGAE) robotStateSubsystem.releaseAlgae();
+    if (startState == RobotStates.BARGE_ALGAE && !robotStateSubsystem.getIsAutoPlacing()) robotStateSubsystem.releaseAlgae();
     else robotStateSubsystem.toScoreAlgae();
   }
 
   @Override
   public boolean isFinished() {
-    if (startState == RobotStates.PROCESSOR_ALGAE || startState == RobotStates.BARGE_ALGAE) {
+    if (startState == RobotStates.PROCESSOR_ALGAE || hasEjectedToBarge) {
       return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
           || robotStateSubsystem.getState() == RobotStates.STOW
           || !startingElevatorFinished;
+    } else if (robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE) {
+      hasEjectedToBarge = true;
     } else {
-      return robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE
-          || robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
+      return robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
           || !robotStateSubsystem.getIsBargeSafe();
     }
+    return false;
   }
 }
