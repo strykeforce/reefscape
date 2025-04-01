@@ -17,9 +17,11 @@ public class AutonConstants {
   // Start Poses
   public static final Pose2d kNonProcessorShallow =
       new Pose2d(7.1, 5.076, Rotation2d.fromDegrees(180));
+  public static final Pose2d kNonProcessorMid =
+      new Pose2d(7.1, 6.1663548, Rotation2d.fromDegrees(180));
   public static final Pose2d kProcessorShallow =
       new Pose2d(7.1, 2.9718, Rotation2d.fromDegrees(180));
-
+  public static final Pose2d kProcessorMid = new Pose2d(7.1, 1.8818, Rotation2d.fromDegrees(180));
   public static final Pose2d kNonProcessorDeep =
       new Pose2d(7.1, 7.257, Rotation2d.fromDegrees(180));
 }

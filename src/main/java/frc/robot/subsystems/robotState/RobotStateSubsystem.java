@@ -184,7 +184,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public boolean hasAlgae() {
-    return algaeSubsystem.hasAlgae();
+    return algaeSubsystem.hasAlgae() || algaeSubsystem.hasCoral();
   }
 
   public boolean safeMoveElevator() {
@@ -213,6 +213,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private void setState(RobotStates robotState) {
     setState(robotState, false);
+  }
+
+  public void clearFutureState() {
+    futureState = null;
   }
 
   public void setAllianceColor(Alliance alliance) {
@@ -339,7 +343,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     if (biscuitSubsystem.isSafeToStow()) {
       setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
-      algaeSubsystem.holdAlgae();
+      if (algaeSubsystem.hasCoral()) {
+        algaeSubsystem.holdCoral();
+      } else {
+        algaeSubsystem.holdAlgae();
+      }
 
       setState(RobotStates.TO_STOW);
     } else {
@@ -352,7 +360,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
-    algaeSubsystem.holdAlgae();
+
+    if (algaeSubsystem.hasCoral()) {
+      algaeSubsystem.holdCoral();
+    } else {
+      algaeSubsystem.holdAlgae();
+    }
 
     setState(RobotStates.TO_STOW_SAFE);
   }
@@ -362,7 +375,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
-    algaeSubsystem.holdAlgae();
+    if (algaeSubsystem.hasCoral()) {
+      algaeSubsystem.holdCoral();
+    } else {
+      algaeSubsystem.holdAlgae();
+    }
 
     setState(RobotStates.TO_STOW_SEQUENTIAL);
   }
@@ -739,6 +756,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     if (bargeAlignSubsystem.getState() != BargeAlignStates.FINISHED) {
       bargeAlignSubsystem.terminate();
+      setAutoPlacingLed(false);
       driveSubsystem.setIgnoreSticks(false);
     }
 
@@ -958,7 +976,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           boolean blueSide = driveSubsystem.getPoseMeters().getX() < DriveConstants.kFieldMaxX / 2;
           if (coralSubsystem.hasCoral()
               && !(isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT)
-              && (blueSide && allianceColor == Alliance.Red
+              && !(blueSide && allianceColor == Alliance.Red
                   || !blueSide && allianceColor == Alliance.Blue)) {
             toReefAlign(false, false);
           } else {

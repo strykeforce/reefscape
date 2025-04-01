@@ -111,8 +111,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
   */
 
   public void terminate() {
-    driveSubsystem.move(0, 0, 0, true);
-    driveSubsystem.drive(0, 0, 0);
+    driveSubsystem.stopDriving();
     setState(BargeAlignStates.FINISHED);
   }
 

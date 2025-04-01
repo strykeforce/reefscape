@@ -13,6 +13,7 @@ import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
 import frc.robot.constants.AutonConstants;
+import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
@@ -163,6 +164,11 @@ public class AutoSwitch extends MeasurableSubsystem {
             "startToJSlow",
             new ArrayList<Character>(Arrays.asList('k', 'l')),
             new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
             'j',
             false,
             AutonConstants.kNonProcessorShallow);
@@ -243,10 +249,16 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Character>(Arrays.asList('k', 'l', 'k')),
             new ArrayList<ScoringLevel>(
                 Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance,
+                    2.1)),
+            new ArrayList<>(Arrays.asList(0.0575, 0.0, 0.0, 0.0)),
             'j',
             false,
             true,
-            AutonConstants.kNonProcessorShallow);
+            AutonConstants.kNonProcessorMid);
       }
 
       case 0x20 -> {
@@ -263,6 +275,11 @@ public class AutoSwitch extends MeasurableSubsystem {
             "startPToESlow",
             new ArrayList<Character>(Arrays.asList('d', 'c')),
             new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
             'e',
             true,
             AutonConstants.kNonProcessorShallow);
@@ -283,10 +300,12 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Character>(Arrays.asList('d', 'c', 'c')),
             new ArrayList<ScoringLevel>(
                 Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
             'e',
             true,
             true,
-            AutonConstants.kNonProcessorShallow);
+            AutonConstants.kProcessorMid);
       }
 
       default -> {

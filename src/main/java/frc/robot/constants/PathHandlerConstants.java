@@ -159,4 +159,6 @@ public class PathHandlerConstants {
   public static final double kWaitingTime = 2.0;
   public static final double kServoRadius = 1.7;
   public static final double kMaxServoErrorY = 0.7;
+  public static final double kLoadLightDistance = 2; // was 1.7
+  // public static final double kFirstLoadLightDistance = 1.9;
 }

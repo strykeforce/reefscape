@@ -38,6 +38,8 @@ public class PathHandler extends MeasurableSubsystem {
   private List<Character> nodeNames = new ArrayList<>(); // the list of nodes, in order, to score on
   private List<ScoringLevel> nodeLevels =
       new ArrayList<>(); // the list of levels, in order, to score on
+  private List<Double> lightDistances = new ArrayList<>();
+  private List<Double> postOffsets = new ArrayList<>();
   private Character startNode = 'a'; // the node that the robot starts in front of
   private boolean mirrorToProcessor =
       false; // whether the robot starts and fetches on the processor side.
@@ -83,6 +85,8 @@ public class PathHandler extends MeasurableSubsystem {
       String[][] pathNames,
       List<Character> nodeNames,
       List<ScoringLevel> nodeLevels,
+      List<Double> lightDistances,
+      List<Double> postOffsets,
       Character startNode,
       boolean mirrorToProcessor) {
     this.driveSubsystem = driveSubsystem;
@@ -91,10 +95,20 @@ public class PathHandler extends MeasurableSubsystem {
     this.pathNames = pathNames;
     this.nodeNames = nodeNames;
     this.nodeLevels = nodeLevels;
+    this.lightDistances = lightDistances;
+    this.postOffsets = postOffsets;
     this.startNode = startNode;
     this.mirrorToProcessor = mirrorToProcessor;
 
     setHeadlights(true);
+  }
+
+  public void setLightDistances(List<Double> lightDistances) {
+    this.lightDistances = lightDistances;
+  }
+
+  public void setPostOffsets(List<Double> postOffsets) {
+    this.postOffsets = postOffsets;
   }
 
   public void setPathNames(String[][] pathNames) {
@@ -241,6 +255,7 @@ public class PathHandler extends MeasurableSubsystem {
         tagAlignSubsystem.startAuto(
             mirrorTrajectory ? Alliance.Red : Alliance.Blue,
             robotStateSubsystem.getCoralLevel(),
+            postOffsets.get(0),
             (nodeNames.get(0) - 'a') % 2 == 0,
             false);
         driveSubsystem.setAutoDebugMsg("Servo Start");
@@ -305,6 +320,8 @@ public class PathHandler extends MeasurableSubsystem {
           false);
       nodeNames.remove(0);
       nodeLevels.remove(0);
+      lightDistances.remove(0);
+      postOffsets.remove(0);
     }
   }
 
@@ -431,13 +448,14 @@ public class PathHandler extends MeasurableSubsystem {
         if (!runningPath) {
           startPath(nextPath());
         }
-        if (FastMath.sqrt(
-                    FastMath.pow(
-                            driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
-                        + FastMath.pow(
-                            driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2))
-                < 1.7
-            && !hasLEDsOn) {
+        double fetchDistance =
+            FastMath.sqrt(
+                FastMath.pow(driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX(), 2)
+                    + FastMath.pow(
+                        driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY(), 2));
+        org.littletonrobotics.junction.Logger.recordOutput(
+            "PathHandler/fetchDistance", fetchDistance);
+        if (fetchDistance < lightDistances.get(0) && !hasLEDsOn) {
           robotStateSubsystem.setLEDLoadCoral(true);
           hasLEDsOn = true;
           // setHeadlights(false);

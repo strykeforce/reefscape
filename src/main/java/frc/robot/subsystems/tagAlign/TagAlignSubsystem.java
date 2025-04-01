@@ -50,6 +50,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private double yawError = 2767;
   private double coralOffset = 0;
   private double noProgressCounts = 0;
+  private double yAutoOffset = 0;
 
   public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -153,8 +154,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     Translation2d sideOffset =
         new Translation2d(
             scoreLeft
-                ? TagServoingConstants.kRightCamOffset
-                : TagServoingConstants.kLeftCamOffset + coralOffset,
+                ? TagServoingConstants.kRightCamOffset + coralOffset + yAutoOffset
+                : TagServoingConstants.kLeftCamOffset + coralOffset + yAutoOffset,
             Rotation2d.fromDegrees(computeFieldRelHexant() * 60 + 180 + 90));
 
     return new Pose2d(
@@ -273,13 +274,16 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void start(Alliance alliance, ScoringLevel level, boolean scoreLeft, boolean algae) {
     isAuto = false;
+    this.yAutoOffset = 0;
     setup(alliance, level, scoreLeft, algae);
 
     curState = TagAlignStates.DRIVE;
   }
 
-  public void startAuto(Alliance alliance, ScoringLevel level, boolean scoreLeft, boolean algae) {
+  public void startAuto(
+      Alliance alliance, ScoringLevel level, double yAutoOffset, boolean scoreLeft, boolean algae) {
     isAuto = true;
+    this.yAutoOffset = yAutoOffset;
     setup(alliance, level, scoreLeft, algae);
     tagAlign();
   }
@@ -428,7 +432,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
         if (finalDrive) {
           if (isAuto) {
-            vX = 0.35;
+            vX = 0.33;
           } else {
             vX = TagServoingConstants.kFinalDriveVel;
           }

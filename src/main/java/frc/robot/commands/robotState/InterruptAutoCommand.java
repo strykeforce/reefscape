@@ -20,6 +20,7 @@ public class InterruptAutoCommand extends Command {
   @Override
   public void initialize() {
     interruptedState = robotState.getInterruptedState();
+    robotState.clearFutureState();
     if (robotState.getState() == RobotStates.INTERRUPTED) {
       if (interruptedState == RobotStates.BARGE_ALIGN
           || interruptedState == RobotStates.TO_BARGE_ALGAE

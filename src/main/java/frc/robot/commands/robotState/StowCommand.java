@@ -23,6 +23,7 @@ public class StowCommand extends Command {
 
   @Override
   public void initialize() {
+    robotState.clearFutureState();
     robotState.toStow();
   }
 

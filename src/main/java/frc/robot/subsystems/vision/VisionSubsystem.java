@@ -416,7 +416,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     validResults.clear();
 
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
-      if (!ignoreRearCams && !isAuto && (i != 1 && i != 3)) {
+      if (!ignoreRearCams && !isAuto || (i == 0 || i == 2)) {
         if (cams[i].hasNewUpdate()) {
           timeSinceLastUpdate = getSeconds();
           validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));

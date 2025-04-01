@@ -347,7 +347,9 @@ public class RobotContainer {
                     coralSubsystem,
                     biscuitSubsystem,
                     algaeSubsystem),
-                () -> robotStateSubsystem.getIsAutoPlacing()));
+                () ->
+                    (robotStateSubsystem.getIsAutoPlacing()
+                        && robotStateSubsystem.getCoralLevel() != ScoringLevel.L1)));
 
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(

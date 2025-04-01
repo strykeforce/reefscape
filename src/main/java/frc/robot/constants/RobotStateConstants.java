@@ -20,7 +20,7 @@ public class RobotStateConstants {
   public static final double kElevatorWaitRadius = 1.5;
 
   // Super Cycle Constants
-  public static final double kBiscuitSuperCycleSafeThres = 5; // 6 is max
+  public static final double kBiscuitSuperCycleSafeThres = 7; // 6 is max
 
   // Elevator good for climb, tolerates stuck coral
   public static final double kElevatorClimbMax = 11.4;
