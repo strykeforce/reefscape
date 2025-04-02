@@ -984,7 +984,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case REMOVE_ALGAE -> {
         if (elevatorSubsystem.isFinished()
             && biscuitSubsystem.getPosition().in(Rotations)
-                <= (scoringLevel == ScoringLevel.L4 && getAlgaeLevel() == ScoringLevel.L3
+                <= (getAlgaeLevel() == ScoringLevel.L3
                     ? RobotStateConstants.kBiscuitSuperCycleSafeThres
                     : RobotStateConstants.kBiscuitSuperCycleSafeFastThres)) {
           biscuitSubsystem.setIsRemovingAlgae(false);
