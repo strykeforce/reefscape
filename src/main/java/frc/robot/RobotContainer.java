@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
@@ -43,7 +44,6 @@ import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoReefCycleCommand;
 import frc.robot.commands.robotState.DepthChargeHealthCheckCommand;
-import frc.robot.commands.robotState.FloorAlgaeCommand;
 import frc.robot.commands.robotState.ForceBargeCommand;
 import frc.robot.commands.robotState.ForceLowFloorAlgaeCommand;
 import frc.robot.commands.robotState.ForceProcessorCommand;
@@ -52,7 +52,6 @@ import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.LockWheelsCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
-import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
@@ -145,6 +144,10 @@ public class RobotContainer {
   private final PathHandler pathHandler;
 
   private final AutoSwitch autoSwitch;
+
+  private boolean canivoreStatus = false;
+  private int rCanErrors = RobotController.getCANStatus().receiveErrorCount;
+  private int tCanErrors = RobotController.getCANStatus().transmitErrorCount;
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick driveJoystick = new Joystick(0);
@@ -358,14 +361,17 @@ public class RobotContainer {
 
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(
-            new ScoreAlgaeCommand(
+            new ForceBargeCommand(
                 robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
-            // new ForceBargeCommand(
-            //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)); // for easy swapping
+    // new ForceBargeCommand(
+    //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)); // for easy
+    // swapping
     Command floorAlgaeCommand =
-        new FloorAlgaeCommand(robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem);
-        // new ForceLowFloorAlgaeCommand(
-        //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem); // for easy swapping
+        // new FloorAlgaeCommand(
+        //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem);
+        new ForceLowFloorAlgaeCommand(
+            robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem); // for easy
+    // swapping
     new JoystickButton(driveJoystick, Button.SWF_UP.id)
         .onTrue(floorAlgaeCommand)
         .onFalse(floorAlgaeCommand);
@@ -641,6 +647,21 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(9, 0);
 
+    Shuffleboard.getTab("Match")
+        .addBoolean("CANivore Connected", () -> canivoreStatus)
+        .withSize(1, 1)
+        .withPosition(2, 2);
+
+    Shuffleboard.getTab("Match")
+        .addInteger("CAN Recieve Errors", () -> rCanErrors)
+        .withSize(1, 1)
+        .withPosition(3, 2);
+
+    Shuffleboard.getTab("Match")
+        .addInteger("CAN Transmit Errors", () -> tCanErrors)
+        .withSize(1, 1)
+        .withPosition(4, 2);
+
     // Shuffleboard.getTab("Match")
     // .addBoolean(
     // "Cams Connected",
@@ -802,6 +823,15 @@ public class RobotContainer {
 
   public AutoSwitch getAutoSwitch() {
     return this.autoSwitch;
+  }
+
+  public void updateCanivoreStatus() {
+    this.canivoreStatus = robotStateSubsystem.isCANivoreConnected();
+  }
+
+  public void updateCANErrorCount() {
+    rCanErrors = RobotController.getCANStatus().receiveErrorCount;
+    tCanErrors = RobotController.getCANStatus().transmitErrorCount;
   }
 
   public void disableNoMotionCal() {

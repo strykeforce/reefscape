@@ -407,7 +407,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               }
             }
             case TAG_ALIGN -> {
-              if ((isAuto ? true : FastMath.abs(alignX.getError()) < driveXCloseEnough)
+              if ((
+                  /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
                   && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
                 finalDrive = true;
               }
@@ -433,7 +434,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
         if (finalDrive) {
           if (isAuto) {
-            vX = 0.33;
+            if (scoreLeft) {
+              vX = 0.25;
+            } else {
+              vX = 0.25;
+            }
           } else {
             vX = TagServoingConstants.kFinalDriveVel;
           }

@@ -50,7 +50,8 @@ public class ElevatorConstants {
 
   // Coral score
   public static final Angle kL1CoralSetpoint = Rotations.of(3.931); // 13.04053
-  public static final Angle kL2CoralSetpoint = Rotations.of(19.62793); // 19.62793 -> 21.0786 ->
+  public static final Angle kL2CoralSetpoint =
+      Rotations.of(20.1559 + 0.176); // 19.62793 -> 21.0786 ->
   public static final Angle kL3CoralSetpoint =
       Rotations.of(31.0901); // was 30.42969 -> 31.7505 -> 31.0901
   public static final Angle kL4CoralSetpoint = Rotations.of(48.28076);

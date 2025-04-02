@@ -498,9 +498,9 @@ public class PathHandler extends MeasurableSubsystem {
             targetHexant = tagAlignSubsystem.computeFieldRelHexant(currPathFinalPose);
             alignTargetPose =
                 tagAlignSubsystem.getTargetDrivePose((next - 'a') % 2 == 0, targetHexant);
+            robotStateSubsystem.setScoringLevel(nodeLevels.get(0));
           }
           startPath(nextPath());
-          robotStateSubsystem.setScoringLevel(nodeLevels.get(0));
         }
         drivePath();
       }

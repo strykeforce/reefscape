@@ -31,7 +31,8 @@ public class ForceBargeCommand extends Command {
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
     robotStateSubsystem.setAlgaeHeight(AlgaeHeight.HIGH);
-    if (startState == RobotStates.BARGE_ALGAE && !robotStateSubsystem.getIsAutoPlacing()) robotStateSubsystem.releaseAlgae();
+    if (startState == RobotStates.BARGE_ALGAE && !robotStateSubsystem.getIsAutoPlacing())
+      robotStateSubsystem.releaseAlgae();
     else robotStateSubsystem.toScoreAlgae();
   }
 

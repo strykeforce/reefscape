@@ -35,26 +35,26 @@ public class ReefCycleCommand extends Command {
     startingElevatorFinished = elevatorSubsystem.isFinished();
     isAutoPlacing = robotStateSubsystem.getIsAutoPlacing();
 
+    robotStateSubsystem.setIsAutoPlacing(false);
+
     robotStateSubsystem.toPrepCoral();
   }
 
   @Override
   public boolean isFinished() {
-    if (isAutoPlacing) {
-      return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD;
-    } else {
-      if (startingRobotState == RobotStates.PRESTAGE || startingRobotState == RobotStates.STOW) {
-        return robotStateSubsystem.getState() == RobotStates.REEF_ALIGN_CORAL
-            || (!robotStateSubsystem.hasCoral() && !robotStateSubsystem.getGetAlgaeOnCycle());
-      }
-      if (startingRobotState == RobotStates.REEF_ALIGN_CORAL) {
-        return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
-            || robotStateSubsystem.getState() == RobotStates.LOADING_CORAL
-            || robotStateSubsystem.getState() == RobotStates.TO_ALGAE_CORAL_LOAD
-            || robotStateSubsystem.getState() == RobotStates.ALGAE_CORAL_LOAD
-            || !startingElevatorFinished;
-      }
+
+    if (startingRobotState == RobotStates.PRESTAGE || startingRobotState == RobotStates.STOW) {
+      return robotStateSubsystem.getState() == RobotStates.REEF_ALIGN_CORAL
+          || (!robotStateSubsystem.hasCoral() && !robotStateSubsystem.getGetAlgaeOnCycle());
     }
+    if (startingRobotState == RobotStates.REEF_ALIGN_CORAL) {
+      return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
+          || robotStateSubsystem.getState() == RobotStates.LOADING_CORAL
+          || robotStateSubsystem.getState() == RobotStates.TO_ALGAE_CORAL_LOAD
+          || robotStateSubsystem.getState() == RobotStates.ALGAE_CORAL_LOAD
+          || !startingElevatorFinished;
+    }
+
     return false;
   }
 }
