@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
-import frc.robot.commands.auton.NonProcessorDeepAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
 import frc.robot.constants.AutonConstants;
+import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
@@ -164,72 +164,78 @@ public class AutoSwitch extends MeasurableSubsystem {
             "startToJSlow",
             new ArrayList<Character>(Arrays.asList('k', 'l')),
             new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance)),
+            new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0)),
             'j',
             false,
             AutonConstants.kNonProcessorShallow);
       }
-      case 0x01 -> {
-        return new NonProcessorShallowAutonCommand(
-            driveSubsystem,
-            pathHandler,
-            robotStateSubsystem,
-            algaeSubsystem,
-            biscuitSubsystem,
-            coralSubsystem,
-            elevatorSubsystem,
-            tagAlignSubsystem,
-            visionSubsystem,
-            "startToJ",
-            new ArrayList<Character>(Arrays.asList('k', 'l', 'i')),
-            new ArrayList<ScoringLevel>(
-                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
-            'j',
-            false,
-            false,
-            AutonConstants.kNonProcessorShallow);
-      }
-      case 0x02 -> {
-        return new NonProcessorShallowAutonCommand(
-            driveSubsystem,
-            pathHandler,
-            robotStateSubsystem,
-            algaeSubsystem,
-            biscuitSubsystem,
-            coralSubsystem,
-            elevatorSubsystem,
-            tagAlignSubsystem,
-            visionSubsystem,
-            "startToJ",
-            new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
-            new ArrayList<ScoringLevel>(
-                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
-            'j',
-            false,
-            false,
-            AutonConstants.kNonProcessorShallow);
-      }
-      case 0x03 -> {
-        return new NonProcessorDeepAutonCommand(
-            driveSubsystem,
-            pathHandler,
-            robotStateSubsystem,
-            algaeSubsystem,
-            biscuitSubsystem,
-            coralSubsystem,
-            elevatorSubsystem,
-            tagAlignSubsystem,
-            visionSubsystem,
-            "startDeepToK",
-            new ArrayList<Character>(Arrays.asList('l', 'a', 'b')),
-            new ArrayList<ScoringLevel>(
-                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
-            'k',
-            true,
-            false,
-            AutonConstants.kNonProcessorDeep);
-      }
+        /*case 0x01 -> {
+          return new NonProcessorShallowAutonCommand(
+              driveSubsystem,
+              pathHandler,
+              robotStateSubsystem,
+              algaeSubsystem,
+              biscuitSubsystem,
+              coralSubsystem,
+              elevatorSubsystem,
+              tagAlignSubsystem,
+              visionSubsystem,
+              "startToJ",
+              new ArrayList<Character>(Arrays.asList('k', 'l', 'i')),
+              new ArrayList<ScoringLevel>(
+                  Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
+              'j',
+              false,
+              false,
+              AutonConstants.kNonProcessorShallow);
+        }
+        case 0x02 -> {
+          return new NonProcessorShallowAutonCommand(
+              driveSubsystem,
+              pathHandler,
+              robotStateSubsystem,
+              algaeSubsystem,
+              biscuitSubsystem,
+              coralSubsystem,
+              elevatorSubsystem,
+              tagAlignSubsystem,
+              visionSubsystem,
+              "startToJ",
+              new ArrayList<Character>(Arrays.asList('k', 'l', 'a')),
+              new ArrayList<ScoringLevel>(
+                  Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
+              'j',
+              false,
+              false,
+              AutonConstants.kNonProcessorShallow);
+        }
+        case 0x03 -> {
+          return new NonProcessorDeepAutonCommand(
+              driveSubsystem,
+              pathHandler,
+              robotStateSubsystem,
+              algaeSubsystem,
+              biscuitSubsystem,
+              coralSubsystem,
+              elevatorSubsystem,
+              tagAlignSubsystem,
+              visionSubsystem,
+              "startDeepToK",
+              new ArrayList<Character>(Arrays.asList('l', 'a', 'b')),
+              new ArrayList<ScoringLevel>(
+                  Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
+              'k',
+              true,
+              false,
+              AutonConstants.kNonProcessorDeep);
+        }*/
 
-      case 0x04 -> {
+      case 0x01 -> {
         return new NonProcessorShallowAutonCommand(
             driveSubsystem,
             pathHandler,
@@ -244,10 +250,12 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Character>(Arrays.asList('k', 'l', 'k')),
             new ArrayList<ScoringLevel>(
                 Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(2.1, 2.1, 2.1)),
+            new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0, 0.0)),
             'j',
             false,
             true,
-            AutonConstants.kNonProcessorShallow);
+            AutonConstants.kNonProcessorMid);
       }
 
       case 0x20 -> {
@@ -264,6 +272,12 @@ public class AutoSwitch extends MeasurableSubsystem {
             "startPToESlow",
             new ArrayList<Character>(Arrays.asList('d', 'c')),
             new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
             'e',
             true,
             AutonConstants.kNonProcessorShallow);
@@ -284,10 +298,12 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Character>(Arrays.asList('d', 'c', 'c')),
             new ArrayList<ScoringLevel>(
                 Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
             'e',
             true,
             true,
-            AutonConstants.kNonProcessorShallow);
+            AutonConstants.kProcessorMid);
       }
 
       default -> {

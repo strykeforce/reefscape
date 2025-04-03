@@ -87,7 +87,7 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
       if (hasAlgae) {
         // why is this if statement here???
         if (isRemovingAlgae) {
-          configurator.apply(RobotConstants.algaeMotionConfig);
+          configurator.apply(RobotConstants.algaeRemovalMotionConfig);
         } else {
           configurator.apply(RobotConstants.algaeMotionConfig);
         }

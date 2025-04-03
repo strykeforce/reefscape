@@ -63,7 +63,7 @@ public class ClimbConstants {
   public static final double kCloseEnoughX = 0.1;
   public static final double kCloseEnoughY = 0.03;
   public static final double kClimbAngleGood = RobotStateConstants.kClimbAngleSmall;
-  public static final double kFastClimbAfter = 3;
+  public static final double kFastClimbAfter = 3.5;
 
   public static TalonFXConfiguration getPivotArmFxConfig() {
     TalonFXConfiguration armFxConfig = new TalonFXConfiguration();

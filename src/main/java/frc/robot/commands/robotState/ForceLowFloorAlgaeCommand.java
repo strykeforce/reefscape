@@ -3,32 +3,37 @@ package frc.robot.commands.robotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
-import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.AlgaeHeight;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
-public class StowCommand extends Command {
+public class ForceLowFloorAlgaeCommand extends Command {
   RobotStateSubsystem robotState;
+  boolean hasTriedToPickup = false;
 
-  public StowCommand(
+  public ForceLowFloorAlgaeCommand(
       RobotStateSubsystem robotState,
       ElevatorSubsystem elevatorSubsystem,
-      CoralSubsystem coralSubsystem,
       BiscuitSubsystem biscuitSubsystem,
       AlgaeSubsystem algaeSubsystem) {
     this.robotState = robotState;
-    addRequirements(elevatorSubsystem, coralSubsystem, biscuitSubsystem, algaeSubsystem);
+    addRequirements(elevatorSubsystem, biscuitSubsystem, algaeSubsystem);
   }
 
   @Override
   public void initialize() {
-    robotState.clearFutureState();
-    robotState.toStow();
+    hasTriedToPickup = false;
+    robotState.setAlgaeHeight(AlgaeHeight.LOW);
+    robotState.toAlgaeFloorPickup();
   }
 
   @Override
   public boolean isFinished() {
-    return robotState.getState() == RobotStates.STOW;
+    if (robotState.getState() == RobotStates.FLOOR_ALGAE
+        || robotState.getState() == RobotStates.MIC_ALGAE) {
+      hasTriedToPickup = true;
+    }
+    return robotState.getState() == RobotStates.STOW && hasTriedToPickup;
   }
 }

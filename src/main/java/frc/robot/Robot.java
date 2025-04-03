@@ -71,6 +71,8 @@ public class Robot extends LoggedRobot {
     // if (!m_robotContainer.hasSwerveZeroed()) m_robotContainer.zeroSwerve();
 
     m_robotContainer.getAutoSwitch().checkSwitch();
+    m_robotContainer.updateCanivoreStatus();
+    m_robotContainer.updateCANErrorCount();
   }
 
   @Override

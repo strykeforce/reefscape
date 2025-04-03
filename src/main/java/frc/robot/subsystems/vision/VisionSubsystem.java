@@ -108,6 +108,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private Matrix<N3, N1> stdMatrix;
 
   private boolean[] acceptUpdates = new boolean[VisionConstants.kNumCams];
+  private boolean ignoreRearCams = false;
+  private boolean isAuto = false;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -147,6 +149,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
   public void setMinTags(int minTags) {
     this.minTags = minTags;
   }
+
+  public void setIgnoreRearCams(boolean ignore) {
+    this.ignoreRearCams = ignore;
+  }
+
+  public void setIsAuto(boolean isAuto) {
+    this.isAuto = isAuto;
+  }
   // Getter Methods
   public double getYawUpdateCamera() {
     return trustedCameraYawIdx;
@@ -175,7 +185,10 @@ public class VisionSubsystem extends MeasurableSubsystem {
     for (int id : ids) {
       Pose3d tagPose = field.getTagPose(id).get();
 
-      double dist = FastMath.hypot(tagPose.getX() - camLoc.getX(), tagPose.getY() - camLoc.getY());
+      double dist =
+          FastMath.sqrtQuick(
+              FastMath.pow2(tagPose.getX() - camLoc.getX())
+                  + FastMath.pow2(tagPose.getY() - camLoc.getY()));
 
       if (dist < minDistance) {
         minDistance = dist;
@@ -195,7 +208,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
     for (int id : ids) {
       Pose3d tagPose = field.getTagPose(id).get();
       totalDistance +=
-          FastMath.hypot(tagPose.getX() - camLoc.getX(), tagPose.getY() - camLoc.getY());
+          FastMath.sqrtQuick(
+              FastMath.pow2(tagPose.getX() - camLoc.getX())
+                  + FastMath.pow2(tagPose.getY() - camLoc.getY()));
     }
     return totalDistance / ids.length;
   }
@@ -209,11 +224,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
     Translation2d disp = (curPose.getTranslation().minus(pose.toTranslation2d()));
 
     double velMagnitude =
-        FastMath.sqrt(
-            FastMath.pow(vel.vxMetersPerSecond, 2) + FastMath.pow(vel.vyMetersPerSecond, 2));
+        FastMath.sqrtQuick(
+            FastMath.pow2(vel.vxMetersPerSecond) + FastMath.pow2(vel.vyMetersPerSecond));
 
     double dispMagnitude =
-        FastMath.sqrt(FastMath.pow(disp.getX(), 2) + FastMath.pow(disp.getY(), 2));
+        FastMath.sqrtQuick(FastMath.pow2(disp.getX()) + FastMath.pow2(disp.getY()));
 
     /*This gets our displacement and compares it to who much we could
     have moved.It does this by getting the velocity and plotting it on a
@@ -222,7 +237,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         && dispMagnitude
             <= (velMagnitude * VisionConstants.kLinearCoeffOnVelFilter
                 + VisionConstants.kOffsetOnVelFilter
-                + FastMath.pow(velMagnitude * VisionConstants.kSquaredCoeffOnVelFilter, 2));
+                + FastMath.pow2(velMagnitude * VisionConstants.kSquaredCoeffOnVelFilter));
   }
 
   private boolean camsWithinField(Translation3d pose, WallEyePoseResult result) {
@@ -241,17 +256,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.FOV58YUYVBaseTrust
-                  * FastMath.pow(
+                  * FastMath.powQuick(
                       VisionConstants.baseNumber,
-                      FastMath.pow(
+                      FastMath.powQuick(
                           VisionConstants.FOV58YUYVSingleTagCoeff * distance,
                           VisionConstants.FOV58YUYVPowerNumber)));
 
         return 1
             / (VisionConstants.FOV58YUYVBaseTrust
-                * FastMath.pow(
+                * FastMath.powQuick(
                     VisionConstants.baseNumber,
-                    FastMath.pow(
+                    FastMath.powQuick(
                         VisionConstants.FOV58YUYVMultiTagCoeff * distance,
                         VisionConstants.FOV58YUYVPowerNumber)));
       }
@@ -259,17 +274,17 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.FOV58YUYVBaseTrust
-                  * FastMath.pow(
+                  * FastMath.powQuick(
                       VisionConstants.baseNumber,
-                      FastMath.pow(
+                      FastMath.powQuick(
                           VisionConstants.FOV58MJPGSingleTagCoeff * distance,
                           VisionConstants.FOV58YUYVPowerNumber)));
 
         return 1
             / (VisionConstants.FOV58YUYVBaseTrust
-                * FastMath.pow(
+                * FastMath.powQuick(
                     VisionConstants.baseNumber,
-                    FastMath.pow(
+                    FastMath.powQuick(
                         VisionConstants.FOV58MJPGSingleTagCoeff * distance,
                         VisionConstants.FOV58YUYVPowerNumber)));
       }
@@ -278,16 +293,16 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.FOV75YUYVBaseTrust
-                  * FastMath.pow(
+                  * FastMath.powQuick(
                       VisionConstants.baseNumber,
-                      FastMath.pow(
+                      FastMath.powQuick(
                           VisionConstants.FOV75YUYVSingleTagCoeff * distance,
                           VisionConstants.FOV75YUYVPowerNumber)));
         return 1
             / (VisionConstants.FOV75YUYVBaseTrust
-                * FastMath.pow(
+                * FastMath.powQuick(
                     VisionConstants.baseNumber,
-                    FastMath.pow(
+                    FastMath.powQuick(
                         VisionConstants.FOV75YUYVMultiTagCoeff * distance,
                         VisionConstants.FOV75YUYVPowerNumber)));
       }
@@ -296,15 +311,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.baseTrust
-                  * FastMath.pow(
+                  * FastMath.powQuick(
                       VisionConstants.baseNumber,
-                      FastMath.pow(
+                      FastMath.powQuick(
                           VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber)));
         return 1
             / (VisionConstants.baseTrust
-                * FastMath.pow(
+                * FastMath.powQuick(
                     VisionConstants.baseNumber,
-                    FastMath.pow(
+                    FastMath.powQuick(
                         VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber)));
       }
     }
@@ -406,10 +421,12 @@ public class VisionSubsystem extends MeasurableSubsystem {
     validResults.clear();
 
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
-      if (cams[i].hasNewUpdate()) {
-        timeSinceLastUpdate = getSeconds();
-        validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
-        lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+      if (!ignoreRearCams && !isAuto || (i == 0 || i == 2)) {
+        if (cams[i].hasNewUpdate()) {
+          timeSinceLastUpdate = getSeconds();
+          validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
+          lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+        }
       }
     }
 

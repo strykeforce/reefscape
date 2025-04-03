@@ -8,6 +8,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 
 public class AutoReefCycleCommand extends Command {
@@ -49,7 +50,9 @@ public class AutoReefCycleCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return scoringCoral && !robotStateSubsystem.hasCoral()
+    return scoringCoral
+            && (!robotStateSubsystem.hasCoral()
+                || robotStateSubsystem.getCoralLevel() == ScoringLevel.L1)
         || !scoringCoral && robotStateSubsystem.hasAlgae();
   }
 }

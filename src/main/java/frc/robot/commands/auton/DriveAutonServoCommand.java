@@ -44,6 +44,8 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   private boolean hasStaged = false;
   private boolean hasPreppedCoral = false;
 
+  private double yOffset;
+
   private SwerveSample desiredState;
   private Pose2d finalPose;
   private Pose2d initialPose = new Pose2d();
@@ -58,7 +60,8 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
       boolean lastPath,
       boolean resetOdometry,
       boolean mirrorToProcessor,
-      boolean scoreLeft) {
+      boolean scoreLeft,
+      double yOffset) {
 
     addRequirements(driveSubsystem, elevatorSubsystem, biscuitSubsystem);
     this.driveSubsystem = driveSubsystem;
@@ -71,6 +74,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     this.trajectoryName = trajectoryName;
     this.mirrorToProcessor = mirrorToProcessor;
     this.scoreLeft = scoreLeft;
+    this.yOffset = yOffset;
     Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
     if (tempTrajectory.isPresent()) {
       trajectory = tempTrajectory.get();
@@ -189,6 +193,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
           tagAlignSubsystem.startAuto(
               mirrorTrajectory ? Alliance.Red : Alliance.Blue,
               robotStateSubsystem.getCoralLevel(),
+              yOffset,
               mirrorToProcessor ? !scoreLeft : scoreLeft,
               false);
         }
