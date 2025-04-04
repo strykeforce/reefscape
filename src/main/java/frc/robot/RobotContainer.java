@@ -44,7 +44,7 @@ import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoReefCycleCommand;
 import frc.robot.commands.robotState.DepthChargeHealthCheckCommand;
-import frc.robot.commands.robotState.ForceBargeCommand;
+import frc.robot.commands.robotState.EjectAlgaeCommand;
 import frc.robot.commands.robotState.ForceLowFloorAlgaeCommand;
 import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
@@ -52,6 +52,7 @@ import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.LockWheelsCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
+import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
@@ -361,7 +362,7 @@ public class RobotContainer {
 
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(
-            new ForceBargeCommand(
+            new ScoreAlgaeCommand(
                 robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
     // new ForceBargeCommand(
     //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)); // for easy
@@ -439,29 +440,33 @@ public class RobotContainer {
     new Trigger(() -> robotStateSubsystem.isStuckAndMisaligned())
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
 
-    // Move biscuit
-    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogBiscuitCommand(
-                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
-        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
-    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogBiscuitCommand(
-                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
-        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger(() -> xboxController.getPOV() != 0)
+        .onTrue(new EjectAlgaeCommand(algaeSubsystem, robotStateSubsystem));
 
-    // Move elevator
-    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
-    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
-        .onTrue(
-            new JogElevatorCommand(
-                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
-        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    // // Move biscuit
+    // new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+    //     .onTrue(
+    //         new JogBiscuitCommand(
+    //             biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+    //     .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    // new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+    //     .onTrue(
+    //         new JogBiscuitCommand(
+    //             biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+    //     .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+
+    // // Move elevator
+    // new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+    //     .onTrue(
+    //         new JogElevatorCommand(
+    //             elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+    //     .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    // new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+    //     .onTrue(
+    //         new JogElevatorCommand(
+    //             elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown,
+    // Rotations)))
+    //     .onFalse(new HoldElevatorCommand(elevatorSubsystem));
   }
 
   private void configureTestOperatorBindings() {
@@ -801,8 +806,9 @@ public class RobotContainer {
     return Commands.print("No autonomous command configured");
   }
 
-  public void stopTagAlign() {
+  public void stopTagAlignAndPathHandler() {
     tagAlignSubsystem.terminate();
+    pathHandler.killPathHandler();
   }
 
   public void setIsAuto(boolean isAuto) {

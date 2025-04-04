@@ -219,7 +219,7 @@ public class PathHandler extends MeasurableSubsystem {
       driveSubsystem.calculateController(
           mirrorToProcessor(currPath.sampleAt(pathTimer.get(), mirrorTrajectory).get()));
       if (pathTimer.hasElapsed(currPath.getTotalTime() + AutonConstants.kAutoTimeout)
-          || (FastMath.sqrtQuick(
+          || (Math.sqrt(
                       FastMath.pow2(
                               driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX())
                           + FastMath.pow2(
@@ -451,7 +451,7 @@ public class PathHandler extends MeasurableSubsystem {
           startPath(nextPath());
         }
         double fetchDistance =
-            FastMath.sqrtQuick(
+            Math.sqrt(
                 FastMath.pow2(driveSubsystem.getPoseMeters().getX() - currPathFinalPose.getX())
                     + FastMath.pow2(
                         driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY()));

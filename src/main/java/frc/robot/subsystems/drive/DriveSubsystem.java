@@ -304,7 +304,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     double vY = cs.vyMetersPerSecond;
 
     // Take fieldRel Speed and get the magnitude of the vector
-    double wheelSpeed = FastMath.sqrtQuick(FastMath.pow2(vX) + FastMath.pow2(vY));
+    double wheelSpeed = Math.sqrt(FastMath.pow2(vX) + FastMath.pow2(vY));
 
     boolean velStill = Math.abs(wheelSpeed) <= DriveConstants.kSpeedStillThreshold;
     boolean gyroStill = isGyroStill();
