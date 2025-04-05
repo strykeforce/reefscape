@@ -331,6 +331,7 @@ public class PathHandler extends MeasurableSubsystem {
     isHandling = false;
     curState = PathStates.DONE;
     runningPath = false;
+    robotStateSubsystem.setLEDLoadCoral(false);
     robotStateSubsystem.setIsAutoPlacing(true);
     pathTimer.stop();
     pathTimer.reset();

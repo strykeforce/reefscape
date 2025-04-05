@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.algae.EjectAlgaeCommand;
 import frc.robot.commands.algae.IntakeAlgaeCommand;
 import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
@@ -44,7 +45,7 @@ import frc.robot.commands.elevator.SetElevatorPositionCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoReefCycleCommand;
 import frc.robot.commands.robotState.DepthChargeHealthCheckCommand;
-import frc.robot.commands.robotState.EjectAlgaeCommand;
+import frc.robot.commands.robotState.ForceBargeCommand;
 import frc.robot.commands.robotState.ForceLowFloorAlgaeCommand;
 import frc.robot.commands.robotState.ForceProcessorCommand;
 import frc.robot.commands.robotState.HPAlgaeCommand;
@@ -52,7 +53,6 @@ import frc.robot.commands.robotState.InterruptAutoCommand;
 import frc.robot.commands.robotState.LockWheelsCommand;
 import frc.robot.commands.robotState.OperatorRumbleCommand;
 import frc.robot.commands.robotState.ReefCycleCommand;
-import frc.robot.commands.robotState.ScoreAlgaeCommand;
 import frc.robot.commands.robotState.SetScoreSideCommand;
 import frc.robot.commands.robotState.SetScoreSideRightCommand;
 import frc.robot.commands.robotState.SetScoringLevelCommand;
@@ -362,10 +362,13 @@ public class RobotContainer {
 
     new JoystickButton(driveJoystick, Button.M_SWE.id)
         .onTrue(
-            new ScoreAlgaeCommand(
-                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
-    // new ForceBargeCommand(
-    //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)); // for easy
+            // new ScoreAlgaeCommand(
+            //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+            new ForceBargeCommand(
+                robotStateSubsystem,
+                elevatorSubsystem,
+                biscuitSubsystem,
+                algaeSubsystem)); // for easy
     // swapping
     Command floorAlgaeCommand =
         // new FloorAlgaeCommand(
@@ -440,8 +443,7 @@ public class RobotContainer {
     new Trigger(() -> robotStateSubsystem.isStuckAndMisaligned())
         .onTrue(new OperatorRumbleCommand(robotStateSubsystem, xboxController));
 
-    new Trigger(() -> xboxController.getPOV() != 0)
-        .onTrue(new EjectAlgaeCommand(algaeSubsystem, robotStateSubsystem));
+    new Trigger(() -> xboxController.getPOV() != -1).onTrue(new EjectAlgaeCommand(algaeSubsystem));
 
     // // Move biscuit
     // new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))

@@ -41,7 +41,7 @@ public class TagServoingConstants {
   public static final int[] kBlueTargetTag = {18, 17, 22, 21, 20, 19};
   public static final int[] kRedTargetTag = {7, 8, 9, 10, 11, 6};
 
-  // Offsets
+  // Offsets (left is negative, right is pos)
   public static final double[][][] kBlueCoralOffset = {
     {{0, 0}, {0, 0}, {0, 0}, {0, 0}},
     {{0, 0}, {0, 0}, {0, 0}, {0, 0}},
