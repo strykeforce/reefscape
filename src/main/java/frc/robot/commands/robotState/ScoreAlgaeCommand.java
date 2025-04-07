@@ -26,6 +26,7 @@ public class ScoreAlgaeCommand extends Command {
 
   @Override
   public void initialize() {
+    hasEjectedToBarge = false;
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
     if (startState == RobotStates.PROCESSOR_ALGAE || startState == RobotStates.BARGE_ALGAE) {

@@ -28,6 +28,7 @@ public class ForceBargeCommand extends Command {
 
   @Override
   public void initialize() {
+    hasEjectedToBarge = false;
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
     robotStateSubsystem.setAlgaeHeight(AlgaeHeight.HIGH);

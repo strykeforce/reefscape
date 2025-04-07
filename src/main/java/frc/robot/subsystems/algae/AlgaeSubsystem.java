@@ -63,7 +63,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
 
   public void holdAlgae() {
     // setSpeed(AlgaeConstants.kHoldSpeed);
-    setPct(0.06);
+    setPct(0.08);
   }
 
   public void holdCoral() {
