@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.constants.BargeAlignConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -673,8 +672,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         }
         double poseX = driveSubsystem.getPoseMeters().getX();
         isBargeSafe =
-            poseX > BargeAlignConstants.kRedRaiseElevatorX
-                || poseX < BargeAlignConstants.kBlueRaiseElevatorX;
+            poseX > RobotStateConstants.kRedBargeSafeX
+                || poseX < RobotStateConstants.kBlueBargeSafeX;
         if (isBargeSafe) {
           driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
           if (isAutoPlacing) {
