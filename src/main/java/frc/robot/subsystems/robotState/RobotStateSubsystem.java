@@ -304,6 +304,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ledSubsystem.setAutoPlacing(isAutoPlacing);
   }
 
+  public void clearCoral() {
+    funnelSubsystem.clearCoral();
+    coralSubsystem.setState(CoralSubsystem.CoralState.EMPTY);
+    algaeSubsystem.setState(AlgaeSubsystem.AlgaeStates.EMPTY);
+    coralLoc = CoralLoc.NONE;
+  }
+
   private boolean needSafeAlgaeTransfer(RobotStates nextState) {
     if (algaeSubsystem.hasAlgae()) {
       switch (curState) {

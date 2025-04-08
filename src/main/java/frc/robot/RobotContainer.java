@@ -640,9 +640,7 @@ public class RobotContainer {
             "Clear Coral",
             new InstantCommand(
                 () -> {
-                  funnelSubsystem.clearCoral();
-                  coralSubsystem.setState(CoralSubsystem.CoralState.EMPTY);
-                  algaeSubsystem.setState(AlgaeSubsystem.AlgaeStates.EMPTY);
+                  robotStateSubsystem.clearCoral();
                 }))
         .withSize(1, 1)
         .withPosition(9, 0);

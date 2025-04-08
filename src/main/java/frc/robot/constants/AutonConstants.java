@@ -14,6 +14,9 @@ public class AutonConstants {
   public static final double kElevatorStageRadiusPathOne = 2.1; // 1.8
   public static final double kInitPathPrestageTime = 0.6;
 
+  public static final double kStageBargeDistance = 2.5;
+  public static final double kBargeScoreMinTime = 3;
+
   // Start Poses
   public static final Pose2d kNonProcessorShallow =
       new Pose2d(7.1, 5.076, Rotation2d.fromDegrees(180));
