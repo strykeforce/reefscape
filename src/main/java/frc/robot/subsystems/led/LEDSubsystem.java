@@ -172,7 +172,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
   }
 
   private void buildBase() {
-
+    base = LEDPattern.solid(Color.kBlack);
     algae =
         LEDPattern.steps(
             Map.of(

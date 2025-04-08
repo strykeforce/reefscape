@@ -7,6 +7,7 @@ public interface AlgaeIO {
   @AutoLog
   public static class AlgaeIOInputs {
     public double velocity;
+    public double statorCurrent;
     public boolean isBeamBroken;
     public boolean isCoralBeamBroken;
   }

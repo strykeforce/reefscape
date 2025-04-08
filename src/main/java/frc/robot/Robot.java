@@ -61,7 +61,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    m_robotContainer.stopTagAlign();
+    m_robotContainer.stopTagAlignAndPathHandler();
   }
 
   @Override
