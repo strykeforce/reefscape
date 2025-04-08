@@ -5,13 +5,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.BargeAlignConstants;
 import frc.robot.constants.DriveConstants;
-import frc.robot.constants.RobotStateConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
+// TODO Make final drive faster. Reverse if we are too close to the barge.
 
 public class BargeAlignSubsystem extends MeasurableSubsystem {
 
@@ -76,15 +76,24 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
   private boolean isSafe() {
     double poseX = driveSubsystem.getPoseMeters().getX();
 
-    return poseX > RobotStateConstants.kRedBargeSafeX
-        || poseX < RobotStateConstants.kBlueBargeSafeX;
+    return poseX > BargeAlignConstants.kRedRaiseElevatorX
+        || poseX < BargeAlignConstants.kBlueRaiseElevatorX;
   }
 
   private boolean shouldRaiseElevator() {
     double poseX = driveSubsystem.getPoseMeters().getX();
     return isOnBlueSide
         ? poseX > BargeAlignConstants.kBlueRaiseElevatorX
-        : poseX < BargeAlignConstants.kRedRaiseElevatorX;
+            && poseX <= BargeAlignConstants.kBlueUnsafeX
+        : poseX < BargeAlignConstants.kRedRaiseElevatorX
+            && poseX >= BargeAlignConstants.kRedUnsafeX;
+  }
+
+  private boolean shouldDriveBackwards() {
+    double poseX = driveSubsystem.getPoseMeters().getX();
+    return isOnBlueSide
+        ? poseX > BargeAlignConstants.kBlueUnsafeX
+        : poseX < BargeAlignConstants.kRedUnsafeX;
   }
 
   private boolean shouldEjectAlgae() {
@@ -131,6 +140,8 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         Logger.recordOutput("BargeAlign/Vomega", vOmega);
         if (shouldRaiseElevator()) {
           setState(BargeAlignStates.RAISE_ELEV);
+        } else if (shouldDriveBackwards()) {
+          setState(BargeAlignStates.REVERSE);
         }
       }
       case RAISE_ELEV -> {
@@ -143,6 +154,14 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         Logger.recordOutput("BargeAlign/Vomega", vOmega);
         if (shouldEjectAlgae()) {
           terminate();
+        }
+      }
+      case REVERSE -> {
+        if (isOnBlueSide) {
+          driveSubsystem.move(
+              -vX, getYStickReading(), BargeAlignConstants.kBlueRaiseElevatorX, true);
+        } else {
+          driveSubsystem.move(vX, getYStickReading(), BargeAlignConstants.kRedRaiseElevatorX, true);
         }
       }
       case FINISHED -> {}
@@ -158,6 +177,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
     // INIT,
     DRIVE,
     RAISE_ELEV,
+    REVERSE,
     FINISHED
   }
 }
