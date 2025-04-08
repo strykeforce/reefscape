@@ -26,10 +26,13 @@ public class AlgaeConstants {
   public static final double kMaxFwd = 100;
   public static final double kMaxRev = -100;
 
-  public static final double kHoldSpeed = -0.1;
-  public static final double kBargeScoreSpeed = 1;
-  public static final double kProcessorScoreSpeed = 1;
-  public static final double kIntakingSpeed = -1;
+  public static final double kHoldSpeed = 0.06;
+  public static final double kCoralHoldSpeed = 0.05;
+  public static final double kBargeScoreSpeed = -1;
+  public static final double kProcessorScoreSpeed = -1;
+  public static final double kCoralScoreSpeed = -0.5;
+  public static final double kIntakingSpeed = 0.75;
+  public static final double kCoralIntakingSpeed = 0.75;
 
   public static final double kHasAlgaeVelThreshold = 10;
   public static final double kSuperCycleHasAlgaeVelThres = 40; // was 40

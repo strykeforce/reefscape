@@ -33,42 +33,35 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
   }
 
   public void intakeAlgae() {
-    // setSpeed(AlgaeConstants.kIntakingSpeed);
-    setPct(0.75);
+    setPct(AlgaeConstants.kIntakingSpeed);
     slowCounts = 0;
     setState(AlgaeStates.EMPTY);
   }
 
   public void intakeCoral() {
-    // setSpeed(AlgaeConstants.kCoralIntakingSpeed); OR - AlgaeConstants.kIntakingSpeed
-    setPct(-0.5);
+    setPct(AlgaeConstants.kCoralIntakingSpeed);
     slowCounts = 0;
     setState(AlgaeStates.CORAL_INTAKE);
   }
 
   public void scoreProcessor() {
-    // setSpeed(AlgaeConstants.kProcessorScoreSpeed);
-    setPct(-1);
+    setPct(AlgaeConstants.kProcessorScoreSpeed);
   }
 
   public void scoreBarge() {
-    // setSpeed(AlgaeConstants.kBargeScoreSpeed);
-    setPct(-1);
+    setPct(AlgaeConstants.kBargeScoreSpeed);
   }
 
   public void scoreCoral() {
-    // setSpeed(AlgaeConstants.kCoralScoreSpeed);
-    setPct(0.5);
+    setPct(AlgaeConstants.kCoralScoreSpeed);
   }
 
   public void holdAlgae() {
-    // setSpeed(AlgaeConstants.kHoldSpeed);
-    setPct(0.08);
+    setPct(AlgaeConstants.kHoldSpeed);
   }
 
   public void holdCoral() {
-    // setSpeed(AlgaeConstants.kCoralHoldSpeed); OR -AlgaeConstants.kHoldSpeed
-    setPct(-0.05);
+    setPct(AlgaeConstants.kCoralHoldSpeed);
   }
 
   public boolean hasAlgae() {
@@ -118,12 +111,12 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
         }
       }
       case HAS_CORAL -> {
-        if (!inputs.isCoralBeamBroken) {
+        if (!inputs.isBeamBroken) {
           setState(AlgaeStates.EMPTY);
         }
       }
       case CORAL_INTAKE -> {
-        if (inputs.isCoralBeamBroken) {
+        if (inputs.isBeamBroken) {
           if (FastMath.abs(inputs.velocity) < AlgaeConstants.kHasCoralVelThreshold) {
             slowCounts++;
           } else {
