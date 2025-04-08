@@ -26,10 +26,11 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
 
   private DriveSubsystem driveSubsystem;
-  private DriveAutonServoCommand startPath;
   private CoralSubsystem coralSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
+
+  private ArrayList<AutoCommandInterface> pathCommands = new ArrayList<>();
 
   public MiddleBargeAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -57,7 +58,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
             robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose));
 
     for (int i = 0; i < grabPaths.size(); i++) {
-      addCommands(
+      var algaeDrive =
           new DriveAlgaeAutonServoCommand(
               driveSubsystem,
               tagAlignSubsystem,
@@ -68,19 +69,26 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
               i == 0,
               false,
               i == 0,
-              grabYOffsets.get(i)),
+              grabYOffsets.get(i));
+      var bargeDrive =
+          new DriveBargeAutonCommand(
+              driveSubsystem,
+              tagAlignSubsystem,
+              elevatorSubsystem,
+              biscuitSubsystem,
+              robotStateSubsystem,
+              bargePaths.get(i),
+              i == grabPaths.size() - 1,
+              false);
+
+      pathCommands.add(algaeDrive);
+      pathCommands.add(bargeDrive);
+      addCommands(
+          algaeDrive,
           new WaitCommand(delays.get(i)),
           new ConditionalCommand(
               new SequentialCommandGroup(
-                  new DriveBargeAutonCommand(
-                      driveSubsystem,
-                      tagAlignSubsystem,
-                      elevatorSubsystem,
-                      biscuitSubsystem,
-                      robotStateSubsystem,
-                      bargePaths.get(i),
-                      i == grabPaths.size() - 1,
-                      false),
+                  bargeDrive,
                   new ScoreAlgaeCommand(
                       robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)),
               new WaitCommand(15),
@@ -90,7 +98,6 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
 
   @Override
   public void reassignAlliance() {
-    startPath.reassignAlliance();
     driveSubsystem.teleResetGyro();
     coralSubsystem.setAutoPreload();
     robotStateSubsystem.setIsAutoPlacing(false);
