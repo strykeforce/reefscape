@@ -160,6 +160,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         if (isOnBlueSide) {
           driveSubsystem.move(
               -vX, getYStickReading(), BargeAlignConstants.kBlueRaiseElevatorX, true);
+              //TODO add should raise elevator
         } else {
           driveSubsystem.move(vX, getYStickReading(), BargeAlignConstants.kRedRaiseElevatorX, true);
         }
