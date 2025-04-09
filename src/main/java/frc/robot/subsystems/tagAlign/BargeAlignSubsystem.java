@@ -169,6 +169,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
     // INIT,
     DRIVE,
     RAISE_ELEV,
+    REVERSE,
     FINISHED
   }
 }

@@ -402,6 +402,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             || FastMath.abs(driveOmega.getError()) < TagServoingConstants.kAngleCloseEnough) {
           switch (curState) {
             case DRIVE -> {
+              //TODO Only look at y error
               if (FastMath.abs(driveX.getError()) < driveXCloseEnough
                       && FastMath.abs(driveY.getError()) < driveYCloseEnough
                   // || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough
@@ -411,10 +412,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               }
             }
             case TAG_ALIGN -> {
-              if ((
-                  /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
-                  && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
+              if (justAlgae && (FastMath.abs(alignY.getError()) < driveYCloseEnough)) {
                 finalDrive = true;
+              } else {
+                if ((
+                    /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
+                    && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
+                  finalDrive = true;
+                }
               }
               if (finalDrive
                   && driveSubsystem.getAvgDriveCurrent()
@@ -435,10 +440,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             }
           }
         }
-        // TODO Change after testing
+        // TODO Find Proper Number
         if (finalDrive) {
-          if (justAlgae && !isAuto) {
-            vX = 0.3;
+          if (justAlgae) {
+            vX = (vX > 0.35) ? vX : 0.35;
           } else if (isAuto) {
             if (scoreLeft) {
               vX = 0.25;
