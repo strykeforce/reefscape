@@ -65,6 +65,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
               elevatorSubsystem,
               biscuitSubsystem,
               robotStateSubsystem,
+              visionSubsystem,
               grabPaths.get(i),
               i == 0,
               false,
@@ -77,6 +78,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
               elevatorSubsystem,
               biscuitSubsystem,
               robotStateSubsystem,
+              visionSubsystem,
               bargePaths.get(i),
               i == grabPaths.size() - 1,
               false);
@@ -84,7 +86,10 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       pathCommands.add(algaeDrive);
       pathCommands.add(bargeDrive);
       addCommands(
-          algaeDrive,
+          new ConditionalCommand(
+              algaeDrive,
+              new WaitCommand(15),
+              () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime),
           new WaitCommand(delays.get(i)),
           new ConditionalCommand(
               new SequentialCommandGroup(
@@ -105,5 +110,9 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
     robotStateSubsystem.setGetAlgaeOnCycle(true);
     robotStateSubsystem.setScoreSide(ScoreSide.LEFT);
     visionSubsystem.setVisionUpdating(true);
+
+    for (var command : pathCommands) {
+      command.reassignAlliance();
+    }
   }
 }

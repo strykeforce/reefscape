@@ -16,6 +16,7 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem.TagAlignStates;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
   private final TagAlignSubsystem tagAlignSubsystem;
   private final ElevatorSubsystem elevatorSubsystem;
   private final RobotStateSubsystem robotStateSubsystem;
+  private final VisionSubsystem visionSubsystem;
 
   private Trajectory<SwerveSample> trajectory;
   private final Timer timer = new Timer();
@@ -54,6 +56,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
       ElevatorSubsystem elevatorSubsystem,
       BiscuitSubsystem biscuitSubsystem,
       RobotStateSubsystem robotStateSubsystem,
+      VisionSubsystem visionSubsystem,
       String trajectoryName,
       boolean firstPath,
       boolean lastPath,
@@ -65,6 +68,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
+    this.visionSubsystem = visionSubsystem;
 
     this.resetOdometry = resetOdometry;
     this.firstPath = firstPath;
@@ -105,6 +109,8 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
     } else {
       robotStateSubsystem.clearCoral();
     }
+
+    visionSubsystem.setIsAuto(false);
 
     isServoing = false;
     hasStaged = false;
@@ -148,6 +154,8 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
 
         if (shouldTransitionToServoing()) {
           isServoing = true;
+
+          visionSubsystem.setIsAuto(true);
 
           tagAlignSubsystem.startAuto(
               robotStateSubsystem.getAllianceColor(),
@@ -194,6 +202,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
     }
 
     tagAlignSubsystem.terminate();
+    visionSubsystem.setIsAuto(true);
 
     driveSubsystem.grapherTrajectoryActive(false);
     logger.info("End Trajectory {}: {}", trajectoryName, timer.get());

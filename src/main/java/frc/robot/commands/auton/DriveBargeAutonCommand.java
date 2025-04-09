@@ -16,8 +16,8 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.AlgaeHeight;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Optional;
-import net.jafama.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +26,7 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
   private final TagAlignSubsystem tagAlignSubsystem;
   private final ElevatorSubsystem elevatorSubsystem;
   private final RobotStateSubsystem robotStateSubsystem;
+  private final VisionSubsystem visionSubsystem;
 
   private Trajectory<SwerveSample> trajectory;
   private final Timer timer = new Timer();
@@ -50,6 +51,7 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
       ElevatorSubsystem elevatorSubsystem,
       BiscuitSubsystem biscuitSubsystem,
       RobotStateSubsystem robotStateSubsystem,
+      VisionSubsystem visionSubsystem,
       String trajectoryName,
       boolean lastPath,
       boolean resetOdometry) {
@@ -59,6 +61,7 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
+    this.visionSubsystem = visionSubsystem;
 
     this.resetOdometry = resetOdometry;
     this.lastPath = lastPath;
@@ -96,6 +99,8 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
     } else {
       robotStateSubsystem.clearCoral();
     }
+
+    visionSubsystem.setIsAuto(false);
 
     hasStaged = false;
     hasPreppedAlgae = false;
@@ -146,9 +151,7 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
       return true;
     }
     return elevatorSubsystem.isFinished()
-        && Math.sqrt(
-                FastMath.pow2(driveSubsystem.getPoseMeters().getX() - finalPose.getX())
-                    + FastMath.pow2(driveSubsystem.getPoseMeters().getY() - finalPose.getY()))
+        && Math.abs(driveSubsystem.getPoseMeters().getX() - finalPose.getX())
             < AutonConstants.kMaxPathErrorMeters
         && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
             < AutonConstants.kMaxOmegaErrorRadians;
@@ -157,6 +160,7 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
   @Override
   public void end(boolean interrupted) {
     driveSubsystem.setEnableHolo(false);
+    visionSubsystem.setIsAuto(true);
 
     if (!interrupted && !lastPath) {
       driveSubsystem.calculateController(
