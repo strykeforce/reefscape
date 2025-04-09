@@ -75,6 +75,9 @@ public class ElevatorConstants {
   // Min elevator height before biscuit movement
   public static final Angle kBiscuitSafeThreshold = Rotations.of(5);
 
+  public static final Angle kProtectAlgaeSetpoint =
+      kBiscuitSafeThreshold; // FIXME use better setpoint
+
   public static TalonFXConfiguration getBothFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();
 
