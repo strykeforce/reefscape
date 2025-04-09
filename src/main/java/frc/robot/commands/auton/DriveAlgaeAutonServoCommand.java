@@ -40,7 +40,6 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
   private boolean resetOdometry;
   private boolean firstPath;
   private boolean lastPath;
-  private boolean scoreLeft;
   private boolean hasStaged = false;
   private boolean hasPreppedAlgae = false;
 
@@ -134,17 +133,11 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
 
   @Override
   public void execute() {
-    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED
-        && !hasStaged
-        && timer.hasElapsed(AutonConstants.kInitPathPrestageTime)) {
-      hasStaged = true;
-      robotStateSubsystem.toAutonPrestage();
-    }
 
-    if (tagAlignSubsystem.getCurRadius() <= AutonConstants.kElevatorStageRadiusPathOne
+    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED && tagAlignSubsystem.getCurRadius() <= 3
         && !hasPreppedAlgae) {
       hasPreppedAlgae = true;
-      robotStateSubsystem.toReefAlignAlgaeAuto(); // initial staging
+      robotStateSubsystem.toReefAlignAlgaeAuto();
     }
 
     if (pathExists) {
@@ -161,7 +154,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
               robotStateSubsystem.getAllianceColor(),
               robotStateSubsystem.getCoralLevel(),
               yOffset,
-              scoreLeft,
+              true,
               true);
         }
       }

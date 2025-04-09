@@ -2,13 +2,10 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
 import frc.robot.commands.robotState.ScoreAlgaeCommand;
-import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -86,18 +83,21 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       pathCommands.add(algaeDrive);
       pathCommands.add(bargeDrive);
       addCommands(
-          new ConditionalCommand(
-              algaeDrive,
-              new WaitCommand(15),
-              () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime),
+          /*
+          new ConditionalCommand( */
+          algaeDrive,
+          /*
+          new WaitCommand(15),
+          () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime), */
           new WaitCommand(delays.get(i)),
+          /*
           new ConditionalCommand(
-              new SequentialCommandGroup(
-                  bargeDrive,
-                  new ScoreAlgaeCommand(
-                      robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)),
+              new SequentialCommandGroup(*/
+          bargeDrive,
+          new ScoreAlgaeCommand(
+              robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem) /*),
               new WaitCommand(15),
-              () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime));
+              () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime) */);
     }
   }
 
