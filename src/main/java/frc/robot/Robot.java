@@ -62,6 +62,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.stopTagAlignAndPathHandler();
+    m_robotContainer.setIsRobotDisabledOnVisionSubsystem(true);
   }
 
   @Override
@@ -76,7 +77,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+    m_robotContainer.setIsRobotDisabledOnVisionSubsystem(false);
+  }
 
   @Override
   public void autonomousInit() {

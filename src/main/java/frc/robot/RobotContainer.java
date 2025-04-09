@@ -669,6 +669,16 @@ public class RobotContainer {
         .withSize(1, 1)
         .withPosition(4, 2);
 
+    Shuffleboard.getTab("Match")
+        .addDouble("Align Yaw", () -> visionSubsystem.getAlignmentYawAverage())
+        .withSize(1, 1)
+        .withPosition(5, 2);
+
+    Shuffleboard.getTab("Match")
+        .addBoolean("Align OK", () -> visionSubsystem.isYawAlignedForAuton(alliance))
+        .withSize(1, 1)
+        .withPosition(6, 2);
+
     // Shuffleboard.getTab("Match")
     // .addBoolean(
     // "Cams Connected",
@@ -860,5 +870,9 @@ public class RobotContainer {
 
   public void setHeadlights(boolean on) {
     pathHandler.setHeadlights(on);
+  }
+
+  public void setIsRobotDisabledOnVisionSubsystem(boolean isRobotDisabled) {
+    visionSubsystem.setIsRobotDisabled(isRobotDisabled);
   }
 }

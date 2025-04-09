@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -98,7 +99,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private boolean visionUpdating = true;
   private int minTags;
   private CircularBuffer<Double> gyroBuffer =
-      new CircularBuffer<Double>(VisionConstants.kCircularBufferSize);
+      new CircularBuffer<Double>(VisionConstants.kGyroBufferSize);
+  private CircularBuffer<Double> alignmentYawBuffer =
+      new CircularBuffer<Double>(VisionConstants.kAlignmentYawBufferSize);
   private double timeSinceLastUpdate;
   private int updatesToWheels;
   private Matrix adaptiveMatrix;
@@ -110,6 +113,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private boolean[] acceptUpdates = new boolean[VisionConstants.kNumCams];
   private boolean ignoreRearCams = false;
   private boolean isAuto = false;
+  private boolean isRobotDisabled = true;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -157,9 +161,42 @@ public class VisionSubsystem extends MeasurableSubsystem {
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
   }
+
+  public void setIsRobotDisabled(boolean isRobotDisabled) {
+    this.isRobotDisabled = isRobotDisabled;
+  }
+
   // Getter Methods
   public double getYawUpdateCamera() {
     return trustedCameraYawIdx;
+  }
+
+  public double getAlignmentYawAverage() {
+    if (alignmentYawBuffer.size() < VisionConstants.kAlignmentYawBufferSize) {
+      return 2767;
+    }
+
+    double average = 0;
+    int index = 0;
+
+    while (index < alignmentYawBuffer.size()) {
+      average += alignmentYawBuffer.get(index);
+
+      index++;
+    }
+
+    average /= alignmentYawBuffer.size();
+
+    return average;
+  }
+
+  public boolean isYawAlignedForAuton(Alliance alliance) {
+    if (alliance == Alliance.Blue) {
+      return Math.abs((getAlignmentYawAverage() + 180) % 360)
+          <= VisionConstants.kAlignmentYawCloseEnough;
+    } else {
+      return Math.abs(getAlignmentYawAverage()) <= VisionConstants.kAlignmentYawCloseEnough;
+    }
   }
 
   public boolean isVisionUpdating() {
@@ -376,7 +413,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     }
 
     // If we don't have enough data in the gyro buffer we default to returning a pose
-    if (gyroBuffer.size() < VisionConstants.kCircularBufferSize) {
+    if (gyroBuffer.size() < VisionConstants.kGyroBufferSize) {
       if (pose1 != null) {
         return pose1;
       } else {
@@ -434,6 +471,8 @@ public class VisionSubsystem extends MeasurableSubsystem {
             scaledWeight >= VisionConstants.kMinStdDev ? scaledWeight : VisionConstants.kMinStdDev);
       }
     }
+
+    int camIndex = 0;
 
     for (Pair<WallEyeResult, Integer> res : validResults) {
       if (res.getFirst() instanceof WallEyePoseResult) {
@@ -509,7 +548,19 @@ public class VisionSubsystem extends MeasurableSubsystem {
         } else {
           Logger.recordOutput("Vision/Rejected Cam " + camNames[idx], robotPose);
         }
+
+        if (isRobotDisabled) {
+          // yaw alignment logic
+          // use camera index 2 (cam3 - Right Servo)
+          if (camIndex == 2) {
+            // stored in degrees
+            alignmentYawBuffer.addFirst(robotPose.getRotation().getDegrees());
+          }
+        }
       }
+
+      // used for getting camera for yaw alignment
+      camIndex++;
     }
   }
 

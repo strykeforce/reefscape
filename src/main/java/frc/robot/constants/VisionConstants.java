@@ -21,6 +21,7 @@ public final class VisionConstants {
   public static final int kMaxTimesOffWheels = 5;
   public static final double kBumperPixelLine = 87; // 100
   public static final double kRobotHeight = 0.5;
+  public static final int kAlignmentYawCloseEnough = 10; // degrees
 
   //   public static final double kThetaStdDevUsed = Units.degreesToRadians(0.02);
   //   public static final double kThetaStdDevRejected = Units.degreesToRadians(360);
@@ -93,7 +94,8 @@ public final class VisionConstants {
   //   public static final int kCam5Idx = 2;
 
   public static final double kLoopTime = 0.02;
-  public static final int kCircularBufferSize = 1000;
+  public static final int kGyroBufferSize = 1000;
+  public static final int kAlignmentYawBufferSize = 10;
   // Poses
   public static final Pose3d kCam1Pose =
       new Pose3d(new Translation3d(0.305, 0.025, 0.311), new Rotation3d());
