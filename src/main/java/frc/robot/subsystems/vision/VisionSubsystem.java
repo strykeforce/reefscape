@@ -186,7 +186,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
       Pose3d tagPose = field.getTagPose(id).get();
 
       double dist =
-          FastMath.sqrtQuick(
+          Math.sqrt(
               FastMath.pow2(tagPose.getX() - camLoc.getX())
                   + FastMath.pow2(tagPose.getY() - camLoc.getY()));
 
@@ -208,7 +208,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     for (int id : ids) {
       Pose3d tagPose = field.getTagPose(id).get();
       totalDistance +=
-          FastMath.sqrtQuick(
+          Math.sqrt(
               FastMath.pow2(tagPose.getX() - camLoc.getX())
                   + FastMath.pow2(tagPose.getY() - camLoc.getY()));
     }
@@ -224,11 +224,9 @@ public class VisionSubsystem extends MeasurableSubsystem {
     Translation2d disp = (curPose.getTranslation().minus(pose.toTranslation2d()));
 
     double velMagnitude =
-        FastMath.sqrtQuick(
-            FastMath.pow2(vel.vxMetersPerSecond) + FastMath.pow2(vel.vyMetersPerSecond));
+        Math.sqrt(FastMath.pow2(vel.vxMetersPerSecond) + FastMath.pow2(vel.vyMetersPerSecond));
 
-    double dispMagnitude =
-        FastMath.sqrtQuick(FastMath.pow2(disp.getX()) + FastMath.pow2(disp.getY()));
+    double dispMagnitude = Math.sqrt(FastMath.pow2(disp.getX()) + FastMath.pow2(disp.getY()));
 
     /*This gets our displacement and compares it to who much we could
     have moved.It does this by getting the velocity and plotting it on a
@@ -256,17 +254,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.FOV58YUYVBaseTrust
-                  * FastMath.powQuick(
-                      VisionConstants.baseNumber,
-                      FastMath.powQuick(
+                  * FastMath.exp(
+                      FastMath.pow(
                           VisionConstants.FOV58YUYVSingleTagCoeff * distance,
                           VisionConstants.FOV58YUYVPowerNumber)));
 
         return 1
             / (VisionConstants.FOV58YUYVBaseTrust
-                * FastMath.powQuick(
-                    VisionConstants.baseNumber,
-                    FastMath.powQuick(
+                * FastMath.exp(
+                    FastMath.pow(
                         VisionConstants.FOV58YUYVMultiTagCoeff * distance,
                         VisionConstants.FOV58YUYVPowerNumber)));
       }
@@ -274,17 +270,15 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.FOV58YUYVBaseTrust
-                  * FastMath.powQuick(
-                      VisionConstants.baseNumber,
-                      FastMath.powQuick(
+                  * FastMath.exp(
+                      FastMath.pow(
                           VisionConstants.FOV58MJPGSingleTagCoeff * distance,
                           VisionConstants.FOV58YUYVPowerNumber)));
 
         return 1
             / (VisionConstants.FOV58YUYVBaseTrust
-                * FastMath.powQuick(
-                    VisionConstants.baseNumber,
-                    FastMath.powQuick(
+                * FastMath.exp(
+                    FastMath.pow(
                         VisionConstants.FOV58MJPGSingleTagCoeff * distance,
                         VisionConstants.FOV58YUYVPowerNumber)));
       }
@@ -293,16 +287,14 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.FOV75YUYVBaseTrust
-                  * FastMath.powQuick(
-                      VisionConstants.baseNumber,
-                      FastMath.powQuick(
+                  * FastMath.exp(
+                      FastMath.pow(
                           VisionConstants.FOV75YUYVSingleTagCoeff * distance,
                           VisionConstants.FOV75YUYVPowerNumber)));
         return 1
             / (VisionConstants.FOV75YUYVBaseTrust
-                * FastMath.powQuick(
-                    VisionConstants.baseNumber,
-                    FastMath.powQuick(
+                * FastMath.exp(
+                    FastMath.pow(
                         VisionConstants.FOV75YUYVMultiTagCoeff * distance,
                         VisionConstants.FOV75YUYVPowerNumber)));
       }
@@ -311,15 +303,13 @@ public class VisionSubsystem extends MeasurableSubsystem {
         if (numTags == 1)
           return 1
               / (VisionConstants.baseTrust
-                  * FastMath.powQuick(
-                      VisionConstants.baseNumber,
-                      FastMath.powQuick(
+                  * FastMath.exp(
+                      FastMath.pow(
                           VisionConstants.singleTagCoeff * distance, VisionConstants.powerNumber)));
         return 1
             / (VisionConstants.baseTrust
-                * FastMath.powQuick(
-                    VisionConstants.baseNumber,
-                    FastMath.powQuick(
+                * FastMath.exp(
+                    FastMath.pow(
                         VisionConstants.multiTagCoeff * distance, VisionConstants.powerNumber)));
       }
     }

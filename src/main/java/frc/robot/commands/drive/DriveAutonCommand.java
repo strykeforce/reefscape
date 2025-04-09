@@ -153,7 +153,7 @@ public class DriveAutonCommand extends Command implements AutoCommandInterface {
       return true;
     }
     return (timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
-        || (FastMath.sqrtQuick(
+        || (Math.sqrt(
                     FastMath.pow2(driveSubsystem.getPoseMeters().getX() - finalPose.getX())
                         + FastMath.pow2((driveSubsystem.getPoseMeters().getY() - finalPose.getY())))
                 < AutonConstants.kMaxPathErrorMeters)

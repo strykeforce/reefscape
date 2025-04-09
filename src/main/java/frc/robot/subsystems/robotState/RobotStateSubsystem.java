@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.constants.BargeAlignConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.RobotConstants;
@@ -361,6 +360,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
 
+    if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
+      tagAlignSubsystem.terminate();
+    }
+    if (bargeAlignSubsystem.getState() != BargeAlignSubsystem.BargeAlignStates.FINISHED) {
+      bargeAlignSubsystem.terminate();
+    }
+
     if (biscuitSubsystem.isSafeToStow()) {
       setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
       elevatorSubsystem.setPosition(RobotConstants.kElevatorStowSetpoint);
@@ -382,6 +388,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
 
+    if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
+      tagAlignSubsystem.terminate();
+    }
+    if (bargeAlignSubsystem.getState() != BargeAlignSubsystem.BargeAlignStates.FINISHED) {
+      bargeAlignSubsystem.terminate();
+    }
+
     if (algaeSubsystem.hasCoral()) {
       algaeSubsystem.holdCoral();
     } else {
@@ -396,6 +409,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
+
+    if (tagAlignSubsystem.getState() != TagAlignSubsystem.TagAlignStates.DONE) {
+      tagAlignSubsystem.terminate();
+    }
+    if (bargeAlignSubsystem.getState() != BargeAlignSubsystem.BargeAlignStates.FINISHED) {
+      bargeAlignSubsystem.terminate();
+    }
     if (algaeSubsystem.hasCoral()) {
       algaeSubsystem.holdCoral();
     } else {
@@ -483,8 +503,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       return;
     }
     boolean wantAlgae = (getAlgae || !hasCoral()) && scoringLevel != ScoringLevel.L1;
-    if ((hasAlgae() && scoreSide == ScoreSide.RIGHT && drive) || (hasAlgae() && !hasCoral())) {
-      setState(RobotStates.STOW);
+    if (
+    /*(hasAlgae() && scoreSide == ScoreSide.RIGHT && drive) ||*/ (hasAlgae() && !hasCoral())) {
+      toStow();
+      return;
     }
 
     boolean ignoreCoralScoring = isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT;
@@ -684,8 +706,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
         double poseX = driveSubsystem.getPoseMeters().getX();
         isBargeSafe =
-            poseX > BargeAlignConstants.kRedRaiseElevatorX
-                || poseX < BargeAlignConstants.kBlueRaiseElevatorX;
+            poseX > RobotStateConstants.kRedBargeSafeX
+                || poseX < RobotStateConstants.kBlueBargeSafeX;
         if (isBargeSafe) {
           driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
           if (isAutoPlacing) {
@@ -906,7 +928,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (algaeSubsystem.hasAlgaeSuperCycle()) {
           switch (getAlgaeLevel()) {
             case L2 -> {
-              biscuitSubsystem.setIsRemovingAlgae(true);
+              // biscuitSubsystem.setIsRemovingAlgae(true);
               biscuitSubsystem.setPosition(
                   RobotConstants.kL2AlgaeRemovalSetpoint,
                   true); // not using setBiscuitTransfer() to ensure hasAlgae is true
@@ -996,7 +1018,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       case REMOVE_ALGAE -> {
         if (elevatorSubsystem.isFinished()
             && biscuitSubsystem.getPosition().in(Rotations)
-                <= (getAlgaeLevel() == ScoringLevel.L3
+                <= (
+                /*getAlgaeLevel() == ScoringLevel.L3*/ true
                     ? RobotStateConstants.kBiscuitSuperCycleSafeThres
                     : RobotStateConstants.kBiscuitSuperCycleSafeFastThres)) {
           biscuitSubsystem.setIsRemovingAlgae(false);
@@ -1100,7 +1123,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             && scoringTimer.hasElapsed(RobotStateConstants.kAlgaeEjectTimer)) {
           Pose2d currentPose = driveSubsystem.getPoseMeters();
           double distanceFromRelease =
-              FastMath.sqrtQuick(
+              Math.sqrt(
                   FastMath.pow2(currentPose.getX() - processorReleasePose.getX())
                       + FastMath.pow2(currentPose.getY() - processorReleasePose.getY()));
           Logger.recordOutput("RobotState/Processor Release Distance", distanceFromRelease);

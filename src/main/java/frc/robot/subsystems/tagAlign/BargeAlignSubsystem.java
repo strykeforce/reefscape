@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.BargeAlignConstants;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotStateConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.Set;
@@ -75,24 +76,15 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
   private boolean isSafe() {
     double poseX = driveSubsystem.getPoseMeters().getX();
 
-    return poseX > BargeAlignConstants.kRedRaiseElevatorX
-        || poseX < BargeAlignConstants.kBlueRaiseElevatorX;
+    return poseX > RobotStateConstants.kRedBargeSafeX
+        || poseX < RobotStateConstants.kBlueBargeSafeX;
   }
 
   private boolean shouldRaiseElevator() {
     double poseX = driveSubsystem.getPoseMeters().getX();
     return isOnBlueSide
         ? poseX > BargeAlignConstants.kBlueRaiseElevatorX
-            && poseX <= BargeAlignConstants.kBlueUnsafeX
-        : poseX < BargeAlignConstants.kRedRaiseElevatorX
-            && poseX >= BargeAlignConstants.kRedUnsafeX;
-  }
-
-  private boolean shouldDriveBackwards() {
-    double poseX = driveSubsystem.getPoseMeters().getX();
-    return isOnBlueSide
-        ? poseX > BargeAlignConstants.kBlueUnsafeX
-        : poseX < BargeAlignConstants.kRedUnsafeX;
+        : poseX < BargeAlignConstants.kRedRaiseElevatorX;
   }
 
   private boolean shouldEjectAlgae() {
@@ -139,8 +131,6 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         Logger.recordOutput("BargeAlign/Vomega", vOmega);
         if (shouldRaiseElevator()) {
           setState(BargeAlignStates.RAISE_ELEV);
-        } else if (shouldDriveBackwards()) {
-          setState(BargeAlignStates.REVERSE);
         }
       }
       case RAISE_ELEV -> {
@@ -179,7 +169,6 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
     // INIT,
     DRIVE,
     RAISE_ELEV,
-    REVERSE,
     FINISHED
   }
 }
