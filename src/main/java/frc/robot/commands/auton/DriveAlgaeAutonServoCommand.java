@@ -134,7 +134,8 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
   @Override
   public void execute() {
 
-    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED && tagAlignSubsystem.getCurRadius() <= 3
+    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED
+        && tagAlignSubsystem.getCurRadius() <= 3
         && !hasPreppedAlgae) {
       hasPreppedAlgae = true;
       robotStateSubsystem.toReefAlignAlgaeAuto();
