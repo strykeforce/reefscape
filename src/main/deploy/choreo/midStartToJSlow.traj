@@ -18,13 +18,13 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"midStart.x", "val":7.1}, "y":{"exp":"midStart.y", "val":6.1663548}, "heading":{"exp":"midStart.heading", "val":3.14159}, "intervals":31, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"5.562692165374756 m", "val":5.562692165374756}, "y":{"exp":"5.754107475280762 m", "val":5.754107475280762}, "heading":{"exp":"-2.120170321746305 rad", "val":-2.120170321746305}, "intervals":35, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.440958023071289 m", "val":5.440958023071289}, "y":{"exp":"5.71448278427124 m", "val":5.71448278427124}, "heading":{"exp":"-2.120170321746305 rad", "val":-2.120170321746305}, "intervals":35, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"J.x", "val":5.1366723649053885}, "y":{"exp":"J.y", "val":5.197141990263579}, "heading":{"exp":"J.heading", "val":4.1887902047863905}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "w":{"exp":"17.548 m", "val":17.548}, "h":{"exp":"8.052 m", "val":8.052}}}, "enabled":true},
-    {"from":0, "to":2, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"3.3 m / s", "val":3.3}}}, "enabled":true},
+    {"from":0, "to":2, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"4 m / s", "val":4.0}}}, "enabled":true},
     {"from":0, "to":2, "data":{"type":"MaxAcceleration", "props":{"max":{"exp":"5 m / s ^ 2", "val":5.0}}}, "enabled":true},
     {"from":1, "to":2, "data":{"type":"MaxAcceleration", "props":{"max":{"exp":"1 m / s ^ 2", "val":1.0}}}, "enabled":true}],
   "targetDt":{
