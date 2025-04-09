@@ -11,7 +11,6 @@ import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
-// TODO Make final drive faster. Reverse if we are too close to the barge.
 
 public class BargeAlignSubsystem extends MeasurableSubsystem {
 
@@ -160,7 +159,9 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         if (isOnBlueSide) {
           driveSubsystem.move(
               -vX, getYStickReading(), BargeAlignConstants.kBlueRaiseElevatorX, true);
-              //TODO add should raise elevator
+          if (shouldRaiseElevator()) {
+            setState(BargeAlignStates.RAISE_ELEV);
+          }
         } else {
           driveSubsystem.move(vX, getYStickReading(), BargeAlignConstants.kRedRaiseElevatorX, true);
         }

@@ -51,6 +51,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private double coralOffset = 0;
   private double noProgressCounts = 0;
   private double yAutoOffset = 0;
+  private boolean justAlgae = false;
 
   public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -78,6 +79,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void setProceedToAlign(boolean proceed) {
     this.proceedToAlign = proceed;
+  }
+
+  public void setJustAlgae(boolean justAlgae) {
+    this.justAlgae = justAlgae;
   }
 
   public boolean yErrorSmall() {
@@ -431,9 +436,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             }
           }
         }
-
+        // TODO Change after testing
         if (finalDrive) {
-          if (isAuto) {
+          if (justAlgae && !isAuto) {
+            vX = 0.3;
+          } else if (isAuto) {
             if (scoreLeft) {
               vX = 0.25;
             } else {

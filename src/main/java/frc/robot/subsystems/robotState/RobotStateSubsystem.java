@@ -345,6 +345,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     return false;
   }
+  // Function made so I don't cram everything into a function call in toReefAlign
+  private boolean justAlgae() {
+    boolean blueSide = driveSubsystem.getPoseMeters().getX() < DriveConstants.kFieldMaxX / 2;
+
+    return !hasCoral()
+        || (blueSide && allianceColor == Alliance.Red)
+        || (!blueSide && allianceColor == Alliance.Blue);
+  }
 
   public void toStow() {
     visionSubsystem.setYawUpdateCamera(-1);
@@ -479,7 +487,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       setState(RobotStates.STOW);
     }
 
+    boolean ignoreCoralScoring = isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT;
+
     if (drive) {
+      // TODO Test without a coral in the robot and we don't want algae
+      tagAlignSubsystem.setJustAlgae(justAlgae());
       tagAlignSubsystem.start(
           allianceColor,
           scoringLevel,
@@ -493,8 +505,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     boolean algaeSafe =
         tagAlignSubsystem.getCurRadius() > TagServoingConstants.kAlgaeStopXDriveRadius
             || tagAlignSubsystem.getState() != TagAlignStates.DRIVE;
-
-    boolean ignoreCoralScoring = isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT;
 
     if (wantAlgae && !algaeSafe) {
       algaeSubsystem.intakeAlgae();
@@ -671,6 +681,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (needSafeAlgaeTransfer(RobotStates.BARGE_ALGAE)) {
           return;
         }
+
         double poseX = driveSubsystem.getPoseMeters().getX();
         isBargeSafe =
             poseX > BargeAlignConstants.kRedRaiseElevatorX
