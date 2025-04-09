@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import frc.robot.constants.AlgaeConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class AlgaeIOFX implements AlgaeIO, Checkable {
   private StatusSignal<ReverseLimitValue> revLimitSwitch;
   private VelocityVoltage speedRequest = new VelocityVoltage(0).withEnableFOC(false).withSlot(0);
   private DutyCycleOut dutyCycleRequest = new DutyCycleOut(0).withEnableFOC(false);
+  private StatusSignal<Current> statorCurrent;
 
   public AlgaeIOFX() {
     logger = LoggerFactory.getLogger(this.getClass());
@@ -49,14 +51,16 @@ public class AlgaeIOFX implements AlgaeIO, Checkable {
     fwdLimitSwitch = talonFXS.getForwardLimit();
     revLimitSwitch = talonFXS.getReverseLimit();
     curVelocity = talonFXS.getVelocity();
+    statorCurrent = talonFXS.getStatorCurrent();
   }
 
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
-    BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch);
+    BaseStatusSignal.refreshAll(curVelocity, fwdLimitSwitch, revLimitSwitch, statorCurrent);
     inputs.velocity = curVelocity.getValueAsDouble();
     inputs.isBeamBroken = fwdLimitSwitch.getValue().value == 0;
     inputs.isCoralBeamBroken = revLimitSwitch.getValue().value == 1;
+    inputs.statorCurrent = statorCurrent.getValueAsDouble();
   }
 
   @Override

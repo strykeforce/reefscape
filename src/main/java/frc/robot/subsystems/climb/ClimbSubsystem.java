@@ -102,7 +102,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   public void climb() {
     if (curState == ClimbState.PREPPED) {
       // setPosition(ClimbConstants.kClimbCagePos);
-      if (DriverStation.getMatchTime() < ClimbConstants.kFastClimbAfter) {
+      if (DriverStation.getMatchTime() <= ClimbConstants.kFastClimbAt) {
         Logger.recordOutput("Climb/isDesparate", true);
         io.setPercent(ClimbConstants.kClimbOpenLoopFastSpeed);
         spedUp = true;
