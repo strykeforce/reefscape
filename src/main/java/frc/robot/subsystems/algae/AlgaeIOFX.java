@@ -52,6 +52,8 @@ public class AlgaeIOFX implements AlgaeIO, Checkable {
     revLimitSwitch = talonFXS.getReverseLimit();
     curVelocity = talonFXS.getVelocity();
     statorCurrent = talonFXS.getStatorCurrent();
+    inputs.isCoralBeamBroken = revLimitSwitch.getValue().value == 1;
+    inputs.statorCurrent = statorCurrent.getValueAsDouble();
   }
 
   @Override
