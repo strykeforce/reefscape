@@ -59,7 +59,7 @@ public class ElevatorConstants {
   public static final Angle kAutoPrestageSetpoint = kL2CoralSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(5.02);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(4.79);
   public static final Angle kMicAlgaeSetpoint = Rotations.of(2.703);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
@@ -67,7 +67,7 @@ public class ElevatorConstants {
   public static final Angle kPrestageSetpoint = Rotations.of(10.0);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint = Rotations.of(3.583);
+  public static final Angle kProcessorSetpoint = Rotations.of(1.49365);
   public static final Angle kBargeSetpoint = Rotations.of(44.785); // 41.936
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 

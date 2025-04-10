@@ -386,7 +386,7 @@ public class RobotConstants {
     public static Angle kL4CoralSetpoint = kPrestageSetpoint;
 
     // Algae obtaining
-    public static Angle kFloorAlgaeSetpoint = Rotations.of(21.16);
+    public static Angle kFloorAlgaeSetpoint = Rotations.of(20.47);
     public static Angle kMicAlgaeSetpoint = Rotations.of(12.87085);
     public static Angle kHpAlgaeSetpoint = kBiscuitStowSetpoint;
     public static Angle kProtectAlgaeSetpoint = kL1CoralSetpoint; // FIXME use better setpoint

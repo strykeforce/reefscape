@@ -46,22 +46,35 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
 
   public void scoreProcessor() {
     setPct(AlgaeConstants.kProcessorScoreSpeed);
+    setState(AlgaeStates.EJECTING);
   }
 
   public void scoreBarge() {
     setPct(AlgaeConstants.kBargeScoreSpeed);
+    setState(AlgaeStates.EJECTING);
   }
 
   public void scoreCoral() {
     setPct(AlgaeConstants.kCoralScoreSpeed);
+    setState(AlgaeStates.EJECTING);
   }
 
   public void holdAlgae() {
-    setPct(AlgaeConstants.kHoldSpeed);
+    if (curState == AlgaeStates.HAS_ALGAE) {
+      setPct(AlgaeConstants.kHoldSpeed);
+    } else {
+      setState(AlgaeStates.EMPTY);
+      setPct(0.0);
+    }
   }
 
   public void holdCoral() {
-    setPct(AlgaeConstants.kCoralHoldSpeed);
+    if (curState == AlgaeStates.HAS_CORAL) {
+      setPct(AlgaeConstants.kCoralHoldSpeed);
+    } else {
+      setState(AlgaeStates.EMPTY);
+      setPct(0.0);
+    }
   }
 
   public boolean hasAlgae() {
@@ -106,17 +119,18 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
       case HAS_ALGAE -> {
         if (!inputs.isBeamBroken) {
           setState(AlgaeStates.EMPTY);
-          // setPct(0);
+          setPct(0);
           // setSpeed(RotationsPerSecond.of(0));
         }
       }
       case HAS_CORAL -> {
-        if (!inputs.isBeamBroken) {
+        if (!inputs.isCoralBeamBroken) {
           setState(AlgaeStates.EMPTY);
+          setPct(0);
         }
       }
       case CORAL_INTAKE -> {
-        if (inputs.isBeamBroken) {
+        if (inputs.isCoralBeamBroken) {
           if (FastMath.abs(inputs.velocity) < AlgaeConstants.kHasCoralVelThreshold) {
             slowCounts++;
           } else {
@@ -125,8 +139,8 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
 
           if (slowCounts >= AlgaeConstants.kHasCoralCounts) {
             slowCounts = 0;
-            holdCoral();
             setState(AlgaeStates.HAS_CORAL);
+            holdCoral();
           }
         }
       }
@@ -140,11 +154,12 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
 
           if (slowCounts >= AlgaeConstants.kHasAlgaeCounts) {
             slowCounts = 0;
-            holdAlgae();
             setState(AlgaeStates.HAS_ALGAE);
+            holdAlgae();
           }
         }
       }
+      case EJECTING -> {}
       case IDLE -> {}
     }
   }
@@ -165,6 +180,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
     HAS_CORAL,
     CORAL_INTAKE,
     EMPTY,
-    IDLE
+    IDLE,
+    EJECTING
   }
 }
