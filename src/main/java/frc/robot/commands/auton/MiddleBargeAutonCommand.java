@@ -2,10 +2,14 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
 import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
+import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -18,6 +22,7 @@ import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class MiddleBargeAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -50,6 +55,10 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
     this.coralSubsystem = coralSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
     this.visionSubsystem = visionSubsystem;
+
+    var awayPath = new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false);
+    BooleanSupplier awayCondition =
+        () -> DriverStation.getMatchTime() < AutonConstants.kBargeScoreMinTime;
 
     addCommands(
         new PrepOdomForAutoCommand(
@@ -85,22 +94,21 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       pathCommands.add(algaeDrive);
       pathCommands.add(bargeDrive);
       addCommands(
-          /*
-          new ConditionalCommand( */
-          algaeDrive,
-          /*
-          new WaitCommand(15),
-          () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime), */
-          new WaitCommand(delays.get(i)),
-          /*
           new ConditionalCommand(
-              new SequentialCommandGroup(*/
-          bargeDrive,
-          new AutoScoreAlgaeCommand(
-              robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem) /*),
-              new WaitCommand(15),
-              () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime) */);
+              new SequentialCommandGroup(awayPath, new WaitCommand(delays.get(i))),
+              algaeDrive,
+              awayCondition),
+          new ConditionalCommand(
+              new SequentialCommandGroup(
+                      bargeDrive,
+                      new AutoScoreAlgaeCommand(
+                          robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
+                  .until(awayCondition),
+              awayPath,
+              awayCondition));
     }
+
+    addCommands(awayPath);
   }
 
   @Override
