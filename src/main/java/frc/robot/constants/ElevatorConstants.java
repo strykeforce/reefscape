@@ -59,7 +59,7 @@ public class ElevatorConstants {
   public static final Angle kAutoPrestageSetpoint = kL2CoralSetpoint;
 
   // Algae obtaining
-  public static final Angle kFloorAlgaeSetpoint = Rotations.of(5.82);
+  public static final Angle kFloorAlgaeSetpoint = Rotations.of(4.79);
   public static final Angle kMicAlgaeSetpoint = Rotations.of(2.703);
   public static final Angle kHpAlgaeSetpoint = Rotations.of(14.9063);
 
@@ -67,14 +67,16 @@ public class ElevatorConstants {
   public static final Angle kPrestageSetpoint = Rotations.of(10.0);
 
   // Algae scoring
-  public static final Angle kProcessorSetpoint =
-      Rotations.of(1.49365); // was 4.297 -> 5.964 -> 3.348
+  public static final Angle kProcessorSetpoint = Rotations.of(1.49365);
   public static final Angle kBargeSetpoint = Rotations.of(44.785); // 41.936
   public static final Angle kBargeHigherThan = Rotations.of(31.0901);
 
   // Min elevator height before biscuit movement
   public static final Angle kBiscuitSafeThreshold = Rotations.of(5);
   public static final Angle kUnderBargeSafeThreshold = Rotations.of(2.3676757);
+
+  public static final Angle kProtectAlgaeSetpoint =
+      kBiscuitSafeThreshold; // FIXME use better setpoint
 
   public static TalonFXConfiguration getBothFXConfig() {
     TalonFXConfiguration fxConfig = new TalonFXConfiguration();

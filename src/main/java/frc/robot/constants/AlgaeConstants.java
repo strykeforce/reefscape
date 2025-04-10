@@ -26,12 +26,15 @@ public class AlgaeConstants {
   public static final double kMaxFwd = 100;
   public static final double kMaxRev = -100;
 
-  public static final double kHoldSpeed = -0.1;
-  public static final double kBargeScoreSpeed = 1;
-  public static final double kProcessorScoreSpeed = 1;
-  public static final double kIntakingSpeed = -1;
+  public static final double kHoldSpeed = 1;
+  public static final double kCoralHoldSpeed = -0.05;
+  public static final double kBargeScoreSpeed = -1;
+  public static final double kProcessorScoreSpeed = -1;
+  public static final double kCoralScoreSpeed = 0.5;
+  public static final double kIntakingSpeed = 1; // 0.75
+  public static final double kCoralIntakingSpeed = -0.75;
 
-  public static final double kHasAlgaeVelThreshold = 10;
+  public static final double kHasAlgaeVelThreshold = 70; // 10
   public static final double kSuperCycleHasAlgaeVelThres = 40; // was 40
   public static final int kHasAlgaeCounts = 2;
 
@@ -46,10 +49,10 @@ public class AlgaeConstants {
 
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(40)
+            .withStatorCurrentLimit(25) // 40
             .withStatorCurrentLimitEnable(true)
             .withSupplyCurrentLimit(10)
-            .withSupplyCurrentLowerLimit(2)
+            .withSupplyCurrentLowerLimit(10) // 2
             .withSupplyCurrentLowerTime(1)
             .withSupplyCurrentLimitEnable(true);
     fxsConfig.CurrentLimits = current;
