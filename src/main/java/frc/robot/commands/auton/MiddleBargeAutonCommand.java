@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
-import frc.robot.commands.robotState.ScoreAlgaeCommand;
+import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -42,6 +42,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       List<Double> grabYOffsets,
       List<Double> delays,
       List<String> bargePaths,
+      List<RobotStateSubsystem.ScoringLevel> algaeLevels,
       Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
@@ -65,9 +66,10 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
               visionSubsystem,
               grabPaths.get(i),
               i == 0,
-              false,
+              true,
               i == 0,
-              grabYOffsets.get(i));
+              grabYOffsets.get(i),
+              algaeLevels.get(i));
       var bargeDrive =
           new DriveBargeAutonCommand(
               driveSubsystem,
@@ -77,7 +79,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
               robotStateSubsystem,
               visionSubsystem,
               bargePaths.get(i),
-              i == grabPaths.size() - 1,
+              true,
               false);
 
       pathCommands.add(algaeDrive);
@@ -94,7 +96,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
           new ConditionalCommand(
               new SequentialCommandGroup(*/
           bargeDrive,
-          new ScoreAlgaeCommand(
+          new AutoScoreAlgaeCommand(
               robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem) /*),
               new WaitCommand(15),
               () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime) */);

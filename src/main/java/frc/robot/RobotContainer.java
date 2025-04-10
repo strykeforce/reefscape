@@ -836,8 +836,8 @@ public class RobotContainer {
   }
 
   public void updateCANErrorCount() {
-    rCanErrors += RobotController.getCANStatus().receiveErrorCount;
-    tCanErrors += RobotController.getCANStatus().transmitErrorCount;
+    rCanErrors = RobotController.getCANStatus().receiveErrorCount;
+    tCanErrors = RobotController.getCANStatus().transmitErrorCount;
   }
 
   public void disableNoMotionCal() {
