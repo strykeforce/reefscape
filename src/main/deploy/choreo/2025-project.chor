@@ -4,6 +4,20 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "FieldMaxX":{
+    "dimension":"Length",
+    "var":{
+     "exp":"17.526 m",
+     "val":17.526
+    }
+   },
+   "FieldMaxY":{
+    "dimension":"Length",
+    "var":{
+     "exp":"8.0518 m",
+     "val":8.0518
+    }
+   },
    "endEffectorOffset":{
     "dimension":"Number",
     "var":{
