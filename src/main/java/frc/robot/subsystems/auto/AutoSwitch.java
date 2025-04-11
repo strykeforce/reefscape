@@ -270,10 +270,64 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToI", "bargeToE")),
-            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
-            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.5, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "EToNearBarge")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
+            AutonConstants.kMiddleBargeStart);
+      }
+
+      case 0x11 -> {
+        return new MiddleBargeAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToE", "bargeToI")),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "IToNearBarge")),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
+            AutonConstants.kMiddleBargeStart);
+      }
+
+      case 0x12 -> {
+        return new MiddleBargeAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToI", null)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "bargeAway")),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
+            AutonConstants.kMiddleBargeStart);
+      }
+
+      case 0x13 -> {
+        return new MiddleBargeAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToE", null)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "bargeAway")),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
             AutonConstants.kMiddleBargeStart);
       }
 
