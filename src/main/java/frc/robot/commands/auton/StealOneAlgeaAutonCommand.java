@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
+import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -60,7 +61,8 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
             true,
             true,
             true,
-            0.0);
+            0.0,
+            ScoringLevel.L2);
 
     secondPath =
         new DriveBargeAutonCommand(
@@ -86,7 +88,8 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
             false,
             true,
             false,
-            0.0);
+            0.0,
+            ScoringLevel.L2);
 
     fourthPath =
         new DriveBargeAutonCommand(
@@ -108,10 +111,13 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
             firstPath,
             new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),
             secondPath,
-            // score Barge
+            new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
             new WaitForElevBelowBarge(elevatorSubsystem),
             thirdPath,
-            fourthPath));
+            fourthPath,
+            new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)));
   }
 
   @Override

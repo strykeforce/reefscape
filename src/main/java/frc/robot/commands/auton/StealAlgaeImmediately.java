@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
+import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -60,7 +61,8 @@ public class StealAlgaeImmediately extends SequentialCommandGroup implements Aut
             true,
             true,
             true,
-            postOffsets.get(0));
+            postOffsets.get(0),
+            null);
 
     secondPath =
         new DriveBargeAutonCommand(
@@ -80,9 +82,9 @@ public class StealAlgaeImmediately extends SequentialCommandGroup implements Aut
                 robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             firstPath,
-            secondPath
-            // score Barge
-            ));
+            secondPath,
+            new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)));
   }
 
   @Override
