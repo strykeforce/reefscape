@@ -78,7 +78,8 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
   }
 
   public boolean hasAlgae() {
-    return curState == AlgaeStates.HAS_ALGAE;
+    return curState == AlgaeStates.HAS_ALGAE
+        || curState == AlgaeStates.EJECTING && inputs.isBeamBroken;
   }
 
   public boolean hasCoral() {

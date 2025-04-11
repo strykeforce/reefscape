@@ -44,6 +44,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
   private boolean hasPreppedAlgae = false;
 
   private double yOffset;
+  private RobotStateSubsystem.ScoringLevel algaeLevel;
 
   private SwerveSample desiredState;
   private Pose2d initialPose = new Pose2d();
@@ -60,7 +61,8 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
       boolean firstPath,
       boolean lastPath,
       boolean resetOdometry,
-      double yOffset) {
+      double yOffset,
+      RobotStateSubsystem.ScoringLevel algaeLevel) {
 
     addRequirements(driveSubsystem, elevatorSubsystem, biscuitSubsystem);
     this.driveSubsystem = driveSubsystem;
@@ -74,6 +76,8 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
     this.lastPath = lastPath;
     this.trajectoryName = trajectoryName;
     this.yOffset = yOffset;
+    this.algaeLevel = algaeLevel;
+
     Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
     if (tempTrajectory.isPresent()) {
       trajectory = tempTrajectory.get();
@@ -110,6 +114,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
     }
 
     visionSubsystem.setIsAuto(false);
+    robotStateSubsystem.setAutoAlgaeLevel(algaeLevel);
 
     isServoing = false;
     hasStaged = false;
@@ -159,6 +164,10 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
               true);
         }
       }
+    }
+
+    if (robotStateSubsystem.getState() == RobotStateSubsystem.RobotStates.REEF_ALIGN_CORAL) {
+      robotStateSubsystem.toPlaceCoralAuto();
     }
   }
 

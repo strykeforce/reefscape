@@ -225,7 +225,7 @@ public class PathHandler extends MeasurableSubsystem {
                           + FastMath.pow2(
                               driveSubsystem.getPoseMeters().getY() - currPathFinalPose.getY()))
                   < AutonConstants.kMaxPathErrorMeters
-              && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
+              && Math.abs(driveSubsystem.getHolonomicControllerOmegaErrorRadians())
                   < AutonConstants.kMaxOmegaErrorRadians)) {
         driveSubsystem.setAutoDebugMsg("End " + currPathString);
         runningPath = false;

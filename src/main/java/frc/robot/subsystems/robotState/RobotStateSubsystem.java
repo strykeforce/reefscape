@@ -69,6 +69,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private ScoringLevel scoringLevel = ScoringLevel.L4;
   private ScoringLevel currentLevel = ScoringLevel.L4;
+  private ScoringLevel autoAlgaeLevel = ScoringLevel.L2;
   private ScoreSide scoreSide = ScoreSide.LEFT;
   private AlgaeHeight algaeHeight = AlgaeHeight.LOW;
   private AlgaeHeight currentAlgaeHeight = AlgaeHeight.LOW;
@@ -150,7 +151,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public ScoringLevel getAlgaeLevel() {
-    return (tagAlignSubsystem.computeHexant() % 2) == 0 ? ScoringLevel.L3 : ScoringLevel.L2;
+    return isAuto
+        ? autoAlgaeLevel
+        : (tagAlignSubsystem.computeHexant() % 2) == 0 ? ScoringLevel.L3 : ScoringLevel.L2;
   }
 
   public ScoringLevel getCoralLevel() {
@@ -237,6 +240,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void setScoringLevel(ScoringLevel scoringLevel) {
     this.scoringLevel = scoringLevel;
     ledSubsystem.setLevelLights(scoringLevel);
+  }
+
+  public void setAutoAlgaeLevel(ScoringLevel algaeLevel) {
+    this.autoAlgaeLevel = algaeLevel;
   }
 
   public void setScoreSide(ScoreSide scoreSide) {

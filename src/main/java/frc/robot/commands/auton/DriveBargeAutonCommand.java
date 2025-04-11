@@ -3,6 +3,7 @@ package frc.robot.commands.auton;
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,7 +13,6 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.AlgaeHeight;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
@@ -38,12 +38,13 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
   private boolean resetOdometry;
   private boolean firstPath;
   private boolean lastPath;
-  private boolean hasStaged = false;
+  private boolean finalDrive = false;
   private boolean hasPreppedAlgae = false;
 
   private SwerveSample desiredState;
   private Pose2d initialPose = new Pose2d();
   private Pose2d finalPose = new Pose2d();
+  private PIDController driveOmega;
 
   public DriveBargeAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -66,6 +67,9 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
     this.resetOdometry = resetOdometry;
     this.lastPath = lastPath;
     this.trajectoryName = trajectoryName;
+    this.driveOmega = new PIDController(6.0, 0, 0);
+    this.driveOmega.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
+
     Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
     if (tempTrajectory.isPresent()) {
       trajectory = tempTrajectory.get();
@@ -101,8 +105,9 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
     }
 
     visionSubsystem.setIsAuto(false);
+    driveOmega.reset();
 
-    hasStaged = false;
+    finalDrive = false;
     hasPreppedAlgae = false;
 
     robotStateSubsystem.setAlgaeHeight(AlgaeHeight.HIGH);
@@ -125,23 +130,30 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
 
   @Override
   public void execute() {
-    if (elevatorSubsystem.getState() == ElevatorStates.ZEROED
-        && !hasStaged
-        && timer.hasElapsed(AutonConstants.kInitPathPrestageTime)) {
-      hasStaged = true;
-      robotStateSubsystem.toAutonPrestage();
-    }
-
     if (pathExists) {
-      if (Math.abs(driveSubsystem.getPoseMeters().getX() - DriveConstants.kCenterLineX)
-              < AutonConstants.kStageBargeDistance
-          && !hasPreppedAlgae) {
+      double centerDist = driveSubsystem.getPoseMeters().getX() - DriveConstants.kCenterLineX;
+      if (Math.abs(centerDist) < AutonConstants.kStageBargeDistance && !hasPreppedAlgae) {
         hasPreppedAlgae = true;
         robotStateSubsystem.toScoreAlgae();
       }
 
-      desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
-      driveSubsystem.calculateController(desiredState);
+      if (!finalDrive && Math.abs(centerDist) < 1.75) {
+        driveSubsystem.setAutoDebugMsg("Final Drive");
+        finalDrive = true;
+        driveSubsystem.setEnableHolo(false);
+      }
+
+      if (finalDrive) {
+        driveSubsystem.move(
+            centerDist < 0 ? 0.45 : -0.45,
+            0,
+            driveOmega.calculate(
+                driveSubsystem.getGyroRotation2d().getRadians(), centerDist < 0 ? 0 : Math.PI),
+            true);
+      } else {
+        desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
+        driveSubsystem.calculateController(desiredState);
+      }
     }
   }
 
@@ -151,10 +163,7 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
       return true;
     }
     return elevatorSubsystem.isFinished()
-        && Math.abs(driveSubsystem.getPoseMeters().getX() - finalPose.getX())
-            < AutonConstants.kMaxPathErrorMeters
-        && driveSubsystem.getHolonomicControllerOmegaErrorRadians()
-            < AutonConstants.kMaxOmegaErrorRadians;
+        && Math.abs(driveSubsystem.getPoseMeters().getX() - DriveConstants.kCenterLineX) < 1.1;
   }
 
   @Override

@@ -4,8 +4,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
-import frc.robot.commands.robotState.ScoreAlgaeCommand;
+import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -42,6 +43,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       List<Double> grabYOffsets,
       List<Double> delays,
       List<String> bargePaths,
+      List<RobotStateSubsystem.ScoringLevel> algaeLevels,
       Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
@@ -50,11 +52,15 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
     this.robotStateSubsystem = robotStateSubsystem;
     this.visionSubsystem = visionSubsystem;
 
+    // BooleanSupplier awayCondition =
+    //     () -> DriverStation.getMatchTime() < AutonConstants.kBargeScoreMinTime;
+
     addCommands(
         new PrepOdomForAutoCommand(
             robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose));
 
     for (int i = 0; i < grabPaths.size(); i++) {
+      boolean last = i == grabPaths.size() - 1;
       var algaeDrive =
           new DriveAlgaeAutonServoCommand(
               driveSubsystem,
@@ -65,40 +71,55 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
               visionSubsystem,
               grabPaths.get(i),
               i == 0,
-              false,
+              true,
               i == 0,
-              grabYOffsets.get(i));
+              grabYOffsets.get(i),
+              algaeLevels.get(i));
       var bargeDrive =
-          new DriveBargeAutonCommand(
-              driveSubsystem,
-              tagAlignSubsystem,
-              elevatorSubsystem,
-              biscuitSubsystem,
-              robotStateSubsystem,
-              visionSubsystem,
-              bargePaths.get(i),
-              i == grabPaths.size() - 1,
-              false);
+          last
+              ? new DriveAutonCommand(driveSubsystem, bargePaths.get(i), true, false, false)
+              : new DriveBargeAutonCommand(
+                  driveSubsystem,
+                  tagAlignSubsystem,
+                  elevatorSubsystem,
+                  biscuitSubsystem,
+                  robotStateSubsystem,
+                  visionSubsystem,
+                  bargePaths.get(i),
+                  true,
+                  false);
 
       pathCommands.add(algaeDrive);
       pathCommands.add(bargeDrive);
-      addCommands(
-          /*
-          new ConditionalCommand( */
-          algaeDrive,
-          /*
-          new WaitCommand(15),
-          () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime), */
-          new WaitCommand(delays.get(i)),
-          /*
-          new ConditionalCommand(
-              new SequentialCommandGroup(*/
-          bargeDrive,
-          new ScoreAlgaeCommand(
-              robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem) /*),
-              new WaitCommand(15),
-              () -> DriverStation.getMatchTime() > AutonConstants.kBargeScoreMinTime) */);
+
+      addCommands(algaeDrive, new WaitCommand(delays.get(i)), bargeDrive);
+
+      if (!last) {
+        addCommands(
+            new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+      }
     }
+    /*
+      addCommands(
+          new ConditionalCommand(
+            new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false),
+              new SequentialCommandGroup(
+                algaeDrive,
+                  new WaitCommand(delays.get(i))),
+              awayCondition),
+          new ConditionalCommand(
+            new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false),
+              new SequentialCommandGroup(
+                      bargeDrive,
+                      new AutoScoreAlgaeCommand(
+                          robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
+                  .until(awayCondition),
+              awayCondition));
+    }
+    */
+
+    // addCommands(new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false));
   }
 
   @Override
