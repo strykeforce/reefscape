@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
-import frc.robot.commands.auton.NonProcessorMediumAutonCommand;
+import frc.robot.commands.auton.NonProcessorMediumCycleAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
@@ -378,6 +378,29 @@ public class AutoSwitch extends MeasurableSubsystem {
             true,
             true,
             AutonConstants.kProcessorMid);
+      }
+
+      case 0x04 -> {
+        return new NonProcessorMediumCycleAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "midStartToJSlow",
+            new ArrayList<Character>(Arrays.asList('l', 'k')),
+            new ArrayList<ScoringLevel>(
+                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+            'j',
+            false,
+            true,
+            AutonConstants.kNonProcessorMid);
       }
 
       default -> {
