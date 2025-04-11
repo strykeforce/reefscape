@@ -26,27 +26,11 @@ public class AutoScoreAlgaeCommand extends Command {
 
   @Override
   public void initialize() {
-    hasEjectedToBarge = false;
-    startState = robotStateSubsystem.getState();
-    startingElevatorFinished = elevatorSubsystem.isFinished();
-    if (startState == RobotStates.PROCESSOR_ALGAE || startState == RobotStates.BARGE_ALGAE) {
-      robotStateSubsystem.releaseAlgae();
-    } else {
-      robotStateSubsystem.toScoreAlgae();
-    }
+    robotStateSubsystem.releaseAlgae();
   }
 
   @Override
   public boolean isFinished() {
-    if (startState == RobotStates.PROCESSOR_ALGAE
-        || startState == RobotStates.BARGE_ALGAE
-        || hasEjectedToBarge) {
-      return !robotStateSubsystem.hasAlgae() || !startingElevatorFinished;
-    } else {
-      return robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
-          || (robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE
-              && !robotStateSubsystem.getIsAutoPlacing())
-          || !robotStateSubsystem.getIsBargeSafe();
-    }
+    return !robotStateSubsystem.hasAlgae();
   }
 }

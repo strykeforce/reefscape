@@ -2,14 +2,11 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
 import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
-import frc.robot.constants.AutonConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -22,7 +19,6 @@ import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 public class MiddleBargeAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -56,15 +52,15 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
     this.robotStateSubsystem = robotStateSubsystem;
     this.visionSubsystem = visionSubsystem;
 
-    var awayPath = new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false);
-    BooleanSupplier awayCondition =
-        () -> DriverStation.getMatchTime() < AutonConstants.kBargeScoreMinTime;
+    // BooleanSupplier awayCondition =
+    //     () -> DriverStation.getMatchTime() < AutonConstants.kBargeScoreMinTime;
 
     addCommands(
         new PrepOdomForAutoCommand(
             robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose));
 
     for (int i = 0; i < grabPaths.size(); i++) {
+      boolean last = i == grabPaths.size() - 1;
       var algaeDrive =
           new DriveAlgaeAutonServoCommand(
               driveSubsystem,
@@ -80,35 +76,50 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
               grabYOffsets.get(i),
               algaeLevels.get(i));
       var bargeDrive =
-          new DriveBargeAutonCommand(
-              driveSubsystem,
-              tagAlignSubsystem,
-              elevatorSubsystem,
-              biscuitSubsystem,
-              robotStateSubsystem,
-              visionSubsystem,
-              bargePaths.get(i),
-              true,
-              false);
+          last
+              ? new DriveAutonCommand(driveSubsystem, bargePaths.get(i), true, false, false)
+              : new DriveBargeAutonCommand(
+                  driveSubsystem,
+                  tagAlignSubsystem,
+                  elevatorSubsystem,
+                  biscuitSubsystem,
+                  robotStateSubsystem,
+                  visionSubsystem,
+                  bargePaths.get(i),
+                  true,
+                  false);
 
       pathCommands.add(algaeDrive);
       pathCommands.add(bargeDrive);
+
+      addCommands(algaeDrive, new WaitCommand(delays.get(i)), bargeDrive);
+
+      if (!last) {
+        addCommands(
+            new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem));
+      }
+    }
+    /*
       addCommands(
           new ConditionalCommand(
-              new SequentialCommandGroup(awayPath, new WaitCommand(delays.get(i))),
-              algaeDrive,
+            new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false),
+              new SequentialCommandGroup(
+                algaeDrive,
+                  new WaitCommand(delays.get(i))),
               awayCondition),
           new ConditionalCommand(
+            new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false),
               new SequentialCommandGroup(
                       bargeDrive,
                       new AutoScoreAlgaeCommand(
                           robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
                   .until(awayCondition),
-              awayPath,
               awayCondition));
     }
+    */
 
-    addCommands(awayPath);
+    // addCommands(new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false));
   }
 
   @Override
