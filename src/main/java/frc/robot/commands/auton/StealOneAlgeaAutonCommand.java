@@ -14,8 +14,6 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
@@ -28,7 +26,6 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
   private CoralSubsystem coralSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
-  private List<Double> postOffsets = new ArrayList<>();
 
   public StealOneAlgeaAutonCommand(
       DriveSubsystem driveSubsystem,
@@ -43,7 +40,6 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
       String secondPathName,
       String thirdPathName,
       String fourthPathName,
-      List<Double> postOffsets,
       Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
@@ -51,7 +47,6 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
     this.coralSubsystem = coralSubsystem;
     this.robotStateSubsystem = robotStateSubsystem;
     this.visionSubsystem = visionSubsystem;
-    this.postOffsets = postOffsets;
 
     firstPath =
         new DriveAlgaeAutonServoCommand(
@@ -65,7 +60,7 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
             true,
             true,
             true,
-            postOffsets.get(0));
+            0.0);
 
     secondPath =
         new DriveBargeAutonCommand(
@@ -91,7 +86,7 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
             false,
             true,
             false,
-            postOffsets.get(1));
+            0.0);
 
     fourthPath =
         new DriveBargeAutonCommand(

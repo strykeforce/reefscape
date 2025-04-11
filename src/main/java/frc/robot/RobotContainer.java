@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -26,7 +27,7 @@ import frc.robot.commands.algae.OpenLoopAlgaeCommand;
 import frc.robot.commands.algae.ProcessorAlgaeCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
-import frc.robot.commands.auton.TestAutonCommand;
+import frc.robot.commands.auton.StealOneAlgeaAutonCommand;
 import frc.robot.commands.auton.ToggleVirtualSwitchCommand;
 import frc.robot.commands.biscuit.HoldBiscuitCommand;
 import frc.robot.commands.biscuit.JogBiscuitCommand;
@@ -158,7 +159,7 @@ public class RobotContainer {
 
   private NonProcessorShallowAutonCommand nonProcessorShallowAutonCommand;
   private ProcessorShallowAutonCommand processorShallowAutonCommand;
-  private TestAutonCommand testAutonCommand;
+  private StealOneAlgeaAutonCommand testAutonCommand;
 
   private Alliance alliance = Alliance.Blue;
   private SuppliedValueWidget<Boolean> allianceColor;
@@ -240,7 +241,21 @@ public class RobotContainer {
             visionSubsystem,
             pathHandler);
 
-    testAutonCommand = new TestAutonCommand(driveSubsystem, robotStateSubsystem, elevatorSubsystem);
+    testAutonCommand =
+        new StealOneAlgeaAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startBargeToG",
+            "GToBarge",
+            "bargeToOppE",
+            "OppEToOppbarge",
+            new Pose2d(7.1, 5.07, Rotation2d.fromRadians(3.14159)));
 
     configureTelemetry();
     configureDriverBindings();
