@@ -16,18 +16,20 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
-public class StealOneAlgeaNoSuperCycleAutonCommand extends SequentialCommandGroup
+public class StealTwoAlgeaNoSuperCycleAutonCommand extends SequentialCommandGroup
     implements AutoCommandInterface {
 
   private DriveSubsystem driveSubsystem;
   private DriveAutonServoCommand firstPath;
   private DriveAlgaeWaitAutonServoCommand secondPath;
   private DriveBargeAutonCommand thirdPath;
+  private DriveAlgaeWaitAutonServoCommand fourthPath;
+  private DriveBargeAutonCommand fifthPath;
   private CoralSubsystem coralSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
   private VisionSubsystem visionSubsystem;
 
-  public StealOneAlgeaNoSuperCycleAutonCommand(
+  public StealTwoAlgeaNoSuperCycleAutonCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       AlgaeSubsystem algaeSubsystem,
@@ -39,7 +41,10 @@ public class StealOneAlgeaNoSuperCycleAutonCommand extends SequentialCommandGrou
       String firstPathName,
       String secondPathName,
       String thirdPathName,
-      ScoringLevel OppAlgeaHeight,
+      String fourthPathName,
+      String fifthPathName,
+      ScoringLevel OppAlgeaHeight1,
+      ScoringLevel OppAlgeaHeight2,
       Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
@@ -75,7 +80,7 @@ public class StealOneAlgeaNoSuperCycleAutonCommand extends SequentialCommandGrou
             true,
             false,
             0.0,
-            OppAlgeaHeight,
+            OppAlgeaHeight1,
             1.5);
 
     thirdPath =
@@ -90,6 +95,34 @@ public class StealOneAlgeaNoSuperCycleAutonCommand extends SequentialCommandGrou
             true,
             false);
 
+    fourthPath =
+        new DriveAlgaeWaitAutonServoCommand(
+            driveSubsystem,
+            tagAlignSubsystem,
+            elevatorSubsystem,
+            biscuitSubsystem,
+            robotStateSubsystem,
+            visionSubsystem,
+            fourthPathName,
+            false,
+            true,
+            false,
+            0.0,
+            OppAlgeaHeight2,
+            0.0);
+
+    fifthPath =
+        new DriveBargeAutonCommand(
+            driveSubsystem,
+            tagAlignSubsystem,
+            elevatorSubsystem,
+            biscuitSubsystem,
+            robotStateSubsystem,
+            visionSubsystem,
+            fifthPathName,
+            true,
+            false);
+
     addCommands(
         new SequentialCommandGroup(
             new PrepOdomForAutoCommand(
@@ -101,6 +134,10 @@ public class StealOneAlgeaNoSuperCycleAutonCommand extends SequentialCommandGrou
             secondPath,
             thirdPath,
             new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
+            fourthPath,
+            fifthPath,
+            new AutoScoreAlgaeCommand(
                 robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)));
   }
 
@@ -109,6 +146,8 @@ public class StealOneAlgeaNoSuperCycleAutonCommand extends SequentialCommandGrou
     firstPath.reassignAlliance();
     secondPath.reassignAlliance();
     thirdPath.reassignAlliance();
+    fourthPath.reassignAlliance();
+    fifthPath.reassignAlliance();
     driveSubsystem.teleResetGyro();
     coralSubsystem.setAutoPreload();
     robotStateSubsystem.setIsAutoPlacing(false);

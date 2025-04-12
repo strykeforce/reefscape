@@ -4,10 +4,12 @@ import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.constants.AutonConstants;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.PathHandlerConstants;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -155,7 +157,13 @@ public class DriveAlgaeWaitAutonServoCommand extends Command implements AutoComm
         desiredState = trajectory.sampleAt(timer.get(), mirrorTrajectory).get();
         driveSubsystem.calculateController(desiredState);
 
-        if (shouldTransitionToServoing()) {
+        double currX = driveSubsystem.getPoseMeters().getX();
+
+        if (shouldTransitionToServoing()
+                && currX > DriveConstants.kCenterLineX
+                && robotStateSubsystem.getAllianceColor() == Alliance.Blue
+            || robotStateSubsystem.getAllianceColor() == Alliance.Red
+                && currX < DriveConstants.kCenterLineX) {
           isServoing = true;
 
           visionSubsystem.setIsAuto(true);

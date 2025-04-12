@@ -16,6 +16,7 @@ import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.StealAlgaeImmediately;
 import frc.robot.commands.auton.StealOneAlgeaAutonCommand;
 import frc.robot.commands.auton.StealOneAlgeaNoSuperCycleAutonCommand;
+import frc.robot.commands.auton.StealTwoAlgeaNoSuperCycleAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
@@ -455,6 +456,26 @@ public class AutoSwitch extends MeasurableSubsystem {
             "HToOppE",
             "OppEToOppbarge",
             ScoringLevel.L3,
+            new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
+      }
+
+      case 0x17 -> {
+        return new StealTwoAlgeaNoSuperCycleAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startHToH",
+            "HToOppE",
+            "OppEToOppbarge",
+            "OppBargeToOppG",
+            "OppGToOppBarge",
+            ScoringLevel.L3,
+            ScoringLevel.L2,
             new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
       }
 
