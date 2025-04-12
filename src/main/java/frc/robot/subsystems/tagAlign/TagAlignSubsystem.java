@@ -51,6 +51,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private double coralOffset = 0;
   private double noProgressCounts = 0;
   private double yAutoOffset = 0;
+  private boolean justAlgae = false;
 
   public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -78,6 +79,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void setProceedToAlign(boolean proceed) {
     this.proceedToAlign = proceed;
+  }
+
+  public void setJustAlgae(boolean justAlgae) {
+    this.justAlgae = justAlgae;
   }
 
   public boolean yErrorSmall() {
@@ -285,6 +290,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     isAuto = true;
     this.yAutoOffset = yAutoOffset;
     setup(alliance, level, scoreLeft, algae);
+    setJustAlgae(false);
     tagAlign();
   }
 
@@ -406,10 +412,14 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
               }
             }
             case TAG_ALIGN -> {
-              if ((
-                  /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
-                  && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
+              if (justAlgae && (FastMath.abs(alignY.getError()) < driveYCloseEnough)) {
                 finalDrive = true;
+              } else {
+                if ((
+                    /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
+                    && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
+                  finalDrive = true;
+                }
               }
               if (finalDrive
                   && driveSubsystem.getAvgDriveCurrent()
@@ -430,9 +440,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             }
           }
         }
-
+        // TODO Find Proper Number
         if (finalDrive) {
-          if (isAuto) {
+          if (justAlgae) {
+            vX = (vX > 0.35) ? vX : 0.35;
+          } else if (isAuto) {
             if (scoreLeft) {
               vX = 0.25;
             } else {
