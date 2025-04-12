@@ -259,6 +259,79 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonProcessorMid);
       }
 
+      case 0x02 -> {
+        return new NonProcessorShallowSlowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "midStartToJSlow",
+            new ArrayList<Character>(Arrays.asList('k', 'l')),
+            new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance)),
+            new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0)),
+            'j',
+            false,
+            AutonConstants.kNonProcessorMid);
+      }
+
+        // case 0x03 -> {
+        //   return new NonProcessorShallowSlowAutonCommand(
+        //       driveSubsystem,
+        //       pathHandler,
+        //       robotStateSubsystem,
+        //       algaeSubsystem,
+        //       biscuitSubsystem,
+        //       coralSubsystem,
+        //       elevatorSubsystem,
+        //       tagAlignSubsystem,
+        //       visionSubsystem,
+        //       "startToJSlow",
+        //       new ArrayList<Character>(Arrays.asList('k', 'l')),
+        //       new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+        //       new ArrayList<>(
+        //           Arrays.asList(
+        //               PathHandlerConstants.kLoadLightDistance,
+        //               PathHandlerConstants.kLoadLightDistance,
+        //               PathHandlerConstants.kLoadLightDistance)),
+        //       new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0)),
+        //       'j',
+        //       true,
+        //       AutonConstants.kNonProcessorMid);
+        // }
+
+        // case 0x04 -> {
+        //   return new NonProcessorMediumCycleAutonCommand(
+        //       driveSubsystem,
+        //       pathHandler,
+        //       robotStateSubsystem,
+        //       algaeSubsystem,
+        //       biscuitSubsystem,
+        //       coralSubsystem,
+        //       elevatorSubsystem,
+        //       tagAlignSubsystem,
+        //       visionSubsystem,
+        //       "midStartToJSlow",
+        //       new ArrayList<Character>(Arrays.asList('l', 'k')),
+        //       new ArrayList<ScoringLevel>(
+        //           Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
+        //       new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+        //       new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+        //       'j',
+        //       false,
+        //       true,
+        //       AutonConstants.kNonProcessorMid);
+        // }
+
       case 0x10 -> {
         return new MiddleBargeAutonCommand(
             driveSubsystem,
@@ -368,6 +441,29 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             "startPToE",
+            new ArrayList<Character>(Arrays.asList('d', 'c', 'c')),
+            new ArrayList<ScoringLevel>(
+                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
+            'e',
+            true,
+            true,
+            AutonConstants.kProcessorMid);
+      }
+
+      case 0x22 -> {
+        return new ProcessorShallowAutonCommand(
+            driveSubsystem,
+            pathHandler,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "midStartPToESlow",
             new ArrayList<Character>(Arrays.asList('d', 'c', 'c')),
             new ArrayList<ScoringLevel>(
                 Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
