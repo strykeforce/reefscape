@@ -69,6 +69,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private ScoringLevel scoringLevel = ScoringLevel.L4;
   private ScoringLevel currentLevel = ScoringLevel.L4;
+  private ScoringLevel autoAlgaeLevel = ScoringLevel.L2;
   private ScoreSide scoreSide = ScoreSide.LEFT;
   private AlgaeHeight algaeHeight = AlgaeHeight.LOW;
   private AlgaeHeight currentAlgaeHeight = AlgaeHeight.LOW;
@@ -150,7 +151,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   }
 
   public ScoringLevel getAlgaeLevel() {
-    return (tagAlignSubsystem.computeHexant() % 2) == 0 ? ScoringLevel.L3 : ScoringLevel.L2;
+    return isAuto
+        ? autoAlgaeLevel
+        : (tagAlignSubsystem.computeHexant() % 2) == 0 ? ScoringLevel.L3 : ScoringLevel.L2;
   }
 
   public ScoringLevel getCoralLevel() {
@@ -239,6 +242,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ledSubsystem.setLevelLights(scoringLevel);
   }
 
+  public void setAutoAlgaeLevel(ScoringLevel algaeLevel) {
+    this.autoAlgaeLevel = algaeLevel;
+  }
+
   public void setScoreSide(ScoreSide scoreSide) {
     this.scoreSide = scoreSide;
     if (!isAutoPlacing) ledSubsystem.setPlaceLights(PlaceStates.MANUAL);
@@ -304,16 +311,29 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     ledSubsystem.setAutoPlacing(isAutoPlacing);
   }
 
+  public void clearCoral() {
+    funnelSubsystem.clearCoral();
+    coralSubsystem.setState(CoralSubsystem.CoralState.EMPTY);
+    algaeSubsystem.setState(AlgaeSubsystem.AlgaeStates.EMPTY);
+    coralLoc = CoralLoc.NONE;
+  }
+
   private boolean needSafeAlgaeTransfer(RobotStates nextState) {
     if (algaeSubsystem.hasAlgae()) {
       switch (curState) {
-        case FLOOR_ALGAE, MIC_ALGAE, PROCESSOR_ALGAE, BARGE_ALGAE, HP_ALGAE, INTERRUPTED -> {
+        case FLOOR_ALGAE,
+            MIC_ALGAE,
+            PROCESSOR_ALGAE,
+            BARGE_ALGAE,
+            HP_ALGAE,
+            INTERRUPTED,
+            PROTECT_ALGAE -> {
           switch (nextState) {
               // These are all the states that could possibly be entered that are also
               // possibly
               // dangerous
               // Each futureState must be handled in STOW
-            case REEF_ALIGN_ALGAE, REEF_ALIGN_CORAL, PREP_CLIMB -> {
+            case REEF_ALIGN_ALGAE, REEF_ALIGN_CORAL, PREP_CLIMB, PROTECT_ALGAE -> {
               futureState = nextState;
               toStowSafe();
               return true;
@@ -325,7 +345,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       switch (curState) {
-        case REEF_ALIGN_ALGAE, REEF_ALIGN_CORAL, REMOVE_ALGAE, PLACE_CORAL, INTERRUPTED -> {
+        case REEF_ALIGN_ALGAE,
+            REEF_ALIGN_CORAL,
+            REMOVE_ALGAE,
+            PLACE_CORAL,
+            INTERRUPTED,
+            PROTECT_ALGAE -> {
           switch (nextState) {
               // These are all the states that could possibly be entered that are also
               // dangerous
@@ -837,6 +862,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
   }
 
+  public void toProtectAlgae() {
+    if (needSafeAlgaeTransfer(RobotStates.PROTECT_ALGAE)) {
+      return;
+    }
+    elevatorSubsystem.setPosition(ElevatorConstants.kProtectAlgaeSetpoint);
+  }
+
   public boolean isElevatorFinished() {
     return elevatorSubsystem.isFinished();
   }
@@ -909,6 +941,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
             case PROCESSOR_ALGAE, BARGE_ALGAE -> toScoreAlgae();
             case MIC_ALGAE, FLOOR_ALGAE -> toAlgaeFloorPickup();
             case PREP_CLIMB -> toPrepClimb();
+            case PROTECT_ALGAE -> toProtectAlgae();
             default -> logger.error("Unhandled future state: {}", futureState);
           }
         }
@@ -1205,6 +1238,12 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toPlaceCoral();
         }
       }
+      case TO_PROTECT_ALGAE -> {
+        if (isElevatorFinished()) {
+          biscuitSubsystem.setPosition(RobotConstants.kStowSetpoint, hasAlgae());
+        }
+      }
+      case PROTECT_ALGAE -> {}
       default -> logger.error("Unhandled state: {}", curState);
     }
     ledSubsystem.setCoralLights(coralLoc);
@@ -1249,7 +1288,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     TRANSFER,
     IDLE,
     STARTUP,
-    FINISH_AUTO
+    FINISH_AUTO,
+    PROTECT_ALGAE,
+    TO_PROTECT_ALGAE
   }
 
   public enum ScoringLevel {

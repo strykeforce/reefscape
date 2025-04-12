@@ -445,30 +445,29 @@ public class RobotContainer {
 
     new Trigger(() -> xboxController.getPOV() != -1).onTrue(new EjectAlgaeCommand(algaeSubsystem));
 
-    // // Move biscuit
-    // new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
-    //     .onTrue(
-    //         new JogBiscuitCommand(
-    //             biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
-    //     .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
-    // new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
-    //     .onTrue(
-    //         new JogBiscuitCommand(
-    //             biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
-    //     .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    // Move biscuit
+    new Trigger((() -> xboxController.getRightY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
+    new Trigger((() -> xboxController.getRightY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogBiscuitCommand(
+                biscuitSubsystem, Angle.ofBaseUnits(BiscuitConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldBiscuitCommand(biscuitSubsystem));
 
-    // // Move elevator
-    // new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
-    //     .onTrue(
-    //         new JogElevatorCommand(
-    //             elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
-    //     .onFalse(new HoldElevatorCommand(elevatorSubsystem));
-    // new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
-    //     .onTrue(
-    //         new JogElevatorCommand(
-    //             elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown,
-    // Rotations)))
-    //     .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    // Move elevator
+    new Trigger((() -> xboxController.getLeftY() < -RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountUp, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
+    new Trigger((() -> xboxController.getLeftY() > RobotConstants.kTestingDeadband))
+        .onTrue(
+            new JogElevatorCommand(
+                elevatorSubsystem, Angle.ofBaseUnits(ElevatorConstants.kJogAmountDown, Rotations)))
+        .onFalse(new HoldElevatorCommand(elevatorSubsystem));
   }
 
   private void configureTestOperatorBindings() {
@@ -647,9 +646,7 @@ public class RobotContainer {
             "Clear Coral",
             new InstantCommand(
                 () -> {
-                  funnelSubsystem.clearCoral();
-                  coralSubsystem.setState(CoralSubsystem.CoralState.EMPTY);
-                  algaeSubsystem.setState(AlgaeSubsystem.AlgaeStates.EMPTY);
+                  robotStateSubsystem.clearCoral();
                 }))
         .withSize(1, 1)
         .withPosition(9, 0);
@@ -838,8 +835,8 @@ public class RobotContainer {
   }
 
   public void updateCANErrorCount() {
-    rCanErrors += RobotController.getCANStatus().receiveErrorCount;
-    tCanErrors += RobotController.getCANStatus().transmitErrorCount;
+    rCanErrors = RobotController.getCANStatus().receiveErrorCount;
+    tCanErrors = RobotController.getCANStatus().transmitErrorCount;
   }
 
   public void disableNoMotionCal() {

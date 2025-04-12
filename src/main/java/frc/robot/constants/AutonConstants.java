@@ -14,6 +14,9 @@ public class AutonConstants {
   public static final double kElevatorStageRadiusPathOne = 2.1; // 1.8
   public static final double kInitPathPrestageTime = 0.6;
 
+  public static final double kStageBargeDistance = 2.5;
+  public static final double kBargeScoreMinTime = 3;
+
   // Start Poses
   public static final Pose2d kNonProcessorShallow =
       new Pose2d(7.1, 5.076, Rotation2d.fromDegrees(180));
@@ -23,5 +26,8 @@ public class AutonConstants {
       new Pose2d(7.1, 2.9718, Rotation2d.fromDegrees(180));
   public static final Pose2d kProcessorMid = new Pose2d(7.1, 1.8818, Rotation2d.fromDegrees(180));
   public static final Pose2d kNonProcessorDeep =
+      new Pose2d(7.1, 7.257, Rotation2d.fromDegrees(180));
+
+  public static final Pose2d kMiddleBargeStart =
       new Pose2d(7.1, 7.257, Rotation2d.fromDegrees(180));
 }
