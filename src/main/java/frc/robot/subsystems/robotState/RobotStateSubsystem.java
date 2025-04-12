@@ -119,13 +119,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.visionSubsystem = visionSubsystem;
     this.bargeAlignSubsystem = bargeAlignSubsystem;
-    this.canBus = new CANBus();
+    this.canBus = new CANBus("CAN FD 25-1");
 
     ledSubsystem.setState(LEDStates.NORMAL);
   }
 
   public boolean isCANivoreConnected() {
-    CANBusStatus status = canBus.getStatus("CAN FD 25-1");
+    CANBusStatus status = canBus.getStatus();
     return status.Status.isOK();
   }
 

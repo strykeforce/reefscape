@@ -290,6 +290,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     isAuto = true;
     this.yAutoOffset = yAutoOffset;
     setup(alliance, level, scoreLeft, algae);
+    setJustAlgae(false);
     tagAlign();
   }
 
@@ -402,7 +403,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             || FastMath.abs(driveOmega.getError()) < TagServoingConstants.kAngleCloseEnough) {
           switch (curState) {
             case DRIVE -> {
-              //TODO Only look at y error
               if (FastMath.abs(driveX.getError()) < driveXCloseEnough
                       && FastMath.abs(driveY.getError()) < driveYCloseEnough
                   // || ignoreX && FastMath.abs(tagRelError.getY()) < driveCloseEnough
