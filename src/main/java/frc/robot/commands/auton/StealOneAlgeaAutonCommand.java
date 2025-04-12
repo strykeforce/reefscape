@@ -1,0 +1,140 @@
+package frc.robot.commands.auton;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.drive.PrepOdomForAutoCommand;
+import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
+import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.biscuit.BiscuitSubsystem;
+import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
+import frc.robot.subsystems.tagAlign.TagAlignSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
+
+public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
+    implements AutoCommandInterface {
+
+  private DriveSubsystem driveSubsystem;
+  private DriveAlgaeAutonServoCommand firstPath;
+  private DriveBargeAutonCommand secondPath;
+  private DriveAlgaeWaitAutonServoCommand thirdPath;
+  private DriveBargeAutonCommand fourthPath;
+  private CoralSubsystem coralSubsystem;
+  private RobotStateSubsystem robotStateSubsystem;
+  private VisionSubsystem visionSubsystem;
+
+  public StealOneAlgeaAutonCommand(
+      DriveSubsystem driveSubsystem,
+      RobotStateSubsystem robotStateSubsystem,
+      AlgaeSubsystem algaeSubsystem,
+      BiscuitSubsystem biscuitSubsystem,
+      CoralSubsystem coralSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      TagAlignSubsystem tagAlignSubsystem,
+      VisionSubsystem visionSubsystem,
+      String firstPathName,
+      String secondPathName,
+      String thirdPathName,
+      String fourthPathName,
+      ScoringLevel OppAlgeaHeight,
+      Pose2d startPose) {
+    addRequirements(
+        driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
+    this.driveSubsystem = driveSubsystem;
+    this.coralSubsystem = coralSubsystem;
+    this.robotStateSubsystem = robotStateSubsystem;
+    this.visionSubsystem = visionSubsystem;
+
+    firstPath =
+        new DriveAlgaeAutonServoCommand(
+            driveSubsystem,
+            tagAlignSubsystem,
+            elevatorSubsystem,
+            biscuitSubsystem,
+            robotStateSubsystem,
+            visionSubsystem,
+            firstPathName,
+            true,
+            true,
+            true,
+            0.0,
+            ScoringLevel.L2);
+
+    secondPath =
+        new DriveBargeAutonCommand(
+            driveSubsystem,
+            tagAlignSubsystem,
+            elevatorSubsystem,
+            biscuitSubsystem,
+            robotStateSubsystem,
+            visionSubsystem,
+            secondPathName,
+            true,
+            false);
+
+    thirdPath =
+        new DriveAlgaeWaitAutonServoCommand(
+            driveSubsystem,
+            tagAlignSubsystem,
+            elevatorSubsystem,
+            biscuitSubsystem,
+            robotStateSubsystem,
+            visionSubsystem,
+            thirdPathName,
+            false,
+            true,
+            false,
+            0.0,
+            OppAlgeaHeight,
+            1.5);
+
+    fourthPath =
+        new DriveBargeAutonCommand(
+            driveSubsystem,
+            tagAlignSubsystem,
+            elevatorSubsystem,
+            biscuitSubsystem,
+            robotStateSubsystem,
+            visionSubsystem,
+            fourthPathName,
+            true,
+            false);
+
+    addCommands(
+        new SequentialCommandGroup(
+            new PrepOdomForAutoCommand(
+                robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
+            // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
+            firstPath,
+            secondPath,
+            new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
+            new WaitForElevBelowBarge(elevatorSubsystem),
+            thirdPath,
+            fourthPath,
+            new AutoScoreAlgaeCommand(
+                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)));
+  }
+
+  @Override
+  public void reassignAlliance() {
+    firstPath.reassignAlliance();
+    secondPath.reassignAlliance();
+    thirdPath.reassignAlliance();
+    fourthPath.reassignAlliance();
+    driveSubsystem.teleResetGyro();
+    coralSubsystem.setAutoPreload();
+    robotStateSubsystem.setIsAutoPlacing(false);
+    robotStateSubsystem.setScoringLevel(ScoringLevel.L4);
+    robotStateSubsystem.setGetAlgaeOnCycle(false);
+    // robotStateSubsystem.setIsAuto(true);
+    robotStateSubsystem.setScoreSide(ScoreSide.RIGHT);
+    visionSubsystem.setVisionUpdating(true);
+    // pathHandler.reassignAlliance();
+  }
+}

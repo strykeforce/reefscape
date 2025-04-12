@@ -13,6 +13,9 @@ import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
+import frc.robot.commands.auton.StealAlgaeImmediately;
+import frc.robot.commands.auton.StealOneAlgeaAutonCommand;
+import frc.robot.commands.auton.StealOneAlgeaNoSuperCycleAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
@@ -402,6 +405,57 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "bargeAway")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
             AutonConstants.kMiddleBargeStart);
+      }
+
+      case 0x14 -> {
+        return new StealOneAlgeaAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startBargeToG",
+            "GToBarge",
+            "bargeToOppE",
+            "OppEToOppbarge",
+            ScoringLevel.L3,
+            new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
+      }
+
+      case 0x15 -> {
+        return new StealAlgaeImmediately(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startBargeToOppE",
+            "OppEToOppbarge",
+            ScoringLevel.L3,
+            new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
+      }
+
+      case 0x16 -> {
+        return new StealOneAlgeaNoSuperCycleAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startHToH",
+            "HToOppE",
+            "OppEToOppbarge",
+            ScoringLevel.L3,
+            new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
       }
 
       case 0x20 -> {
