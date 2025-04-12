@@ -145,6 +145,17 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
           terminate();
         }
       }
+      case REVERSE -> {
+        if (isOnBlueSide) {
+          driveSubsystem.move(
+              -vX, getYStickReading(), BargeAlignConstants.kBlueRaiseElevatorX, true);
+          if (shouldRaiseElevator()) {
+            setState(BargeAlignStates.RAISE_ELEV);
+          }
+        } else {
+          driveSubsystem.move(vX, getYStickReading(), BargeAlignConstants.kRedRaiseElevatorX, true);
+        }
+      }
       case FINISHED -> {}
     }
   }
@@ -158,6 +169,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
     // INIT,
     DRIVE,
     RAISE_ELEV,
+    REVERSE,
     FINISHED
   }
 }
