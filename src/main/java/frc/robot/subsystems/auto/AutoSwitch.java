@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
-import frc.robot.commands.auton.NonProcessorMediumCycleAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.ProcessorShallowAutonCommand;
@@ -270,7 +269,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             elevatorSubsystem,
             tagAlignSubsystem,
             visionSubsystem,
-            "startToJSlow",
+            "midStartToJSlow",
             new ArrayList<Character>(Arrays.asList('k', 'l')),
             new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
             new ArrayList<>(
@@ -284,30 +283,53 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kNonProcessorMid);
       }
 
-      case 0x03 -> {
-        return new NonProcessorShallowSlowAutonCommand(
-            driveSubsystem,
-            pathHandler,
-            robotStateSubsystem,
-            algaeSubsystem,
-            biscuitSubsystem,
-            coralSubsystem,
-            elevatorSubsystem,
-            tagAlignSubsystem,
-            visionSubsystem,
-            "startToJSlow",
-            new ArrayList<Character>(Arrays.asList('k', 'l')),
-            new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
-            new ArrayList<>(
-                Arrays.asList(
-                    PathHandlerConstants.kLoadLightDistance,
-                    PathHandlerConstants.kLoadLightDistance,
-                    PathHandlerConstants.kLoadLightDistance)),
-            new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0)),
-            'j',
-            true,
-            AutonConstants.kNonProcessorMid);
-      }
+        // case 0x03 -> {
+        //   return new NonProcessorShallowSlowAutonCommand(
+        //       driveSubsystem,
+        //       pathHandler,
+        //       robotStateSubsystem,
+        //       algaeSubsystem,
+        //       biscuitSubsystem,
+        //       coralSubsystem,
+        //       elevatorSubsystem,
+        //       tagAlignSubsystem,
+        //       visionSubsystem,
+        //       "startToJSlow",
+        //       new ArrayList<Character>(Arrays.asList('k', 'l')),
+        //       new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+        //       new ArrayList<>(
+        //           Arrays.asList(
+        //               PathHandlerConstants.kLoadLightDistance,
+        //               PathHandlerConstants.kLoadLightDistance,
+        //               PathHandlerConstants.kLoadLightDistance)),
+        //       new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0)),
+        //       'j',
+        //       true,
+        //       AutonConstants.kNonProcessorMid);
+        // }
+
+        // case 0x04 -> {
+        //   return new NonProcessorMediumCycleAutonCommand(
+        //       driveSubsystem,
+        //       pathHandler,
+        //       robotStateSubsystem,
+        //       algaeSubsystem,
+        //       biscuitSubsystem,
+        //       coralSubsystem,
+        //       elevatorSubsystem,
+        //       tagAlignSubsystem,
+        //       visionSubsystem,
+        //       "midStartToJSlow",
+        //       new ArrayList<Character>(Arrays.asList('l', 'k')),
+        //       new ArrayList<ScoringLevel>(
+        //           Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
+        //       new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+        //       new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+        //       'j',
+        //       false,
+        //       true,
+        //       AutonConstants.kNonProcessorMid);
+        // }
 
       case 0x20 -> {
         return new ProcessorShallowSlowAutonCommand(
@@ -378,29 +400,6 @@ public class AutoSwitch extends MeasurableSubsystem {
             true,
             true,
             AutonConstants.kProcessorMid);
-      }
-
-      case 0x04 -> {
-        return new NonProcessorMediumCycleAutonCommand(
-            driveSubsystem,
-            pathHandler,
-            robotStateSubsystem,
-            algaeSubsystem,
-            biscuitSubsystem,
-            coralSubsystem,
-            elevatorSubsystem,
-            tagAlignSubsystem,
-            visionSubsystem,
-            "midStartToJSlow",
-            new ArrayList<Character>(Arrays.asList('l', 'k')),
-            new ArrayList<ScoringLevel>(
-                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L4)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
-            'j',
-            false,
-            true,
-            AutonConstants.kNonProcessorMid);
       }
 
       default -> {
