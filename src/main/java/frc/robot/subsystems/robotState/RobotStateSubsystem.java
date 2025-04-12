@@ -15,6 +15,7 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.algae.AlgaeSubsystem.AlgaeStates;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.climb.ClimbAlignSubsystem;
@@ -463,13 +464,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     if (scoringLevel == ScoringLevel.L1) {
       elevatorSubsystem.setPosition(RobotConstants.kElevatorL1LoadSetpoint);
-      algaeSubsystem.intakeCoral();
+
       funnelSubsystem.reverse();
       coralSubsystem.stop();
 
       setState(RobotStates.TO_ALGAE_CORAL_LOAD, false);
     } else {
       setBiscuitTransfer(RobotConstants.kFunnelSetpoint, true);
+      algaeSubsystem.holdAlgae();
       elevatorSubsystem.setPosition(RobotConstants.kElevatorFunnelSetpoint);
       coralSubsystem.intake();
       setState(RobotStates.FUNNEL_LOAD, true);
@@ -1116,6 +1118,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (scoringLevel != ScoringLevel.L1) {
           toFunnelLoad();
         }
+
+        double currentX = driveSubsystem.getPoseMeters().getX();
+
+        if (allianceColor == Alliance.Blue && currentX < RobotStateConstants.kL1FunnelLoadX
+            || allianceColor == Alliance.Red
+                && currentX > (DriveConstants.kFieldMaxX - RobotStateConstants.kL1FunnelLoadX)) {
+          if (algaeSubsystem.getState() != AlgaeStates.CORAL_INTAKE
+              && algaeSubsystem.getState() != AlgaeStates.HAS_CORAL) {
+            algaeSubsystem.intakeCoral();
+          }
+        } else if (algaeSubsystem.getState() == AlgaeStates.CORAL_INTAKE) {
+          algaeSubsystem.holdAlgae();
+        }
+
         if (algaeSubsystem.hasCoral()) {
           coralLoc = CoralLoc.ALGAE;
           toPrestage();
