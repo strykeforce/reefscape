@@ -480,7 +480,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
             'e',
             true,
-            AutonConstants.kNonProcessorShallow);
+            AutonConstants.kProcessorShallow);
       }
 
       case 0x21 -> {
@@ -507,7 +507,7 @@ public class AutoSwitch extends MeasurableSubsystem {
       }
 
       case 0x22 -> {
-        return new ProcessorShallowAutonCommand(
+        return new ProcessorShallowSlowAutonCommand(
             driveSubsystem,
             pathHandler,
             robotStateSubsystem,
@@ -518,13 +518,15 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             "midStartPToESlow",
-            new ArrayList<Character>(Arrays.asList('d', 'c', 'c')),
-            new ArrayList<ScoringLevel>(
-                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
+            new ArrayList<Character>(Arrays.asList('d', 'c')),
+            new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
             'e',
-            true,
             true,
             AutonConstants.kProcessorMid);
       }
