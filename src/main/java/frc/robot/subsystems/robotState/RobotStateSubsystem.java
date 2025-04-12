@@ -15,6 +15,7 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.RobotStateConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.algae.AlgaeSubsystem.AlgaeStates;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.climb.ClimbAlignSubsystem;
@@ -120,13 +121,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     this.tagAlignSubsystem = tagAlignSubsystem;
     this.visionSubsystem = visionSubsystem;
     this.bargeAlignSubsystem = bargeAlignSubsystem;
-    this.canBus = new CANBus();
+    this.canBus = new CANBus("CAN FD 25-1");
 
     ledSubsystem.setState(LEDStates.NORMAL);
   }
 
   public boolean isCANivoreConnected() {
-    CANBusStatus status = canBus.getStatus("CAN FD 25-1");
+    CANBusStatus status = canBus.getStatus();
     return status.Status.isOK();
   }
 
@@ -369,6 +370,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     return false;
   }
+  // Function made so I don't cram everything into a function call in toReefAlign
+  private boolean justAlgae() {
+    boolean blueSide = driveSubsystem.getPoseMeters().getX() < DriveConstants.kFieldMaxX / 2;
+
+    return !hasCoral()
+        || (blueSide && allianceColor == Alliance.Red)
+        || (!blueSide && allianceColor == Alliance.Blue);
+  }
 
   public void toStow() {
     visionSubsystem.setYawUpdateCamera(-1);
@@ -455,13 +464,14 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
     if (scoringLevel == ScoringLevel.L1) {
       elevatorSubsystem.setPosition(RobotConstants.kElevatorL1LoadSetpoint);
-      algaeSubsystem.intakeCoral();
+
       funnelSubsystem.reverse();
       coralSubsystem.stop();
 
       setState(RobotStates.TO_ALGAE_CORAL_LOAD, false);
     } else {
       setBiscuitTransfer(RobotConstants.kFunnelSetpoint, true);
+      algaeSubsystem.holdAlgae();
       elevatorSubsystem.setPosition(RobotConstants.kElevatorFunnelSetpoint);
       coralSubsystem.intake();
       setState(RobotStates.FUNNEL_LOAD, true);
@@ -526,7 +536,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       return;
     }
 
+    boolean ignoreCoralScoring = isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT;
+
     if (drive) {
+      // TODO Test without a coral in the robot and we don't want algae
+      tagAlignSubsystem.setJustAlgae(justAlgae());
       tagAlignSubsystem.start(
           allianceColor,
           scoringLevel,
@@ -540,8 +554,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     boolean algaeSafe =
         tagAlignSubsystem.getCurRadius() > TagServoingConstants.kAlgaeStopXDriveRadius
             || tagAlignSubsystem.getState() != TagAlignStates.DRIVE;
-
-    boolean ignoreCoralScoring = isAutoPlacing && getAlgaeOnCycle && scoreSide == ScoreSide.RIGHT;
 
     if (wantAlgae && !algaeSafe) {
       algaeSubsystem.intakeAlgae();
@@ -718,6 +730,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (needSafeAlgaeTransfer(RobotStates.BARGE_ALGAE)) {
           return;
         }
+
         double poseX = driveSubsystem.getPoseMeters().getX();
         isBargeSafe =
             poseX > RobotStateConstants.kRedBargeSafeX
@@ -1105,6 +1118,20 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (scoringLevel != ScoringLevel.L1) {
           toFunnelLoad();
         }
+
+        double currentX = driveSubsystem.getPoseMeters().getX();
+
+        if (allianceColor == Alliance.Blue && currentX < RobotStateConstants.kL1FunnelLoadX
+            || allianceColor == Alliance.Red
+                && currentX > (DriveConstants.kFieldMaxX - RobotStateConstants.kL1FunnelLoadX)) {
+          if (algaeSubsystem.getState() != AlgaeStates.CORAL_INTAKE
+              && algaeSubsystem.getState() != AlgaeStates.HAS_CORAL) {
+            algaeSubsystem.intakeCoral();
+          }
+        } else if (algaeSubsystem.getState() == AlgaeStates.CORAL_INTAKE) {
+          algaeSubsystem.holdAlgae();
+        }
+
         if (algaeSubsystem.hasCoral()) {
           coralLoc = CoralLoc.ALGAE;
           toPrestage();

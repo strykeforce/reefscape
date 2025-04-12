@@ -78,12 +78,16 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
     this.yOffset = yOffset;
     this.algaeLevel = algaeLevel;
 
-    Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
-    if (tempTrajectory.isPresent()) {
-      trajectory = tempTrajectory.get();
-      pathExists = true;
+    if (trajectoryName != null) {
+      Optional<Trajectory<SwerveSample>> tempTrajectory = Choreo.loadTrajectory(trajectoryName);
+      if (tempTrajectory.isPresent()) {
+        trajectory = tempTrajectory.get();
+        pathExists = true;
+      } else {
+        logger.error("Trajectory {} not found", trajectoryName);
+        pathExists = false;
+      }
     } else {
-      logger.error("Trajectory {} not found", trajectoryName);
       pathExists = false;
     }
     org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorToProcessor", mirrorToProcessor);
@@ -197,7 +201,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
   public void end(boolean interrupted) {
     driveSubsystem.setEnableHolo(false);
 
-    if (!interrupted && !lastPath) {
+    if (!interrupted && !lastPath && pathExists) {
       driveSubsystem.calculateController(
           trajectory.sampleAt(trajectory.getTotalTime(), mirrorTrajectory).get());
     } else {
