@@ -30,6 +30,9 @@ public class RobotStateConstants {
   public static final double kClimbAngleSmall = -0.235; // -0.245
   public static final double kClimbAngleBig = -0.213; // -0.215
 
+  // Funnel load algae on
+  public static final double kL1FunnelLoadX = 2.5;
+
   // Offsets
   public static final Angle kStuckCoralElevatorOffset = Rotations.of(3.746);
   public static final Angle[][][] kBlueCoralElevatorOffset = {
