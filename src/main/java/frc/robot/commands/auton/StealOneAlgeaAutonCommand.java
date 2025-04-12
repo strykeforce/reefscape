@@ -22,7 +22,7 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
   private DriveSubsystem driveSubsystem;
   private DriveAlgaeAutonServoCommand firstPath;
   private DriveBargeAutonCommand secondPath;
-  private DriveAlgaeAutonServoCommand thirdPath;
+  private DriveAlgaeWaitAutonServoCommand thirdPath;
   private DriveBargeAutonCommand fourthPath;
   private CoralSubsystem coralSubsystem;
   private RobotStateSubsystem robotStateSubsystem;
@@ -41,6 +41,7 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
       String secondPathName,
       String thirdPathName,
       String fourthPathName,
+      ScoringLevel OppAlgeaHeight,
       Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
@@ -77,7 +78,7 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
             false);
 
     thirdPath =
-        new DriveAlgaeAutonServoCommand(
+        new DriveAlgaeWaitAutonServoCommand(
             driveSubsystem,
             tagAlignSubsystem,
             elevatorSubsystem,
@@ -89,7 +90,8 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
             true,
             false,
             0.0,
-            ScoringLevel.L2);
+            OppAlgeaHeight,
+            1.5);
 
     fourthPath =
         new DriveBargeAutonCommand(
@@ -109,7 +111,6 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
                 robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
             // new SetGyroOffsetCommand(driveSubsystem, Rotation2d.fromDegrees(180)),
             firstPath,
-            new PlaceCoralAutonCommand(robotStateSubsystem, coralSubsystem),
             secondPath,
             new AutoScoreAlgaeCommand(
                 robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
@@ -123,6 +124,9 @@ public class StealOneAlgeaAutonCommand extends SequentialCommandGroup
   @Override
   public void reassignAlliance() {
     firstPath.reassignAlliance();
+    secondPath.reassignAlliance();
+    thirdPath.reassignAlliance();
+    fourthPath.reassignAlliance();
     driveSubsystem.teleResetGyro();
     coralSubsystem.setAutoPreload();
     robotStateSubsystem.setIsAutoPlacing(false);

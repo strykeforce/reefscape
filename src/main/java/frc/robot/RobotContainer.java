@@ -255,7 +255,8 @@ public class RobotContainer {
             "GToBarge",
             "bargeToOppE",
             "OppEToOppbarge",
-            new Pose2d(7.1, 5.07, Rotation2d.fromRadians(3.14159)));
+            ScoringLevel.L3,
+            new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
 
     configureTelemetry();
     configureDriverBindings();
