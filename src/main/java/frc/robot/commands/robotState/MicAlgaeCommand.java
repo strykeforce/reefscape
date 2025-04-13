@@ -11,6 +11,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 public class MicAlgaeCommand extends Command {
   private RobotStateSubsystem robotState;
   private boolean hasTriedToPickup = false;
+  private boolean safeMoveElevator;
 
   public MicAlgaeCommand(
       RobotStateSubsystem robotState,
@@ -23,6 +24,7 @@ public class MicAlgaeCommand extends Command {
 
   @Override
   public void initialize() {
+    safeMoveElevator = robotState.safeMoveElevator();
     hasTriedToPickup = false;
     robotState.setAlgaeHeight(AlgaeHeight.HIGH);
     robotState.toAlgaeFloorPickup();
@@ -33,6 +35,6 @@ public class MicAlgaeCommand extends Command {
     if (robotState.getState() == RobotStates.MIC_ALGAE) {
       hasTriedToPickup = true;
     }
-    return robotState.getState() == RobotStates.STOW && hasTriedToPickup;
+    return !safeMoveElevator || robotState.getState() == RobotStates.STOW && hasTriedToPickup;
   }
 }

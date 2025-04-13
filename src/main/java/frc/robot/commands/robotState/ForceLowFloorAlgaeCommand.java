@@ -9,7 +9,7 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.AlgaeHeight;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
 public class ForceLowFloorAlgaeCommand extends Command {
-  RobotStateSubsystem robotState;
+  private RobotStateSubsystem robotState;
   boolean hasTriedToPickup = false;
   boolean notSafeElevator = false;
 

@@ -160,10 +160,10 @@ public class DriveAlgaeWaitAutonServoCommand extends Command implements AutoComm
         double currX = driveSubsystem.getPoseMeters().getX();
 
         if (shouldTransitionToServoing()
-                && currX > DriveConstants.kCenterLineX
-                && robotStateSubsystem.getAllianceColor() == Alliance.Blue
-            || robotStateSubsystem.getAllianceColor() == Alliance.Red
-                && currX < DriveConstants.kCenterLineX) {
+            && (currX > DriveConstants.kCenterLineX
+                    && robotStateSubsystem.getAllianceColor() == Alliance.Blue
+                || robotStateSubsystem.getAllianceColor() == Alliance.Red
+                    && currX < DriveConstants.kCenterLineX)) {
           isServoing = true;
 
           visionSubsystem.setIsAuto(true);

@@ -9,12 +9,13 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.AlgaeHeight;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
 public class ForceBargeCommand extends Command {
-  RobotStateSubsystem robotStateSubsystem;
-  ElevatorSubsystem elevatorSubsystem;
-  boolean hasTriedToPickup = false;
+  private RobotStateSubsystem robotStateSubsystem;
+  private ElevatorSubsystem elevatorSubsystem;
+  private boolean hasTriedToPickup = false;
   private RobotStates startState;
   private boolean startingElevatorFinished;
   private boolean hasEjectedToBarge;
+  private boolean safeMoveElevator;
 
   public ForceBargeCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -28,6 +29,7 @@ public class ForceBargeCommand extends Command {
 
   @Override
   public void initialize() {
+    safeMoveElevator = robotStateSubsystem.safeMoveElevator();
     hasEjectedToBarge = false;
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
@@ -39,6 +41,9 @@ public class ForceBargeCommand extends Command {
 
   @Override
   public boolean isFinished() {
+    if (!safeMoveElevator) {
+      return true;
+    }
     if (startState == RobotStates.PROCESSOR_ALGAE
         || startState == RobotStates.BARGE_ALGAE
         || hasEjectedToBarge) {

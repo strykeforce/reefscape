@@ -16,6 +16,7 @@ public class AutoReefCycleCommand extends Command {
   private TagAlignSubsystem tagAlignSubsystem;
   private DriveSubsystem driveSubsystem;
   private boolean scoringCoral;
+  private boolean safeMoveElevator;
 
   public AutoReefCycleCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -34,6 +35,7 @@ public class AutoReefCycleCommand extends Command {
 
   @Override
   public void initialize() {
+    safeMoveElevator = robotStateSubsystem.safeMoveElevator();
     driveSubsystem.setIgnoreSticks(true);
     robotStateSubsystem.toReefAlign();
     scoringCoral =
@@ -50,7 +52,8 @@ public class AutoReefCycleCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return scoringCoral
+    return !safeMoveElevator
+        || scoringCoral
             && (!robotStateSubsystem.hasCoral()
                 || robotStateSubsystem.getCoralLevel() == ScoringLevel.L1)
         || !scoringCoral && robotStateSubsystem.hasAlgae();
