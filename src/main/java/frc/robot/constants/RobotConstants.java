@@ -437,8 +437,8 @@ public class RobotConstants {
 
       CurrentLimitsConfigs current =
           new CurrentLimitsConfigs()
-              .withStatorCurrentLimit(0)
-              .withStatorCurrentLimitEnable(false)
+              .withStatorCurrentLimit(100)
+              .withStatorCurrentLimitEnable(true)
               .withSupplyCurrentLimit(20)
               .withSupplyCurrentLowerLimit(5)
               .withSupplyCurrentLowerTime(2)

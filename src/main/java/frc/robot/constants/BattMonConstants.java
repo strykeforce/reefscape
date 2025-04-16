@@ -11,18 +11,18 @@ public class BattMonConstants {
   public static final double kBattVolt1DC = 0.9;
   public static final double kBattVolt2 = 2;
   public static final double kBattVolt2DC = 0.1;
-  public static final double kBattVoltSlope = 1;
+  public static final double kBattVoltSlope = 10.01;
   // (kBattVolt1 - kBattVolt2) / (kBattVolt1DC - kBattVolt2DC);
-  public static final double kBattVoltOffset = 0; // kBattVolt1 - kBattVoltSlope * kBattVolt1DC;
+  public static final double kBattVoltOffset = 4.035; // kBattVolt1 - kBattVoltSlope * kBattVolt1DC;
 
   // Battery Current Conversion
   public static final double kBattCurrent1 = 50;
   public static final double kBattCurrent1DC = 0.9;
   public static final double kBattCurrent2 = 1;
   public static final double kBattCurrent2DC = 0.1;
-  public static final double kBattCurrentSlope = 1;
+  public static final double kBattCurrentSlope = 1088.3;
   // (kBattCurrent1 - kBattCurrent2) / (kBattCurrent1DC - kBattCurrent2DC);
-  public static final double kBattCurrentOffset = 0;
+  public static final double kBattCurrentOffset = -543.7;
   // kBattCurrent1 - kBattCurrentSlope * kBattCurrent1DC;
 
   // PDP Voltage Conversion
