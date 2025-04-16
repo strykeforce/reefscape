@@ -30,7 +30,7 @@ public class AlgaeConstants {
   public static final double kCoralHoldSpeed = -0.05;
   public static final double kBargeScoreSpeed = -1;
   public static final double kProcessorScoreSpeed = -1;
-  public static final double kCoralScoreSpeed = 0.5;
+  public static final double kCoralScoreSpeed = 0.4; // 0.5;
   public static final double kIntakingSpeed = 1; // 0.75
   public static final double kCoralIntakingSpeed = -0.3; // -0.75;
 
@@ -38,8 +38,8 @@ public class AlgaeConstants {
   public static final double kSuperCycleHasAlgaeVelThres = 40; // was 40
   public static final int kHasAlgaeCounts = 2;
 
-  public static final double kHasCoralVelThreshold = 70; // FIXME
-  public static final int kHasCoralCounts = 10; // FIXME
+  public static final double kHasCoralVelThreshold = 30;
+  public static final int kHasCoralCounts = 3;
 
   public static final double kCoralScoringTime = 1; // FIXME
 

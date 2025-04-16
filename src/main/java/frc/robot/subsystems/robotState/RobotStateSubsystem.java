@@ -382,6 +382,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void toStow() {
     visionSubsystem.setYawUpdateCamera(-1);
     visionSubsystem.setIgnoreRearCams(false);
+    visionSubsystem.setUsingLeftCam(true);
+    visionSubsystem.setUsingRightCam(true);
     biscuitSubsystem.setIsRemovingAlgae(false);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
@@ -410,6 +412,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStowSafe() {
     visionSubsystem.setIgnoreRearCams(false);
+    visionSubsystem.setUsingLeftCam(true);
+    visionSubsystem.setUsingRightCam(true);
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);
@@ -432,6 +436,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toStowSequential() {
     visionSubsystem.setIgnoreRearCams(false);
+    visionSubsystem.setUsingLeftCam(true);
+    visionSubsystem.setUsingRightCam(true);
     setBiscuitTransfer(RobotConstants.kStowSetpoint, true);
     driveSubsystem.removeDriveMultiplier();
     driveSubsystem.setIgnoreSticks(false);

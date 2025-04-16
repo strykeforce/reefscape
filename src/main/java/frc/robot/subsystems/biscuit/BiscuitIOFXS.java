@@ -56,7 +56,7 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   public BiscuitIOFXS() {
     // Logger initialization with class name
     logger = LoggerFactory.getLogger(this.getClass());
-    // Moter initialization with ID from constants
+    // Motor initialization with ID from constants
     talon = new TalonFXS(BiscuitConstants.talonID);
     // Set the starting encoder position
     sensorInitial = talon.getPosition().getValue();
@@ -85,7 +85,6 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   public void setPosition(Angle position, boolean hasAlgae) {
     if (hasAlgae != lastHadAlgae) {
       if (hasAlgae) {
-        // why is this if statement here???
         if (isRemovingAlgae) {
           configurator.apply(RobotConstants.algaeRemovalMotionConfig);
         } else {

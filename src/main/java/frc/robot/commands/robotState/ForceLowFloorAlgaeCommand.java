@@ -9,8 +9,9 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem.AlgaeHeight;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
 public class ForceLowFloorAlgaeCommand extends Command {
-  RobotStateSubsystem robotState;
+  private RobotStateSubsystem robotState;
   boolean hasTriedToPickup = false;
+  boolean notSafeElevator = false;
 
   public ForceLowFloorAlgaeCommand(
       RobotStateSubsystem robotState,
@@ -24,6 +25,7 @@ public class ForceLowFloorAlgaeCommand extends Command {
   @Override
   public void initialize() {
     hasTriedToPickup = false;
+    notSafeElevator = !robotState.safeMoveElevator();
     robotState.setAlgaeHeight(AlgaeHeight.LOW);
     robotState.toAlgaeFloorPickup();
   }
@@ -34,6 +36,6 @@ public class ForceLowFloorAlgaeCommand extends Command {
         || robotState.getState() == RobotStates.MIC_ALGAE) {
       hasTriedToPickup = true;
     }
-    return robotState.getState() == RobotStates.STOW && hasTriedToPickup;
+    return (robotState.getState() == RobotStates.STOW && hasTriedToPickup) || notSafeElevator;
   }
 }

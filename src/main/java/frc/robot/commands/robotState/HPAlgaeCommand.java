@@ -8,8 +8,9 @@ import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
 
 public class HPAlgaeCommand extends Command {
-  RobotStateSubsystem robotState;
+  private RobotStateSubsystem robotState;
   private boolean hasTriedToGrab = false;
+  private boolean safeMoveElevator;
 
   public HPAlgaeCommand(
       RobotStateSubsystem robotState,
@@ -22,6 +23,7 @@ public class HPAlgaeCommand extends Command {
 
   @Override
   public void initialize() {
+    safeMoveElevator = robotState.safeMoveElevator();
     hasTriedToGrab = false;
     robotState.toHpAlgae();
   }
@@ -31,6 +33,6 @@ public class HPAlgaeCommand extends Command {
     if (robotState.getState() == RobotStates.HP_ALGAE) {
       hasTriedToGrab = true;
     }
-    return robotState.getState() == RobotStates.STOW && hasTriedToGrab;
+    return !safeMoveElevator || robotState.getState() == RobotStates.STOW && hasTriedToGrab;
   }
 }

@@ -33,8 +33,11 @@ public class BattMonHardware implements BattMonIO {
     // inputs.pdpVoltage =
     //     pdpCycle.getOutput() * BattMonConstants.kPdpVoltSlope + BattMonConstants.kPdpVoltOffset;
     inputs.breakerTemp =
-        ((tempCycle.getHighTimeNanoseconds() / (tempCounter.getPeriod() / 1000000000))
+        ((tempCycle.getHighTimeNanoseconds() / (tempCounter.getPeriod() * 1_000_000_000))
                 - BattMonConstants.kBreakerTemp1)
             / BattMonConstants.kBreakerTemp2;
+    // (((tempCycle.getHighTimeNanoseconds() / 1_000_000_000) / tempCounter.getPeriod())
+    //         - BattMonConstants.kBreakerTemp1)
+    //     / BattMonConstants.kBreakerTemp2;
   }
 }

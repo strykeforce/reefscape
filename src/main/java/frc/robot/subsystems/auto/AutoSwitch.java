@@ -16,6 +16,7 @@ import frc.robot.commands.auton.ProcessorShallowSlowAutonCommand;
 import frc.robot.commands.auton.StealAlgaeImmediately;
 import frc.robot.commands.auton.StealOneAlgeaAutonCommand;
 import frc.robot.commands.auton.StealOneAlgeaNoSuperCycleAutonCommand;
+import frc.robot.commands.auton.StealTwoAlgeaNoSuperCycleAutonCommand;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.PathHandlerConstants;
 import frc.robot.constants.RobotConstants;
@@ -458,6 +459,26 @@ public class AutoSwitch extends MeasurableSubsystem {
             new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
       }
 
+      case 0x17 -> {
+        return new StealTwoAlgeaNoSuperCycleAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startHToH",
+            "HToOppE",
+            "OppEToOppbarge",
+            "OppBargeToOppG",
+            "OppGToOppBarge",
+            ScoringLevel.L3,
+            ScoringLevel.L2,
+            new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
+      }
+
       case 0x20 -> {
         return new ProcessorShallowSlowAutonCommand(
             driveSubsystem,
@@ -480,7 +501,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
             'e',
             true,
-            AutonConstants.kNonProcessorShallow);
+            AutonConstants.kProcessorShallow);
       }
 
       case 0x21 -> {
@@ -507,7 +528,7 @@ public class AutoSwitch extends MeasurableSubsystem {
       }
 
       case 0x22 -> {
-        return new ProcessorShallowAutonCommand(
+        return new ProcessorShallowSlowAutonCommand(
             driveSubsystem,
             pathHandler,
             robotStateSubsystem,
@@ -518,13 +539,15 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             "midStartPToESlow",
-            new ArrayList<Character>(Arrays.asList('d', 'c', 'c')),
-            new ArrayList<ScoringLevel>(
-                Arrays.asList(ScoringLevel.L4, ScoringLevel.L4, ScoringLevel.L3)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0)),
+            new ArrayList<Character>(Arrays.asList('d', 'c')),
+            new ArrayList<ScoringLevel>(Arrays.asList(ScoringLevel.L4, ScoringLevel.L4)),
+            new ArrayList<>(
+                Arrays.asList(
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance,
+                    PathHandlerConstants.kLoadLightDistance)),
+            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
             'e',
-            true,
             true,
             AutonConstants.kProcessorMid);
       }

@@ -349,7 +349,7 @@ public class RobotConstants {
 
   public static class CompConstants {
     public static Angle kElevatorFunnelSetpoint = Rotations.of(0.3676757);
-    public static Angle kElevatorL1LoadSetpoint = Rotations.of(0.63);
+    public static Angle kElevatorL1LoadSetpoint = Rotations.of(0.278); // 0.63
     public static Angle kElevatorStowSetpoint = kElevatorFunnelSetpoint;
 
     // Biscuit
@@ -437,8 +437,8 @@ public class RobotConstants {
 
       CurrentLimitsConfigs current =
           new CurrentLimitsConfigs()
-              .withStatorCurrentLimit(0)
-              .withStatorCurrentLimitEnable(false)
+              .withStatorCurrentLimit(100)
+              .withStatorCurrentLimitEnable(true)
               .withSupplyCurrentLimit(20)
               .withSupplyCurrentLowerLimit(5)
               .withSupplyCurrentLowerTime(2)

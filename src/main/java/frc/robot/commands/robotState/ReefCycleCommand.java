@@ -8,6 +8,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.RobotStates;
+import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 
 public class ReefCycleCommand extends Command {
   private RobotStateSubsystem robotStateSubsystem;
@@ -16,6 +17,7 @@ public class ReefCycleCommand extends Command {
   private RobotStates startingRobotState;
   private boolean startingElevatorFinished;
   private boolean isAutoPlacing;
+  private boolean safeMoveElevator;
 
   public ReefCycleCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -31,6 +33,7 @@ public class ReefCycleCommand extends Command {
 
   @Override
   public void initialize() {
+    safeMoveElevator = robotStateSubsystem.safeMoveElevator();
     startingRobotState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
     isAutoPlacing = robotStateSubsystem.getIsAutoPlacing();
@@ -43,12 +46,20 @@ public class ReefCycleCommand extends Command {
   @Override
   public boolean isFinished() {
 
-    if (startingRobotState == RobotStates.PRESTAGE || startingRobotState == RobotStates.STOW) {
-      return robotStateSubsystem.getState() == RobotStates.REEF_ALIGN_CORAL
-          || (!robotStateSubsystem.hasCoral() && !robotStateSubsystem.getGetAlgaeOnCycle());
+    if (startingRobotState == RobotStates.PRESTAGE
+        || startingRobotState == RobotStates.STOW
+        || startingRobotState == RobotStates.ALGAE_CORAL_LOAD
+        || startingRobotState == RobotStates.TO_ALGAE_CORAL_LOAD
+        || startingRobotState == RobotStates.TRANSFER) {
+      return !safeMoveElevator
+          || robotStateSubsystem.getState() == RobotStates.REEF_ALIGN_CORAL
+          || (!robotStateSubsystem.hasCoral()
+              && (!robotStateSubsystem.getGetAlgaeOnCycle()
+                  || robotStateSubsystem.getCoralLevel() == ScoringLevel.L1));
     }
     if (startingRobotState == RobotStates.REEF_ALIGN_CORAL) {
-      return robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
+      return !safeMoveElevator
+          || robotStateSubsystem.getState() == RobotStates.FUNNEL_LOAD
           || robotStateSubsystem.getState() == RobotStates.LOADING_CORAL
           || robotStateSubsystem.getState() == RobotStates.TO_ALGAE_CORAL_LOAD
           || robotStateSubsystem.getState() == RobotStates.ALGAE_CORAL_LOAD

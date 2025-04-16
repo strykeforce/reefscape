@@ -96,14 +96,16 @@ public final class VisionConstants {
   public static final int kCircularBufferSize = 1000;
   // Poses
   public static final Pose3d kCam1Pose =
-      new Pose3d(new Translation3d(0.305, 0.025, 0.311), new Rotation3d());
+      new Pose3d(new Translation3d(0.305, 0.0255, 0.311), new Rotation3d());
   public static final Pose3d kCam2Pose =
       new Pose3d(
           new Translation3d(-0.275, -0.21, 0.49),
           new Rotation3d(
               Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(145)));
   public static final Pose3d kCam3Pose =
-      new Pose3d(new Translation3d(0.133, -0.305, 0.311), new Rotation3d());
+      new Pose3d(
+          new Translation3d(0.133, -0.3, 0.311), // -0.305
+          new Rotation3d(0, Units.degreesToRadians(-2), Units.degreesToRadians(1)));
   public static final Pose3d kCam4Pose =
       new Pose3d(
           new Translation3d(-0.275, -0.145, 0.49),

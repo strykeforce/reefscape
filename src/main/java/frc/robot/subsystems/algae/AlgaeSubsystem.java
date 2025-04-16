@@ -126,8 +126,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
       }
       case HAS_CORAL -> {
         if (!inputs.isCoralBeamBroken) {
-          setState(AlgaeStates.EMPTY);
-          setPct(0);
+          intakeCoral();
         }
       }
       case CORAL_INTAKE -> {

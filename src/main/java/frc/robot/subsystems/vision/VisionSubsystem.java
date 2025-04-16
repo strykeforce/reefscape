@@ -130,6 +130,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     // Fill our camera array
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
       cams[i] = new WallEyeCam(camNames[i], -1);
+      acceptUpdates[i] = true;
     }
     // Initialize our udpSubscribers
     udpSubscriber[0] = new UdpSubscriber(5802, cams[0]);
@@ -152,11 +153,22 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   public void setIgnoreRearCams(boolean ignore) {
     this.ignoreRearCams = ignore;
+    acceptUpdates[1] = acceptUpdates[3] = !ignore;
   }
 
   public void setIsAuto(boolean isAuto) {
     this.isAuto = isAuto;
+    acceptUpdates[1] = acceptUpdates[3] = !isAuto;
   }
+
+  public void setUsingLeftCam(boolean useLeft) {
+    acceptUpdates[0] = useLeft;
+  }
+
+  public void setUsingRightCam(boolean useRight) {
+    acceptUpdates[2] = useRight;
+  }
+
   // Getter Methods
   public double getYawUpdateCamera() {
     return trustedCameraYawIdx;
@@ -411,7 +423,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     validResults.clear();
 
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
-      if (!ignoreRearCams && !isAuto || (i == 0 || i == 2)) {
+      if (!ignoreRearCams && !isAuto || (i == 0 || i == 2) && acceptUpdates[i]) {
         if (cams[i].hasNewUpdate()) {
           timeSinceLastUpdate = getSeconds();
           validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));

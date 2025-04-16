@@ -312,12 +312,15 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     this.driveRadius =
         algae ? TagServoingConstants.kAlgaeAlignRadius : TagServoingConstants.kCoralAlignRadius;
+
     targetPose = getTargetDrivePose(scoreLeft);
     Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
   }
 
   public void terminate() {
     driveSubsystem.stopDriving();
+    visionSubsystem.setUsingLeftCam(true);
+    visionSubsystem.setUsingRightCam(true);
     curState = TagAlignStates.DONE;
   }
 
@@ -414,11 +417,25 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             case TAG_ALIGN -> {
               if (justAlgae && (FastMath.abs(alignY.getError()) < driveYCloseEnough)) {
                 finalDrive = true;
+                if (scoreLeft) {
+                  visionSubsystem.setUsingLeftCam(false);
+                  visionSubsystem.setUsingRightCam(true);
+                } else {
+                  visionSubsystem.setUsingLeftCam(true);
+                  visionSubsystem.setUsingRightCam(false);
+                }
               } else {
                 if ((
                     /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
                     && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
                   finalDrive = true;
+                  if (scoreLeft) {
+                    visionSubsystem.setUsingLeftCam(false);
+                    visionSubsystem.setUsingRightCam(true);
+                  } else {
+                    visionSubsystem.setUsingLeftCam(true);
+                    visionSubsystem.setUsingRightCam(false);
+                  }
                 }
               }
               if (finalDrive

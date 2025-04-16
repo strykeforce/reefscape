@@ -13,6 +13,7 @@ public class ScoreAlgaeCommand extends Command {
   private RobotStates startState;
   private boolean startingElevatorFinished;
   private boolean hasEjectedToBarge;
+  private boolean safeMoveElevator;
 
   public ScoreAlgaeCommand(
       RobotStateSubsystem robotStateSubsystem,
@@ -26,6 +27,7 @@ public class ScoreAlgaeCommand extends Command {
 
   @Override
   public void initialize() {
+    safeMoveElevator = robotStateSubsystem.safeMoveElevator();
     hasEjectedToBarge = false;
     startState = robotStateSubsystem.getState();
     startingElevatorFinished = elevatorSubsystem.isFinished();
@@ -38,6 +40,9 @@ public class ScoreAlgaeCommand extends Command {
 
   @Override
   public boolean isFinished() {
+    if (!safeMoveElevator) {
+      return true;
+    }
     if (startState == RobotStates.PROCESSOR_ALGAE
         || startState == RobotStates.BARGE_ALGAE
         || hasEjectedToBarge) {
