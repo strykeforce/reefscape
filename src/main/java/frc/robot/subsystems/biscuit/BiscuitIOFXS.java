@@ -42,6 +42,7 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   private StatusSignal<ForwardLimitTypeValue> fwdLimitSwitch;
   private StatusSignal<Angle> rawQuadrature;
   private StatusSignal<Angle> rawPulseWidth;
+  // private StatusSignal<Current> statorCurrent;
   private boolean didZero;
   private boolean fwdLimitSwitchOpen;
   private Angle offset;
@@ -73,6 +74,8 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
     rawQuadrature.setUpdateFrequency(20);
     rawPulseWidth = talon.getRawPulseWidthPosition();
     rawPulseWidth.setUpdateFrequency(200);
+    // statorCurrent = talon.getStatorCurrent();
+    // statorCurrent.setUpdateFrequency(4);
     zero();
   }
 

@@ -437,12 +437,12 @@ public class RobotConstants {
 
       CurrentLimitsConfigs current =
           new CurrentLimitsConfigs()
-              .withStatorCurrentLimit(100)
+              .withStatorCurrentLimit(60)
               .withStatorCurrentLimitEnable(true)
               .withSupplyCurrentLimit(20)
               .withSupplyCurrentLowerLimit(5)
               .withSupplyCurrentLowerTime(2)
-              .withSupplyCurrentLimitEnable(true);
+              .withSupplyCurrentLimitEnable(false);
       fxsConfig.CurrentLimits = current;
 
       HardwareLimitSwitchConfigs hwLimit =
