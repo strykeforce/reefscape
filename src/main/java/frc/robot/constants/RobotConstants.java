@@ -349,7 +349,7 @@ public class RobotConstants {
 
   public static class CompConstants {
     public static Angle kElevatorFunnelSetpoint = Rotations.of(0.3676757);
-    public static Angle kElevatorL1LoadSetpoint = Rotations.of(0.278); // 0.63
+    public static Angle kElevatorL1LoadSetpoint = Rotations.of(0.278 + 0.352); // 0.278
     public static Angle kElevatorStowSetpoint = kElevatorFunnelSetpoint;
 
     // Biscuit
@@ -366,7 +366,7 @@ public class RobotConstants {
     // Idle
     public static Angle kBiscuitStowSetpoint = Rotations.of(1.862 / 2);
     public static Angle kFunnelSetpoint = kBiscuitStowSetpoint;
-    public static Angle kL1CoralLoadSetpoint = Rotations.of(6.29); // 0.05 is about an inch
+    public static Angle kL1CoralLoadSetpoint = Rotations.of(6.29 + 0.25); //  was 6.29
     public static Angle kPrestageSetpoint = Rotations.of(-2.94);
     public static Angle kPrestageAlgaeSetpoint = kBiscuitStowSetpoint;
 

@@ -348,10 +348,11 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToI", "bargeToE")),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
-            new ArrayList<Double>(Arrays.asList(0.5, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "EToNearBarge")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            0.5);
       }
 
       case 0x11 -> {
@@ -369,7 +370,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "IToNearBarge")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            0.5);
       }
 
       case 0x12 -> {
@@ -387,7 +389,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "bargeAway")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            2.0);
       }
 
       case 0x13 -> {
@@ -405,7 +408,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "bargeAway")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            2.0);
       }
 
       case 0x14 -> {
