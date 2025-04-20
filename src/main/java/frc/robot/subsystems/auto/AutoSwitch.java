@@ -282,7 +282,7 @@ public class AutoSwitch extends MeasurableSubsystem {
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance)),
-            new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(-0.0075, -0.0075, -0.0075)),
             'j',
             false,
             AutonConstants.kNonProcessorMid);
@@ -366,12 +366,12 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToE", "bargeToI")),
-            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(-0.00475, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "IToNearBarge")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
-            0.5);
+            0.0);
       }
 
       case 0x12 -> {
@@ -550,7 +550,7 @@ public class AutoSwitch extends MeasurableSubsystem {
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(-0.0075, -0.0075, -0.0075)),
             'e',
             true,
             AutonConstants.kProcessorMid);

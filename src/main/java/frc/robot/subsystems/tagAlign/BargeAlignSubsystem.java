@@ -83,8 +83,17 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
   private boolean shouldRaiseElevator() {
     double poseX = driveSubsystem.getPoseMeters().getX();
     return isOnBlueSide
-        ? poseX > BargeAlignConstants.kBlueRaiseElevatorX
-        : poseX < BargeAlignConstants.kRedRaiseElevatorX;
+        ? (poseX > BargeAlignConstants.kBlueRaiseElevatorX
+            && poseX <= BargeAlignConstants.kBlueUnsafeX)
+        : (poseX < BargeAlignConstants.kRedRaiseElevatorX
+            && poseX >= BargeAlignConstants.kRedUnsafeX);
+  }
+
+  private boolean shouldDriveBackwards() {
+    double poseX = driveSubsystem.getPoseMeters().getX();
+    return isOnBlueSide
+        ? poseX > BargeAlignConstants.kBlueUnsafeX
+        : poseX < BargeAlignConstants.kRedUnsafeX;
   }
 
   private boolean shouldEjectAlgae() {
@@ -131,6 +140,8 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         Logger.recordOutput("BargeAlign/Vomega", vOmega);
         if (shouldRaiseElevator()) {
           setState(BargeAlignStates.RAISE_ELEV);
+        } else if (shouldDriveBackwards()) {
+          setState(BargeAlignStates.REVERSE);
         }
       }
       case RAISE_ELEV -> {
@@ -146,14 +157,18 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         }
       }
       case REVERSE -> {
-        if (isOnBlueSide) {
-          driveSubsystem.move(
-              -vX, getYStickReading(), BargeAlignConstants.kBlueRaiseElevatorX, true);
-          if (shouldRaiseElevator()) {
-            setState(BargeAlignStates.RAISE_ELEV);
-          }
-        } else {
-          driveSubsystem.move(vX, getYStickReading(), BargeAlignConstants.kRedRaiseElevatorX, true);
+        double vOmega =
+            driveOmega.calculate(
+                driveSubsystem.getPoseMeters().getRotation().getRadians(), targetYaw.getRadians());
+
+        driveSubsystem.move(-vX, getYStickReading(), vOmega, true);
+
+        Logger.recordOutput("BargeAlign/Vx", vX);
+        Logger.recordOutput("BargeAlign/OmegaErr", driveOmega.getError());
+        Logger.recordOutput("BargeAlign/Vomega", vOmega);
+
+        if (shouldRaiseElevator()) {
+          setState(BargeAlignStates.RAISE_ELEV);
         }
       }
       case FINISHED -> {}
