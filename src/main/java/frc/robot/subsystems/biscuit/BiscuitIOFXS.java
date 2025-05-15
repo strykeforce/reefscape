@@ -6,7 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfigurator;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import edu.wpi.first.math.MathUtil;
@@ -51,8 +51,8 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
   private boolean isRemovingAlgae = false;
 
   private TalonFXSConfigurator configurator;
-  private MotionMagicDutyCycle positionRequest =
-      new MotionMagicDutyCycle(0).withEnableFOC(false).withFeedForward(0);
+  private MotionMagicVoltage positionRequest =
+      new MotionMagicVoltage(0).withEnableFOC(false).withFeedForward(0);
 
   public BiscuitIOFXS() {
     // Logger initialization with class name
