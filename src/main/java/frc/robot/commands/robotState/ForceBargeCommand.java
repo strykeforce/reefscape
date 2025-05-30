@@ -58,7 +58,7 @@ public class ForceBargeCommand extends Command {
       return robotStateSubsystem.getState() == RobotStates.PROCESSOR_ALGAE
           || (robotStateSubsystem.getState() == RobotStates.BARGE_ALGAE
               && !robotStateSubsystem.getIsAutoPlacing())
-          || !robotStateSubsystem.getIsBargeSafe();
+      /*|| !robotStateSubsystem.getIsBargeSafe() */ ;
     }
   }
 }

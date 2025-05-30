@@ -741,18 +741,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         isBargeSafe =
             poseX > RobotStateConstants.kRedBargeSafeX
                 || poseX < RobotStateConstants.kBlueBargeSafeX;
-        if (isBargeSafe) {
-          driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
-          if (isAutoPlacing) {
-            setAutoPlacingLed(true);
-            driveSubsystem.setIgnoreSticks(true);
-            bargeAlignSubsystem.startBargeAlign(allianceColor);
-            setState(RobotStates.BARGE_ALIGN);
-          } else {
-            elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
-            setState(RobotStates.TO_BARGE_ALGAE);
-          }
+        // if (isBargeSafe) {
+        driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
+        if (isAutoPlacing) {
+          setAutoPlacingLed(true);
+          driveSubsystem.setIgnoreSticks(true);
+          bargeAlignSubsystem.startBargeAlign(allianceColor);
+          setState(RobotStates.BARGE_ALIGN);
+        } else {
+          elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
+          setState(RobotStates.TO_BARGE_ALGAE);
         }
+        // }
       }
     }
   }
