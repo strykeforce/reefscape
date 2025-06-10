@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.laser.LaserSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.Set;
@@ -22,6 +23,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DriveSubsystem.class);
   private DriveSubsystem driveSubsystem;
   private VisionSubsystem visionSubsystem;
+  private LaserSubsystem laserSubsystem;
 
   private PIDController driveX;
   private PIDController driveY;
@@ -51,11 +53,13 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private double coralOffset = 0;
   private double noProgressCounts = 0;
   private double yAutoOffset = 0;
+  private boolean behindCoral = false;
   private boolean justAlgae = false;
 
-  public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
+  public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, LaserSubsystem laserSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.visionSubsystem = visionSubsystem;
+    this.laserSubsystem = laserSubsystem;
 
     this.driveX = new PIDController(4, 0, 0);
     this.driveY = new PIDController(4, 0, 0);
@@ -211,6 +215,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return yawError;
   }
 
+  public boolean getBehindCoral() {
+    return behindCoral;
+  }
+
   public boolean isFinalDrive() {
     return finalDrive;
   }
@@ -220,8 +228,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public boolean fixableStuckCoral() {
-    return FastMath.abs(getCurRadius() - TagServoingConstants.kCoralStuckRadius)
-        < TagServoingConstants.kCoralStuckAllowence;
+    return laserSubsystem.getDistance() < TagServoingConstants.kCoralStuckDistance;
   }
 
   public boolean isAligned() {
@@ -437,6 +444,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                     visionSubsystem.setUsingRightCam(false);
                   }
                 }
+              } else if (stalled() && fixableStuckCoral() && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
+                finalDrive = true;
+                behindCoral = true;
               }
               if (finalDrive
                   && driveSubsystem.getAvgDriveCurrent()
@@ -505,6 +515,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     DRIVE,
     WAITING,
     TAG_ALIGN,
+    
     DONE
   }
 }

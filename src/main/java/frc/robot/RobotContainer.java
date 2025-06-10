@@ -91,6 +91,8 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem.ElevatorStates;
 import frc.robot.subsystems.funnel.FunnelIOFXS;
 import frc.robot.subsystems.funnel.FunnelSubsystem;
+import frc.robot.subsystems.laser.LaserIOCANRange;
+import frc.robot.subsystems.laser.LaserSubsystem;
 import frc.robot.subsystems.led.LEDIO;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.pathHandler.PathHandler;
@@ -137,6 +139,9 @@ public class RobotContainer {
 
   private final LEDIO ledIO;
   private final LEDSubsystem ledSubsystem;
+
+  private final LaserIOCANRange laserIO;
+  private final LaserSubsystem laserSubsystem;
 
   private final TagAlignSubsystem tagAlignSubsystem;
   private final BargeAlignSubsystem bargeAlignSubsystem;
@@ -199,6 +204,9 @@ public class RobotContainer {
 
     ledIO = new LEDIO();
     ledSubsystem = new LEDSubsystem(ledIO);
+
+    laserIO = new LaserIOCANRange();
+    laserSubsystem = new LaserSubsystem(laserIO);
 
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
