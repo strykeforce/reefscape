@@ -56,7 +56,10 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private boolean behindCoral = false;
   private boolean justAlgae = false;
 
-  public TagAlignSubsystem(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, LaserSubsystem laserSubsystem) {
+  public TagAlignSubsystem(
+      DriveSubsystem driveSubsystem,
+      VisionSubsystem visionSubsystem,
+      LaserSubsystem laserSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.visionSubsystem = visionSubsystem;
     this.laserSubsystem = laserSubsystem;
@@ -431,6 +434,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                   visionSubsystem.setUsingLeftCam(true);
                   visionSubsystem.setUsingRightCam(false);
                 }
+              } else if (stalled()
+                  && fixableStuckCoral()
+                  && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
+                finalDrive = true;
+                behindCoral = true;
               } else {
                 if ((
                     /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
@@ -444,9 +452,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
                     visionSubsystem.setUsingRightCam(false);
                   }
                 }
-              } else if (stalled() && fixableStuckCoral() && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
-                finalDrive = true;
-                behindCoral = true;
               }
               if (finalDrive
                   && driveSubsystem.getAvgDriveCurrent()
@@ -515,7 +520,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     DRIVE,
     WAITING,
     TAG_ALIGN,
-    
+
     DONE
   }
 }

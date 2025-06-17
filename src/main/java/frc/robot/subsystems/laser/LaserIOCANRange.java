@@ -8,7 +8,7 @@ import frc.robot.constants.LaserConstants;
 public class LaserIOCANRange implements LaserIO {
   private CANrange laser;
 
-  public void LaserIO() {
+  public LaserIOCANRange() {
     laser = new CANrange(LaserConstants.LaserCanId);
     laser.getConfigurator().apply(LaserConstants.getLaserConfig());
   }

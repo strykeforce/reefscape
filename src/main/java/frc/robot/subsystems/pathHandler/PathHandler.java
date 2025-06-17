@@ -172,7 +172,6 @@ public class PathHandler extends MeasurableSubsystem {
     mirrorTrajectory = driveSubsystem.shouldFlip();
     Optional<Trajectory<SwerveSample>> temp;
     for (int i = 0; i < 12; i++) {
-      logger.info(i + "");
       temp = Choreo.loadTrajectory(pathNames[0][i]);
       if (!temp.isEmpty()) {
         fetchPaths.add(temp.get());

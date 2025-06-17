@@ -210,7 +210,7 @@ public class RobotContainer {
 
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
-    tagAlignSubsystem = new TagAlignSubsystem(driveSubsystem, visionSubsystem);
+    tagAlignSubsystem = new TagAlignSubsystem(driveSubsystem, visionSubsystem, laserSubsystem);
     bargeAlignSubsystem = new BargeAlignSubsystem(flysky, driveSubsystem);
 
     robotStateSubsystem =
@@ -308,6 +308,7 @@ public class RobotContainer {
     biscuitSubsystem.registerWith(telemetryService);
     ledSubsystem.registerWith(telemetryService);
     climbSubsystem.registerWith(telemetryService);
+    laserSubsystem.registerWith(telemetryService);
     telemetryService.start();
   }
 

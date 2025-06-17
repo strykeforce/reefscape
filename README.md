@@ -36,7 +36,8 @@
 | Funnel    | FXS      | rollers                   | 40  | rio     |          |           | Minion |         |
 | Climb     | FX       | frontMain                 | 45  | rio     |          |           | Minion |         |
 | Climb     | FX       | backFollow                | 46  | rio     |          |           | kraken |         |
-| Climb     | CANcoder | CANCoder                  | 47  | ri0     |          |           | n/a    |         |
+| Climb     | CANcoder | CANCoder                  | 47  | rio     |          |           | n/a    |         |
+| Laser     | CANRange | CANRange                  | 50  | rio     |          |           | n/a    |         |
 | -         | -        | rio                       | -   | both    |          | 12        |        |         |
 | -         | -        | vrm (radio, pigeon)       | -   | -       |          | 13        |        |         |
 | -         | -        | custom circuit (pi power) | -   | -       |          |           |        |         |
