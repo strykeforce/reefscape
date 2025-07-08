@@ -110,6 +110,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
   private boolean[] acceptUpdates = new boolean[VisionConstants.kNumCams];
   private boolean ignoreRearCams = false;
   private boolean isAuto = false;
+  private int trustedReefTag = -1;
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
@@ -135,7 +136,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
     // Initialize our udpSubscribers
     udpSubscriber[0] = new UdpSubscriber(5802, cams[0]);
     udpSubscriber[1] = new UdpSubscriber(5803, cams[2]);
-    udpSubscriber[2] = new UdpSubscriber(5804, cams[1], cams[3], cams[4]);
+    udpSubscriber[2] = new UdpSubscriber(5804, cams[1], cams[3]);
   }
   // Setter Methods
   public void setVisionUpdating(boolean updating) {
@@ -167,6 +168,11 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   public void setUsingRightCam(boolean useRight) {
     acceptUpdates[2] = useRight;
+  }
+
+  public void setTrustedTag(int trusted) {
+    this.trustedReefTag = trusted;
+    Logger.recordOutput("Vision/trusted reef tag", trustedReefTag);
   }
 
   // Getter Methods
@@ -423,11 +429,26 @@ public class VisionSubsystem extends MeasurableSubsystem {
     validResults.clear();
 
     for (int i = 0; i < VisionConstants.kNumCams; i++) {
-      if (!ignoreRearCams && !isAuto || (i == 0 || i == 2) && acceptUpdates[i]) {
+      if (!ignoreRearCams && !isAuto || (i == 0 || i == 2)) {
+        boolean seeGoodTag = false;
+
         if (cams[i].hasNewUpdate()) {
-          timeSinceLastUpdate = getSeconds();
-          validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
-          lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+          if (!acceptUpdates[i] && (i == 0 || i == 2)) {
+            var tags = ((WallEyeTagResult) cams[i].getResults()).getTagIDs();
+            for (int j = 0; j < tags.length; j++) {
+              if (tags[j] == trustedReefTag) {
+                seeGoodTag = true;
+                break;
+              }
+            }
+          }
+
+          if (((acceptUpdates[i] || seeGoodTag) && (i == 0 || i == 2))
+              || ((i == 1 || i == 3) && !ignoreRearCams && !isAuto)) {
+            timeSinceLastUpdate = getSeconds();
+            validResults.add(new Pair<WallEyeResult, Integer>(cams[i].getResults(), i));
+            lastResult[i] = (WallEyeTagResult) cams[i].getResults();
+          }
         }
       }
     }

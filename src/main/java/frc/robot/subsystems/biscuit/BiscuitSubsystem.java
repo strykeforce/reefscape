@@ -100,7 +100,16 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
       case NORMAL:
         if (isFinished()
             && FastMath.abs(inputs.velocity) <= BiscuitConstants.kZeroVelThresh
-            && setPoint != prevSetPoint) curState = BiscuitState.CHECK_ZERO;
+            && prevSetPoint != setPoint) {
+          if (FastMath.abs(RobotConstants.kMicAlgaeSetpoint.minus(setPoint).in(Rotations))
+                  < BiscuitConstants.kCloseEnough
+              || FastMath.abs(RobotConstants.kProcessorSetpoint.minus(setPoint).in(Rotations))
+                  < BiscuitConstants.kCloseEnough) {
+            curState = BiscuitState.CHECK_ZERO;
+          } else {
+            prevSetPoint = setPoint;
+          }
+        }
         break;
       case CHECK_ZERO:
         prevSetPoint = setPoint;
