@@ -295,10 +295,24 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   private void tagAlign() {
+    boolean blueSide = driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2);
+
     alignX.reset();
     alignY.reset();
 
     curState = TagAlignStates.TAG_ALIGN;
+
+    if (scoreLeft) {
+      visionSubsystem.setUsingLeftCam(false);
+      visionSubsystem.setUsingRightCam(true);
+    } else {
+      visionSubsystem.setUsingLeftCam(true);
+      visionSubsystem.setUsingRightCam(false);
+    }
+
+    visionSubsystem.setTrustedTag(
+        (blueSide ? TagServoingConstants.kBlueTargetTag : TagServoingConstants.kRedTargetTag)
+            [(fieldRelHexant + (blueSide ? 0 : 3)) % 6]);
 
     this.driveXCloseEnough =
         algae
@@ -319,6 +333,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public void terminate() {
     driveSubsystem.stopDriving();
+    visionSubsystem.setTrustedTag(-1);
     visionSubsystem.setUsingLeftCam(true);
     visionSubsystem.setUsingRightCam(true);
     curState = TagAlignStates.DONE;
@@ -417,25 +432,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             case TAG_ALIGN -> {
               if (justAlgae && (FastMath.abs(alignY.getError()) < driveYCloseEnough)) {
                 finalDrive = true;
-                if (scoreLeft) {
-                  visionSubsystem.setUsingLeftCam(false);
-                  visionSubsystem.setUsingRightCam(true);
-                } else {
-                  visionSubsystem.setUsingLeftCam(true);
-                  visionSubsystem.setUsingRightCam(false);
-                }
               } else {
                 if ((
                     /*isAuto ? true :*/ FastMath.abs(alignX.getError()) < driveXCloseEnough)
                     && FastMath.abs(alignY.getError()) < driveYCloseEnough) {
                   finalDrive = true;
-                  if (scoreLeft) {
-                    visionSubsystem.setUsingLeftCam(false);
-                    visionSubsystem.setUsingRightCam(true);
-                  } else {
-                    visionSubsystem.setUsingLeftCam(true);
-                    visionSubsystem.setUsingRightCam(false);
-                  }
                 }
               }
               if (finalDrive

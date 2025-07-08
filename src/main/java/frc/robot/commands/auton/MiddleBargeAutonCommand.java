@@ -44,7 +44,8 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       List<Double> delays,
       List<String> bargePaths,
       List<RobotStateSubsystem.ScoringLevel> algaeLevels,
-      Pose2d startPose) {
+      Pose2d startPose,
+      double startDelay) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
     this.driveSubsystem = driveSubsystem;
@@ -57,7 +58,8 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
 
     addCommands(
         new PrepOdomForAutoCommand(
-            robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose));
+            robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
+        new WaitCommand(startDelay));
 
     for (int i = 0; i < grabPaths.size(); i++) {
       boolean last = i == grabPaths.size() - 1;

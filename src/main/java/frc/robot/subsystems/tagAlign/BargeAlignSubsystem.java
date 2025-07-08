@@ -39,12 +39,12 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
 
   public void startBargeAlign(Alliance alliance) {
     this.alliance = alliance;
-    if (isSafe()) {
-      this.isOnBlueSide = isOnBlueSide();
-      setState(BargeAlignStates.DRIVE);
-      setupBargeAlign();
-      driveOmega.reset();
-    }
+    // if (isSafe()) {
+    this.isOnBlueSide = isOnBlueSide();
+    setState(BargeAlignStates.DRIVE);
+    setupBargeAlign();
+    driveOmega.reset();
+    // }
   }
 
   public void killBargeAlign() {
@@ -83,8 +83,24 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
   private boolean shouldRaiseElevator() {
     double poseX = driveSubsystem.getPoseMeters().getX();
     return isOnBlueSide
-        ? poseX > BargeAlignConstants.kBlueRaiseElevatorX
-        : poseX < BargeAlignConstants.kRedRaiseElevatorX;
+        ? (poseX > BargeAlignConstants.kBlueRaiseElevatorX
+            && poseX <= BargeAlignConstants.kBlueUnsafeX)
+        : (poseX < BargeAlignConstants.kRedRaiseElevatorX
+            && poseX >= BargeAlignConstants.kRedUnsafeX);
+  }
+
+  private boolean shouldDriveBackwards() {
+    double poseX = driveSubsystem.getPoseMeters().getX();
+    return isOnBlueSide
+        ? poseX > BargeAlignConstants.kBlueUnsafeX
+        : poseX < BargeAlignConstants.kRedUnsafeX;
+  }
+
+  private boolean shouldStopDrivingBackwards() {
+    double poseX = driveSubsystem.getPoseMeters().getX();
+    return isOnBlueSide
+        ? poseX < BargeAlignConstants.kBlueRevDoneX
+        : poseX > BargeAlignConstants.kRedRevDoneX;
   }
 
   private boolean shouldEjectAlgae() {
@@ -131,6 +147,8 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         Logger.recordOutput("BargeAlign/Vomega", vOmega);
         if (shouldRaiseElevator()) {
           setState(BargeAlignStates.RAISE_ELEV);
+        } else if (shouldDriveBackwards()) {
+          setState(BargeAlignStates.REVERSE);
         }
       }
       case RAISE_ELEV -> {
@@ -146,14 +164,18 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         }
       }
       case REVERSE -> {
-        if (isOnBlueSide) {
-          driveSubsystem.move(
-              -vX, getYStickReading(), BargeAlignConstants.kBlueRaiseElevatorX, true);
-          if (shouldRaiseElevator()) {
-            setState(BargeAlignStates.RAISE_ELEV);
-          }
-        } else {
-          driveSubsystem.move(vX, getYStickReading(), BargeAlignConstants.kRedRaiseElevatorX, true);
+        double vOmega =
+            driveOmega.calculate(
+                driveSubsystem.getPoseMeters().getRotation().getRadians(), targetYaw.getRadians());
+        double revX = BargeAlignConstants.kXRevSpeed * (isOnBlueSide ? -1 : 1);
+        driveSubsystem.move(revX, getYStickReading(), vOmega, true);
+
+        Logger.recordOutput("BargeAlign/Vx", revX);
+        Logger.recordOutput("BargeAlign/OmegaErr", driveOmega.getError());
+        Logger.recordOutput("BargeAlign/Vomega", vOmega);
+
+        if (shouldStopDrivingBackwards()) {
+          setState(BargeAlignStates.RAISE_ELEV);
         }
       }
       case FINISHED -> {}
