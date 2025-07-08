@@ -304,7 +304,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("EToBarge", "GToBarge", "bargeAway")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L2, ScoringLevel.L3)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kDeepBarge);
       }
 
         // case 0x03 -> {

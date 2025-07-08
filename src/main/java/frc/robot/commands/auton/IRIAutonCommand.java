@@ -10,6 +10,7 @@ import frc.robot.commands.drive.PrepOdomForAutoCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
 import frc.robot.commands.robotState.ForceBargeCommand;
+import frc.robot.commands.robotState.ForceLowFloorAlgaeCommand;
 import frc.robot.commands.robotState.SetAutoPlacingCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
@@ -63,6 +64,7 @@ public class IRIAutonCommand extends SequentialCommandGroup implements AutoComma
             new PrepOdomForAutoCommand(
                 robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(90.0), startPose),
             new ZeroElevatorCommand(elevatorSubsystem)),
+        new ForceLowFloorAlgaeCommand(robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
         new SetAutoPlacingCommand(robotStateSubsystem, true),
         new ForceBargeCommand(
             robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
