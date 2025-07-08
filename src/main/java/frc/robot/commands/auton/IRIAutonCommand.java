@@ -64,7 +64,8 @@ public class IRIAutonCommand extends SequentialCommandGroup implements AutoComma
             new PrepOdomForAutoCommand(
                 robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(90.0), startPose),
             new ZeroElevatorCommand(elevatorSubsystem)),
-        new ForceLowFloorAlgaeCommand(robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
+        new ForceLowFloorAlgaeCommand(
+            robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
         new SetAutoPlacingCommand(robotStateSubsystem, true),
         new ForceBargeCommand(
             robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),

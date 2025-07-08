@@ -1182,6 +1182,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   FastMath.pow2(currentPose.getX() - processorReleasePose.getX())
                       + FastMath.pow2(currentPose.getY() - processorReleasePose.getY()));
           Logger.recordOutput("RobotState/Processor Release Distance", distanceFromRelease);
+          algaeSubsystem.holdAlgae(); // stop wheels once algae is out
 
           if (distanceFromRelease > RobotStateConstants.kProcessorStowRadius) {
             isEjectingAlgae = false;
