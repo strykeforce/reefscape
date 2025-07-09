@@ -55,6 +55,7 @@
 | Coral     | wheels  | 35  | REV     | Coral partially in |
 | Coral     | wheels  | 35  | FWD     | Coral fully in     |
 | Algae     | algae   | 30  | FWD     | Algae in claw      |
+| Algae     | algae   | 30  | REV     | Lvl 1 Coral in     |
 
 
 ## Roborio
