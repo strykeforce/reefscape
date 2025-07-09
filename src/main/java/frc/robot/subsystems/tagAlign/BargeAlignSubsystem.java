@@ -39,12 +39,12 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
 
   public void startBargeAlign(Alliance alliance) {
     this.alliance = alliance;
-    if (isSafe()) {
-      this.isOnBlueSide = isOnBlueSide();
-      setState(BargeAlignStates.DRIVE);
-      setupBargeAlign();
-      driveOmega.reset();
-    }
+    // if (isSafe()) {
+    this.isOnBlueSide = isOnBlueSide();
+    setState(BargeAlignStates.DRIVE);
+    setupBargeAlign();
+    driveOmega.reset();
+    // }
   }
 
   public void killBargeAlign() {
@@ -94,6 +94,13 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
     return isOnBlueSide
         ? poseX > BargeAlignConstants.kBlueUnsafeX
         : poseX < BargeAlignConstants.kRedUnsafeX;
+  }
+
+  private boolean shouldStopDrivingBackwards() {
+    double poseX = driveSubsystem.getPoseMeters().getX();
+    return isOnBlueSide
+        ? poseX < BargeAlignConstants.kBlueRevDoneX
+        : poseX > BargeAlignConstants.kRedRevDoneX;
   }
 
   private boolean shouldEjectAlgae() {
@@ -160,14 +167,14 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
         double vOmega =
             driveOmega.calculate(
                 driveSubsystem.getPoseMeters().getRotation().getRadians(), targetYaw.getRadians());
+        double revX = BargeAlignConstants.kXRevSpeed * (isOnBlueSide ? -1 : 1);
+        driveSubsystem.move(revX, getYStickReading(), vOmega, true);
 
-        driveSubsystem.move(-vX, getYStickReading(), vOmega, true);
-
-        Logger.recordOutput("BargeAlign/Vx", vX);
+        Logger.recordOutput("BargeAlign/Vx", revX);
         Logger.recordOutput("BargeAlign/OmegaErr", driveOmega.getError());
         Logger.recordOutput("BargeAlign/Vomega", vOmega);
 
-        if (shouldRaiseElevator()) {
+        if (shouldStopDrivingBackwards()) {
           setState(BargeAlignStates.RAISE_ELEV);
         }
       }
