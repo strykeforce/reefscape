@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
+import frc.robot.commands.auton.IRIAutonCommand;
 import frc.robot.commands.auton.MiddleBargeAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
@@ -286,6 +287,24 @@ public class AutoSwitch extends MeasurableSubsystem {
             'j',
             false,
             AutonConstants.kNonProcessorMid);
+      }
+
+      case 0x03 -> {
+        return new IRIAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            new ArrayList<String>(Arrays.asList("deepBargeToE", "bargeToG", null)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<String>(Arrays.asList("EToBarge", "GToBarge", "bargeAway")),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L2, ScoringLevel.L3)),
+            AutonConstants.kDeepBarge);
       }
 
         // case 0x03 -> {
