@@ -514,7 +514,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             "startBargeToG",
             "GToBarge",
             "bargeToOppG",
-            "OppGToOppbarge",
+            "OppGToOppBarge",
             ScoringLevel.L2,
             new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
       }
