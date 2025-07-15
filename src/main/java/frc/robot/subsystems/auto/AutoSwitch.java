@@ -501,6 +501,23 @@ public class AutoSwitch extends MeasurableSubsystem {
             ScoringLevel.L2,
             new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
       }
+      case 0x18 -> {
+        return new StealOneAlgeaAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startBargeToG",
+            "GToBarge",
+            "bargeToOppG",
+            "OppGToOppBarge",
+            ScoringLevel.L2,
+            new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
+      }
 
       case 0x20 -> {
         return new ProcessorShallowSlowAutonCommand(

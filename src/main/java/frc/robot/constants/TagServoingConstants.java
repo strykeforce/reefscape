@@ -101,6 +101,8 @@ public class TagServoingConstants {
   public static final double kCoralStuckAllowence = 0.03;
 
   // Reef
-  public static final Translation2d kBlueReefPose = new Translation2d(4.489323, 4.0259);
-  public static final Translation2d kRedReefPose = new Translation2d(13.058902, 4.0259);
+  public static final Translation2d kBlueReefPose =
+      new Translation2d(4.489323, 4.0259); // welded: 4.489323, 4.0259, AM: 4.489323, 4.02082
+  public static final Translation2d kRedReefPose =
+      new Translation2d(13.058902, 4.0259); // welded: 13.058902, 4.0259, AM: 13.058902, 4.02082
 }
