@@ -2,6 +2,17 @@
 
 [![CI](https://github.com/strykeforce/reefscape/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/reefscape/actions/workflows/main.yml)
 
+
+
+<p align="left">
+  <img alt="pic1" src="docs/IMG_WM25-013.jpg" width="20%">
+&nbsp; &nbsp;
+  <img alt="skystriker-2" src="docs/IMG_WM25-491.jpg" width="20%">
+</p>
+
+![steal1](docs/Einstein_5__2025_FIRST_Championship.gif)
+![steal2](docs/Steal2AlgaeGIF.gif)
+
 ## Controls
 
 ### Driver Controller
@@ -14,6 +25,9 @@
 
 ### Robot State
 ![robotState](docs/reefscape-RobotState-Light.png)
+
+### Tag Align
+![tagAlignState](docs/reefscape-Tag%20Align-Light.png)
 
 
 ## CAN Bus
