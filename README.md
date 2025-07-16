@@ -5,9 +5,9 @@
 
 
 <p align="left">
-  <img alt="pic1" src="docs/IMG_WM25-013.jpg" width="20%">
+  <img alt="pic1" src="docs/IMG_WM25-013.jpg" width="30%">
 &nbsp; &nbsp;
-  <img alt="skystriker-2" src="docs/IMG_WM25-491.jpg" width="20%">
+  <img alt="skystriker-2" src="docs/IMG_WM25-491.jpg" width="30%">
 </p>
 
 ![steal1](docs/Einstein_5__2025_FIRST_Championship.gif)
@@ -27,8 +27,7 @@
 ![robotState](docs/reefscape-RobotState-Light.png)
 
 ### Tag Align
-![tagAlignState](docs/reefscape-Tag%20Align-Light.png)
-
+<img alt="tagAlign" src="docs/reefscape-Tag Align-Light.png" width="250">
 
 ## CAN Bus
 
