@@ -998,9 +998,10 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case SWITCH_ALGAE_LEVEL -> {
         if (biscuitSubsystem.getPosition().in(Rotations)
-            <= RobotConstants.kL2AlgaeSetpoint.in(Rotations)) {
-          elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
-          if(elevatorSubsystem.isFinished()){
+            <= RobotConstants.kStowSetpoint.in(Rotations)) {
+          elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeSetpoint);
+          if (elevatorSubsystem.isFinished()) {
+            biscuitSubsystem.setPosition(RobotConstants.kL2AlgaeSetpoint, false);
             curState = RobotStates.REEF_ALIGN_ALGAE;
           }
         }
