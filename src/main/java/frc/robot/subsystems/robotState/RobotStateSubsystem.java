@@ -151,10 +151,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     return allianceColor;
   }
 
-  public ScoringLevel getAlgaeLevel() {
-    return isAuto
-        ? autoAlgaeLevel
-        : (tagAlignSubsystem.computeHexant() % 2) == 0 ? ScoringLevel.L3 : ScoringLevel.L2;
+  public ScoringLevel getCurrentAlgaeLevel() {
+    return (elevatorSubsystem.getSetPoint()).in(Rotations)
+            > (ElevatorConstants.kAlgaeLevel).in(Rotations)
+        ? ScoringLevel.L3
+        : ScoringLevel.L2;
   }
   // (tagAlignSubsystem.computeHexant() % 2) == 0 ? ScoringLevel.L3 : ScoringLevel.L2
   // This is a useful tool we'll need later
@@ -578,7 +579,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         case L3 -> {
           elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeSetpoint);
         }
-        default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
       }
     }
 
@@ -604,7 +604,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           setBiscuitTransfer(RobotConstants.kL3AlgaeSetpoint, true);
           elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeSetpoint);
         }
-        default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
       }
     } else if (!drive) {
       if (!hasCoral() || ignoreCoralScoring) {
@@ -973,7 +972,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case REEF_ALIGN_ALGAE -> {
         if (algaeSubsystem.hasAlgaeSuperCycle()) {
-          switch (getTargetAlgaeLevel()) {
+          switch (getCurrentAlgaeLevel()) {
             case L2 -> {
               // biscuitSubsystem.setIsRemovingAlgae(true);
               biscuitSubsystem.setPosition(
@@ -987,15 +986,13 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   true); // not using setBiscuitTransfer() to ensure hasAlgae is true
               elevatorSubsystem.setPosition(ElevatorConstants.kL3AlgaeRemovalSetpoint);
             }
-            default -> logger.error("Invalid algae level: {}", getAlgaeLevel());
           }
 
           setState(RobotStates.REMOVE_ALGAE);
         } else if (tagAlignSubsystem.getState() == TagAlignStates.DONE
             && (tagAlignSubsystem.computeHexant() % 2) != 0
-            && getAlgaeLevel() == ScoringLevel.L3) {
+            && getCurrentAlgaeLevel() == ScoringLevel.L3) {
           biscuitSubsystem.setPosition(RobotConstants.kStowSetpoint, false);
-          elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
           curState = RobotStates.SWITCH_ALGAE_LEVEL;
         }
       }
@@ -1003,13 +1000,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         if (biscuitSubsystem.getPosition().in(Rotations)
             <= RobotConstants.kL2AlgaeSetpoint.in(Rotations)) {
           elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeRemovalSetpoint);
-          curState = RobotStates.REMOVE_SWITCH_ALGAE;
-        }
-      }
-      case REMOVE_SWITCH_ALGAE -> {
-        if (elevatorSubsystem.isFinished()) {
-          biscuitSubsystem.setPosition(RobotConstants.kL2AlgaeSetpoint, true);
-          // TODO Finish Removal sequence
+          if(elevatorSubsystem.isFinished()){
+            curState = RobotStates.REEF_ALIGN_ALGAE;
+          }
         }
       }
       case REEF_ALIGN_CORAL -> {
@@ -1316,7 +1309,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     REEF_ALIGN,
     REEF_ALIGN_ALGAE,
     SWITCH_ALGAE_LEVEL,
-    REMOVE_SWITCH_ALGAE,
     REEF_ALIGN_CORAL,
     REMOVE_ALGAE,
     PLACE_CORAL,
