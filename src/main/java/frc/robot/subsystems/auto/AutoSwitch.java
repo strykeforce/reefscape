@@ -369,7 +369,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "EToNearBarge")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             0.5);
       }
@@ -388,7 +388,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(-0.00475, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "IToNearBarge")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             0.0);
       }
@@ -407,7 +407,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "bargeAway")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             2.0);
       }
@@ -426,7 +426,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "bargeAway")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             2.0);
       }
@@ -498,7 +498,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             "OppBargeToOppG",
             "OppGToOppBarge",
             ScoringLevel.L3,
-            ScoringLevel.L2,
+            ScoringLevel.L3,
             new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
       }
       case 0x18 -> {
@@ -515,7 +515,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             "GToBarge",
             "bargeToOppG",
             "OppGToOppBarge",
-            ScoringLevel.L2,
+            ScoringLevel.L3,
             new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
       }
 
