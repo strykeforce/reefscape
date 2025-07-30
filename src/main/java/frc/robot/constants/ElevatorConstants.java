@@ -43,6 +43,7 @@ public class ElevatorConstants {
 
   // Algae removal
   public static final Angle kL2AlgaeSetpoint = Rotations.of(6.3457); // was 6.308
+  public static final Angle kAlgaeLevel = Rotations.of(11.8869615);
   public static final Angle kL3AlgaeSetpoint = Rotations.of(17.428223);
 
   public static final Angle kL2AlgaeRemovalSetpoint = kL2AlgaeSetpoint;

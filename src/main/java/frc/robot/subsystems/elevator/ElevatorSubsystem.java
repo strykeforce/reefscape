@@ -41,6 +41,10 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
     return currState;
   }
 
+  public Angle getSetPoint() {
+    return setpoint;
+  }
+
   @Override
   public boolean isFinished() {
     return Math.abs(getPosition().minus(setpoint).in(Rotations))
