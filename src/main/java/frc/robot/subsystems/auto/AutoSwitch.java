@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
 import frc.robot.commands.auton.IRIAutonCommand;
+import frc.robot.commands.auton.KetteringAutoCommand;
 import frc.robot.commands.auton.MiddleBargeAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
@@ -305,6 +306,25 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<String>(Arrays.asList("EToBarge", "GToBarge", "bargeAway")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L2, ScoringLevel.L3)),
             AutonConstants.kDeepBarge);
+      }
+
+      case 0x04 -> {
+        return new KetteringAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "ketteringStartPath",
+            "bargeAlgae1ToBargeAlgae2",
+            "ketteringBargeToI",
+            "IToBarge",
+            "bargeAway",
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3)),
+            AutonConstants.kKetteringStart);
       }
 
         // case 0x03 -> {
