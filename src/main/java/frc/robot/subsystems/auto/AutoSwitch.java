@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
 import frc.robot.commands.auton.IRIAutonCommand;
+import frc.robot.commands.auton.KetteringAutoCommand;
 import frc.robot.commands.auton.MiddleBargeAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
@@ -307,6 +308,25 @@ public class AutoSwitch extends MeasurableSubsystem {
             AutonConstants.kDeepBarge);
       }
 
+      case 0x04 -> {
+        return new KetteringAutoCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "ketteringStartPath",
+            "bargeAlgae1ToBargeAlgae2",
+            "ketteringBargeToI",
+            "ketteringIprepBarge",
+            "bargeAway",
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3)),
+            AutonConstants.kKetteringStart);
+      }
+
         // case 0x03 -> {
         //   return new NonProcessorShallowSlowAutonCommand(
         //       driveSubsystem,
@@ -369,7 +389,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "EToNearBarge")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             0.5);
       }
@@ -388,7 +408,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(-0.00475, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "IToNearBarge")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             0.0);
       }
@@ -407,7 +427,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "bargeAway")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             2.0);
       }
@@ -426,7 +446,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "bargeAway")),
-            new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L3, ScoringLevel.L3)),
             AutonConstants.kMiddleBargeStart,
             2.0);
       }
@@ -498,7 +518,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             "OppBargeToOppG",
             "OppGToOppBarge",
             ScoringLevel.L3,
-            ScoringLevel.L2,
+            ScoringLevel.L3,
             new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
       }
       case 0x18 -> {
@@ -515,7 +535,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             "GToBarge",
             "bargeToOppG",
             "OppGToOppBarge",
-            ScoringLevel.L2,
+            ScoringLevel.L3,
             new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
       }
 

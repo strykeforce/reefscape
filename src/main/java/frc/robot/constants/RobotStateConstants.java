@@ -23,6 +23,9 @@ public class RobotStateConstants {
   public static final double kBiscuitSuperCycleSafeFastThres = 8; // 6 is max
   public static final double kBiscuitSuperCycleSafeThres = 6; // 6 is max
 
+  // Kettering Constants
+  public static final double kBiscuitSwitchAlgaeLevelThres = 2;
+
   // Elevator good for climb, tolerates stuck coral
   public static final double kElevatorClimbMax = 11.4;
 

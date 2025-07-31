@@ -2,18 +2,34 @@
 
 [![CI](https://github.com/strykeforce/reefscape/actions/workflows/main.yml/badge.svg)](https://github.com/strykeforce/reefscape/actions/workflows/main.yml)
 
+
+
+<p align="left">
+  <img alt="barge-score" src="docs/IMG_WM25-013.jpg" width="30%">
+&nbsp; &nbsp;
+  <img alt="reef-score" src="docs/IMG_WM25-491.jpg" width="30%">
+</p>
+
+![steal1](docs/Einstein_5__2025_FIRST_Championship.gif)
+![steal2](docs/Steal2AlgaeGIF.gif)
+
 ## Controls
 
-### Driver Controller
-![flysky](docs/driver-controls.png)
+<table>
+  <tr><th>Driver Controls</th><th>Operator Controls</th></tr>
+  <tr><td><img alt="driver-cont" src="docs/driver-controls.png">
+  </td><td><img alt="operator-cont" src="docs/operator-controls.png"></td></tr>
+</table>
 
-### Operator Controller
-![operator](docs/operator-controls.png)
 
 ## State Diagrams
 
-### Robot State
-![robotState](docs/reefscape-RobotState-Light.png)
+<table>
+  <tr><th>Robot State</th><th>Tag Align</th></tr>
+  <tr><td><img alt="robot-state" src="docs/reefscape-RobotState-Light.png"></td>
+  <td><img alt="tag-align" src="docs/reefscape-Tag Align-Light.png"></td></tr>
+</table>
+
 
 
 ## CAN Bus
@@ -63,7 +79,10 @@
 | --------- | --------- | -------- |
 | n/a       | USB       | CANivore |
 
-## DIO
+<table>
+  <tr><th>DIO</th><th>MXP</th><th>PWM</th><th>Analog</th></tr>
+  <tr><td>
+
 | Subsystem  | name             | ID  |
 | ---------- | ---------------- | --- |
 | BattMon    | Batt I           | 0   |
@@ -76,8 +95,8 @@
 | AutoSwitch | switch           | 7   |
 | AutoSwitch | switch           | 8   |
 | AutoSwitch | switch           | 9   |
+  </td><td>
 
-## MXP
 | Subsystem | name | ID  |
 | --------- | ---- | --- |
 |           |      | 10  |
@@ -96,9 +115,8 @@
 |           |      | 23  |
 |           |      | 24  |
 |           |      | 25  |
+  </td><td>
 
-
-## PWM
 | Subsystem | name         | ID  |
 | --------- | ------------ | --- |
 | LED       | lights       | 0   |
@@ -110,9 +128,9 @@
 |           |              | 6   |
 |           |              | 7   |
 |           |              | 8   |
-|           |              | 9   |    
-
-## Analog
+|           |              | 9   | 
+  </td><td>
+    
 | Subsystem | name | ID  |
 | --------- | ---- | --- |
 |           |      | 0   |
@@ -125,12 +143,34 @@
 |           |      | 7   |
 |           |      | 8   |
 |           |      | 9   |
+  </td></tr>
+</table>
 
 ## Cameras
 | Camera      | IP Address  | Type    |
 | ----------- | ----------- | ------- |
 | Left Servo  | 10.27.67.11 | USB 3.0 |
 | Right Servo | 10.27.67.12 | USB 3.0 |
-| Upper Left  | 10.27.67.11 | USB 2.0 |
-| Upper Right | 10.27.67.12 | USB 2.0 |
-| Rear        | 10.27.67.13 | USB 2.0 |
+| Rear Left   | 10.27.67.13 | USB 2.0 |
+| Rear Right  | 10.27.67.13 | USB 2.0 |
+
+## Autos
+| ID   | Start Loc                | Description                      | Status           |
+| ---- | ------------------------ | -------------------------------- | ---------------- |
+| 0x00 | non-processor shallow    | 3.5 piece Coral                  | Tested           |
+| 0x01 | non-processor mid        | 4 piece Coral                    | Needs Tuning     |
+| 0x02 | non-processor mid        | 3.5 piece Coral                  | Tested           |
+| 0x03 | non-processor deep barge | IRI - 3 Algae                    | Partially Tested |
+| 0x10 | Middle Barge             | 2.5 Algae, Non-Processor First   | Tested           |
+| 0x11 | Middle Barge             | 2.5 Algae, Processor First       | Tested           |
+| 0x12 | Middle Barge             | 2 Algae, Non-Processor           | Tested           |
+| 0x13 | Middle Barge             | 2 Algae, Processor               | Tested           |
+| 0x14 | Middle Barge             | Super-Cycle then Steal Processor | Tested           |
+| 0x15 | Middle Barge             | Steal Immediately Processor      | Tested           |
+| 0x16 | Middle Barge             | Coral then Steal Processor       | Tested           |
+| 0x17 | Middle Barge             | Coral then Steal Two             | Tested           |
+| 0x18 | Middle Barge             | Super-Cycle then Steal Front     | Partially Tested |
+| 0x20 | processor shallow        | 3.5 piece Coral                  | Tested           |
+| 0x21 | processor shallow        | 4 piece Coral                    | Needs Tuning     |
+| 0x22 | processor mid            | 3.5 piece Coral                  | Tested           |
+

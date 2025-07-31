@@ -998,7 +998,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
       case SWITCH_ALGAE_LEVEL -> {
         if (biscuitSubsystem.getPosition().in(Rotations)
-            <= RobotConstants.kStowSetpoint.in(Rotations)) {
+            <= RobotStateConstants.kBiscuitSwitchAlgaeLevelThres) {
           elevatorSubsystem.setPosition(ElevatorConstants.kL2AlgaeSetpoint);
           if (elevatorSubsystem.isFinished()) {
             biscuitSubsystem.setPosition(RobotConstants.kL2AlgaeSetpoint, false);
