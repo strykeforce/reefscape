@@ -11,8 +11,8 @@ public class BargeAlignConstants {
   public static final double kBlueRaiseElevatorX = 6.82; // 7.02
   public static final double kRedRaiseElevatorX = 10.71; // 10.51
 
-  public static final double kBlueRevDoneX = kBlueRaiseElevatorX + 0.7; //+0.25
-  public static final double kRedRevDoneX = kRedRaiseElevatorX - 0.7; //-0.25
+  public static final double kBlueRevDoneX = kBlueRaiseElevatorX + 0.7; // +0.25
+  public static final double kRedRevDoneX = kRedRaiseElevatorX - 0.7; // -0.25
 
   public static final double kBlueUnsafeX = 7.02;
   public static final double kRedUnsafeX = 10.51;

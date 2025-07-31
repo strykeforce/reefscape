@@ -32,6 +32,5 @@ public class AutonConstants {
       new Pose2d(7.1, 3.7209, Rotation2d.fromDegrees(180));
 
   public static final Pose2d kDeepBarge = new Pose2d(7.7, 7.092, Rotation2d.fromDegrees(90));
-  public static final Pose2d kKetteringStart =
-      new Pose2d(7.6, 7.01835, Rotation2d.fromDegrees(0));
+  public static final Pose2d kKetteringStart = new Pose2d(7.6, 7.01835, Rotation2d.fromDegrees(0));
 }

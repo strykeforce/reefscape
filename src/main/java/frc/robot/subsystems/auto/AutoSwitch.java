@@ -321,7 +321,7 @@ public class AutoSwitch extends MeasurableSubsystem {
             "ketteringStartPath",
             "bargeAlgae1ToBargeAlgae2",
             "ketteringBargeToI",
-            "IToBarge",
+            "ketteringIprepBarge",
             "bargeAway",
             new ArrayList<>(Arrays.asList(ScoringLevel.L3)),
             AutonConstants.kKetteringStart);

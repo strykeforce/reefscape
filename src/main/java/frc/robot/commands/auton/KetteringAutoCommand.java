@@ -8,7 +8,6 @@ import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
 import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoForceBargeCommand;
-import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
 import frc.robot.commands.robotState.MicAlgaeCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
@@ -30,7 +29,7 @@ public class KetteringAutoCommand extends SequentialCommandGroup implements Auto
 
   private DriveAutonCommand bargeToAlgaePath;
   private DriveAlgaeAutonServoNoZeroCommand bargeToReefPath;
-  private DriveBargeAutonCommand reefToBargePath;
+  private DriveAutonCommand reefToBargePath;
   private DriveAutonCommand bargeAwayPath;
   private DriveAutonCommand startPath;
 
@@ -72,17 +71,7 @@ public class KetteringAutoCommand extends SequentialCommandGroup implements Auto
             false,
             0,
             algaeLevels.get(0));
-    reefToBargePath =
-        new DriveBargeAutonCommand(
-            driveSubsystem,
-            tagAlignSubsystem,
-            elevatorSubsystem,
-            biscuitSubsystem,
-            robotStateSubsystem,
-            visionSubsystem,
-            reefToBarge,
-            true,
-            false);
+    reefToBargePath = new DriveAutonCommand(driveSubsystem, reefToBarge, true, false, false);
     bargeAwayPath = new DriveAutonCommand(driveSubsystem, bargeAway, true, false, false);
     startPath = new DriveAutonCommand(driveSubsystem, startString, true, true, false);
 
@@ -113,10 +102,10 @@ public class KetteringAutoCommand extends SequentialCommandGroup implements Auto
             algaeSubsystem,
             visionSubsystem),
         bargeToReefPath,
-        reefToBargePath,
-        new AutoScoreAlgaeCommand(
-            robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
-        bargeAwayPath);
+        reefToBargePath);
+    // new AutoScoreAlgaeCommand(
+    //     robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
+    // bargeAwayPath);
   }
 
   @Override
