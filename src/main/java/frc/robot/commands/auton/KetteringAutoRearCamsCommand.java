@@ -90,9 +90,10 @@ public class KetteringAutoRearCamsCommand extends SequentialCommandGroup
                 robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(0.0), startPose),
             new ZeroElevatorCommand(elevatorSubsystem)),
         new ParallelCommandGroup(
-            startPath,
-            new MicAlgaeCommand(
-                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)),
+                startPath,
+                new MicAlgaeCommand(
+                    robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
+            .withTimeout(1.0),
         new AutoForceBargeCommand(
             robotStateSubsystem,
             elevatorSubsystem,
@@ -101,9 +102,10 @@ public class KetteringAutoRearCamsCommand extends SequentialCommandGroup
             visionSubsystem),
         new WaitForElevBelowBarge(elevatorSubsystem),
         new ParallelCommandGroup(
-            bargeToAlgaePath,
-            new MicAlgaeCommand(
-                robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem)),
+                bargeToAlgaePath,
+                new MicAlgaeCommand(
+                    robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
+            .withTimeout(1.9),
         new AutoForceBargeCommand(
             robotStateSubsystem,
             elevatorSubsystem,
