@@ -161,6 +161,7 @@
 | 0x01 | non-processor mid        | 4 piece Coral                    | Needs Tuning     |
 | 0x02 | non-processor mid        | 3.5 piece Coral                  | Tested           |
 | 0x03 | non-processor deep barge | IRI - 3 Algae                    | Partially Tested |
+| 0x04 | non-processor Kettering  | 2 Mic to barge, Supercycle I     | Tested           |
 | 0x10 | Middle Barge             | 2.5 Algae, Non-Processor First   | Tested           |
 | 0x11 | Middle Barge             | 2.5 Algae, Processor First       | Tested           |
 | 0x12 | Middle Barge             | 2 Algae, Non-Processor           | Tested           |
@@ -173,4 +174,57 @@
 | 0x20 | processor shallow        | 3.5 piece Coral                  | Tested           |
 | 0x21 | processor shallow        | 4 piece Coral                    | Needs Tuning     |
 | 0x22 | processor mid            | 3.5 piece Coral                  | Tested           |
+
+## LEDs
+
+<table>
+  <tr><th>Super Structure Strip</th><th>Front Strip</th><th>Back Strip</th></tr>
+  <tr><td>
+
+| Strip Segment      | Color  | Pattern  | Meaning              |
+| ------------------ | ------ | -------- | -------------------- |
+| Coral Level        | Red    | Solid    | Level 1              |
+| Coral Level        | Yellow | Solid    | Level 2              |
+| Coral Level        | Green  | Solid    | Level 3              |
+| Coral Level        | Blue   | Solid    | Level 4              |
+| Auto Score Side    | Black  | Solid    | Manual               |
+| Auto Score Side    | Purple | Solid    | Left Post            |
+| Auto Score Side    | Orange | Solid    | Right Post           |
+| Get Algae On Cycle | Teal   | Solid    | Get Algae            |
+| Get Algae On Cycle | Black  | Solid    | No Algae             |
+| Full Strip         | Blue   | Blinking | Auto Place Active    |
+| Full Strip         | Red    | Blinking | Thermal Limit Active |
+| Full Strip         | Red    | Solid    | Climb Too Far        |
+| Full Strip         | Green  | Solid    | Climb Good           |
+| Full Strip         | Blue   | Solid    | Climb Too Close      |
+
+</td><td>
+
+| Strip Segment | Color  | Pattern  | Meaning              |
+| ------------- | ------ | -------- | -------------------- |
+| Upper         | Orange | Solid    | No Coral in Bot      |
+| Upper         | Purple | Solid    | Coral in Transit     |
+| Upper         | White  | Solid    | Coral Fully Loaded   |
+| Lower         | Black  | Solid    | No Algae in Bot      |
+| Lower         | Teal   | Solid    | Algae in Claw        |
+| Full Strip    | Blue   | Blinking | Auto Place Active    |
+| Full Strip    | Red    | Blinking | Thermal Limit Active |
+| Full Strip    | Red    | Solid    | Climb Too Far        |
+| Full Strip    | Green  | Solid    | Climb Good           |
+| Full Strip    | Blue   | Solid    | Climb Too Close      |
+  
+</td><td>
+
+| Strip Segment | Color  | Pattern  | Meaning              |
+| ------------- | ------ | -------- | -------------------- |
+| Full Strip    | Blue   | Solid    | High Algae           |
+| Full Strip    | Brown  | Solid    | Low Algae            |
+| Full Strip    | Blue   | Blinking | Auto Place Active    |
+| Full Strip    | Red    | Blinking | Thermal Limit Active |
+| Full Strip    | Red    | Solid    | Climb Too Far        |
+| Full Strip    | Green  | Solid    | Climb Good           |
+| Full Strip    | Blue   | Solid    | Climb Too Close      |
+  
+</td></tr>
+
 
