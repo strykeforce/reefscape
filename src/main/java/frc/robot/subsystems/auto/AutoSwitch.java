@@ -10,6 +10,7 @@ import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
 import frc.robot.commands.auton.IRIAutonCommand;
 import frc.robot.commands.auton.KetteringAutoCommand;
+import frc.robot.commands.auton.KetteringAutoRearCamsCommand;
 import frc.robot.commands.auton.MiddleBargeAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
@@ -319,6 +320,24 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             "ketteringStartPath",
+            "bargeAlgae1ToBargeAlgae2",
+            "ketteringBargeToI",
+            "ketteringIprepBarge",
+            "bargeAway",
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3)),
+            AutonConstants.kKetteringStart);
+      }
+      case 0x05 -> {
+        return new KetteringAutoRearCamsCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "ketteringStartPathRearCams",
             "bargeAlgae1ToBargeAlgae2",
             "ketteringBargeToI",
             "ketteringIprepBarge",

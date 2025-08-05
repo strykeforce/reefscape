@@ -155,25 +155,26 @@
 | Rear Right  | 10.27.67.13 | USB 2.0 |
 
 ## Autos
-| ID   | Start Loc                | Description                      | Status           |
-| ---- | ------------------------ | -------------------------------- | ---------------- |
-| 0x00 | non-processor shallow    | 3.5 piece Coral                  | Tested           |
-| 0x01 | non-processor mid        | 4 piece Coral                    | Needs Tuning     |
-| 0x02 | non-processor mid        | 3.5 piece Coral                  | Tested           |
-| 0x03 | non-processor deep barge | IRI - 3 Algae                    | Partially Tested |
-| 0x04 | non-processor Kettering  | 2 Mic to barge, Supercycle I     | Tested           |
-| 0x10 | Middle Barge             | 2.5 Algae, Non-Processor First   | Tested           |
-| 0x11 | Middle Barge             | 2.5 Algae, Processor First       | Tested           |
-| 0x12 | Middle Barge             | 2 Algae, Non-Processor           | Tested           |
-| 0x13 | Middle Barge             | 2 Algae, Processor               | Tested           |
-| 0x14 | Middle Barge             | Super-Cycle then Steal Processor | Tested           |
-| 0x15 | Middle Barge             | Steal Immediately Processor      | Tested           |
-| 0x16 | Middle Barge             | Coral then Steal Processor       | Tested           |
-| 0x17 | Middle Barge             | Coral then Steal Two             | Tested           |
-| 0x18 | Middle Barge             | Super-Cycle then Steal Front     | Partially Tested |
-| 0x20 | processor shallow        | 3.5 piece Coral                  | Tested           |
-| 0x21 | processor shallow        | 4 piece Coral                    | Needs Tuning     |
-| 0x22 | processor mid            | 3.5 piece Coral                  | Tested           |
+| ID   | Start Loc                | Description                               | Status           |
+| ---- | ------------------------ | ----------------------------------------- | ---------------- |
+| 0x00 | non-processor shallow    | 3.5 piece Coral                           | Tested           |
+| 0x01 | non-processor mid        | 4 piece Coral                             | Needs Tuning     |
+| 0x02 | non-processor mid        | 3.5 piece Coral                           | Tested           |
+| 0x03 | non-processor deep barge | IRI - 3 Algae                             | Partially Tested |
+| 0x04 | non-processor Kettering  | 2 Mic to barge, Supercycle I              | Tested           |
+| 0x05 | non-processor Kettering  | 2 Mic to barge, Supercycle I, rearCams on | Not Te       |
+| 0x10 | Middle Barge             | 2.5 Algae, Non-Processor First            | Tested           |
+| 0x11 | Middle Barge             | 2.5 Algae, Processor First                | Tested           |
+| 0x12 | Middle Barge             | 2 Algae, Non-Processor                    | Tested           |
+| 0x13 | Middle Barge             | 2 Algae, Processor                        | Tested           |
+| 0x14 | Middle Barge             | Super-Cycle then Steal Processor          | Tested           |
+| 0x15 | Middle Barge             | Steal Immediately Processor               | Tested           |
+| 0x16 | Middle Barge             | Coral then Steal Processor                | Tested           |
+| 0x17 | Middle Barge             | Coral then Steal Two                      | Tested           |
+| 0x18 | Middle Barge             | Super-Cycle then Steal Front              | Partially Tested |
+| 0x20 | processor shallow        | 3.5 piece Coral                           | Tested           |
+| 0x21 | processor shallow        | 4 piece Coral                             | Needs Tuning     |
+| 0x22 | processor mid            | 3.5 piece Coral                           | Tested           |
 
 ## LEDs
 
