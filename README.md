@@ -162,7 +162,7 @@
 | 0x02 | non-processor mid        | 3.5 piece Coral                           | Tested           |
 | 0x03 | non-processor deep barge | IRI - 3 Algae                             | Partially Tested |
 | 0x04 | non-processor Kettering  | 2 Mic to barge, Supercycle I              | Tested           |
-| 0x05 | non-processor Kettering  | 2 Mic to barge, Supercycle I, rearCams on | Not Te       |
+| 0x05 | non-processor Kettering  | 2 Mic to barge, Supercycle I, rearCams on | Tested           |
 | 0x10 | Middle Barge             | 2.5 Algae, Non-Processor First            | Tested           |
 | 0x11 | Middle Barge             | 2.5 Algae, Processor First                | Tested           |
 | 0x12 | Middle Barge             | 2 Algae, Non-Processor                    | Tested           |
