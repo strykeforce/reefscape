@@ -105,7 +105,8 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     // setSpeed(CoralConstants.kEjectingSpeed);
 
     switch (level) {
-      case L1, L2 -> setPct(0.8);
+      case L1 -> setPct(0.8);
+      case L2 -> setPct(0.7);
       case L3 -> setPct(0.75);
       case L4 -> setPct(1);
     }
