@@ -743,6 +743,11 @@ public class RobotContainer {
             new StopOpenLoopCommand(robotStateSubsystem, coralSubsystem, funnelIO, algaeIO))
         .withPosition(7, 1)
         .withSize(1, 1);
+
+    Shuffleboard.getTab("Pit")
+        .add("Retract Climb", new ClimbCommand(robotStateSubsystem, climbSubsystem))
+        .withPosition(8, 1)
+        .withSize(1, 1);
   }
 
   public void configTestDash() {
