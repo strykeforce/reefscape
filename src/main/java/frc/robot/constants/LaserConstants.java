@@ -12,6 +12,7 @@ public class LaserConstants {
         config.ToFParams.withUpdateMode(UpdateModeValue.LongRangeUserFreq).withUpdateFrequency(50);
     config.ProximityParams = config.ProximityParams.withProximityThreshold(1.0);
     config.FovParams = config.FovParams.withFOVRangeX(10.0).withFOVRangeY(10.0);
+    config.ToFParams = config.ToFParams.withUpdateFrequency(25.0);
     return config;
   }
 }
