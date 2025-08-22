@@ -2,11 +2,16 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.DriveAutonCommand;
 import frc.robot.commands.drive.PrepOdomForAutoCommand;
+import frc.robot.commands.elevator.ZeroElevatorCommand;
 import frc.robot.commands.robotState.AutoScoreAlgaeCommand;
+import frc.robot.commands.robotState.ForceBargeCommand;
+import frc.robot.commands.robotState.ForceLowFloorAlgaeCommand;
+import frc.robot.commands.robotState.SetAutoPlacingCommand;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.biscuit.BiscuitSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -20,8 +25,7 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MiddleBargeAutonCommand extends SequentialCommandGroup
-    implements AutoCommandInterface {
+public class IRIAutonCommand extends SequentialCommandGroup implements AutoCommandInterface {
 
   private DriveSubsystem driveSubsystem;
   private CoralSubsystem coralSubsystem;
@@ -30,7 +34,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
 
   private ArrayList<AutoCommandInterface> pathCommands = new ArrayList<>();
 
-  public MiddleBargeAutonCommand(
+  public IRIAutonCommand(
       DriveSubsystem driveSubsystem,
       RobotStateSubsystem robotStateSubsystem,
       AlgaeSubsystem algaeSubsystem,
@@ -44,8 +48,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       List<Double> delays,
       List<String> bargePaths,
       List<RobotStateSubsystem.ScoringLevel> algaeLevels,
-      Pose2d startPose,
-      double startDelay) {
+      Pose2d startPose) {
     addRequirements(
         driveSubsystem, algaeSubsystem, biscuitSubsystem, coralSubsystem, elevatorSubsystem);
     this.driveSubsystem = driveSubsystem;
@@ -57,9 +60,16 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
     //     () -> DriverStation.getMatchTime() < AutonConstants.kBargeScoreMinTime;
 
     addCommands(
-        new PrepOdomForAutoCommand(
-            robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(180.0), startPose),
-        new WaitCommand(startDelay));
+        new ParallelCommandGroup(
+            new PrepOdomForAutoCommand(
+                robotStateSubsystem, driveSubsystem, Rotation2d.fromDegrees(90.0), startPose),
+            new ZeroElevatorCommand(elevatorSubsystem)),
+        new ForceLowFloorAlgaeCommand(
+            robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
+        new SetAutoPlacingCommand(robotStateSubsystem, true),
+        new ForceBargeCommand(
+            robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem),
+        new SetAutoPlacingCommand(robotStateSubsystem, false));
 
     for (int i = 0; i < grabPaths.size(); i++) {
       boolean last = i == grabPaths.size() - 1;
@@ -103,21 +113,21 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
       }
     }
     /*
-      addCommands(
-          new ConditionalCommand(
+    addCommands(
+        new ConditionalCommand(
             new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false),
-              new SequentialCommandGroup(
+            new SequentialCommandGroup(
                 algaeDrive,
-                  new WaitCommand(delays.get(i))),
-              awayCondition),
-          new ConditionalCommand(
+                new WaitCommand(delays.get(i))),
+            awayCondition),
+        new ConditionalCommand(
             new DriveAutonCommand(driveSubsystem, "bargeLeave", true, false, false),
-              new SequentialCommandGroup(
-                      bargeDrive,
-                      new AutoScoreAlgaeCommand(
-                          robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
-                  .until(awayCondition),
-              awayCondition));
+            new SequentialCommandGroup(
+                    bargeDrive,
+                    new AutoScoreAlgaeCommand(
+                        robotStateSubsystem, elevatorSubsystem, biscuitSubsystem, algaeSubsystem))
+                .until(awayCondition),
+            awayCondition));
     }
     */
 
@@ -128,7 +138,7 @@ public class MiddleBargeAutonCommand extends SequentialCommandGroup
   public void reassignAlliance() {
     driveSubsystem.teleResetGyro();
     coralSubsystem.setAutoPreload();
-    robotStateSubsystem.setIsAutoPlacing(false);
+    robotStateSubsystem.setIsAutoPlacing(true);
     robotStateSubsystem.setScoringLevel(ScoringLevel.L4);
     robotStateSubsystem.setGetAlgaeOnCycle(true);
     robotStateSubsystem.setScoreSide(ScoreSide.LEFT);

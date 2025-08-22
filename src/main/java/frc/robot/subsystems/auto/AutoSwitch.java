@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.auton.AutoCommandInterface;
 import frc.robot.commands.auton.DefaultAutonCommand;
+import frc.robot.commands.auton.IRIAutonCommand;
 import frc.robot.commands.auton.MiddleBargeAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowAutonCommand;
 import frc.robot.commands.auton.NonProcessorShallowSlowAutonCommand;
@@ -282,10 +283,28 @@ public class AutoSwitch extends MeasurableSubsystem {
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance)),
-            new ArrayList<>(Arrays.asList(-0.0175, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(-0.0075, -0.0075, -0.0075)),
             'j',
             false,
             AutonConstants.kNonProcessorMid);
+      }
+
+      case 0x03 -> {
+        return new IRIAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            new ArrayList<String>(Arrays.asList("deepBargeToE", "bargeToG", null)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<String>(Arrays.asList("EToBarge", "GToBarge", "bargeAway")),
+            new ArrayList<>(Arrays.asList(ScoringLevel.L3, ScoringLevel.L2, ScoringLevel.L3)),
+            AutonConstants.kDeepBarge);
       }
 
         // case 0x03 -> {
@@ -348,10 +367,11 @@ public class AutoSwitch extends MeasurableSubsystem {
             visionSubsystem,
             new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToI", "bargeToE")),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
-            new ArrayList<Double>(Arrays.asList(0.5, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "EToNearBarge")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            0.5);
       }
 
       case 0x11 -> {
@@ -365,11 +385,12 @@ public class AutoSwitch extends MeasurableSubsystem {
             tagAlignSubsystem,
             visionSubsystem,
             new ArrayList<String>(Arrays.asList("startBargeToG", "bargeToE", "bargeToI")),
-            new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<Double>(Arrays.asList(-0.00475, 0.0, 0.0)),
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "IToNearBarge")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L3)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            0.0);
       }
 
       case 0x12 -> {
@@ -387,7 +408,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "IToBarge", "bargeAway")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            2.0);
       }
 
       case 0x13 -> {
@@ -405,7 +427,8 @@ public class AutoSwitch extends MeasurableSubsystem {
             new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0)),
             new ArrayList<String>(Arrays.asList("GToBarge", "EToBarge", "bargeAway")),
             new ArrayList<>(Arrays.asList(ScoringLevel.L2, ScoringLevel.L3, ScoringLevel.L2)),
-            AutonConstants.kMiddleBargeStart);
+            AutonConstants.kMiddleBargeStart,
+            2.0);
       }
 
       case 0x14 -> {
@@ -478,6 +501,23 @@ public class AutoSwitch extends MeasurableSubsystem {
             ScoringLevel.L2,
             new Pose2d(7.1008875, 4.0509, Rotation2d.fromDegrees(180.0)));
       }
+      case 0x18 -> {
+        return new StealOneAlgeaAutonCommand(
+            driveSubsystem,
+            robotStateSubsystem,
+            algaeSubsystem,
+            biscuitSubsystem,
+            coralSubsystem,
+            elevatorSubsystem,
+            tagAlignSubsystem,
+            visionSubsystem,
+            "startBargeToG",
+            "GToBarge",
+            "bargeToOppG",
+            "OppGToOppBarge",
+            ScoringLevel.L2,
+            new Pose2d(7.1, 3.7209, Rotation2d.fromRadians(3.14159)));
+      }
 
       case 0x20 -> {
         return new ProcessorShallowSlowAutonCommand(
@@ -546,7 +586,7 @@ public class AutoSwitch extends MeasurableSubsystem {
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance,
                     PathHandlerConstants.kLoadLightDistance)),
-            new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0)),
+            new ArrayList<>(Arrays.asList(-0.0075, -0.0075, -0.0075)),
             'e',
             true,
             AutonConstants.kProcessorMid);

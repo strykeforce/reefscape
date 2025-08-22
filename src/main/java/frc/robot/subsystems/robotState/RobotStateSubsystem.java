@@ -741,18 +741,18 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
         isBargeSafe =
             poseX > RobotStateConstants.kRedBargeSafeX
                 || poseX < RobotStateConstants.kBlueBargeSafeX;
-        if (isBargeSafe) {
-          driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
-          if (isAutoPlacing) {
-            setAutoPlacingLed(true);
-            driveSubsystem.setIgnoreSticks(true);
-            bargeAlignSubsystem.startBargeAlign(allianceColor);
-            setState(RobotStates.BARGE_ALIGN);
-          } else {
-            elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
-            setState(RobotStates.TO_BARGE_ALGAE);
-          }
+        // if (isBargeSafe) {
+        driveSubsystem.setDriveMultiplier(DriveConstants.kBargeScoreStickMultiplier);
+        if (isAutoPlacing) {
+          setAutoPlacingLed(true);
+          driveSubsystem.setIgnoreSticks(true);
+          bargeAlignSubsystem.startBargeAlign(allianceColor);
+          setState(RobotStates.BARGE_ALIGN);
+        } else {
+          elevatorSubsystem.setPosition(ElevatorConstants.kBargeSetpoint);
+          setState(RobotStates.TO_BARGE_ALGAE);
         }
+        // }
       }
     }
   }
@@ -1182,6 +1182,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
                   FastMath.pow2(currentPose.getX() - processorReleasePose.getX())
                       + FastMath.pow2(currentPose.getY() - processorReleasePose.getY()));
           Logger.recordOutput("RobotState/Processor Release Distance", distanceFromRelease);
+          algaeSubsystem.holdAlgae(); // stop wheels once algae is out
 
           if (distanceFromRelease > RobotStateConstants.kProcessorStowRadius) {
             isEjectingAlgae = false;

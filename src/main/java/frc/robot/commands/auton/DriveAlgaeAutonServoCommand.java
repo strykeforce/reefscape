@@ -117,7 +117,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
       robotStateSubsystem.clearCoral();
     }
 
-    visionSubsystem.setIsAuto(false);
+    // visionSubsystem.setIsAuto(false);
     robotStateSubsystem.setAutoAlgaeLevel(algaeLevel);
 
     isServoing = false;
