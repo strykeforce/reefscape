@@ -45,6 +45,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   private boolean scoreLeft = true;
   private int currentThresCount = 0;
   private boolean finalDrive = false;
+  private boolean isLevelOneAuto = false; //f
   private double xError = 2767;
   private double yError = 2767;
   private double yawError = 2767;
@@ -195,6 +196,55 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     return Math.sqrt(FastMath.pow2(reefRelative.getX()) + FastMath.pow2(reefRelative.getY()));
   }
 
+  // Might also just add if statement to the state machine or something, instead of
+  //   making a new method.
+  public Pose2d getTargetDrivePose(boolean scoreLeft, int hexant, boolean levelOneAuto) {
+    Translation2d reefT =
+        driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2)
+        ? TagServoingConstants.kBlueReefPose
+        : TagServoingConstants.kRedReefPose;
+      
+    Translation2d offset =
+        new Translation2d(driveRadius, Rotation2d.fromDegrees(hexant * 60 + 180)); 
+
+        Translation2d sideOffset =
+        new Translation2d(
+            scoreLeft ? TagServoingConstants.kRightCamOffset: TagServoingConstants.kLeftCamOffset, 
+            Rotation2d.fromDegrees(hexant * 60 + 180 + 90)); 
+       
+          offset = 
+          new Translation2d(driveRadius + TagServoingConstants.kL1CoralRadius, Rotation2d.fromDegrees(hexant * 60 + 180));
+                                      
+        if (levelOneAuto) {                               
+          sideOffset =
+          new Translation2d(
+              scoreLeft ? TagServoingConstants.kRightCamOffset - TagServoingConstants.kCoralL1CamOffset : 
+              TagServoingConstants.kLeftCamOffset + TagServoingConstants.kCoralL1CamOffset, 
+              Rotation2d.fromDegrees(hexant * 60 + 180 + 90));
+        }
+
+    return new Pose2d(reefT.plus(offset).plus(sideOffset), Rotation2d.fromDegrees(hexant * 60));
+  }
+
+/*Will get the actual radius offset with a tape measure (+ edit it experimentally).
+  public double getCurLevelOneRadius(boolean levelOne) {
+    Translation2d LevelOneT = 
+        driveSubsystem.getPoseMeters().getX() < (DriveConstants.kFieldMaxX / 2)
+        ? TagServoingConstants.kBlueReefPose
+        : TagServoingConstants.kRedReefPose;
+
+    Translation2d reefRelative = driveSubsystem.getPoseMeters().getTranslation().minus(LevelOneT);
+
+    if (levelOne) {
+      return Math.sqrt(FastMath.pow2(reefRelative.getX() + TagServoingConstants.kL1CoralRadius) + FastMath.pow2(reefRelative.getY())); //do this add different radii
+    }
+    
+    else {
+      return Math.sqrt(FastMath.pow2(reefRelative.getX()) + FastMath.pow2(reefRelative.getY()));
+    }
+  }
+  */
+
   public TagAlignStates getState() {
     return curState;
   }
@@ -242,7 +292,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             ? TagServoingConstants.kAlgaeInitialDriveRadius
             : (level == ScoringLevel.L1
                 ? TagServoingConstants.kL1CoralRadius
-                : TagServoingConstants.kCoralInitialDriveRadius);
+                : TagServoingConstants.kCoralInitialDriveRadius); 
     this.algae = algae;
     this.driveXCloseEnough = TagServoingConstants.kInitialCloseEnough;
     this.driveYCloseEnough = TagServoingConstants.kInitialCloseEnough;
@@ -325,7 +375,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             : TagServoingConstants.kCoralDriveYCloseEnough;
 
     this.driveRadius =
-        algae ? TagServoingConstants.kAlgaeAlignRadius : TagServoingConstants.kCoralAlignRadius;
+          algae
+              ? TagServoingConstants.kAlgaeAlignRadius
+              : (level == ScoringLevel.L1
+                  ? TagServoingConstants.kL1CoralRadius
+                  : TagServoingConstants.kCoralAlignRadius);  
 
     targetPose = getTargetDrivePose(scoreLeft);
     Logger.recordOutput("TagAlignSubsystem/TargetPose", targetPose);
@@ -346,6 +400,7 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("TagAlignSubsystem/isAligned", isAligned());
     Logger.recordOutput("TagAlignSubsystem/stalled", stalled());
     Logger.recordOutput("TagAlignSubsystem/stuckCoral", fixableStuckCoral());
+    Logger.recordOutput("TagAlignSubsystem/isLevelOneAuto", )
 
     switch (curState) {
       case DRIVE, TAG_ALIGN -> {
@@ -458,6 +513,11 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
             }
           }
         }
+
+        if (L1_FINAL) {
+
+        }
+
         // TODO Find Proper Number
         if (finalDrive) {
           if (justAlgae) {

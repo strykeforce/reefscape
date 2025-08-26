@@ -12,6 +12,7 @@ public class TagServoingConstants {
   // Offsets
   public static final double kLeftCamOffset = VisionConstants.kCam1Pose.getY();
   public static final double kRightCamOffset = VisionConstants.kCam3Pose.getY();
+  public static final double kCoralL1CamOffset = 5; //this is the offset from camera to algae
 
   // Targets
   public static final double kHorizontalTarget = 800;
@@ -74,7 +75,8 @@ public class TagServoingConstants {
   public static final double kAlgaeAlignRadius = kCoralAlignRadius; // 1.34; // was 1.34
   public static final double kAlgaeStopXDriveRadius =
       kAlgaeInitialDriveRadius; // Should be closer to reef than target
-  public static final double kL1CoralRadius = 1.5;
+  public static final double kL1CoralRadius = 1.5; //To the person who made this: I'm assuming it's what I
+                                                  //think this is supposed to be.
 
   // Final drive
   public static final double kFinalDriveVel = 0.25;
