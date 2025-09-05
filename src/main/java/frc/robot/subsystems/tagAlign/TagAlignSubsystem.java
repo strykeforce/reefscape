@@ -231,7 +231,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
   }
 
   public boolean fixableStuckCoral() {
-    return laserSubsystem.getDistance() < TagServoingConstants.kCoralStuckDistance;
+    return laserSubsystem.getDistance() > TagServoingConstants.kCoralStuckDistance
+        && laserSubsystem.getDistance() < TagServoingConstants.kUnfixableCoralStuckDistance && stalled();
   }
 
   public boolean isAligned() {
@@ -528,7 +529,6 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
     DRIVE,
     WAITING,
     TAG_ALIGN,
-
     DONE
   }
 }
