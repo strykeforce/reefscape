@@ -95,8 +95,8 @@ public class TagServoingConstants {
   public static final double kEndVelThreshold = 5;
 
   // Stuck coral
-  public static final double kMinStuckCounts = 5;
-  public static final double kCoralStuckDistance = 0.21;
+  public static final double kMinStuckCounts = 3;
+  public static final double kCoralStuckDistance = 0.19;
   public static final double kUnfixableCoralStuckDistance = 0.34;
 
   // Reef

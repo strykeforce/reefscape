@@ -13,6 +13,11 @@ public class LaserIOCANRange implements LaserIO {
     laser.getConfigurator().apply(LaserConstants.getLaserConfig());
   }
 
+  @Override
+  public void updateInputs(LaserIOInputs inputs) {
+    inputs.distance = getDistanceMeters();
+  }
+
   public double getDistanceMeters() {
     if (laser.getIsDetected().getValue()) {
       return laser.getDistance().getValue().in(Meters);

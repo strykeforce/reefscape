@@ -232,7 +232,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   public boolean fixableStuckCoral() {
     return laserSubsystem.getDistance() > TagServoingConstants.kCoralStuckDistance
-        && laserSubsystem.getDistance() < TagServoingConstants.kUnfixableCoralStuckDistance && stalled();
+        && laserSubsystem.getDistance() < TagServoingConstants.kUnfixableCoralStuckDistance
+        && FastMath.abs(driveOmega.getError()) < TagServoingConstants.kAngleCloseEnough
+        && stalled();
   }
 
   public boolean isAligned() {
