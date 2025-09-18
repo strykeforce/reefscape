@@ -10,6 +10,14 @@ public interface AlgaeIO {
     public double statorCurrent;
     public boolean isBeamBroken;
     public boolean isCoralBeamBroken;
+    public double positionRad = 0.0;
+    public double velocityRadPerSec = 0.0;
+    public double appliedVolts = 0.0;
+    public double supplyCurrentAmps = 0.0;
+    public double torqueCurrentAmps = 0.0;
+    public double tempCelsius = 0.0;
+    public boolean tempFaulted = false;
+    public boolean isAlive = true;
   }
 
   public default void updateInputs(AlgaeIOInputs inputs) {}

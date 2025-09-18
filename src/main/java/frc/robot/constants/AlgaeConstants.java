@@ -1,5 +1,7 @@
 package frc.robot.constants;
-
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.RobotBase;
 import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
@@ -20,6 +22,9 @@ import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 public class AlgaeConstants {
+    public static final double loopPeriodSecs = 0.02;
+    public static final boolean tuningMode = false;
+
   public static final int kFxId = 30;
 
   public static final double kCloseEnough = 0.1;
@@ -43,6 +48,7 @@ public class AlgaeConstants {
   // Example Talon FX Config
   public static TalonFXSConfiguration getFXConfig() {
     TalonFXSConfiguration fxsConfig = new TalonFXSConfiguration();
+    
 
     CurrentLimitsConfigs current =
         new CurrentLimitsConfigs()
