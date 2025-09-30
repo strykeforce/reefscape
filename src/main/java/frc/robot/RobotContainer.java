@@ -70,7 +70,9 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.controllers.FlyskyJoystick;
 import frc.robot.controllers.FlyskyJoystick.Button;
 import frc.robot.subsystems.algae.AlgaeIOFX;
+import frc.robot.subsystems.algae.AlgaeIOSim;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.algae.AlgaeIO.AlgaeIOInputs;
 import frc.robot.subsystems.auto.AutoSwitch;
 import frc.robot.subsystems.battMon.BattMonHardware;
 import frc.robot.subsystems.battMon.BattMonSubsystem;
@@ -861,4 +863,7 @@ public class RobotContainer {
   public void setHeadlights(boolean on) {
     pathHandler.setHeadlights(on);
   }
+
+  public void updateSimulation(){
+    AlgaeIOSim.updateInputs(/*idk what goes here i prob messed it up */);
 }
