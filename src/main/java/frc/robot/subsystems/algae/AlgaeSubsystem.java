@@ -18,7 +18,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
   private int slowCounts = 0;
 
   private AlgaeStates curState = AlgaeStates.EMPTY;
-
+  
   public AlgaeSubsystem(AlgaeIO io) {
     this.io = io;
   }
