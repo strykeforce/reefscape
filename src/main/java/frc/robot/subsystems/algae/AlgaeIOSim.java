@@ -38,6 +38,9 @@ public void updateInputs(AlgaeIOInputs inputs) {
   inputs.tempFaulted = false;   // No real temp fault in sim
   inputs.isAlive = true;        // Sim always considered "alive"
 }
+public static AlgaeIOSim getInstance(){
+  return sim;
+}
 
   @Override
   public void setSpeed(double volts) {

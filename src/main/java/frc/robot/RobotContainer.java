@@ -865,7 +865,7 @@ public class RobotContainer {
   }
 
   public void setupSimulation(){
-    AlgaeIOSim.setupSimulation();
+    AlgaeIOSim.getInstance().setupSimulation(arm.getTalon());
   }
   public void updateSimulation(){
     AlgaeIOSim.updateInputs(/*idk what goes here i prob messed it up */);
