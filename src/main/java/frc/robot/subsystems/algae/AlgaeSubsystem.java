@@ -1,6 +1,7 @@
 package frc.robot.subsystems.algae;
 
 import frc.robot.constants.AlgaeConstants;
+import frc.robot.subsystems.algae.AlgaeIOInputsAutoLogged;
 import java.util.Set;
 import net.jafama.FastMath;
 import org.littletonrobotics.junction.Logger;

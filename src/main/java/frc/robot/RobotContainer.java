@@ -864,9 +864,12 @@ public class RobotContainer {
     pathHandler.setHeadlights(on);
   }
 
-  public void setupSimulation(){
-    AlgaeIOSim.getInstance().setupSimulation(arm.getTalon());
+
+  public void setupSimulation() {
+    // Optional setup if needed
   }
-  public void updateSimulation(){
-    AlgaeIOSim.updateInputs(/*idk what goes here i prob messed it up */);
+
+  public void updateSimulation() {
+    AlgaeIOSim.getInstance().update();
+}
 }

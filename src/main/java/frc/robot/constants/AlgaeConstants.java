@@ -27,6 +27,10 @@ public class AlgaeConstants {
 
   public static final int kFxId = 30;
 
+
+    public static final double gearRatio = 10.0; // 10:1
+    public static final double moi = 0.00032; // kg m^2 (0.00032)
+
   public static final double kCloseEnough = 0.1;
   public static final double kMaxFwd = 100;
   public static final double kMaxRev = -100;

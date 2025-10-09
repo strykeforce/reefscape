@@ -23,6 +23,8 @@ public interface AlgaeIO {
   public default void updateInputs(AlgaeIOInputs inputs) {}
 
   public default void setSpeed(double speed) {}
+  
+  public default void update() {}
 
   public default void setPct(double pct) {}
 
