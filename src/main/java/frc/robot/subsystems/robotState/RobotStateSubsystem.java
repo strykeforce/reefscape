@@ -673,6 +673,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     scoringTimer.stop();
     scoringTimer.reset();
     scoringTimer.start();
+    reefCoralStuckFixable = false;
     setState(RobotStates.PLACE_CORAL);
   }
 
@@ -1043,7 +1044,29 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           }
         } */
 
-        if ((isAutoPlacing
+        if (tagAlignSubsystem.fixableStuckCoral() == true) {
+          switch (scoringLevel) {
+            case L1 -> {}
+            case L2 -> {
+              setBiscuitTransfer(RobotConstants.kL2CoralSetpoint, true);
+              elevatorSubsystem.setPosition(
+                  ElevatorConstants.kL2CoralSetpoint.plus(
+                      RobotStateConstants.kStuckCoralElevatorOffset));
+              setState(RobotStates.PLACE_CORAL, true);
+              reefCoralStuckFixable = tagAlignSubsystem.fixableStuckCoral();
+            }
+            case L3 -> {
+              setBiscuitTransfer(RobotConstants.kL3CoralSetpoint, true);
+              elevatorSubsystem.setPosition(
+                  ElevatorConstants.kL3CoralSetpoint.plus(
+                      RobotStateConstants.kStuckCoralElevatorOffset));
+              setState(RobotStates.PLACE_CORAL, true);
+              reefCoralStuckFixable = tagAlignSubsystem.fixableStuckCoral();
+            }
+            case L4 -> {}
+          }
+          tagAlignSubsystem.terminate();
+        } else if ((isAutoPlacing
                 && (tagAlignSubsystem.getState() == TagAlignSubsystem.TagAlignStates.DONE
                 /*  || reefCoralStuckFixable
                 && tagAlignSubsystem.isAligned()
@@ -1053,7 +1076,6 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
           toPlaceCoral();
           // tagAlignSubsystem.terminate();
           isAutoReadyForEject = false;
-          reefCoralStuckFixable = false;
         }
       }
       case REMOVE_ALGAE -> {
@@ -1078,7 +1100,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       }
 
       case PLACE_CORAL -> {
-        if (!hasCoral() && scoringTimer.hasElapsed(RobotStateConstants.kCoralEjectTimer)) {
+        if (reefCoralStuckFixable) {
+          toPlaceCoral();
+        } else if (!hasCoral() && scoringTimer.hasElapsed(RobotStateConstants.kCoralEjectTimer)) {
 
           coralLoc = CoralLoc.NONE;
           visionSubsystem.setYawUpdateCamera(-1);
