@@ -3,6 +3,8 @@ package frc.robot.subsystems.led;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.constants.LEDConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.AlgaeHeight;
@@ -18,6 +20,8 @@ public class LEDSubsystem extends MeasurableSubsystem {
   private LEDIO io;
   private LEDPattern base = LEDPattern.solid(Color.kBlack);
   public LEDStates currState = LEDStates.OFF;
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   // section patterns
   private LEDPattern algae =
@@ -313,6 +317,9 @@ public class LEDSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     Logger.recordOutput("LedSubsystem/state", currState);
     Logger.recordOutput("LedSubsystem/hasAlgae", hasAlgae);
     Logger.recordOutput("LedSubsystem/coralState", coralState);
@@ -336,6 +343,7 @@ public class LEDSubsystem extends MeasurableSubsystem {
       default -> {}
     }
     io.updateLEDs();
+    Logger.recordOutput("LedSubsystem/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

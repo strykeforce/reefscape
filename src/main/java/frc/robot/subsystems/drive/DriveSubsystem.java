@@ -15,6 +15,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem;
 import java.util.Set;
@@ -52,8 +53,11 @@ public class DriveSubsystem extends MeasurableSubsystem {
   private boolean ignoreSticks = false;
 
   private RobotStateSubsystem robotStateSubsystem;
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   public DriveSubsystem(SwerveIO io) {
+    loopTimer.start();
     this.io = io;
     // Setup Holonomic Controller
     omegaController =
@@ -446,8 +450,12 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
+    Logger.recordOutput("DriveSubsystem/updateInputs", (RobotController.getFPGATime() - startTime));
     org.littletonrobotics.junction.Logger.recordOutput(
         "DriveSubsystem/Swerve Pose", inputs.swervePose);
 
@@ -467,10 +475,10 @@ public class DriveSubsystem extends MeasurableSubsystem {
     if (gyroDifferentCount > DriveConstants.kGyroDifferentCount && isDriveStill()) {
       io.setPigeonGyroOffset(
           inputs.navxRotation2d.minus(inputs.gyroRotation2d).plus(io.getPigeonGyroOffset()));
-      logger.info(
-          "NavX gyro correction degs {} -> {}",
-          inputs.gyroRotation2d.getDegrees(),
-          inputs.navxRotation2d.getDegrees());
+      /*logger.info(
+      "NavX gyro correction degs {} -> {}",
+      inputs.gyroRotation2d.getDegrees(),
+      inputs.navxRotation2d.getDegrees());*/
       gyroDifferentCount = 0;
       gyroCorrectionCount++;
     }
@@ -481,6 +489,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
       case SAFE_HOLD -> {}
       default -> {}
     }
+    Logger.recordOutput("Drive/LoopTime", (RobotController.getFPGATime() - startTime));
   }
 
   public enum DriveStates {

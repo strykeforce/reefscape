@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.TagServoingConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -34,6 +36,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   private TagAlignStates curState = TagAlignStates.DONE;
   private boolean isAuto = false;
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   // Set by start()
   private Pose2d targetPose;
@@ -354,6 +358,9 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     Logger.recordOutput("TagAlignSubsystem/State", curState.toString());
     Logger.recordOutput("TagAlignSubsystem/FinalDrive", finalDrive);
     Logger.recordOutput("TagAlignSubsystem/isAligned", isAligned());
@@ -520,6 +527,8 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
       case DONE -> {}
     }
+
+    Logger.recordOutput("TagAlignSubsystem/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

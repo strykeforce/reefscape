@@ -3,6 +3,7 @@ package frc.robot.subsystems.tagAlign;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.constants.BargeAlignConstants;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.RobotStateConstants;
@@ -28,6 +29,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
   private double vX;
   private Rotation2d targetYaw;
   private double targetX;
+  private long startTime = 0;
 
   public BargeAlignSubsystem(FlyskyJoystick flysky, DriveSubsystem driveSubsystem) {
     this.flysky = flysky;
@@ -133,6 +135,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    startTime = RobotController.getFPGATime();
     Logger.recordOutput("BargeAlign/State", curState);
     switch (curState) {
       case DRIVE -> {
@@ -180,6 +183,7 @@ public class BargeAlignSubsystem extends MeasurableSubsystem {
       }
       case FINISHED -> {}
     }
+    Logger.recordOutput("BargeAlign/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

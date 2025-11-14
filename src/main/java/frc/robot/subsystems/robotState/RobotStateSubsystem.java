@@ -8,6 +8,7 @@ import com.ctre.phoenix6.CANBus.CANBusStatus;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.ElevatorConstants;
@@ -93,6 +94,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private Timer scoringTimer = new Timer();
   private Angle nextBiscuitSetpoint;
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   public RobotStateSubsystem(
       AlgaeSubsystem algaeSubsystem,
@@ -215,11 +218,11 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
   public void setState(RobotStates robotState, boolean transfer) {
     if (curState != robotState) {
       if (transfer) {
-        logger.info("TRANSFER ({} -> {})", curState, robotState);
+        // logger.info("TRANSFER ({} -> {})", curState, robotState);
         nextState = robotState;
         curState = RobotStates.TRANSFER;
       } else {
-        logger.info("{} -> {}", this.curState, robotState);
+        // logger.info("{} -> {}", this.curState, robotState);
         curState = nextState = robotState;
       }
     }
@@ -888,6 +891,9 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     Logger.recordOutput("RobotState/state", curState);
     Logger.recordOutput("RobotState/futureState", futureState);
     Logger.recordOutput("RobotState/hasCoral", hasCoral());
@@ -1295,6 +1301,8 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
     ledSubsystem.setCoralLights(coralLoc);
     ledSubsystem.setAlgeaLights(hasAlgae());
+    Logger.recordOutput("RobotState/endState", curState);
+    Logger.recordOutput("RobotState/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

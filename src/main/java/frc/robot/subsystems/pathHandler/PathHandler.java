@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AutonConstants;
 import frc.robot.constants.DriveConstants;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import net.jafama.FastMath;
+import org.littletonrobotics.junction.Logger;
 import org.slf4j.LoggerFactory;
 import org.strykeforce.telemetry.measurable.MeasurableSubsystem;
 import org.strykeforce.telemetry.measurable.Measure;
@@ -67,6 +69,8 @@ public class PathHandler extends MeasurableSubsystem {
   private boolean hasLEDsOn = false;
 
   private DigitalOutput lights = new DigitalOutput(3);
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   public PathHandler(
       DriveSubsystem driveSubsystem,
@@ -437,6 +441,9 @@ public class PathHandler extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/State", curState);
     org.littletonrobotics.junction.Logger.recordOutput("PathHandler/curPath", currPathString);
     org.littletonrobotics.junction.Logger.recordOutput(
@@ -544,6 +551,7 @@ public class PathHandler extends MeasurableSubsystem {
       case DONE -> isHandling = false;
       default -> {}
     }
+    Logger.recordOutput("PathHandler/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

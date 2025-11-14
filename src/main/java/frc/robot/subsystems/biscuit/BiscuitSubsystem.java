@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.BiscuitConstants;
 import frc.robot.constants.RobotConstants;
 import java.util.Set;
@@ -29,8 +31,11 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
   private int zeroCounter = 0;
 
   public BiscuitState curState = BiscuitState.NORMAL;
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   public BiscuitSubsystem(BiscuitIO io) {
+    loopTimer.start();
     this.logger = LoggerFactory.getLogger(this.getClass());
     this.io = io;
     hasZeroed = io.zero();
@@ -94,6 +99,9 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     io.updateInputs(inputs);
 
     switch (curState) {
@@ -124,6 +132,7 @@ public class BiscuitSubsystem extends MeasurableSubsystem {
     Logger.recordOutput("Biscuit/IsFinished", isFinished() ? 1.0 : 0.0);
     Logger.recordOutput("Biscuit/curState", curState);
     Logger.recordOutput("Biscuit/zeroCounts", zeroCounter);
+    Logger.recordOutput("Biscuit/loopTime", (RobotController.getFPGATime() - startTime));
 
     // if (setPoint != prevSetPoint && isFinished()) {
     //   zeroCheck();

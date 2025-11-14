@@ -4,12 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.IterativeRobotBase;
+import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.robotState.ToggleAllianceColorCommand;
 import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoreSide;
+import java.lang.reflect.Field;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -19,6 +23,7 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private double watchdogTimeout = 2.0;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -46,6 +51,15 @@ public class Robot extends LoggedRobot {
       Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
       Logger.addDataReceiver(new NT4Publisher());
     }
+    try {
+      Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
+      watchdogField.setAccessible(true);
+      Watchdog watchdog = (Watchdog) watchdogField.get(this);
+      watchdog.setTimeout(watchdogTimeout);
+    } catch (Exception e) {
+      DriverStation.reportWarning("Failed to disable loop overrun warnings", false);
+    }
+    CommandScheduler.getInstance().setPeriod(watchdogTimeout);
     Logger.start();
 
     Shuffleboard.getTab("Match")

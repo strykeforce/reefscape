@@ -3,6 +3,8 @@ package frc.robot.subsystems.coral;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.CoralConstants;
 import frc.robot.standards.ClosedLoopSpeedSubsystem;
 import frc.robot.subsystems.robotState.RobotStateSubsystem.ScoringLevel;
@@ -19,9 +21,12 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   private AngularVelocity setpoint = RotationsPerSecond.of(0.0);
   private CoralState curState = CoralState.IDLE;
   private org.slf4j.Logger logger = LoggerFactory.getLogger(CoralSubsystem.class);
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   public CoralSubsystem(CoralIO io) {
     this.io = io;
+    loopTimer.start();
   }
 
   public CoralState getState() {
@@ -119,6 +124,9 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   // Periodic Function
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     // Read Inputs
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
@@ -149,6 +157,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
     // Log Outputs
     Logger.recordOutput("Coral/curState", curState);
     Logger.recordOutput("Coral/setpoint", setpoint.in(RotationsPerSecond));
+    Logger.recordOutput("Coral/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

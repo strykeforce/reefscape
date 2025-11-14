@@ -3,6 +3,8 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
 import java.util.Set;
@@ -21,8 +23,11 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
   private Angle setpoint = Rotations.of(0);
 
   private int zeroCounter = 0;
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   public ElevatorSubsystem(ElevatorIO io) {
+    loopTimer.start();
     this.io = io;
   }
 
@@ -63,6 +68,9 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     // Read inputs
     io.updateInputs(inputs);
     org.littletonrobotics.junction.Logger.processInputs("ElevatorInputs", inputs);
@@ -91,6 +99,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
       case ZEROED -> {}
       case IDLE -> {}
     }
+    Logger.recordOutput("Elevator/LoopTime", (RobotController.getFPGATime() - startTime));
   }
 
   // Grapher

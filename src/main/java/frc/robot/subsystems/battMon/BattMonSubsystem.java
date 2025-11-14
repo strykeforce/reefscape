@@ -2,6 +2,8 @@ package frc.robot.subsystems.battMon;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -18,13 +20,19 @@ public class BattMonSubsystem extends SubsystemBase {
   private double recoveryTempThreshold;
   private double curDangerThreshold;
   private double curWarnThreshold;
+  private Timer loopTime = new Timer();
+  private long startTime = 0;
 
   public BattMonSubsystem(BattMonIO io) {
+    loopTime.start();
     this.io = io;
   }
 
   @Override
   public void periodic() {
+    loopTime.reset();
+    loopTime.start();
+    startTime = RobotController.getFPGATime();
     // Refresh data and graph it
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
@@ -64,6 +72,7 @@ public class BattMonSubsystem extends SubsystemBase {
     //       curState = battMonState.WARNING;
     //     }
     // }
+    Logger.recordOutput("BattMon/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   public battMonState getState() {

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.algae;
 
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.AlgaeConstants;
 import java.util.Set;
 import net.jafama.FastMath;
@@ -16,10 +18,13 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
   private final AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
   private double desiredSpeed = 0;
   private int slowCounts = 0;
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   private AlgaeStates curState = AlgaeStates.EMPTY;
 
   public AlgaeSubsystem(AlgaeIO io) {
+    loopTimer.start();
     this.io = io;
   }
 
@@ -111,6 +116,9 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     io.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
     Logger.recordOutput("Algae/state", curState);
@@ -162,6 +170,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
       case EJECTING -> {}
       case IDLE -> {}
     }
+    Logger.recordOutput("Algae/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

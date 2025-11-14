@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.standards.ClosedLoopPosSubsystem;
@@ -35,8 +36,11 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
   private double setpoints = 0.0;
   private ClimbState curState = ClimbState.INIT;
   private Timer hangTimer = new Timer();
+  private Timer loopTimer = new Timer();
+  private long startTime = 0;
 
   public ClimbSubsystem(ClimbIO io) {
+    loopTimer.start();
     this.io = io;
     Logger.recordOutput("Climb/isDesparate", false);
     enableRatchet(false);
@@ -145,6 +149,9 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
 
   @Override
   public void periodic() {
+    loopTimer.reset();
+    loopTimer.start();
+    startTime = RobotController.getFPGATime();
     // Read Inputs
     io.updateInputs(climbInputs);
     Logger.processInputs(getName(), climbInputs);
@@ -177,6 +184,7 @@ public class ClimbSubsystem extends MeasurableSubsystem implements ClosedLoopPos
     // Log Outputs
     Logger.recordOutput("Climb/curState", curState);
     Logger.recordOutput("Climb/setpoint", setpoints);
+    Logger.recordOutput("Climb/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override

@@ -33,6 +33,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   // Array of cameras
   private WallEyeCam[] cams;
+  private long startTime = 0;
 
   // Array of camera positions
   private Translation3d[] camPositions = {
@@ -416,6 +417,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    startTime = RobotController.getFPGATime();
     Logger.recordOutput("Vision/Vision Updates On", visionUpdating);
     double gyroData = FastMath.normalizeMinusPiPi(driveSubsystem.getGyroRotation2d().getRadians());
     gyroBuffer.addFirst(gyroData);
@@ -452,6 +454,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         }
       }
     }
+    Logger.recordOutput("Vision/validResultsTime", (RobotController.getFPGATime() - startTime));
 
     if (getSeconds() - timeSinceLastUpdate >= VisionConstants.kTimeToDecayDev) {
       // Decrease the thresholds required for a good pose over time. A graph is in the docs
@@ -467,6 +470,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
             scaledWeight >= VisionConstants.kMinStdDev ? scaledWeight : VisionConstants.kMinStdDev);
       }
     }
+    Logger.recordOutput("Vision/adaptiveMatrixTime", (RobotController.getFPGATime() - startTime));
 
     for (Pair<WallEyeResult, Integer> res : validResults) {
       if (res.getFirst() instanceof WallEyePoseResult) {
@@ -544,6 +548,7 @@ public class VisionSubsystem extends MeasurableSubsystem {
         }
       }
     }
+    Logger.recordOutput("Vision/loopTime", (RobotController.getFPGATime() - startTime));
   }
 
   public WallEyeTagResult getLastResult(int index) {
