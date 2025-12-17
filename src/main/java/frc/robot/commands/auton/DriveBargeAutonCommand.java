@@ -179,7 +179,7 @@ public class DriveBargeAutonCommand extends Command implements AutoCommandInterf
     }
 
     driveSubsystem.grapherTrajectoryActive(false);
-    logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
+    // logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
     driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
   }
 }

@@ -240,7 +240,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     tagAlignSubsystem.terminate();
 
     driveSubsystem.grapherTrajectoryActive(false);
-    logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
+    // logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
     driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
   }
 }

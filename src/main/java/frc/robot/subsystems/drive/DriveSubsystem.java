@@ -182,7 +182,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void resetOdometry(Pose2d pose) {
     io.resetOdometry(pose);
-    logger.info("reset odometry with: {}", pose);
+    // logger.info("reset odometry with: {}", pose);
   }
 
   public void recordAutoTrajectory(Trajectory<SwerveSample> traj) {
@@ -262,7 +262,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     yController.reset();
     omegaController.reset(yaw);
     holonomicController.getThetaController().reset(yaw);
-    logger.info("Holonomic Controller Reset: {}", yaw);
+    // logger.info("Holonomic Controller Reset: {}", yaw);
   }
 
   public void resetHolonomicController() {
@@ -270,7 +270,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
     yController.reset();
     omegaController.reset(inputs.gyroRotation2d.getRadians());
     holonomicController.getThetaController().reset(inputs.gyroRotation2d.getRadians());
-    logger.info("Holonomic Controller Reset: {}", inputs.gyroRotation2d.getRadians());
+    // logger.info("Holonomic Controller Reset: {}", inputs.gyroRotation2d.getRadians());
   }
 
   public void resetOmegaController() {
@@ -327,7 +327,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void setEnableHolo(boolean enabled) {
     holonomicController.setEnabled(enabled);
-    logger.info("Holonomic Controller Enabled: {}", enabled);
+    // logger.info("Holonomic Controller Enabled: {}", enabled);
   }
 
   public void prepClimb() {
@@ -341,7 +341,7 @@ public class DriveSubsystem extends MeasurableSubsystem {
 
   public void teleResetGyro() {
     setAutoDebugMsg("Reset Gyro");
-    logger.info("Driver Joystick: Reset Gyro");
+    // logger.info("Driver Joystick: Reset Gyro");
     double gyroResetDegs = robotStateSubsystem.getAllianceColor() == Alliance.Blue ? 0.0 : 180.0;
     io.setBothGyroOffset(Rotation2d.fromDegrees(gyroResetDegs));
     Logger.recordOutput("DriveSubsystem/gyroOffset", Rotation2d.fromDegrees(gyroResetDegs));
@@ -381,15 +381,16 @@ public class DriveSubsystem extends MeasurableSubsystem {
   }
 
   public Rotation2d apply(Rotation2d rotation) {
-    logger.info(
-        "initial target yaw: {}, cos: {}, sin: {}", rotation, rotation.getCos(), rotation.getSin());
+    // logger.info(
+    //    "initial target yaw: {}, cos: {}, sin: {}", rotation, rotation.getCos(),
+    // rotation.getSin());
     if (shouldFlip()) {
       return new Rotation2d(-rotation.getCos(), rotation.getSin());
     } else return rotation;
   }
 
   public double apply(double x) {
-    logger.info("initial x: {}", x);
+    // logger.info("initial x: {}", x);
     if (shouldFlip()) {
       return DriveConstants.kFieldMaxX - x;
     } else return x;

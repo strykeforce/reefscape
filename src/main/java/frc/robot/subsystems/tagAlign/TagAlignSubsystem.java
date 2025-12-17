@@ -80,11 +80,12 @@ public class TagAlignSubsystem extends MeasurableSubsystem {
 
     driveRadius = 1.338;
     for (int i = 0; i < 6; i++) {
-      logger.info("Hexant {}, left and right", i);
+      // logger.info("Hexant {}, left and right", i);
 
-      logger.info("{}, {}", getTargetDrivePose(true, i).getX(), getTargetDrivePose(true, i).getY());
-      logger.info(
-          "{}, {}", getTargetDrivePose(false, i).getX(), getTargetDrivePose(false, i).getY());
+      // logger.info("{}, {}", getTargetDrivePose(true, i).getX(), getTargetDrivePose(true,
+      // i).getY());
+      /*logger.info(
+      "{}, {}", getTargetDrivePose(false, i).getX(), getTargetDrivePose(false, i).getY());*/
     }
   }
 

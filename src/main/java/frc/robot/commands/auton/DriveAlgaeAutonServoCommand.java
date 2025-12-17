@@ -212,7 +212,7 @@ public class DriveAlgaeAutonServoCommand extends Command implements AutoCommandI
     visionSubsystem.setIsAuto(true);
 
     driveSubsystem.grapherTrajectoryActive(false);
-    logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
+    // logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
     driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
   }
 }

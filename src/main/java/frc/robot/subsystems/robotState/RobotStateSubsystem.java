@@ -238,7 +238,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void setAllianceColor(Alliance alliance) {
     allianceColor = alliance;
-    logger.info("Change color to: {}", allianceColor);
+    // logger.info("Change color to: {}", allianceColor);
   }
 
   public void setScoringLevel(ScoringLevel scoringLevel) {
@@ -535,7 +535,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
       drive = false;
     }
     if (!safeMoveElevator()) {
-      logger.info("Elevator movement is dangerous!");
+      // logger.info("Elevator movement is dangerous!");
       return;
     }
     boolean wantAlgae = (getAlgae || !hasCoral()) && scoringLevel != ScoringLevel.L1;
@@ -682,7 +682,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toAlgaeFloorPickup() {
     if (!safeMoveElevator()) {
-      logger.info("Elevator movement is dangerous!");
+      // logger.info("Elevator movement is dangerous!");
       return;
     }
 
@@ -728,7 +728,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
     }
 
     if (!safeMoveElevator()) {
-      logger.info("Elevator movement is dangerous!");
+      // logger.info("Elevator movement is dangerous!");
       return;
     }
 
@@ -790,7 +790,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   public void toHpAlgae() {
     if (!safeMoveElevator()) {
-      logger.info("Elevator movement is dangerous!");
+      // logger.info("Elevator movement is dangerous!");
       return;
     }
     currentAlgaeHeight = algaeHeight;
@@ -808,7 +808,7 @@ public class RobotStateSubsystem extends MeasurableSubsystem {
 
   private void toProcessor() {
     if (!safeMoveElevator()) {
-      logger.info("Elevator movement is dangerous!");
+      // logger.info("Elevator movement is dangerous!");
       return;
     }
 

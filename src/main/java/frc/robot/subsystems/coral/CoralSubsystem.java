@@ -39,7 +39,7 @@ public class CoralSubsystem extends MeasurableSubsystem implements ClosedLoopSpe
   }
 
   public void setState(CoralState state) {
-    logger.info("{} -> {}", curState, state);
+    // logger.info("{} -> {}", curState, state);
     this.curState = state;
   }
 

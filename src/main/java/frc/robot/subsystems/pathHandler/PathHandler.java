@@ -197,7 +197,7 @@ public class PathHandler extends MeasurableSubsystem {
     waitingTimer.reset();
     if (isHandling && path != null) {
       driveSubsystem.setAutoDebugMsg("Start " + currPathString);
-      logger.info("start Path:" + currPathString);
+      // logger.info("start Path:" + currPathString);
       currPath = path;
       currPathFinalPose = mirrorToProcessor(path.getFinalPose(mirrorTrajectory).get());
       runningPath = true;

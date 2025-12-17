@@ -100,7 +100,7 @@ public class RobotConstants {
       algaeRemovalMotionConfig = CompConstants.getAlgaeRemovalMotionConfig();
       noAlgaeMotionConfig = CompConstants.getNoAlgaeMotionConfig();
       kTicksPerRot = 80;
-      logger.info("Using Comp Constants");
+      // logger.info("Using Comp Constants");
 
       // Biscuit
 
@@ -149,7 +149,7 @@ public class RobotConstants {
       algaeRemovalMotionConfig = algaeMotionConfig;
       noAlgaeMotionConfig = ProtoConstants.getNoAlgaeMotionConfig();
       kTicksPerRot = 160;
-      logger.info("Using Proto Constants");
+      // logger.info("Using Proto Constants");
 
       // Biscuit
 

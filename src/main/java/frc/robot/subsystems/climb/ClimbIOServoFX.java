@@ -1,7 +1,5 @@
 package frc.robot.subsystems.climb;
 
-import static edu.wpi.first.units.Units.Rotations;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -67,7 +65,7 @@ public class ClimbIOServoFX implements ClimbIO {
   public void setPosition(Angle position) {
     pivotArmSetpoint = position.plus(relSetpointOffset);
 
-    logger.info("Setting position to {} rotations", pivotArmSetpoint.in(Rotations));
+    // logger.info("Setting position to {} rotations", pivotArmSetpoint.in(Rotations));
 
     talonFxPivotArmFront.setControl(positionRequestMain.withPosition(pivotArmSetpoint));
   }

@@ -124,15 +124,15 @@ public class BiscuitIOFXS implements BiscuitIO, Checkable {
     if (pos3 != 1.0) {
       double setPos = RobotConstants.kTicksPerRot * (RobotConstants.kBiscuitZero - pos3);
       talon.setPosition(setPos);
-      logger.info(
-          "set Biscuit position to "
-              + setPos
-              + ", Abs Pos 1: "
-              + pos
-              + ", Abs Pos 2: "
-              + pos2
-              + "Abs Pos 3: "
-              + pos3);
+      /*logger.info(
+      "set Biscuit position to "
+          + setPos
+          + ", Abs Pos 1: "
+          + pos
+          + ", Abs Pos 2: "
+          + pos2
+          + "Abs Pos 3: "
+          + pos3);*/
       didZero = true;
     }
     return didZero;

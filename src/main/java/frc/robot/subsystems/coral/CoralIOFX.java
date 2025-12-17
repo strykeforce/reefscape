@@ -1,7 +1,5 @@
 package frc.robot.subsystems.coral;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -56,7 +54,7 @@ public class CoralIOFX implements CoralIO, Checkable {
 
   @Override
   public void setVelocity(AngularVelocity velocity) {
-    logger.info("Setting velocity to {} rots per second", velocity.in(RotationsPerSecond));
+    // logger.info("Setting velocity to {} rots per second", velocity.in(RotationsPerSecond));
 
     talonFx.setControl(velocityRequest.withVelocity(velocity));
   }

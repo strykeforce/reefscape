@@ -49,11 +49,11 @@ public class ExampleIOFX implements ExampleIO {
   @Override
   public void zero() {
     relSetpointOffset = ExampleConstants.kZeroTicks;
-    logger.info(
-        "Abs: {}, Zero Pos: {}, Offset: {}",
-        absSensorInitial,
-        ExampleConstants.kZeroTicks,
-        absSensorInitial.minus(ExampleConstants.kZeroTicks));
+    /*logger.info(
+    "Abs: {}, Zero Pos: {}, Offset: {}",
+    absSensorInitial,
+    ExampleConstants.kZeroTicks,
+    absSensorInitial.minus(ExampleConstants.kZeroTicks));*/
   }
 
   @Override

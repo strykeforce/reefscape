@@ -117,7 +117,8 @@ public class AutoSwitch extends MeasurableSubsystem {
 
   public void checkSwitch() {
     if (hasSwitchChanged()) {
-      logger.info("Initializing Auto Switch Position: {}", String.format("%02X", curAutoSwitchPos));
+      // logger.info("Initializing Auto Switch Position: {}", String.format("%02X",
+      // curAutoSwitchPos));
       autoCommand = getAutoCommand(curAutoSwitchPos);
       autoCommand.reassignAlliance();
     }
@@ -125,7 +126,7 @@ public class AutoSwitch extends MeasurableSubsystem {
 
   public void resetSwitchPos() {
     if (curAutoSwitchPos == -1) {
-      logger.info("Reset Auto Switch");
+      // logger.info("Reset Auto Switch");
     }
     curAutoSwitchPos = -1;
   }
@@ -608,7 +609,7 @@ public class AutoSwitch extends MeasurableSubsystem {
   }
 
   public void toggleVirtualSwitch() {
-    logger.info("toggledSwitch:function");
+    // logger.info("toggledSwitch:function");
     if (useVirtualSwitch) {
       useVirtualSwitch = false;
     } else {

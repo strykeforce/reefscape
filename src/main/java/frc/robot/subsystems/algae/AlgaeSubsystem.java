@@ -33,7 +33,7 @@ public class AlgaeSubsystem extends MeasurableSubsystem {
   }
 
   public void setState(AlgaeStates newState) {
-    logger.info("{} -> {}", curState, newState);
+    // logger.info("{} -> {}", curState, newState);
     curState = newState;
   }
 
