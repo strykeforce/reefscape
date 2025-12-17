@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -28,6 +29,7 @@ public class ClimbAlignSubsystem extends MeasurableSubsystem {
   private Pose2d targetPose;
   private boolean directionPositive;
   private Timer delay = new Timer();
+  private long startTime = 0;
 
   public ClimbAlignSubsystem(ClimbSubsystem climbSubsystem, DriveSubsystem driveSubsystem) {
     this.climbSubsystem = climbSubsystem;
@@ -117,6 +119,7 @@ public class ClimbAlignSubsystem extends MeasurableSubsystem {
 
   @Override
   public void periodic() {
+    startTime = RobotController.getFPGATime();
     Logger.recordOutput("ClimbAlignSubsystem/State", curState.toString());
 
     switch (curState) {
@@ -176,6 +179,8 @@ public class ClimbAlignSubsystem extends MeasurableSubsystem {
       }
       case DONE -> {}
     }
+    Logger.recordOutput(
+        "ClimbAlignSubsystem/LoopTime", (RobotController.getFPGATime() - startTime));
   }
 
   @Override
