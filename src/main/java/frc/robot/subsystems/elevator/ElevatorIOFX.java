@@ -101,18 +101,28 @@ public class ElevatorIOFX implements ElevatorIO, Checkable {
 
   @Override
   public void setCurrentLimitConfig(CurrentLimitsConfigs config) {
+    // NOTE: These are blocking calls (i.e. they wait for a response)
+    // This function should not be used in a periodic or command
+    // Measurements indicate it takes ~2ms (I suspect sometimes longer)
     configuratorFront.apply(config);
     configuratorBack.apply(config);
   }
 
   @Override
   public void setSoftLimitConfig(SoftwareLimitSwitchConfigs config) {
+    // NOTE: These are blocking calls (i.e. they wait for a response)
+    // This function should not be used in a periodic or command
+    // Measurements indicate it takes ~8ms (I suspect sometimes longer)
+    // Can we use .withOverrideSoftLimits ?
     configuratorFront.apply(config);
     configuratorBack.apply(config);
   }
 
   @Override
   public void zero() {
+    // NOTE: These are blocking calls (i.e. they wait for a response)
+    // This function should not be used in a periodic or command
+    // Measurements indicate it takes ~9ms (I suspect sometimes longer)
     talonFxFront.setPosition(0.0);
     talonFxBack.setPosition(0.0);
     setVelocityOpenLoop(0.0);

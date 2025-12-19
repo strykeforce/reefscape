@@ -6,6 +6,7 @@ import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.drive.DriveAutonCommand;
@@ -49,6 +50,9 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
   private SwerveSample desiredState;
   private Pose2d finalPose;
   private Pose2d initialPose = new Pose2d();
+  private long startTime = 0;
+  private long testStartTime = 0;
+  private long testTime = 0;
 
   public DriveAutonServoCommand(
       DriveSubsystem driveSubsystem,
@@ -79,12 +83,20 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     if (tempTrajectory.isPresent()) {
       trajectory = tempTrajectory.get();
       isTherePath = true;
+      // Initial call of this to get the trajectory juicing...sometimes first call takes a while
+      desiredState =
+          mirrorToProcessor(
+              trajectory.sampleAt(timer.get(), mirrorTrajectory).get()); // DurationMs: 4-20ms
     } else {
       logger.error("Trajectory {} not found", trajectoryName);
       isTherePath = false;
     }
     org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorToProcessor", mirrorToProcessor);
     org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorTrajectory", mirrorTrajectory);
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/initializeTime", 0);
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/executeTime", 0);
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/isFinishedTime", 0);
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/testTime", 0);
     timer.start();
   }
 
@@ -150,7 +162,10 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     //     driveSubsystem.resetOdometry(initialPose);
     // driveSubsystem.resetHolonomicController();
     //   }
-    elevatorSubsystem.zero();
+    startTime = RobotController.getFPGATime();
+    testStartTime = RobotController.getFPGATime();
+    elevatorSubsystem.zero(); // DurationMs: ~10ms
+    testTime = RobotController.getFPGATime();
     isServoing = false;
     hasStaged = false;
 
@@ -162,16 +177,24 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
       driveSubsystem.grapherTrajectoryActive(true);
       timer.reset();
       // logger.info("Begin Trajectory: {}", trajectoryName);
-      desiredState = mirrorToProcessor(trajectory.sampleAt(timer.get(), mirrorTrajectory).get());
-      driveSubsystem.calculateController(desiredState);
+      desiredState =
+          mirrorToProcessor(
+              trajectory
+                  .sampleAt(timer.get(), mirrorTrajectory)
+                  .get()); // DurationMs: 4-20ms (if first call)
+      driveSubsystem.calculateController(desiredState); // DurationMs: 3ms
       if (resetOdometry) {
-        driveSubsystem.resetOdometry(initialPose);
+        driveSubsystem.resetOdometry(initialPose); // DurationMs: 2-5ms
       }
     }
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Auto/initializeTime", (RobotController.getFPGATime() - startTime));
+    org.littletonrobotics.junction.Logger.recordOutput("Auto/testTime", (testTime - testStartTime));
   }
 
   @Override
   public void execute() {
+    startTime = RobotController.getFPGATime();
     if (elevatorSubsystem.getState() == ElevatorStates.ZEROED
         && !hasStaged
         && timer.hasElapsed(AutonConstants.kInitPathPrestageTime)) {
@@ -201,6 +224,8 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     }
     org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorToProcessor", mirrorToProcessor);
     org.littletonrobotics.junction.Logger.recordOutput("Auto/mirrorTrajectory", mirrorTrajectory);
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Auto/executeTime", (RobotController.getFPGATime() - startTime));
   }
 
   private boolean shouldTransitionToServoing() {
@@ -209,12 +234,23 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
   @Override
   public boolean isFinished() {
+    startTime = RobotController.getFPGATime();
+
+    boolean retVal = true;
     if (!isTherePath) {
-      return true;
+      retVal = true;
+    } else {
+      retVal =
+          ((timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
+                  || tagAlignSubsystem.getState() == TagAlignStates.DONE && isServoing))
+              && elevatorSubsystem.isFinished();
     }
-    return ((timer.hasElapsed(trajectory.getTotalTime() + AutonConstants.kAutoTimeout)
-            || tagAlignSubsystem.getState() == TagAlignStates.DONE && isServoing))
-        && elevatorSubsystem.isFinished();
+
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Auto/isFinishedTime", (RobotController.getFPGATime() - startTime));
+
+    return retVal;
+
     // || (FastMath.sqrt(
     //             FastMath.pow(driveSubsystem.getPoseMeters().getX() - finalPose.getX(), 2)
     //                 + FastMath.pow(
@@ -226,6 +262,7 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
 
   @Override
   public void end(boolean interrupted) {
+    startTime = RobotController.getFPGATime();
     driveSubsystem.setEnableHolo(false);
     // driveSubsystem.recordAutoTrajectory(null);
 
@@ -242,5 +279,8 @@ public class DriveAutonServoCommand extends Command implements AutoCommandInterf
     driveSubsystem.grapherTrajectoryActive(false);
     // logger.info("End Trajectory {}: {}", trajectoryName, timer.get());
     driveSubsystem.setAutoDebugMsg("End " + trajectoryName);
+
+    org.littletonrobotics.junction.Logger.recordOutput(
+        "Auto/endTime", (RobotController.getFPGATime() - startTime));
   }
 }

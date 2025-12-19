@@ -25,6 +25,8 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
   private int zeroCounter = 0;
   private Timer loopTimer = new Timer();
   private long startTime = 0;
+  private long testStartTime = 0;
+  private long testTime = 0;
 
   public ElevatorSubsystem(ElevatorIO io) {
     loopTimer.start();
@@ -85,10 +87,15 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
         if (Math.abs(inputs.velocity) < ElevatorConstants.kZeroedThreshhold) {
           zeroCounter++;
           if (zeroCounter >= ElevatorConstants.kZeroCounter) {
-            io.zero();
+            testStartTime = RobotController.getFPGATime();
+            io.zero(); // DurationMs: 9ms
             zeroCounter = 0;
-            io.setCurrentLimitConfig(ElevatorConstants.getBothFXConfig().CurrentLimits);
-            io.setSoftLimitConfig(ElevatorConstants.getBothFXConfig().SoftwareLimitSwitch);
+            io.setCurrentLimitConfig(
+                ElevatorConstants.getBothFXConfig().CurrentLimits); // DurationMs: 2ms
+            testStartTime = RobotController.getFPGATime();
+            io.setSoftLimitConfig(
+                ElevatorConstants.getBothFXConfig().SoftwareLimitSwitch); // DurationMs: 8ms
+            testTime = RobotController.getFPGATime();
             currState = ElevatorStates.ZEROED;
             setPosition(Rotations.of(0));
           }
@@ -100,6 +107,7 @@ public class ElevatorSubsystem extends MeasurableSubsystem implements ClosedLoop
       case IDLE -> {}
     }
     Logger.recordOutput("Elevator/LoopTime", (RobotController.getFPGATime() - startTime));
+    Logger.recordOutput("Elevator/testTime", (testTime - testStartTime));
   }
 
   // Grapher
